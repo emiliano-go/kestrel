@@ -1,18 +1,25 @@
 #!/bin/bash
 
-# helios:summary=Reinstall all default HeliOS packages from the stable channel
+# helios:summary=Reinstall all default HeliOS packages from the Arch repositories and the AUR
 # helios:requires-sudo=true
 
 set -e
 
-# Reinstall all default HeliOS packages from the stable channel and downgrade any packages that are too new.
+# Reinstall all default HeliOS packages and downgrade any packages that are too new.
 
-# Set the package repository to the stable mirrors
+# Set the package repository to the Arch mirrors
 helios-refresh-pacman
 
-# Downgrade any packages to the stable setup
+# Downgrade any packages to the Arch setup
 helios-update-pacman -Suu --noconfirm
 
-# Ensure all packages are installed
+# Ensure all Arch packages are installed
 mapfile -t packages < <(grep -v '^#' "$HELIOS_PATH/install/helios-base.packages" | grep -v '^$')
 helios-update-pacman -Syu --noconfirm --needed "${packages[@]}"
+
+# Ensure the frozen AUR packages are installed (names only; versions are the
+# snapshot HeliOS was audited against and recorded in the file).
+mapfile -t aur_packages < <(grep -v '^#' "$HELIOS_PATH/install/helios-aur.packages" | grep -v '^$' | sed 's/=.*//')
+if (( ${#aur_packages[@]} )); then
+  helios-pkg-aur-add "${aur_packages[@]}"
+fi

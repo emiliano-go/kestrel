@@ -1,29 +1,18 @@
 #!/bin/bash
 
-# helios:summary=Print the active HeliOS mirror and package channel
+# helios:summary=Print the active package mirror
 
-if grep -q "https://stable-mirror.omarchy.org/" /etc/pacman.d/mirrorlist; then
-  mirror="stable"
+# HeliOS ships upstream Arch mirrors and no package channel of its own. Report
+# "arch" when the Arch mirror is configured, a legacy channel name if an older
+# omarchy-style mirror is still present, otherwise "custom".
+if grep -q "geo.mirror.pkgbuild.com" /etc/pacman.d/mirrorlist; then
+  echo "arch"
+elif grep -q "https://stable-mirror.omarchy.org/" /etc/pacman.d/mirrorlist; then
+  echo "stable"
 elif grep -q "https://rc-mirror.omarchy.org/" /etc/pacman.d/mirrorlist; then
-  mirror="rc"
+  echo "rc"
 elif grep -q "https://mirror.omarchy.org/" /etc/pacman.d/mirrorlist; then
-  mirror="edge"
+  echo "edge"
 else
-  mirror="unknown"
-fi
-
-if grep -q "https://pkgs.omarchy.org/stable/" /etc/pacman.conf; then
-  pkgs="stable"
-elif grep -q "https://pkgs.omarchy.org/rc/" /etc/pacman.conf; then
-  pkgs="rc"
-elif grep -q "https://pkgs.omarchy.org/edge/" /etc/pacman.conf; then
-  pkgs="edge"
-else
-  pkgs="unknown"
-fi
-
-if [[ $mirror == $pkgs ]]; then
-  echo $mirror
-else
-  echo "$mirror / $pkgs"
+  echo "custom"
 fi

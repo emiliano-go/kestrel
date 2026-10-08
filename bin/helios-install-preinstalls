@@ -10,8 +10,9 @@ if gum confirm "Are you sure you want to restore all preinstalled web apps, TUI 
   # that back claude, gh, opencode, and the rest of the agents
   helios-refresh-applications
 
-  # Mirrors the list in helios-remove-preinstalls; both track helios-base.packages
-  if ! helios-pkg-add \
+  # Mirrors the list in helios-remove-preinstalls; both track helios-base.packages.
+  # AUR-only apps are routed through the AUR by helios-pkg-add-any.
+  if ! helios-pkg-add-any \
     aether \
     cliamp \
     libreoffice-fresh \

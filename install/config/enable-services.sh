@@ -16,3 +16,13 @@ systemctl enable sddm.service
 # whole session down. [Install] pulls in systemd-oomd.socket via Also=, which
 # is what the user manager reports app.slice candidacy over.
 systemctl enable systemd-oomd.service
+systemctl enable systemd-timesyncd.service
+
+# Default optimizations: keep the SSD trimmed, watch disk health, refresh the
+# Arch mirror list, and scrub Btrfs where the root filesystem is Btrfs.
+systemctl enable fstrim.timer
+systemctl enable smartd.service
+systemctl enable reflector.timer
+if [[ $(findmnt -no FSTYPE /) == "btrfs" ]]; then
+  systemctl enable btrfs-scrub@-.timer
+fi

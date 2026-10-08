@@ -1,0 +1,32 @@
+# AUR packages installed with yay. Version on each line is the frozen
+# snapshot HeliOS was audited against; the ISO builder installs these via
+# yay and records the resolved version.
+# Format: <package>=<version>
+
+aether=4.32.0-1
+cliamp=2.3.0-1
+disktree-bin=0.10.0-1
+herdr=0.9.3-1
+hype=2.0.4-1
+hyprland-preview-share-picker-git=0.2.1.r6.g344394a-1
+intel-ipu7-camera-bin=r31.09ccd02-1
+lib32-nvidia-580xx-utils=580.178.04-1
+limine-mkinitcpio-hook=1.40.0-1
+limine-snapper-sync=1.32.1-1
+localsend=1.18.2-2
+macbook12-spi-driver-dkms=0+git.315-1
+mise-bin=2026.10.4-1
+nvidia-580xx-dkms=580.178.04-4
+nvidia-580xx-utils=580.178.04-4
+omasnap-bin=1.21.0-1
+omawrite=0.5.0-1
+owe=0.2.10-1
+qmk-hid=0.1.11-3
+ttf-ia-writer=20181225-1
+ttfx=0.5.0-1
+tuxedo-drivers-nocompatcheck-dkms=4.22.1-1
+tzupdate=3.1.0-1
+ufw-docker=251123-1
+vi=1:070224-9
+yaru-icon-theme=26.04.5.1ubuntu-1
+yay=13.0.1-1
