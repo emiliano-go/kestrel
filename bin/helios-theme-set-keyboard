@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# helios:summary=Apply the current theme keyboard color to supported keyboards
+# helios:hidden=true
+
+helios-theme-set-keyboard-asus-rog
+helios-theme-set-keyboard-f16

@@ -23,7 +23,7 @@ SH
 }
 
 run_orphan_checker() {
-  HOME="$test_home" PATH="$stub_bin:$ROOT/bin:$PATH" "$ROOT/bin/omarchy-update-orphan-pkgs" "$@"
+  HOME="$test_home" PATH="$stub_bin:$ROOT/bin:$PATH" "$ROOT/bin/helios-update-orphan-pkgs" "$@"
 }
 
 write_stub pacman 'if [[ $1 == "-Qtdq" ]]; then printf "old-lib\nunused-tool\n"; exit 0; fi; exit 1'
@@ -32,7 +32,7 @@ write_stub gum 'echo "gum should not be called" >&2; exit 99'
 
 run_orphan_checker >"$test_tmp/noninteractive.out" 2>"$test_tmp/noninteractive.err"
 grep -q '^  old-lib$' "$test_tmp/noninteractive.out" || fail "orphan checker lists orphan packages"
-grep -q 'Re-run omarchy-update-orphan-pkgs in a terminal' "$test_tmp/noninteractive.out" || fail "orphan checker does not remove packages non-interactively"
+grep -q 'Re-run helios-update-orphan-pkgs in a terminal' "$test_tmp/noninteractive.out" || fail "orphan checker does not remove packages non-interactively"
 pass "orphan checker only reports orphans non-interactively"
 
 export REMOVAL_LOG="$test_tmp/removal.log"
@@ -45,7 +45,7 @@ write_stub sudo '"$@"'
 run_orphan_checker -y >"$test_tmp/approved.out" 2>"$test_tmp/approved.err"
 diff <(printf '%s\n' -Rns --noconfirm old-lib unused-tool) "$REMOVAL_LOG" ||
   fail "approved cleanup removes the orphan packages without pacman confirmation"
-pass "approved cleanup removes orphans without Omarchy or pacman confirmation"
+pass "approved cleanup removes orphans without HeliOS or pacman confirmation"
 
 write_stub sudo 'exit 42'
 if run_orphan_checker -y >"$test_tmp/failure.out" 2>"$test_tmp/failure.err"; then

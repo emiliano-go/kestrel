@@ -4,7 +4,7 @@ set -euo pipefail
 
 source "$(dirname "$0")/base-test.sh"
 
-# Exercises migrations/1788256455.sh, which repairs an Omarchy-created
+# Exercises migrations/1788256455.sh, which repairs an HeliOS-created
 # /etc/pam.d/polkit-1 that lists pam_unix directly (dropping pam_faillock)
 # instead of including system-auth. The migration keeps its production path
 # fixed; as in sshd-hardening-migration-test.sh, this test rewrites that one
@@ -56,7 +56,7 @@ run_migration() {
 result() { cat "$test_dir/$1/polkit-1"; }
 
 # The four layouts the old setup / remove commands leave behind.
-fingerprint_stack='auth      [success=1 default=ignore] pam_exec.so quiet /usr/bin/omarchy-hw-laptop-closed
+fingerprint_stack='auth      [success=1 default=ignore] pam_exec.so quiet /usr/bin/helios-hw-laptop-closed
 auth      sufficient pam_fprintd.so
 auth      required pam_unix.so
 
@@ -71,7 +71,7 @@ account   required pam_unix.so
 password  required pam_unix.so
 session   required pam_unix.so
 '
-both_stack='auth      [success=1 default=ignore] pam_exec.so quiet /usr/bin/omarchy-hw-laptop-closed
+both_stack='auth      [success=1 default=ignore] pam_exec.so quiet /usr/bin/helios-hw-laptop-closed
 auth      sufficient pam_fprintd.so
 auth      sufficient pam_u2f.so cue authfile=/etc/fido2/fido2
 auth      required pam_unix.so
@@ -95,7 +95,7 @@ password  include system-auth
 session   include system-auth
 '
 # An administrator's own stack that happens to use pam_fprintd but carries an
-# extra directive Omarchy never writes.
+# extra directive HeliOS never writes.
 admin_stack='auth      sufficient pam_fprintd.so
 auth      required pam_unix.so
 auth      optional pam_permit.so
@@ -120,7 +120,7 @@ run_migration fingerprint "$fingerprint_stack"
 (( migrate_rc == 0 )) || fail "fingerprint stack migrates cleanly"
 assert_repaired fingerprint
 grep -qF 'pam_fprintd.so' <<<"$(result fingerprint)" || fail "fingerprint line is preserved"
-grep -qF 'omarchy-hw-laptop-closed' <<<"$(result fingerprint)" || fail "clamshell gate is preserved"
+grep -qF 'helios-hw-laptop-closed' <<<"$(result fingerprint)" || fail "clamshell gate is preserved"
 pass "migration repairs the fingerprint stack and keeps its hardware-auth lines"
 
 run_migration fido2 "$fido2_stack"
@@ -141,11 +141,11 @@ run_migration markerless "$markerless_stack"
 assert_repaired markerless
 pass "migration repairs the markerless post-removal stack"
 
-run_migration comment "# managed by omarchy
+run_migration comment "# managed by helios
 $fingerprint_stack"
 (( migrate_rc == 0 )) || fail "commented stack migrates cleanly"
 assert_repaired comment
-grep -qxF '# managed by omarchy' <<<"$(result comment)" || fail "comments are preserved through the rewrite"
+grep -qxF '# managed by helios' <<<"$(result comment)" || fail "comments are preserved through the rewrite"
 pass "migration repairs a commented stack and preserves the comment"
 
 run_migration commented-include "# auth include system-auth
@@ -162,10 +162,10 @@ pass "migration is idempotent: an already-fixed stack is untouched"
 run_migration admin "$admin_stack"
 [[ "$(result admin)" == "$(printf '%s' "$admin_stack")" ]] || fail "an administrator-authored stack is left unchanged"
 ! grep -q '^sudo ' "$test_dir/admin.calls" || fail "an administrator-authored stack triggers no privileged writes"
-pass "migration refuses a stack carrying non-Omarchy directives"
+pass "migration refuses a stack carrying non-HeliOS directives"
 
 # Privilege failure is the retryable case: the migration must exit non-zero so
-# omarchy-migrate does not record it complete, and must leave the file unchanged.
+# helios-migrate does not record it complete, and must leave the file unchanged.
 SUDO_ALLOWED=0 run_migration no-sudo "$fingerprint_stack"
 (( migrate_rc != 0 )) || fail "the migration stays pending when privileges are unavailable"
 [[ "$(result no-sudo)" == "$(printf '%s' "$fingerprint_stack")" ]] || fail "a failed repair leaves the original file intact"

@@ -13,7 +13,7 @@ export SYNC_TEST
 local_home="$SYNC_TEST/home"
 stub_bin="$SYNC_TEST/bin"
 remote_bin="$SYNC_TEST/remote-bin"
-mkdir -p "$local_home/.local/state/omarchy/current" "$stub_bin" "$remote_bin" "$SYNC_TEST/run"
+mkdir -p "$local_home/.local/state/helios/current" "$stub_bin" "$remote_bin" "$SYNC_TEST/run"
 
 # herdr lists one unreachable machine first, this machine, and a disabled one.
 cat >"$stub_bin/herdr" <<'EOF'
@@ -49,9 +49,9 @@ fi
 HOME="$remote" PATH="$SYNC_TEST/remote-bin:/usr/bin:/bin" bash -s
 EOF
 
-cat >"$remote_bin/omarchy" <<'EOF'
+cat >"$remote_bin/helios" <<'EOF'
 #!/bin/bash
-echo "$* from=$OMARCHY_THEME_SYNC_FROM session=$WAYLAND_DISPLAY" >>"$HOME/set.log"
+echo "$* from=$HELIOS_THEME_SYNC_FROM session=$WAYLAND_DISPLAY" >>"$HOME/set.log"
 EOF
 
 cat >"$remote_bin/hyprctl" <<'EOF'
@@ -65,21 +65,21 @@ reset_remotes() {
   rm -rf "$SYNC_TEST/remotes" "$SYNC_TEST/ssh-calls" "$SYNC_TEST/ssh-options"
   local machine
   for machine in alpha beta gamma local-box; do
-    mkdir -p "$SYNC_TEST/remotes/$machine/.local/state/omarchy/current"
-    echo "tokyo-night" >"$SYNC_TEST/remotes/$machine/.local/state/omarchy/current/theme.name"
-    mkdir -p "$SYNC_TEST/remotes/$machine/.local/state/omarchy/toggles"
-    touch "$SYNC_TEST/remotes/$machine/.local/state/omarchy/toggles/herdr-theme-sync"
+    mkdir -p "$SYNC_TEST/remotes/$machine/.local/state/helios/current"
+    echo "tokyo-night" >"$SYNC_TEST/remotes/$machine/.local/state/helios/current/theme.name"
+    mkdir -p "$SYNC_TEST/remotes/$machine/.local/state/helios/toggles"
+    touch "$SYNC_TEST/remotes/$machine/.local/state/helios/toggles/herdr-theme-sync"
   done
 }
 
-local_toggle="$local_home/.local/state/omarchy/toggles/herdr-theme-sync"
+local_toggle="$local_home/.local/state/helios/toggles/herdr-theme-sync"
 
 set_local_theme() {
-  echo "$1" >"$local_home/.local/state/omarchy/current/theme.name"
+  echo "$1" >"$local_home/.local/state/helios/current/theme.name"
 }
 
 run_sync() {
-  HOME="$local_home" XDG_RUNTIME_DIR="$SYNC_TEST/run" PATH="$stub_bin:$ROOT/bin:$PATH" omarchy-theme-set-herdr-machines "$@"
+  HOME="$local_home" XDG_RUNTIME_DIR="$SYNC_TEST/run" PATH="$stub_bin:$ROOT/bin:$PATH" helios-theme-set-herdr-machines "$@"
 }
 
 set_log() {
@@ -98,8 +98,8 @@ touch "$local_toggle"
 # Syncs every enabled machine except this one, skipping machines already on the theme.
 reset_remotes
 set_local_theme lumon
-echo "lumon" >"$SYNC_TEST/remotes/beta/.local/state/omarchy/current/theme.name"
-echo "lumon" >"$SYNC_TEST/remotes/local-box/.local/state/omarchy/current/theme.name"
+echo "lumon" >"$SYNC_TEST/remotes/beta/.local/state/helios/current/theme.name"
+echo "lumon" >"$SYNC_TEST/remotes/local-box/.local/state/helios/current/theme.name"
 output=$(run_sync)
 [[ $(set_log alpha) == "theme set lumon from=local-box session=wayland-1" ]] || fail "sets the theme inside the newest Hyprland session"
 pass "sets the theme inside the newest Hyprland session"
@@ -115,8 +115,8 @@ pass "logs an unreachable machine"
 # Keep reusable connections in a directory only this user can access.
 grep -qx 'ControlMaster=auto' "$SYNC_TEST/ssh-options" || fail "reuses authenticated SSH connections"
 grep -qx 'ControlPersist=600' "$SYNC_TEST/ssh-options" || fail "keeps connections for ten idle minutes"
-grep -qxF "ControlPath=$SYNC_TEST/run/omarchy-theme-sync/%C" "$SYNC_TEST/ssh-options" || fail "keeps separate control sockets for each SSH destination"
-[[ $(stat -c %a "$SYNC_TEST/run/omarchy-theme-sync") == "700" ]] || fail "control socket directory is private"
+grep -qxF "ControlPath=$SYNC_TEST/run/helios-theme-sync/%C" "$SYNC_TEST/ssh-options" || fail "keeps separate control sockets for each SSH destination"
+[[ $(stat -c %a "$SYNC_TEST/run/helios-theme-sync") == "700" ]] || fail "control socket directory is private"
 pass "reuses SSH connections for ten idle minutes in a private runtime directory"
 
 # Connects one machine at a time.
@@ -125,7 +125,7 @@ pass "connects to machines one at a time in order"
 
 # A machine with the toggle off refuses themes from other machines.
 reset_remotes
-rm "$SYNC_TEST/remotes/gamma/.local/state/omarchy/toggles/herdr-theme-sync"
+rm "$SYNC_TEST/remotes/gamma/.local/state/helios/toggles/herdr-theme-sync"
 output=$(run_sync)
 [[ -z $(set_log gamma) && $output == *"gamma: theme sync is off"* ]] || fail "a remote with theme sync off keeps its theme"
 pass "a remote with theme sync off keeps its theme"
@@ -140,7 +140,7 @@ touch "$local_toggle"
 
 # Turning sync off also stops a run that is still waiting for an earlier one to finish.
 reset_remotes
-exec 8>"$SYNC_TEST/run/omarchy-theme-set-herdr-machines.lock"
+exec 8>"$SYNC_TEST/run/helios-theme-set-herdr-machines.lock"
 flock 8
 run_sync >/dev/null &
 queued=$!
@@ -154,7 +154,7 @@ touch "$local_toggle"
 
 # A theme that arrived from another machine is never sent on.
 reset_remotes
-OMARCHY_THEME_SYNC_FROM=elsewhere run_sync >/dev/null
+HELIOS_THEME_SYNC_FROM=elsewhere run_sync >/dev/null
 [[ ! -e $SYNC_TEST/ssh-calls ]] || fail "a mirrored theme change is not mirrored again"
 pass "a mirrored theme change is not mirrored again"
 

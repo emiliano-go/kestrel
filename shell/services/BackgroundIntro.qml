@@ -11,7 +11,7 @@ Item {
 
   property var host: null
   property bool cover: true
-  readonly property bool sessionConsumed: String(sessionMarker.text() || "").trim() === (Quickshell.env("OMARCHY_SESSION_ID") || Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE"))
+  readonly property bool sessionConsumed: String(sessionMarker.text() || "").trim() === (Quickshell.env("HELIOS_SESSION_ID") || Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE"))
   property bool startupSettled: sessionConsumed
   property bool startupPending: !sessionConsumed
   property bool startupMediaReady: false
@@ -20,24 +20,24 @@ Item {
   property bool checked: false
   property string themeToken: ""
   property string transitionToken: ""
-  readonly property string startupBackgroundPath: Quickshell.env("OMARCHY_STARTUP_BACKGROUND")
+  readonly property string startupBackgroundPath: Quickshell.env("HELIOS_STARTUP_BACKGROUND")
   property string themeBackground: sessionConsumed && !Util.isVideoPath(startupBackgroundPath) ? startupBackgroundPath : ""
   property var themeNativeSize: null
   property string themeColors: ""
   property string themeShell: ""
   property real themeOpacity: 1
-  readonly property var backgroundService: host && host.services ? host.firstPartyServiceFor("omarchy.background") : null
+  readonly property var backgroundService: host && host.services ? host.firstPartyServiceFor("helios.background") : null
   readonly property bool backgroundActive: !!backgroundService && !backgroundService.suspended
   readonly property bool backgroundReady: backgroundActive && backgroundService.ready !== false
 
   function restoreStartupCursor() {
-    Quickshell.execDetached(["hyprctl", "eval", "if omarchy_startup_cursor_restore then omarchy_startup_cursor_restore() end"])
+    Quickshell.execDetached(["hyprctl", "eval", "if helios_startup_cursor_restore then helios_startup_cursor_restore() end"])
   }
 
   function finishStartup() {
     if (!cover || !startupSettled) return
     var registry = host ? host.pluginRegistry : null
-    var backgroundId = registry ? registry.resolveEnabledId("omarchy.background") : ""
+    var backgroundId = registry ? registry.resolveEnabledId("helios.background") : ""
     var disabled = registry && registry.installedPlugins[backgroundId] && !registry.isEnabled(backgroundId)
     if (!backgroundReady && !disabled) return
     cover = false
@@ -195,7 +195,7 @@ Item {
   // A shell restart shares this compositor session; a new login does not.
   FileView {
     id: sessionMarker
-    path: Quickshell.env("HOME") + "/.local/state/omarchy/background-intro.session-id"
+    path: Quickshell.env("HOME") + "/.local/state/helios/background-intro.session-id"
     blockLoading: true
     watchChanges: false
     printErrors: false
@@ -203,7 +203,7 @@ Item {
 
   Process {
     id: startupBackground
-    command: ["readlink", "-f", Quickshell.env("HOME") + "/.local/state/omarchy/current/background"]
+    command: ["readlink", "-f", Quickshell.env("HOME") + "/.local/state/helios/current/background"]
     stdout: StdioCollector { id: startupBackgroundOut }
     onExited: function(exitCode) {
       var path = String(startupBackgroundOut.text || "").trim()
@@ -247,7 +247,7 @@ Item {
       exclusionMode: ExclusionMode.Ignore
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-      WlrLayershell.namespace: "omarchy-background"
+      WlrLayershell.namespace: "helios-background"
 
       Rectangle {
         anchors.fill: parent
@@ -285,7 +285,7 @@ Item {
       exclusionMode: ExclusionMode.Ignore
       WlrLayershell.layer: WlrLayer.Bottom
       WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-      WlrLayershell.namespace: "omarchy-background"
+      WlrLayershell.namespace: "helios-background"
 
       Rectangle {
         anchors.fill: parent
@@ -321,7 +321,7 @@ Item {
 
   Process {
     id: introProc
-    command: ["omarchy-theme-bg-boot-intro"]
+    command: ["helios-theme-bg-boot-intro"]
     onExited: {
       root.startupSettled = true
       root.finishStartup()

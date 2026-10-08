@@ -23,11 +23,11 @@ touch "$wrapper_root/shell/shell.qml"
 cat >"$wrapper_bin/qs" <<'SH'
 #!/bin/bash
 
-[[ -n ${OMARCHY_TEST_QS_ARGS:-} ]] && printf '%s\n' "$*" >"$OMARCHY_TEST_QS_ARGS"
+[[ -n ${HELIOS_TEST_QS_ARGS:-} ]] && printf '%s\n' "$*" >"$HELIOS_TEST_QS_ARGS"
 
-if [[ ${OMARCHY_TEST_QS_HANG:-0} == 1 ]]; then
+if [[ ${HELIOS_TEST_QS_HANG:-0} == 1 ]]; then
   sleep 5
-elif [[ ${OMARCHY_TEST_QS_STARTING:-0} == 1 ]]; then
+elif [[ ${HELIOS_TEST_QS_STARTING:-0} == 1 ]]; then
   printf 'Not ready to accept queries yet.\n'
 else
   printf 'ok\n'
@@ -36,33 +36,33 @@ SH
 chmod +x "$wrapper_bin/qs"
 
 wrapper_error=$(PATH="$wrapper_bin:$PATH" \
-  OMARCHY_PATH="$wrapper_root" \
-  OMARCHY_SHELL_IPC_TIMEOUT=0.1s \
-  OMARCHY_TEST_QS_HANG=1 \
-  "$ROOT/bin/omarchy-shell" shell ping 2>&1) && fail "hung shell IPC returns a failure"
-[[ $wrapper_error == "omarchy-shell is not responding" ]] || fail "hung shell IPC reports that the shell is unresponsive" "$wrapper_error"
+  HELIOS_PATH="$wrapper_root" \
+  HELIOS_SHELL_IPC_TIMEOUT=0.1s \
+  HELIOS_TEST_QS_HANG=1 \
+  "$ROOT/bin/helios-shell" shell ping 2>&1) && fail "hung shell IPC returns a failure"
+[[ $wrapper_error == "helios-shell is not responding" ]] || fail "hung shell IPC reports that the shell is unresponsive" "$wrapper_error"
 pass "shell IPC calls time out when Quickshell is unresponsive"
 
 # A starting shell answers on stdout and exits 0, so a ping reads it as up.
 wrapper_error=$(PATH="$wrapper_bin:$PATH" \
-  OMARCHY_PATH="$wrapper_root" \
-  OMARCHY_TEST_QS_STARTING=1 \
-  "$ROOT/bin/omarchy-shell" shell ping 2>&1) && fail "a starting shell answers IPC calls with a failure"
-[[ $wrapper_error == "omarchy-shell is not ready" ]] || fail "a starting shell reports that it is not ready" "$wrapper_error"
+  HELIOS_PATH="$wrapper_root" \
+  HELIOS_TEST_QS_STARTING=1 \
+  "$ROOT/bin/helios-shell" shell ping 2>&1) && fail "a starting shell answers IPC calls with a failure"
+[[ $wrapper_error == "helios-shell is not ready" ]] || fail "a starting shell reports that it is not ready" "$wrapper_error"
 pass "shell IPC calls fail while Quickshell is still starting"
 
 PATH="$wrapper_bin:$PATH" \
-OMARCHY_PATH="$wrapper_root" \
-OMARCHY_TEST_QS_STARTING=1 \
-  "$ROOT/bin/omarchy-shell" -q shell ping >/dev/null 2>&1 ||
+HELIOS_PATH="$wrapper_root" \
+HELIOS_TEST_QS_STARTING=1 \
+  "$ROOT/bin/helios-shell" -q shell ping >/dev/null 2>&1 ||
   fail "quiet best-effort IPC calls tolerate a starting shell"
 pass "quiet best-effort IPC calls tolerate a starting shell"
 
 wrapper_args="$test_tmp/wrapper-args"
 PATH="$wrapper_bin:$PATH" \
-OMARCHY_PATH="$wrapper_root" \
-OMARCHY_TEST_QS_ARGS="$wrapper_args" \
-  "$ROOT/bin/omarchy-shell" shell ping >/dev/null
+HELIOS_PATH="$wrapper_root" \
+HELIOS_TEST_QS_ARGS="$wrapper_args" \
+  "$ROOT/bin/helios-shell" shell ping >/dev/null
 
 grep -F -- 'ipc -n -p' "$wrapper_args" >/dev/null || fail "shell IPC targets the newest live Quickshell instance"
 pass "shell IPC targets the newest live Quickshell instance"
@@ -77,28 +77,28 @@ ipc_log="$test_tmp/ipc.log"
 runtime_dir="$test_tmp/runtime"
 mkdir -p "$restart_root/shell" "$restart_bin" "$runtime_dir"
 touch "$restart_root/shell/shell.qml"
-ln -s "$ROOT/bin/omarchy-shell" "$restart_bin/omarchy-shell"
-ln -s "$ROOT/bin/omarchy-launch-shell" "$restart_bin/omarchy-launch-shell"
-ln -s "$ROOT/bin/omarchy-cmd-missing" "$restart_bin/omarchy-cmd-missing"
-ln -s "$ROOT/bin/omarchy-hyprland-session-locked" "$restart_bin/omarchy-hyprland-session-locked"
+ln -s "$ROOT/bin/helios-shell" "$restart_bin/helios-shell"
+ln -s "$ROOT/bin/helios-launch-shell" "$restart_bin/helios-launch-shell"
+ln -s "$ROOT/bin/helios-cmd-missing" "$restart_bin/helios-cmd-missing"
+ln -s "$ROOT/bin/helios-hyprland-session-locked" "$restart_bin/helios-hyprland-session-locked"
 
 cat >"$restart_bin/qs" <<'SH'
 #!/bin/bash
 
-printf '%s\n' "$*" >>"$OMARCHY_TEST_IPC_LOG"
+printf '%s\n' "$*" >>"$HELIOS_TEST_IPC_LOG"
 
 case "$*" in
   *'shell ping')
-    [[ $* == *"-p $OMARCHY_TEST_SESSION_PATH/shell"* ]] &&
-      grep -Fx '303' "$OMARCHY_TEST_QS_STATE" >/dev/null &&
+    [[ $* == *"-p $HELIOS_TEST_SESSION_PATH/shell"* ]] &&
+      grep -Fx '303' "$HELIOS_TEST_QS_STATE" >/dev/null &&
       printf 'ok\n'
     ;;
   *'lock lock')
-    touch "$OMARCHY_TEST_QS_STATE.locked"
+    touch "$HELIOS_TEST_QS_STATE.locked"
     printf 'ok\n'
     ;;
   *'lock status')
-    if [[ -f $OMARCHY_TEST_QS_STATE.locked ]]; then
+    if [[ -f $HELIOS_TEST_QS_STATE.locked ]]; then
       printf '{"secure": true, "requested": true}\n'
     else
       printf '{"secure": false, "requested": false}\n'
@@ -110,20 +110,20 @@ SH
 cat >"$restart_bin/quickshell" <<'SH'
 #!/bin/bash
 
-printf '%s\n' "$*" >>"$OMARCHY_TEST_QS_LOG"
+printf '%s\n' "$*" >>"$HELIOS_TEST_QS_LOG"
 
 case " $* " in
   *' kill -p '*)
-    pid=$(head -n 1 "$OMARCHY_TEST_QS_STATE")
+    pid=$(head -n 1 "$HELIOS_TEST_QS_STATE")
     [[ $pid =~ ^[0-9]+$ ]] || exit 1
     kill "$pid" 2>/dev/null
     while kill -0 "$pid" 2>/dev/null; do sleep 0.01; done
-    awk 'NR > 1' "$OMARCHY_TEST_QS_STATE" >"$OMARCHY_TEST_QS_STATE.next"
-    mv "$OMARCHY_TEST_QS_STATE.next" "$OMARCHY_TEST_QS_STATE"
+    awk 'NR > 1' "$HELIOS_TEST_QS_STATE" >"$HELIOS_TEST_QS_STATE.next"
+    mv "$HELIOS_TEST_QS_STATE.next" "$HELIOS_TEST_QS_STATE"
     ;;
   *' -n -p '*)
-    printf '%s\n' "${OMARCHY_TEST_TRANSIENT_ENV-unset}" >"$OMARCHY_TEST_QS_ENV_LOG"
-    printf '303\n' >"$OMARCHY_TEST_QS_STATE"
+    printf '%s\n' "${HELIOS_TEST_TRANSIENT_ENV-unset}" >"$HELIOS_TEST_QS_ENV_LOG"
+    printf '303\n' >"$HELIOS_TEST_QS_STATE"
     ;;
 esac
 SH
@@ -134,15 +134,15 @@ cat >"$restart_bin/hyprctl" <<'SH'
 if [[ ${1:-} == "-j" && ${2:-} == "monitors" ]]; then
   # Hyprland reports an active session lock as a reason the monitor cannot hand
   # a client the whole screen, not as a workspace.
-  if [[ ${OMARCHY_TEST_SESSION_LOCKED:-0} == 1 ]]; then
+  if [[ ${HELIOS_TEST_SESSION_LOCKED:-0} == 1 ]]; then
     printf '[{"name":"eDP-1","solitaryBlockedBy":["WINDOWED","LOCK","CANDIDATE"]}]\n'
   else
     printf '[{"name":"eDP-1","solitaryBlockedBy":["WINDOWED","CANDIDATE"]}]\n'
   fi
 elif [[ ${1:-} == "dispatch" && ${2:-} == hl.dsp.exec_cmd* ]]; then
-  printf '%s\n' "${2:-}" >>"$OMARCHY_TEST_DISPATCH_LOG"
-  OMARCHY_PATH="$OMARCHY_TEST_SESSION_PATH" \
-    env -u OMARCHY_TEST_TRANSIENT_ENV omarchy-launch-shell
+  printf '%s\n' "${2:-}" >>"$HELIOS_TEST_DISPATCH_LOG"
+  HELIOS_PATH="$HELIOS_TEST_SESSION_PATH" \
+    env -u HELIOS_TEST_TRANSIENT_ENV helios-launch-shell
   printf 'ok\n'
 elif [[ ${1:-} == "dispatch" ]]; then
   exit 1
@@ -164,7 +164,7 @@ cat >"$restart_bin/systemctl" <<'SH'
 #!/bin/bash
 
 if [[ ${1:-} == "--user" && ${2:-} == "show-environment" ]]; then
-  printf 'OMARCHY_PATH=%s\n' "$OMARCHY_TEST_SESSION_PATH"
+  printf 'HELIOS_PATH=%s\n' "$HELIOS_TEST_SESSION_PATH"
 elif [[ ${1:-} == "--user" && ${2:-} == "try-restart" ]]; then
   exit 0
 else
@@ -174,16 +174,16 @@ SH
 
 cat >"$restart_bin/busctl" <<'SH'
 #!/bin/bash
-if [[ -z ${OMARCHY_TEST_NOTIFICATION_CHECKS:-} ]]; then
+if [[ -z ${HELIOS_TEST_NOTIFICATION_CHECKS:-} ]]; then
   echo 'b false'
 else
   checks=0
-  [[ ! -f $OMARCHY_TEST_NOTIFICATION_CHECKS ]] || read -r checks <"$OMARCHY_TEST_NOTIFICATION_CHECKS"
+  [[ ! -f $HELIOS_TEST_NOTIFICATION_CHECKS ]] || read -r checks <"$HELIOS_TEST_NOTIFICATION_CHECKS"
   (( checks += 1 ))
-  printf '%s\n' "$checks" >"$OMARCHY_TEST_NOTIFICATION_CHECKS"
+  printf '%s\n' "$checks" >"$HELIOS_TEST_NOTIFICATION_CHECKS"
   # The service was running before the restart and, when asked to, never
   # comes back afterwards.
-  if [[ ${OMARCHY_TEST_NOTIFICATIONS_DIE:-0} == 1 ]]; then
+  if [[ ${HELIOS_TEST_NOTIFICATIONS_DIE:-0} == 1 ]]; then
     (( checks == 1 )) && echo 'b true' || echo 'b false'
     exit 0
   fi
@@ -208,17 +208,17 @@ mkdir -p "$caller_root/shell"
 touch "$caller_root/shell/shell.qml"
 
 PATH="$restart_bin:$PATH" \
-OMARCHY_PATH="$caller_root" \
+HELIOS_PATH="$caller_root" \
 XDG_RUNTIME_DIR="$runtime_dir" \
-OMARCHY_TEST_QS_STATE="$restart_state" \
-OMARCHY_TEST_QS_LOG="$restart_log" \
-OMARCHY_TEST_QS_ENV_LOG="$restart_env_log" \
-OMARCHY_TEST_DISPATCH_LOG="$dispatch_log" \
-OMARCHY_TEST_IPC_LOG="$ipc_log" \
-OMARCHY_TEST_SESSION_PATH="$restart_root" \
-OMARCHY_TEST_TRANSIENT_ENV=leaked \
-OMARCHY_TEST_NOTIFICATION_CHECKS="$test_tmp/notification-checks" \
-  timeout 5 "$ROOT/bin/omarchy-restart-shell"
+HELIOS_TEST_QS_STATE="$restart_state" \
+HELIOS_TEST_QS_LOG="$restart_log" \
+HELIOS_TEST_QS_ENV_LOG="$restart_env_log" \
+HELIOS_TEST_DISPATCH_LOG="$dispatch_log" \
+HELIOS_TEST_IPC_LOG="$ipc_log" \
+HELIOS_TEST_SESSION_PATH="$restart_root" \
+HELIOS_TEST_TRANSIENT_ENV=leaked \
+HELIOS_TEST_NOTIFICATION_CHECKS="$test_tmp/notification-checks" \
+  timeout 5 "$ROOT/bin/helios-restart-shell"
 
 if kill -0 "$restart_pid_one" 2>/dev/null; then
   fail "restart stops the first matching shell instance"
@@ -234,7 +234,7 @@ restart_pid_two=""
 [[ $(grep -c '^-n -p ' "$restart_log") == 1 ]] || fail "restart launches one fresh shell process"
 grep -F "kill -p $restart_root/shell --any-display" "$restart_log" >/dev/null || fail "restart stops the shell from the session checkout"
 [[ $(<"$restart_env_log") == "unset" ]] || fail "restart uses the Hyprland session environment for the fresh shell"
-grep -F 'hl.dsp.exec_cmd("omarchy-launch-shell")' "$dispatch_log" >/dev/null || fail "restart launches the fresh shell through Hyprland"
+grep -F 'hl.dsp.exec_cmd("helios-launch-shell")' "$dispatch_log" >/dev/null || fail "restart launches the fresh shell through Hyprland"
 grep -F "ipc -n -p $restart_root/shell call -- shell ping" "$ipc_log" >/dev/null || fail "restart checks readiness in the session checkout"
 pass "restart replaces duplicate shell instances from the session checkout"
 [[ $(<"$test_tmp/notification-checks") == 4 ]] || fail "restart waits for the existing notification service after core IPC is ready"
@@ -245,17 +245,17 @@ printf '303\n' >"$restart_state"
 touch "$restart_state.locked"
 
 locked_error=$(PATH="$restart_bin:$PATH" \
-  OMARCHY_PATH="$restart_root" \
+  HELIOS_PATH="$restart_root" \
   XDG_RUNTIME_DIR="$runtime_dir" \
-  OMARCHY_TEST_SESSION_LOCKED=1 \
-  OMARCHY_TEST_QS_STATE="$restart_state" \
-  OMARCHY_TEST_QS_LOG="$restart_log" \
-  OMARCHY_TEST_DISPATCH_LOG="$dispatch_log" \
-  OMARCHY_TEST_IPC_LOG="$ipc_log" \
-  OMARCHY_TEST_SESSION_PATH="$restart_root" \
-  "$ROOT/bin/omarchy-restart-shell" 2>&1) && fail "restart refuses while the shell lock is active"
+  HELIOS_TEST_SESSION_LOCKED=1 \
+  HELIOS_TEST_QS_STATE="$restart_state" \
+  HELIOS_TEST_QS_LOG="$restart_log" \
+  HELIOS_TEST_DISPATCH_LOG="$dispatch_log" \
+  HELIOS_TEST_IPC_LOG="$ipc_log" \
+  HELIOS_TEST_SESSION_PATH="$restart_root" \
+  "$ROOT/bin/helios-restart-shell" 2>&1) && fail "restart refuses while the shell lock is active"
 
-[[ $locked_error == "Refusing to restart Omarchy shell while the session is locked." ]] || fail "locked restart explains why it was refused" "$locked_error"
+[[ $locked_error == "Refusing to restart HeliOS shell while the session is locked." ]] || fail "locked restart explains why it was refused" "$locked_error"
 [[ $(<"$restart_state") == 303 ]] || fail "locked restart preserves the running shell"
 [[ ! -s $restart_log ]] || fail "locked restart does not stop or launch Quickshell"
 pass "restart preserves the shell while its lock is active"
@@ -271,16 +271,16 @@ rm -f "$restart_state.locked"
 : >"$ipc_log"
 
 PATH="$restart_bin:$PATH" \
-OMARCHY_PATH="$restart_root" \
+HELIOS_PATH="$restart_root" \
 XDG_RUNTIME_DIR="$runtime_dir" \
-OMARCHY_TEST_SESSION_LOCKED=1 \
-OMARCHY_TEST_QS_STATE="$restart_state" \
-OMARCHY_TEST_QS_LOG="$restart_log" \
-OMARCHY_TEST_QS_ENV_LOG="$restart_env_log" \
-OMARCHY_TEST_DISPATCH_LOG="$dispatch_log" \
-OMARCHY_TEST_IPC_LOG="$ipc_log" \
-OMARCHY_TEST_SESSION_PATH="$restart_root" \
-  timeout 5 "$ROOT/bin/omarchy-restart-shell" || fail "locked restart recovers when the lock client is dead"
+HELIOS_TEST_SESSION_LOCKED=1 \
+HELIOS_TEST_QS_STATE="$restart_state" \
+HELIOS_TEST_QS_LOG="$restart_log" \
+HELIOS_TEST_QS_ENV_LOG="$restart_env_log" \
+HELIOS_TEST_DISPATCH_LOG="$dispatch_log" \
+HELIOS_TEST_IPC_LOG="$ipc_log" \
+HELIOS_TEST_SESSION_PATH="$restart_root" \
+  timeout 5 "$ROOT/bin/helios-restart-shell" || fail "locked restart recovers when the lock client is dead"
 
 if kill -0 "$restart_pid_one" 2>/dev/null; then
   fail "dead-lock recovery stops the stale shell instance"
@@ -303,18 +303,18 @@ rm -f "$restart_state.locked" "$test_tmp/notification-checks"
 : >"$ipc_log"
 
 if PATH="$restart_bin:$PATH" \
-  OMARCHY_PATH="$restart_root" \
+  HELIOS_PATH="$restart_root" \
   XDG_RUNTIME_DIR="$runtime_dir" \
-  OMARCHY_TEST_SESSION_LOCKED=1 \
-  OMARCHY_TEST_QS_STATE="$restart_state" \
-  OMARCHY_TEST_QS_LOG="$restart_log" \
-  OMARCHY_TEST_QS_ENV_LOG="$restart_env_log" \
-  OMARCHY_TEST_DISPATCH_LOG="$dispatch_log" \
-  OMARCHY_TEST_IPC_LOG="$ipc_log" \
-  OMARCHY_TEST_SESSION_PATH="$restart_root" \
-  OMARCHY_TEST_NOTIFICATION_CHECKS="$test_tmp/notification-checks" \
-  OMARCHY_TEST_NOTIFICATIONS_DIE=1 \
-  timeout 10 "$ROOT/bin/omarchy-restart-shell" >"$test_tmp/dead-notifications.out" 2>&1; then
+  HELIOS_TEST_SESSION_LOCKED=1 \
+  HELIOS_TEST_QS_STATE="$restart_state" \
+  HELIOS_TEST_QS_LOG="$restart_log" \
+  HELIOS_TEST_QS_ENV_LOG="$restart_env_log" \
+  HELIOS_TEST_DISPATCH_LOG="$dispatch_log" \
+  HELIOS_TEST_IPC_LOG="$ipc_log" \
+  HELIOS_TEST_SESSION_PATH="$restart_root" \
+  HELIOS_TEST_NOTIFICATION_CHECKS="$test_tmp/notification-checks" \
+  HELIOS_TEST_NOTIFICATIONS_DIE=1 \
+  timeout 10 "$ROOT/bin/helios-restart-shell" >"$test_tmp/dead-notifications.out" 2>&1; then
   fail "a restart whose notification service never returns must not report success"
 fi
 wait "$restart_pid_one" 2>/dev/null || true

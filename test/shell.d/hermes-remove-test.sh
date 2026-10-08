@@ -12,16 +12,16 @@ test_home="$test_tmp/home"
 mkdir -p "$mock_bin"
 
 # Keep package-path checks scoped to the fixture, even with a live app open.
-python3 - "$ROOT/bin/omarchy-remove-ai-hermes" "$test_tmp" <<'PY'
+python3 - "$ROOT/bin/helios-remove-ai-hermes" "$test_tmp" <<'PY'
 from pathlib import Path
 import sys
 source, scratch = map(Path, sys.argv[1:])
 (scratch / 'remover').write_text(source.read_text().replace('/opt/hermes-desktop', str(scratch / 'package')))
 PY
 
-cat >"$mock_bin/omarchy-pkg-drop" <<'SH'
+cat >"$mock_bin/helios-pkg-drop" <<'SH'
 #!/bin/bash
-printf '%s\0' "$@" >>"$OMARCHY_TEST_DROP_LOG"
+printf '%s\0' "$@" >>"$HELIOS_TEST_DROP_LOG"
 SH
 
 # The remover asks through gum whether the user's data should go too. The stub
@@ -30,28 +30,28 @@ SH
 # very data loss the default-no exists to prevent.
 cat >"$mock_bin/gum" <<'SH'
 #!/bin/bash
-printf '%s\0' "$@" >>"$OMARCHY_TEST_GUM_LOG"
-if [[ -n ${OMARCHY_TEST_PROMPT_GATE:-} ]]; then
-  touch "$OMARCHY_TEST_PROMPT_GATE.started"
+printf '%s\0' "$@" >>"$HELIOS_TEST_GUM_LOG"
+if [[ -n ${HELIOS_TEST_PROMPT_GATE:-} ]]; then
+  touch "$HELIOS_TEST_PROMPT_GATE.started"
   for (( attempt=0; attempt<500; attempt++ )); do
-    [[ ! -e $OMARCHY_TEST_PROMPT_GATE.continue ]] || exit 0
+    [[ ! -e $HELIOS_TEST_PROMPT_GATE.continue ]] || exit 0
     sleep 0.01
   done
   exit 1
 fi
-exit "${OMARCHY_TEST_GUM_STATUS:-1}"
+exit "${HELIOS_TEST_GUM_STATUS:-1}"
 SH
 # A unit that will not stop, when a test says so: disable fails and is-active
 # keeps answering active.
 cat >"$mock_bin/systemctl" <<'SH'
 #!/bin/bash
-echo "systemctl $*" >>"$OMARCHY_TEST_SYSTEMCTL_LOG"
-if [[ ${OMARCHY_TEST_UNIT_STUCK:-0} == 1 ]]; then
+echo "systemctl $*" >>"$HELIOS_TEST_SYSTEMCTL_LOG"
+if [[ ${HELIOS_TEST_UNIT_STUCK:-0} == 1 ]]; then
   [[ $2 == "disable" ]] && exit 1
   [[ $2 == "is-active" ]] && echo active
 fi
 # A user manager that refuses the disable of a unit that is already down.
-if [[ ${OMARCHY_TEST_UNIT_DOWN:-0} == 1 ]]; then
+if [[ ${HELIOS_TEST_UNIT_DOWN:-0} == 1 ]]; then
   [[ $2 == "disable" ]] && exit 1
   [[ $2 == "is-active" ]] && echo inactive
 fi
@@ -82,9 +82,9 @@ seed_install() {
 remove() {
   : >"$test_tmp/gum-log"
   : >"$test_tmp/systemctl-log"
-  OMARCHY_TEST_DROP_LOG="$test_tmp/drop-log" \
-    OMARCHY_TEST_SYSTEMCTL_LOG="$test_tmp/systemctl-log" \
-    OMARCHY_TEST_GUM_LOG="$test_tmp/gum-log" \
+  HELIOS_TEST_DROP_LOG="$test_tmp/drop-log" \
+    HELIOS_TEST_SYSTEMCTL_LOG="$test_tmp/systemctl-log" \
+    HELIOS_TEST_GUM_LOG="$test_tmp/gum-log" \
     HOME="$test_home" XDG_CONFIG_HOME= PATH="$mock_bin:$PATH" \
     bash "$test_tmp/remover" </dev/null >"$test_tmp/output" 2>&1
 }
@@ -94,10 +94,10 @@ remove() {
 remove_tty() {
   : >"$test_tmp/gum-log"
   : >"$test_tmp/systemctl-log"
-  OMARCHY_TEST_DROP_LOG="$test_tmp/drop-log" \
-    OMARCHY_TEST_SYSTEMCTL_LOG="$test_tmp/systemctl-log" \
-    OMARCHY_TEST_GUM_LOG="$test_tmp/gum-log" \
-    OMARCHY_TEST_GUM_STATUS="${OMARCHY_TEST_GUM_STATUS:-1}" \
+  HELIOS_TEST_DROP_LOG="$test_tmp/drop-log" \
+    HELIOS_TEST_SYSTEMCTL_LOG="$test_tmp/systemctl-log" \
+    HELIOS_TEST_GUM_LOG="$test_tmp/gum-log" \
+    HELIOS_TEST_GUM_STATUS="${HELIOS_TEST_GUM_STATUS:-1}" \
     HOME="$test_home" XDG_CONFIG_HOME= PATH="$mock_bin:$PATH" \
     script -qec "bash '$test_tmp/remover'" /dev/null >"$test_tmp/output" 2>&1
 }
@@ -112,7 +112,7 @@ remove || fail "remove succeeds"
 [[ ! -d $test_home/.hermes/node ]] || fail "the node the app installed is removed"
 pass "removal takes the whole runtime the app installed"
 
-grep -Fxq 'systemctl --user stop omarchy-hermes-theme.service' "$test_tmp/systemctl-log" ||
+grep -Fxq 'systemctl --user stop helios-hermes-theme.service' "$test_tmp/systemctl-log" ||
   fail "the unit the installer left waiting to hand over the theme is stopped" "$(cat "$test_tmp/systemctl-log")"
 pass "removal stops the installer's theme hand-over"
 
@@ -196,7 +196,7 @@ pass "removal asks on a terminal and declining keeps the data"
 
 # An explicit yes is the one path that takes the data too.
 seed_install
-OMARCHY_TEST_GUM_STATUS=0 remove_tty || fail "remove succeeds when the data goes too"
+HELIOS_TEST_GUM_STATUS=0 remove_tty || fail "remove succeeds when the data goes too"
 [[ ! -e $test_home/.hermes && ! -e $test_home/.config/Hermes ]] ||
   fail "a yes deletes ~/.hermes and ~/.config/Hermes"
 pass "removal deletes the user's data only on an explicit yes"
@@ -217,7 +217,7 @@ pass "removal asks without the marker and declining keeps everything"
 # unowned runtime and all -- that is what was asked and answered.
 seed_install
 rm -f "$test_home/.hermes/hermes-agent/.hermes-bootstrap-complete"
-OMARCHY_TEST_GUM_STATUS=0 remove_tty ||
+HELIOS_TEST_GUM_STATUS=0 remove_tty ||
   fail "remove succeeds when the data goes too without the marker"
 [[ ! -e $test_home/.hermes && ! -e $test_home/.config/Hermes ]] ||
   fail "a yes takes ~/.hermes whole when the marker never appeared"
@@ -251,7 +251,7 @@ pass "removal stops the gateway unit and takes it with the runtime, leaving unit
 seed_install
 mkdir -p "$unit_dir"
 printf '[Service]\nExecStart=%s/.hermes/hermes-agent/venv/bin/python %s/.hermes/hermes-agent/hermes gateway run\n' "$test_home" "$test_home" >"$unit_dir/hermes-gateway.service"
-OMARCHY_TEST_UNIT_DOWN=1 remove || fail "remove succeeds when disable fails on a unit that is already inactive" "$(cat "$test_tmp/output")"
+HELIOS_TEST_UNIT_DOWN=1 remove || fail "remove succeeds when disable fails on a unit that is already inactive" "$(cat "$test_tmp/output")"
 [[ ! -e $unit_dir/hermes-gateway.service && ! -d $test_home/.hermes/hermes-agent ]] || fail "an inactive unit whose disable failed still goes with the runtime"
 pass "a unit already down goes even when systemd refuses the disable"
 
@@ -261,7 +261,7 @@ seed_install
 mkdir -p "$unit_dir"
 printf '[Service]\nExecStart=%s/.hermes/hermes-agent/venv/bin/python %s/.hermes/hermes-agent/hermes gateway run\n' "$test_home" "$test_home" >"$unit_dir/hermes-gateway.service"
 : >"$test_tmp/drop-log"
-OMARCHY_TEST_UNIT_STUCK=1 remove && fail "a gateway that will not stop aborts the removal"
+HELIOS_TEST_UNIT_STUCK=1 remove && fail "a gateway that will not stop aborts the removal"
 grep -q 'Could not stop hermes-gateway.service' "$test_tmp/output" || fail "a gateway that will not stop is named" "$(cat "$test_tmp/output")"
 [[ ! -s $test_tmp/drop-log ]] || fail "the package is not dropped under a gateway that will not stop"
 [[ -d $test_home/.hermes/hermes-agent && -f $unit_dir/hermes-gateway.service ]] || fail "nothing is removed under a gateway that will not stop"
@@ -296,11 +296,11 @@ def setup(name):
     (runtime / '.hermes-bootstrap-complete').touch()
     (home / '.config/Hermes').mkdir(parents=True)
     env = {**os.environ, 'HOME': str(home), 'XDG_CONFIG_HOME': '', 'PATH': f"{scratch / 'bin'}:/usr/bin:/bin",
-           'OMARCHY_TEST_GUM_STATUS': '0'}
+           'HELIOS_TEST_GUM_STATUS': '0'}
     for key in ('DROP', 'SYSTEMCTL', 'GUM'):
         log = home / (key + '.log')
         log.touch()
-        env['OMARCHY_TEST_' + key + '_LOG'] = str(log)
+        env['HELIOS_TEST_' + key + '_LOG'] = str(log)
     return home, runtime, env
 
 def writer(db):
@@ -482,7 +482,7 @@ print('ok - unrelated database holders are left alone')
 
 home, runtime, env = setup('prompt-race')
 gate = home / 'prompt'
-env['OMARCHY_TEST_PROMPT_GATE'] = str(gate)
+env['HELIOS_TEST_PROMPT_GATE'] = str(gate)
 master, slave = pty.openpty()
 remover = subprocess.Popen(['bash', str(scratch / 'remover')], env=env, stdin=slave,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)

@@ -8,7 +8,7 @@ require_command gcc
 require_command setpriv
 require_command unshare
 
-if [[ ${OMARCHY_REMOVE_DEV_ENV_SECURITY_NS:-0} != "1" ]]; then
+if [[ ${HELIOS_REMOVE_DEV_ENV_SECURITY_NS:-0} != "1" ]]; then
   outer_uid=$(id -u)
   outer_gid=$(id -g)
   outer_user=$(id -un)
@@ -30,7 +30,7 @@ if [[ ${OMARCHY_REMOVE_DEV_ENV_SECURITY_NS:-0} != "1" ]]; then
 
   # Probe only the prerequisites; failures from the actual test must propagate.
   if unshare "${namespace_args[@]}" /usr/bin/true; then
-    exec unshare "${namespace_args[@]}" env OMARCHY_REMOVE_DEV_ENV_SECURITY_NS=1 bash "$0"
+    exec unshare "${namespace_args[@]}" env HELIOS_REMOVE_DEV_ENV_SECURITY_NS=1 bash "$0"
   else
     pass "user/mount namespace setup unavailable; skipping OCaml sudo namespace proof"
     exit 0
@@ -40,8 +40,8 @@ fi
 (( EUID == 0 )) || fail "OCaml sudo proof did not enter its root namespace"
 
 # Keep the synthetic user's paths traversable even when TMPDIR is private.
-test_tmp=$(mktemp -d /tmp/omarchy-remove-dev-env-security.XXXXXX)
-test_helper=$test_tmp/omarchy-remove-dev-env
+test_tmp=$(mktemp -d /tmp/helios-remove-dev-env-security.XXXXXX)
+test_helper=$test_tmp/helios-remove-dev-env
 test_home=$test_tmp/home
 stub_bin=$test_home/bin
 event_log=$test_tmp/events
@@ -71,7 +71,7 @@ cleanup() {
 trap cleanup EXIT
 
 mount -t tmpfs -o mode=0755,suid tmpfs "$test_tmp"
-install -m 0755 "$ROOT/bin/omarchy-remove-dev-env" "$test_helper"
+install -m 0755 "$ROOT/bin/helios-remove-dev-env" "$test_helper"
 mkdir -p "$stub_bin"
 touch "$event_log"
 

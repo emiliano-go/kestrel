@@ -3,7 +3,7 @@
 # The fingerprint setup installs libfprint-git in place of stock libfprint. The
 # two conflict, so the swap has to happen inside one --ask 4 transaction, and a
 # rerun with everything installed must not touch pacman at all. The real
-# omarchy-pkg-missing runs; pacman and the privileged calls are stubbed.
+# helios-pkg-missing runs; pacman and the privileged calls are stubbed.
 
 set -euo pipefail
 
@@ -15,7 +15,7 @@ mkdir -p "$scratch/bin"
 export CALL_LOG="$scratch/calls"
 export PATH="$scratch/bin:$ROOT/bin:$PATH"
 
-cat > "$scratch/bin/omarchy-hw-fingerprint" <<'STUB'
+cat > "$scratch/bin/helios-hw-fingerprint" <<'STUB'
 #!/bin/bash
 exit "${HARDWARE_STATUS:-0}"
 STUB
@@ -60,23 +60,23 @@ exit "${VERIFY_STATUS:-1}"
 STUB
 chmod +x "$scratch/bin/"*
 
-cat > "$scratch/bin/omarchy-apply-lock" <<'STUB'
+cat > "$scratch/bin/helios-apply-lock" <<'STUB'
 #!/bin/bash
 echo apply-lock >> "$CALL_LOG"
 if [[ ${LOCK_SETUP_UNKNOWN:-0} != "1" ]]; then
   touch "$TEST_LOCK_PAM"
 fi
 STUB
-chmod +x "$scratch/bin/omarchy-apply-lock"
+chmod +x "$scratch/bin/helios-apply-lock"
 
-export TEST_LOCK_PAM="$scratch/omarchy-lock-fingerprint"
-setup_script="$scratch/omarchy-setup-security-fingerprint"
-sed "s|/etc/pam.d/omarchy-lock-fingerprint|$TEST_LOCK_PAM|g" "$ROOT/bin/omarchy-setup-security-fingerprint" > "$setup_script"
+export TEST_LOCK_PAM="$scratch/helios-lock-fingerprint"
+setup_script="$scratch/helios-setup-security-fingerprint"
+sed "s|/etc/pam.d/helios-lock-fingerprint|$TEST_LOCK_PAM|g" "$ROOT/bin/helios-setup-security-fingerprint" > "$setup_script"
 chmod +x "$setup_script"
 
 run_setup() {
   : > "$CALL_LOG"
-  if OMARCHY_PATH="$scratch" "$setup_script" > "$scratch/output" 2>&1; then
+  if HELIOS_PATH="$scratch" "$setup_script" > "$scratch/output" 2>&1; then
     fail "setup stops on the simulated enrollment or installation failure"
   fi
   if grep -Eq '^(pam |apply-lock$|Unexpected privileged call)' "$CALL_LOG"; then
@@ -117,14 +117,14 @@ pass "missing hardware performs no package operations"
 
 # Successful setup must reuse the same lock/recovery installer as updates.
 : > "$CALL_LOG"
-OMARCHY_PATH="$scratch" ENROLL_STATUS=0 VERIFY_STATUS=0 \
+HELIOS_PATH="$scratch" ENROLL_STATUS=0 VERIFY_STATUS=0 \
   "$setup_script" > "$scratch/output" 2>&1 || fail "successful enrollment configures authentication"
 [[ $(grep -E '^(enroll|verify|apply-lock)$' "$CALL_LOG") == $'enroll\nverify\napply-lock' ]] ||
   fail "setup configures lock recovery once, after enrollment and verification"
 pass "setup reuses apply-lock after enrollment and verification"
 
 rm -f "$TEST_LOCK_PAM"
-if OMARCHY_PATH="$scratch" ENROLL_STATUS=0 VERIFY_STATUS=0 LOCK_SETUP_UNKNOWN=1 \
+if HELIOS_PATH="$scratch" ENROLL_STATUS=0 VERIFY_STATUS=0 LOCK_SETUP_UNKNOWN=1 \
   "$setup_script" > "$scratch/output" 2>&1; then
   fail "an inconclusive lock installer cannot report successful lock setup"
 fi

@@ -13,7 +13,7 @@ tall_height=$((remaining_height * 2 + 1600))
 virtual_monitor=""
 
 cleanup() {
-  omarchy-shell shell hide omarchy.menu >/dev/null 2>&1 || true
+  helios-shell shell hide helios.menu >/dev/null 2>&1 || true
   if [[ -n $virtual_monitor ]]; then
     hyprctl output remove "$virtual_monitor" >/dev/null 2>&1 || true
   fi
@@ -35,7 +35,7 @@ monitor_is_focused() {
 }
 
 menu_on_monitor() {
-  hyprctl -j layers | jq -e --arg name "$1" '[.[$name].levels["3"][]? | select(.namespace == "omarchy-menu")] | length == 1'
+  hyprctl -j layers | jq -e --arg name "$1" '[.[$name].levels["3"][]? | select(.namespace == "helios-menu")] | length == 1'
 }
 
 monitor_contains() {
@@ -68,29 +68,29 @@ remove_source_monitor() {
   wait_until "remaining monitor is focused" 15 monitor_is_focused "$remaining_monitor"
 }
 
-omarchy-shell shell hide omarchy.menu >/dev/null
-wait_until "menu starts closed" 15 layer_absent "omarchy-menu"
+helios-shell shell hide helios.menu >/dev/null
+wait_until "menu starts closed" 15 layer_absent "helios-menu"
 
 # A closed overlay must drop its old output and reopen on a connected one.
 create_source_monitor
-omarchy-shell shell summon omarchy.menu '{"menu":"root"}' >/dev/null
+helios-shell shell summon helios.menu '{"menu":"root"}' >/dev/null
 wait_until "menu opens on temporary monitor" 15 menu_on_monitor "$virtual_monitor"
 wait_until "menu renders on temporary monitor" 15 monitor_contains "$virtual_monitor" "Apps"
 screenshot "success-overlay-monitor-01-closed-source"
-omarchy-shell shell hide omarchy.menu >/dev/null
-wait_until "menu unmaps before monitor removal" 15 layer_absent "omarchy-menu"
+helios-shell shell hide helios.menu >/dev/null
+wait_until "menu unmaps before monitor removal" 15 layer_absent "helios-menu"
 remove_source_monitor
-omarchy-shell shell summon omarchy.menu '{"menu":"root"}' >/dev/null
+helios-shell shell summon helios.menu '{"menu":"root"}' >/dev/null
 wait_until "closed menu reopens on remaining monitor" 15 menu_on_monitor "$remaining_monitor"
 wait_until "reopened menu renders on remaining monitor" 15 monitor_contains "$remaining_monitor" "Apps"
 screenshot "success-overlay-monitor-02-closed-recovered"
-omarchy-shell shell hide omarchy.menu >/dev/null
-wait_until "reopened menu closes" 15 layer_absent "omarchy-menu"
+helios-shell shell hide helios.menu >/dev/null
+wait_until "reopened menu closes" 15 layer_absent "helios-menu"
 
 # Typing freezes the menu's position. Recovery onto a shorter screen must
 # unfreeze that position while preserving the search and keyboard handling.
 create_source_monitor
-omarchy-shell shell summon omarchy.menu '{"menu":"root"}' >/dev/null
+helios-shell shell summon helios.menu '{"menu":"root"}' >/dev/null
 wait_until "open recovery menu maps on tall monitor" 15 menu_on_monitor "$virtual_monitor"
 wait_until "open recovery menu renders" 15 monitor_contains "$virtual_monitor" "Apps"
 screenshot "success-overlay-monitor-03-open-root"
@@ -104,4 +104,4 @@ screenshot "success-overlay-monitor-05-open-recovered"
 wtype -k Escape
 wait_until "recovered menu clears search through keyboard" 15 monitor_contains "$remaining_monitor" "Apps"
 wtype -k Escape
-wait_until "recovered menu closes through keyboard" 15 layer_absent "omarchy-menu"
+wait_until "recovered menu closes through keyboard" 15 layer_absent "helios-menu"

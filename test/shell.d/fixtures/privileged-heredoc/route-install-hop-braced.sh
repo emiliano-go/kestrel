@@ -1,5 +1,5 @@
-tmp=/tmp/omarchy-generated
+tmp=/tmp/helios-generated
 cat >"$tmp" <<EOF
-command=$HOME/.local/share/omarchy/bin/example
+command=$HOME/.local/share/helios/bin/example
 EOF
-sudo install -m644 "${tmp}" /etc/omarchy/example.conf
+sudo install -m644 "${tmp}" /etc/helios/example.conf

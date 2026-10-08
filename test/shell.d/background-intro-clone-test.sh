@@ -15,20 +15,20 @@ cleanup() {
   rm -rf "$stage"
 }
 trap cleanup EXIT
-mkdir -p "$stage/bin" "$stage/home/.local/state/omarchy/current"
+mkdir -p "$stage/bin" "$stage/home/.local/state/helios/current"
 cat >"$stage/bin/noop" <<'SH'
 #!/bin/bash
 exit 0
 SH
 chmod +x "$stage/bin/noop"
-for command in omarchy-shell omarchy-plugin-enable omarchy-notification-send; do
+for command in helios-shell helios-plugin-enable helios-notification-send; do
   ln -s noop "$stage/bin/$command"
 done
-cat >"$stage/bin/omarchy-plugin-list" <<'SH'
+cat >"$stage/bin/helios-plugin-list" <<'SH'
 #!/bin/bash
 printf '[{"id":"intro-test.background"}]\n'
 SH
-cat >"$stage/bin/omarchy-theme-bg-boot-intro" <<'SH'
+cat >"$stage/bin/helios-theme-bg-boot-intro" <<'SH'
 #!/bin/bash
 for attempt in {1..200}; do
   [[ ! -s $INTRO_TEST_RELEASE ]] || exit 0
@@ -36,16 +36,16 @@ for attempt in {1..200}; do
 done
 exit 1
 SH
-chmod +x "$stage/bin/omarchy-plugin-list" "$stage/bin/omarchy-theme-bg-boot-intro"
-HOME="$stage/home" USER=intro-test OMARCHY_PATH="$ROOT" PATH="$stage/bin:$ROOT/bin:$PATH" \
-  "$ROOT/bin/omarchy-plugin-clone" omarchy.background >/dev/null
-ln -s "$stage/home/.config/omarchy/plugins/intro-test.background" "$stage/clone"
+chmod +x "$stage/bin/helios-plugin-list" "$stage/bin/helios-theme-bg-boot-intro"
+HOME="$stage/home" USER=intro-test HELIOS_PATH="$ROOT" PATH="$stage/bin:$ROOT/bin:$PATH" \
+  "$ROOT/bin/helios-plugin-clone" helios.background >/dev/null
+ln -s "$stage/home/.config/helios/plugins/intro-test.background" "$stage/clone"
 ln -s "$ROOT/shell/Commons" "$stage/Commons"
 ln -s "$ROOT/shell/Ui" "$stage/Ui"
 ln -s "$ROOT/shell/services" "$stage/services"
 cp "$SHELL_TEST_DIR/fixtures/background-intro-clone/shell.qml" "$stage/shell.qml"
 magick -size 128x128 xc:magenta "$stage/still.png"
-ln -s "$stage/still.png" "$stage/home/.local/state/omarchy/current/background"
+ln -s "$stage/still.png" "$stage/home/.local/state/helios/current/background"
 
 wait_phase() {
   for attempt in {1..100}; do
@@ -63,11 +63,11 @@ capture_pixel() {
 }
 for consumed in false true; do
   if [[ $consumed == true ]]; then
-    printf '%s\n' "$HYPRLAND_INSTANCE_SIGNATURE" >"$stage/home/.local/state/omarchy/background-intro.session-id"
+    printf '%s\n' "$HYPRLAND_INSTANCE_SIGNATURE" >"$stage/home/.local/state/helios/background-intro.session-id"
   fi
   rm -f "$stage/result.json"
   : >"$stage/release"
-  HOME="$stage/home" OMARCHY_PATH="$ROOT" PATH="$stage/bin:$PATH" INTRO_TEST_RESULT="$stage/result.json" INTRO_TEST_RELEASE="$stage/release" \
+  HOME="$stage/home" HELIOS_PATH="$ROOT" PATH="$stage/bin:$PATH" INTRO_TEST_RESULT="$stage/result.json" INTRO_TEST_RELEASE="$stage/release" \
     quickshell -p "$stage" --no-color >"$stage/quickshell.log" 2>&1 &
   qs_pid=$!
   wait_phase cover

@@ -1,4 +1,4 @@
 echo "Replace GNOME Calculator with Omacalc"
 
-omarchy-pkg-add omacalc
-omarchy-pkg-drop gnome-calculator
+helios-pkg-add omacalc
+helios-pkg-drop gnome-calculator

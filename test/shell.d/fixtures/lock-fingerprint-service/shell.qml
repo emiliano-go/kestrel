@@ -6,8 +6,8 @@ import qs.Commons
 ShellRoot {
   id: root
 
-  readonly property string rootPath: Quickshell.env("OMARCHY_PATH")
-  readonly property string resultPath: Quickshell.env("OMARCHY_QML_TEST_RESULT")
+  readonly property string rootPath: Quickshell.env("HELIOS_PATH")
+  readonly property string resultPath: Quickshell.env("HELIOS_QML_TEST_RESULT")
   property var failures: []
   property int checks: 0
 
@@ -29,7 +29,7 @@ ShellRoot {
   function run() {
     var component = Qt.createComponent("file://" + rootPath + "/shell/plugins/lock/Service.qml", Component.PreferSynchronous)
     if (component.status !== Component.Ready) throw new Error(component.errorString())
-    var service = component.createObject(host, { omarchyPath: rootPath })
+    var service = component.createObject(host, { heliosPath: rootPath })
     if (!service) throw new Error(component.errorString())
     try {
       var retry = timer(service, 250, false)

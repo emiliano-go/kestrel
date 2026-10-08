@@ -16,7 +16,7 @@ export XDG_CACHE_HOME="$test_tmp/cache"
 export XDG_DATA_HOME="$test_tmp/data"
 unset CLAUDE_CONFIG_DIR CODEX_HOME
 
-accounts="$XDG_STATE_HOME/omarchy/agents/accounts"
+accounts="$XDG_STATE_HOME/helios/agents/accounts"
 mkdir -p "$HOME/.claude/projects" "$HOME/.codex/sessions" "$accounts/claude/work" "$accounts/claude/old" "$accounts/codex/side"
 
 future_ms=$(( ($(date +%s) + 3600) * 1000 ))
@@ -30,9 +30,9 @@ credentials token-work "$future_ms" default_claude_max_5x >"$accounts/claude/wor
 credentials token-old 1000 default_claude_max_5x >"$accounts/claude/old/.credentials.json"
 
 # A parked account whose sign-in lapsed still has its last numbers on disk.
-mkdir -p "$XDG_CACHE_HOME/omarchy/agent-usage"
+mkdir -p "$XDG_CACHE_HOME/helios/agent-usage"
 jq -nc --arg open "$open_at" '{fetchedAtMs: 1, limits: [{label: "Weekly (7-day)", percent: 0.4, resetsAt: $open}]}' \
-  >"$XDG_CACHE_HOME/omarchy/agent-usage/claude-limits-old.json"
+  >"$XDG_CACHE_HOME/helios/agent-usage/claude-limits-old.json"
 
 cat >"$accounts/claude.json" <<JSON
 {
@@ -49,7 +49,7 @@ JSON
 
 # Anthropic answers per token, so each account's probe is told apart by the
 # credential it carried.
-claude_record=$(COLLECTOR="$ROOT/bin/omarchy-agent-usage-claude" python3 - <<'PY'
+claude_record=$(COLLECTOR="$ROOT/bin/helios-agent-usage-claude" python3 - <<'PY'
 import importlib.machinery, importlib.util, io, json, os, sys
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -66,7 +66,7 @@ def urlopen(request, timeout=None):
 collector.urllib.request.urlopen = urlopen
 collector.scan_pi_usage = lambda age: None
 collector.scan_opencode_usage = lambda age: None
-sys.argv = ["omarchy-agent-usage-claude", "--force"]
+sys.argv = ["helios-agent-usage-claude", "--force"]
 collector.main()
 PY
 )
@@ -87,7 +87,7 @@ pass "a lapsed account keeps its last-known limits and says why"
   fail "the record's own limits describe the active account" "$claude_record"
 pass "the record's own limits describe the active account"
 
-[[ -f $XDG_CACHE_HOME/omarchy/agent-usage/claude-limits.json && -f $XDG_CACHE_HOME/omarchy/agent-usage/claude-limits-u-work.json ]] ||
+[[ -f $XDG_CACHE_HOME/helios/agent-usage/claude-limits.json && -f $XDG_CACHE_HOME/helios/agent-usage/claude-limits-u-work.json ]] ||
   fail "each account keeps its own limits cache, keyed by subscription"
 pass "each account keeps its own limits cache"
 
@@ -95,8 +95,8 @@ pass "each account keeps its own limits cache"
 # allowance back: that reads as 0%, not as nothing known.
 past_at=$(python3 -c 'import datetime as dt; print((dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=5)).isoformat())')
 jq -nc --arg past "$past_at" '{fetchedAtMs: 1, limits: [{label: "Session (5-hour)", percent: 0.99, resetsAt: $past}]}' \
-  >"$XDG_CACHE_HOME/omarchy/agent-usage/claude-limits-old.json"
-rested=$(COLLECTOR="$ROOT/bin/omarchy-agent-usage-claude" python3 - <<'PY'
+  >"$XDG_CACHE_HOME/helios/agent-usage/claude-limits-old.json"
+rested=$(COLLECTOR="$ROOT/bin/helios-agent-usage-claude" python3 - <<'PY'
 import importlib.machinery, importlib.util, io, json, os, sys
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -106,7 +106,7 @@ loader.exec_module(collector)
 collector.urllib.request.urlopen = lambda request, timeout=None: io.BytesIO(b'{"five_hour": {"utilization": 30.0}}')
 collector.scan_pi_usage = lambda age: None
 collector.scan_opencode_usage = lambda age: None
-sys.argv = ["omarchy-agent-usage-claude", "--force"]
+sys.argv = ["helios-agent-usage-claude", "--force"]
 collector.main()
 PY
 )
@@ -116,8 +116,8 @@ pass "a lapsed account whose windows all reset reads as untouched"
 
 # A cache stamped ahead of a clock that later stepped back is still what the
 # account last saw, so its reset windows still read as untouched.
-touch -d "@$(( $(date +%s) + 3600 ))" "$XDG_CACHE_HOME/omarchy/agent-usage/claude-limits-old.json"
-rested_future=$(COLLECTOR="$ROOT/bin/omarchy-agent-usage-claude" python3 - <<'PY'
+touch -d "@$(( $(date +%s) + 3600 ))" "$XDG_CACHE_HOME/helios/agent-usage/claude-limits-old.json"
+rested_future=$(COLLECTOR="$ROOT/bin/helios-agent-usage-claude" python3 - <<'PY'
 import importlib.machinery, importlib.util, io, json, os, sys
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -127,7 +127,7 @@ loader.exec_module(collector)
 collector.urllib.request.urlopen = lambda request, timeout=None: io.BytesIO(b'{"five_hour": {"utilization": 30.0}}')
 collector.scan_pi_usage = lambda age: None
 collector.scan_opencode_usage = lambda age: None
-sys.argv = ["omarchy-agent-usage-claude", "--force"]
+sys.argv = ["helios-agent-usage-claude", "--force"]
 collector.main()
 PY
 )
@@ -140,8 +140,8 @@ pass "a future-dated cache of reset windows still reads as untouched"
 printf '{"oauthAccount":{"accountUuid":"u-new"}}\n' >"$HOME/.claude.json"
 now_ms=$(( $(date +%s) * 1000 ))
 jq -nc --arg open "$open_at" --argjson now "$now_ms" '{fetchedAtMs: $now, limits: [{label: "Session (5-hour)", percent: 0.55, resetsAt: $open}]}' \
-  >"$XDG_CACHE_HOME/omarchy/agent-usage/claude-limits.json"
-resigned=$(COLLECTOR="$ROOT/bin/omarchy-agent-usage-claude" python3 - <<'PY'
+  >"$XDG_CACHE_HOME/helios/agent-usage/claude-limits.json"
+resigned=$(COLLECTOR="$ROOT/bin/helios-agent-usage-claude" python3 - <<'PY'
 import importlib.machinery, importlib.util, io, json, os, sys
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -157,7 +157,7 @@ def urlopen(request, timeout=None):
 collector.urllib.request.urlopen = urlopen
 collector.scan_pi_usage = lambda age: None
 collector.scan_opencode_usage = lambda age: None
-sys.argv = ["omarchy-agent-usage-claude", "--force"]
+sys.argv = ["helios-agent-usage-claude", "--force"]
 collector.main()
 PY
 )
@@ -169,7 +169,7 @@ pass "a primary home signed in to another subscription doesn't inherit its limit
 # A registry with one account changes nothing about the record.
 jq '.accounts |= [.[0]] | .active = "main"' "$accounts/claude.json" >"$test_tmp/one.json"
 mv "$test_tmp/one.json" "$accounts/claude.json"
-single=$(COLLECTOR="$ROOT/bin/omarchy-agent-usage-claude" python3 - <<'PY'
+single=$(COLLECTOR="$ROOT/bin/helios-agent-usage-claude" python3 - <<'PY'
 import importlib.machinery, importlib.util, io, json, os, sys
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -179,7 +179,7 @@ loader.exec_module(collector)
 collector.urllib.request.urlopen = lambda request, timeout=None: io.BytesIO(b'{"five_hour": {"utilization": 30.0}}')
 collector.scan_pi_usage = lambda age: None
 collector.scan_opencode_usage = lambda age: None
-sys.argv = ["omarchy-agent-usage-claude", "--force"]
+sys.argv = ["helios-agent-usage-claude", "--force"]
 collector.main()
 PY
 )
@@ -192,8 +192,8 @@ pass "a single account record is unchanged"
 # A failed probe falls back on hour-old numbers, and the record says so.
 hour_ago_ms=$(( ($(date +%s) - 3600) * 1000 ))
 jq -nc --arg open "$open_at" --argjson at "$hour_ago_ms" '{fetchedAtMs: $at, limits: [{label: "Session (5-hour)", percent: 0.42, resetsAt: $open}]}' \
-  >"$XDG_CACHE_HOME/omarchy/agent-usage/claude-limits.json"
-kept=$(COLLECTOR="$ROOT/bin/omarchy-agent-usage-claude" python3 - <<'PY'
+  >"$XDG_CACHE_HOME/helios/agent-usage/claude-limits.json"
+kept=$(COLLECTOR="$ROOT/bin/helios-agent-usage-claude" python3 - <<'PY'
 import importlib.machinery, importlib.util, os, sys
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -207,7 +207,7 @@ def urlopen(request, timeout=None):
 collector.urllib.request.urlopen = urlopen
 collector.scan_pi_usage = lambda age: None
 collector.scan_opencode_usage = lambda age: None
-sys.argv = ["omarchy-agent-usage-claude", "--force"]
+sys.argv = ["helios-agent-usage-claude", "--force"]
 collector.main()
 PY
 )
@@ -245,13 +245,13 @@ cat >"$accounts/codex.json" <<JSON
 }
 JSON
 
-codex_record=$(PATH="$test_tmp/bin:$PATH" "$ROOT/bin/omarchy-agent-usage-codex" --force)
+codex_record=$(PATH="$test_tmp/bin:$PATH" "$ROOT/bin/helios-agent-usage-codex" --force)
 [[ $(jq -c '[.accounts[] | {id, active, used: .limits[0].percent}]' <<<"$codex_record") == '[{"id":"main","active":true,"used":0.4},{"id":"side","active":false,"used":0.91}]' ]] ||
   fail "Codex record asks each account's own app-server" "$codex_record"
 [[ $(jq '.limits[0].percent' <<<"$codex_record") == 0.4 ]] || fail "Codex record's own limits describe the active account" "$codex_record"
 pass "Codex record lists every registered account"
 
-inherited=$(CODEX_HOME="$accounts/codex/side" PATH="$test_tmp/bin:$PATH" "$ROOT/bin/omarchy-agent-usage-codex" --force)
+inherited=$(CODEX_HOME="$accounts/codex/side" PATH="$test_tmp/bin:$PATH" "$ROOT/bin/helios-agent-usage-codex" --force)
 [[ $(jq -c '[.accounts[] | .limits[0].percent]' <<<"$inherited") == '[0.4,0.91]' ]] ||
   fail "Main's Codex limits come from ~/.codex whatever CODEX_HOME says" "$inherited"
 pass "Main's Codex limits come from ~/.codex whatever CODEX_HOME says"
@@ -259,7 +259,7 @@ pass "Main's Codex limits come from ~/.codex whatever CODEX_HOME says"
 # A secondary home nobody signed in to is waiting for auth, even while
 # ~/.codex holds a login, and its app-server is never started.
 rm "$accounts/codex/side/auth.json"
-signed_out=$(PATH="$test_tmp/bin:$PATH" "$ROOT/bin/omarchy-agent-usage-codex" --force)
+signed_out=$(PATH="$test_tmp/bin:$PATH" "$ROOT/bin/helios-agent-usage-codex" --force)
 [[ $(jq -c '[.accounts[] | {id, used: .limits[0].percent, status: .usageStatusText}]' <<<"$signed_out") == '[{"id":"main","used":0.4,"status":""},{"id":"side","used":null,"status":"Waiting for auth"}]' ]] ||
   fail "a signed-out Codex home waits for auth on its own" "$signed_out"
 touch "$accounts/codex/side/auth.json"

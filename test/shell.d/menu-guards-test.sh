@@ -8,16 +8,16 @@ run_node_test <<'JS'
 const menu = requireFromRoot('shell/plugins/menu/MenuModel.js')
 
 const items = {
-  'setup.default.browser.brave': { id: 'setup.default.browser.brave', when: 'omarchy-pkg-present brave-bin', checked: '[[ "$(omarchy-default-browser)" == "brave" ]]' },
-  'setup.default.browser.zen': { id: 'setup.default.browser.zen', when: 'omarchy-pkg-present zen-browser-bin', checked: '[[ "$(omarchy-default-browser)" == "zen" ]]' },
-  'install.browser.zen': { id: 'install.browser.zen', disabled: 'omarchy-pkg-present zen-browser-bin' },
+  'setup.default.browser.brave': { id: 'setup.default.browser.brave', when: 'helios-pkg-present brave-bin', checked: '[[ "$(helios-default-browser)" == "brave" ]]' },
+  'setup.default.browser.zen': { id: 'setup.default.browser.zen', when: 'helios-pkg-present zen-browser-bin', checked: '[[ "$(helios-default-browser)" == "zen" ]]' },
+  'install.browser.zen': { id: 'install.browser.zen', disabled: 'helios-pkg-present zen-browser-bin' },
   'plain': { id: 'plain', label: 'No guards' }
 }
 const script = menu.guardScript(items)
-const browserSlot = `\${__omarchy_read_${menu.guardReaders.indexOf('omarchy-default-browser')}}`
+const browserSlot = `\${__helios_read_${menu.guardReaders.indexOf('helios-default-browser')}}`
 
 assert(
-  script.includes('if { omarchy-pkg-present brave-bin; } >/dev/null 2>&1; then echo setup.default.browser.brave:w:1; else echo setup.default.browser.brave:w:0; fi'),
+  script.includes('if { helios-pkg-present brave-bin; } >/dev/null 2>&1; then echo setup.default.browser.brave:w:1; else echo setup.default.browser.brave:w:0; fi'),
   'guard script reports a when: as <id>:w:<0|1>'
 )
 assert(
@@ -25,7 +25,7 @@ assert(
   'guard script reports a checked: as <id>:c:<0|1>'
 )
 assert(
-  script.includes('if { omarchy-pkg-present zen-browser-bin; } >/dev/null 2>&1; then echo install.browser.zen:d:1; else echo install.browser.zen:d:0; fi'),
+  script.includes('if { helios-pkg-present zen-browser-bin; } >/dev/null 2>&1; then echo install.browser.zen:d:1; else echo install.browser.zen:d:0; fi'),
   'guard script reports a disabled: as <id>:d:<0|1>'
 )
 assert(!/\bplain:[wcd]:/.test(script), 'guard script skips items with nothing to evaluate')
@@ -34,44 +34,44 @@ assertEqual(menu.guardScript({ plain: items.plain }), '', 'guard script is empty
 // The cost the menu is paying is per fork, not per expression, so what makes
 // the batch fast is asking each command once however many rows want it.
 assertEqual(
-  (script.match(/^__omarchy_read_\d+=\$\(omarchy-default-browser /gm) || []).length,
+  (script.match(/^__helios_read_\d+=\$\(helios-default-browser /gm) || []).length,
   1,
   'guard script reads a value command once for the whole batch'
 )
 assert(
-  script.includes(`[[ "${browserSlot}" == "brave" ]]`) && !script.includes('"$(omarchy-default-browser)"'),
+  script.includes(`[[ "${browserSlot}" == "brave" ]]`) && !script.includes('"$(helios-default-browser)"'),
   'guard script substitutes the captured answer into the expression'
 )
 assert(
-  script.indexOf('__omarchy_read_') < script.indexOf('if { omarchy-pkg-present'),
+  script.indexOf('__helios_read_') < script.indexOf('if { helios-pkg-present'),
   'guard script captures readers before any guard runs, since $() would trap a lazy memo in its subshell'
 )
 
 // Substitution is confined to the plain `$(reader)` form on purpose. A
 // function shadowing the name would also catch these, and answer them wrong.
 const untouched = menu.guardScript({
-  a: { id: 'a', when: 'command -v omarchy-dns' },
-  b: { id: 'b', when: '[[ "$(OMARCHY_PATH=/usr/share/omarchy omarchy-channel-current)" == "stable" ]]' },
-  c: { id: 'c', when: '(( $(omarchy-default-browser | wc -l) == 1 ))' }
+  a: { id: 'a', when: 'command -v helios-dns' },
+  b: { id: 'b', when: '[[ "$(HELIOS_PATH=/usr/share/helios helios-channel-current)" == "stable" ]]' },
+  c: { id: 'c', when: '(( $(helios-default-browser | wc -l) == 1 ))' }
 })
 assert(
-  untouched.includes('command -v omarchy-dns')
-    && untouched.includes('$(OMARCHY_PATH=/usr/share/omarchy omarchy-channel-current)')
-    && untouched.includes('$(omarchy-default-browser | wc -l)'),
+  untouched.includes('command -v helios-dns')
+    && untouched.includes('$(HELIOS_PATH=/usr/share/helios helios-channel-current)')
+    && untouched.includes('$(helios-default-browser | wc -l)'),
   'guard script leaves every form but the plain substitution to run the real command'
 )
 assert(
-  !/^__omarchy_read_/m.test(untouched),
+  !/^__helios_read_/m.test(untouched),
   'guard script captures nothing when no guard uses the plain substitution'
 )
 
 // Every reader named in the shipped menu has to be listed, or it silently
 // keeps forking once per row that reads it.
 const fs = require('fs')
-const defaultItems = menu.parseMenuJsonc(fs.readFileSync(path.join(root, 'default/omarchy/omarchy-menu.jsonc'), 'utf8'))
+const defaultItems = menu.parseMenuJsonc(fs.readFileSync(path.join(root, 'default/helios/helios-menu.jsonc'), 'utf8'))
 const guardText = defaultItems.map(item => `${item.when}\n${item.checked}\n${item.disabled}`).join('\n')
 const repeated = [...new Set(
-  (guardText.match(/\$\((omarchy-[a-z0-9-]+(?: [a-z0-9-]+)*)\)/g) || []).map(match => match.slice(2, -1))
+  (guardText.match(/\$\((helios-[a-z0-9-]+(?: [a-z0-9-]+)*)\)/g) || []).map(match => match.slice(2, -1))
 )].filter(command => guardText.split(`$(${command})`).length > 2)
 assertDeepEqual(
   repeated.filter(command => !menu.guardReaders.includes(command)),
@@ -152,7 +152,7 @@ assert_helper_agrees() {
 # vim, sh and xxd are provided rather than installed, and xxd only appears on a
 # wrapped continuation line; bash>=1 is a version constraint no set can answer.
 pkg_cases=("bash" "vim" "sh" "xxd" "absent" "bash vim" "bash absent" "bash>=1" "vim>=1" "")
-for helper in omarchy-pkg-present omarchy-pkg-missing; do
+for helper in helios-pkg-present helios-pkg-missing; do
   for case in "${pkg_cases[@]}"; do
     read -r -a argv <<<"$case"
     assert_helper_agrees "guard prelude resolves packages as pacman does" "$helper" "${argv[@]}"
@@ -162,13 +162,13 @@ pass "guard prelude resolves packages through provides, wrapping, and constraint
 
 # cd is a shell builtin `command -v` finds and a PATH search does not.
 cmd_cases=("gvim" "cd" "absent" "gvim absent" "gvim cd" "")
-for helper in omarchy-cmd-present omarchy-cmd-missing; do
+for helper in helios-cmd-present helios-cmd-missing; do
   for case in "${cmd_cases[@]}"; do
     read -r -a argv <<<"$case"
     assert_helper_agrees "guard prelude resolves commands as the real helper does" "$helper" "${argv[@]}"
   done
 done
-pass "guard prelude resolves commands as omarchy-cmd-present and omarchy-cmd-missing do"
+pass "guard prelude resolves commands as helios-cmd-present and helios-cmd-missing do"
 
 # A reader is replaced by what it printed, which has to compare identically to
 # the substitution it stood in for -- including the trailing newline $() drops.
@@ -176,13 +176,13 @@ reader_script=$(node -e '
   const path = require("path")
   const menu = require(path.join(process.env.ROOT, "shell/plugins/menu/MenuModel.js"))
   process.stdout.write(menu.guardScript({
-    hit: { id: "hit", checked: "[[ \"$(omarchy-dns)\" == \"Cloudflare\" ]]" },
-    miss: { id: "miss", checked: "[[ \"$(omarchy-dns)\" == \"Google\" ]]" }
+    hit: { id: "hit", checked: "[[ \"$(helios-dns)\" == \"Cloudflare\" ]]" },
+    miss: { id: "miss", checked: "[[ \"$(helios-dns)\" == \"Google\" ]]" }
   }))
 ')
 reader_result=$(bash -c '
-omarchy-dns() { printf "Cloudflare\n"; }
-export -f omarchy-dns
+helios-dns() { printf "Cloudflare\n"; }
+export -f helios-dns
 '"$reader_script")
 [[ $reader_result == $'hit:c:1\nmiss:c:0' ]] ||
   fail "guard prelude compares a captured reader as the substitution did" "got: $reader_result"
@@ -191,25 +191,25 @@ pass "guard prelude compares a captured reader exactly as the substitution it re
 # The batch inherits whatever a login shell left set. A reader that exits
 # nonzero must not take the rest of the menu's rows down with it.
 errexit_result=$(bash -e -c '
-omarchy-dns() { printf "Cloudflare\n"; return 3; }
-export -f omarchy-dns
+helios-dns() { printf "Cloudflare\n"; return 3; }
+export -f helios-dns
 '"$reader_script"'
 printf "survived\n"' 2>/dev/null)
 [[ $errexit_result == $'hit:c:1\nmiss:c:0\nsurvived' ]] ||
   fail "guard batch survives a failing reader under errexit" "got: $errexit_result"
 pass "guard batch survives a reader that exits nonzero under errexit"
 
-# Update > Extra Themes runs omarchy-theme-update, which pulls the themes that
+# Update > Extra Themes runs helios-theme-update, which pulls the themes that
 # came from a git clone and skips everything else, so the guard has to answer
 # for the same set: a row that appears over a symlinked theme or a worktree's
 # `.git` file opens a terminal that prints nothing and closes. Both sides ask
-# omarchy-theme-extras today; the shapes below are what would tell us if one
+# helios-theme-extras today; the shapes below are what would tell us if one
 # of them stopped.
 themes_guard=$(node -e '
   const fs = require("fs")
   const path = require("path")
   const menu = require(path.join(process.env.ROOT, "shell/plugins/menu/MenuModel.js"))
-  const items = menu.parseMenuJsonc(fs.readFileSync(path.join(process.env.ROOT, "default/omarchy/omarchy-menu.jsonc"), "utf8"))
+  const items = menu.parseMenuJsonc(fs.readFileSync(path.join(process.env.ROOT, "default/helios/helios-menu.jsonc"), "utf8"))
   process.stdout.write(items.find(item => item.id === "update.themes").when)
 ')
 
@@ -230,7 +230,7 @@ assert_themes_guard_agrees() {
   local guarded=0 updated=0
 
   HOME="$home" PATH="$ROOT/bin:$PATH" bash -e -c "{ $themes_guard; } >/dev/null 2>&1" || guarded=$?
-  [[ -n $(HOME="$home" PATH="$ROOT/bin:$stub_dir:$PATH" "$ROOT/bin/omarchy-theme-update" 2>/dev/null) ]] || updated=1
+  [[ -n $(HOME="$home" PATH="$ROOT/bin:$stub_dir:$PATH" "$ROOT/bin/helios-theme-update" 2>/dev/null) ]] || updated=1
   ((guarded == expected)) || fail "$description" "$home: guard=$guarded expected=$expected"
   ((updated == expected)) || fail "$description" "$home: update=$updated expected=$expected"
 }
@@ -241,39 +241,39 @@ trap 'rm -rf "$stub_dir" "$themes_home"' EXIT
 # A theme copied by hand has nothing to pull, a symlinked one is someone's
 # working copy, and a `.git` file is a worktree living elsewhere.
 mkdir -p "$themes_home/missing"
-mkdir -p "$themes_home/empty/.config/omarchy/themes"
-mkdir -p "$themes_home/copied/.config/omarchy/themes/handmade"
-mkdir -p "$themes_home/cloned/.config/omarchy/themes/tokyo-night/.git"
-mkdir -p "$themes_home/linked/.config/omarchy/themes" "$themes_home/checkout/.git"
-ln -s "$themes_home/checkout" "$themes_home/linked/.config/omarchy/themes/in-progress"
-mkdir -p "$themes_home/worktree/.config/omarchy/themes/branch"
-printf 'gitdir: /elsewhere\n' >"$themes_home/worktree/.config/omarchy/themes/branch/.git"
+mkdir -p "$themes_home/empty/.config/helios/themes"
+mkdir -p "$themes_home/copied/.config/helios/themes/handmade"
+mkdir -p "$themes_home/cloned/.config/helios/themes/tokyo-night/.git"
+mkdir -p "$themes_home/linked/.config/helios/themes" "$themes_home/checkout/.git"
+ln -s "$themes_home/checkout" "$themes_home/linked/.config/helios/themes/in-progress"
+mkdir -p "$themes_home/worktree/.config/helios/themes/branch"
+printf 'gitdir: /elsewhere\n' >"$themes_home/worktree/.config/helios/themes/branch/.git"
 
 for shape in missing:1 empty:1 copied:1 cloned:0 linked:1 worktree:1; do
   assert_themes_guard_agrees \
-    "Extra Themes shows exactly when omarchy-theme-update has something to pull" \
+    "Extra Themes shows exactly when helios-theme-update has something to pull" \
     "$themes_home/${shape%:*}" "${shape#*:}"
 done
-pass "Extra Themes shows exactly when omarchy-theme-update has something to pull"
+pass "Extra Themes shows exactly when helios-theme-update has something to pull"
 
 # Which themes get pulled, not just that something did: a name with a space in
 # it is the one that goes missing the moment a path is split rather than passed
 # whole, and it would still print an Updating: line on its way to the wrong
 # directory.
-many="$themes_home/many/.config/omarchy/themes"
+many="$themes_home/many/.config/helios/themes"
 mkdir -p "$many/tokyo night/.git" "$many/zen/.git" "$many/handmade"
 ln -s "$themes_home/checkout" "$many/in-progress"
 
-listed=$(HOME="$themes_home/many" LC_ALL=C "$ROOT/bin/omarchy-theme-extras")
+listed=$(HOME="$themes_home/many" LC_ALL=C "$ROOT/bin/helios-theme-extras")
 [[ $listed == "$many/tokyo night"$'\n'"$many/zen" ]] ||
-  fail "omarchy-theme-extras lists every clone and nothing else" "got: $listed"
-pass "omarchy-theme-extras lists every clone and nothing else"
+  fail "helios-theme-extras lists every clone and nothing else" "got: $listed"
+pass "helios-theme-extras lists every clone and nothing else"
 
 git_calls=$(mktemp)
 trap 'rm -rf "$stub_dir" "$themes_home" "$git_calls"' EXIT
 HOME="$themes_home/many" LC_ALL=C GIT_CALLS="$git_calls" PATH="$ROOT/bin:$stub_dir:$PATH" \
-  "$ROOT/bin/omarchy-theme-update" >/dev/null 2>&1
+  "$ROOT/bin/helios-theme-update" >/dev/null 2>&1
 pulled=$(<"$git_calls")
 [[ $pulled == "<-C><$many/tokyo night><pull>"$'\n'"<-C><$many/zen><pull>" ]] ||
-  fail "omarchy-theme-update pulls each clone by its whole path" "got: $pulled"
-pass "omarchy-theme-update pulls each clone by its whole path"
+  fail "helios-theme-update pulls each clone by its whole path" "got: $pulled"
+pass "helios-theme-update pulls each clone by its whole path"

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# helios:summary=Reinstall all default HeliOS packages from the stable channel
+# helios:requires-sudo=true
+
+set -e
+
+# Reinstall all default HeliOS packages from the stable channel and downgrade any packages that are too new.
+
+# Set the package repository to the stable mirrors
+helios-refresh-pacman
+
+# Downgrade any packages to the stable setup
+helios-update-pacman -Suu --noconfirm
+
+# Ensure all packages are installed
+mapfile -t packages < <(grep -v '^#' "$HELIOS_PATH/install/helios-base.packages" | grep -v '^$')
+helios-update-pacman -Syu --noconfirm --needed "${packages[@]}"

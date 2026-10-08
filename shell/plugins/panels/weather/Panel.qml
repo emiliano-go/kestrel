@@ -8,8 +8,8 @@ import "Model.js" as Model
 
 Panel {
   id: root
-  moduleName: "omarchy.weather"
-  ipcTarget: "omarchy.weather"
+  moduleName: "helios.weather"
+  ipcTarget: "helios.weather"
   manageIpc: false
 
   property var anchorItem: null
@@ -96,7 +96,7 @@ Panel {
   }
 
   property FileView locationFile: FileView {
-    path: Quickshell.env("HOME") + "/.local/state/omarchy/settings/weather.json"
+    path: Quickshell.env("HOME") + "/.local/state/helios/settings/weather.json"
     watchChanges: true
     printErrors: false
     onFileChanged: reload()

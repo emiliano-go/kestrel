@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# helios:summary=Compatibility wrapper for helios-migrate-notify.
+# helios:hidden=true
+
+exec helios-migrate-notify "$@"

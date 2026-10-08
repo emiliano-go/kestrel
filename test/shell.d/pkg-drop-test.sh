@@ -29,7 +29,7 @@ EOF
 chmod +x "$mock_path/pacman" "$mock_path/sudo"
 
 PATH="$mock_path:$PATH" TEST_TMP="$test_tmp" \
-  "$ROOT/bin/omarchy-pkg-drop" exact-package virtual-package provider-package exact-package
+  "$ROOT/bin/helios-pkg-drop" exact-package virtual-package provider-package exact-package
 
 [[ $(<"$test_tmp/pkg-drop-command") == "pacman -Rns --noconfirm exact-package provider-package" ]] ||
   fail "package removal targets exact installed names only"
@@ -37,19 +37,19 @@ pass "package removal ignores providers and duplicate arguments"
 
 rm "$test_tmp/pkg-drop-command"
 if PATH="$mock_path:$PATH" TEST_TMP="$test_tmp" TEST_QUERY_STATUS=1 \
-  "$ROOT/bin/omarchy-pkg-drop" exact-package >"$test_tmp/output" 2>&1; then
+  "$ROOT/bin/helios-pkg-drop" exact-package >"$test_tmp/output" 2>&1; then
   fail "failed package discovery must fail removal even with partial output"
 fi
 [[ ! -e $test_tmp/pkg-drop-command ]] || fail "failed discovery must not request privileges"
 pass "package removal propagates discovery errors before requesting privileges"
 
 PATH="$mock_path:$PATH" TEST_TMP="$test_tmp" TEST_PACKAGES_EMPTY=1 \
-  "$ROOT/bin/omarchy-pkg-drop" exact-package
+  "$ROOT/bin/helios-pkg-drop" exact-package
 [[ ! -e $test_tmp/pkg-drop-command ]] || fail "empty package database must not request privileges"
 pass "an empty package database is a successful no-op"
 
 if PATH="$mock_path:$PATH" TEST_TMP="$test_tmp" TEST_REMOVE_STATUS=1 \
-  "$ROOT/bin/omarchy-pkg-drop" exact-package; then
+  "$ROOT/bin/helios-pkg-drop" exact-package; then
   fail "failed package transaction must fail removal"
 fi
 pass "package removal propagates transaction failures"

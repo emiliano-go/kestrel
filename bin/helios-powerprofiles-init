@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# helios:summary=Set the correct power profile on boot based on current AC/battery state.
+
+exec helios-powerprofiles-set autodetect

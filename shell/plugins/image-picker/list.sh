@@ -1,7 +1,7 @@
 #!/bin/bash
 
 image_dirs=${1:-}
-cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/omarchy/image-selector
+cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/helios/image-selector
 index_file="$cache_dir/index.tsv"
 pending_video_file=$(mktemp)
 

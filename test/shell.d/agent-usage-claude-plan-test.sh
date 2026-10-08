@@ -31,7 +31,7 @@ read_plan() {
   [[ -n $stray ]] && printf '%s' "$stray" >"$other"
 
   plan=$(env -u CLAUDE_CONFIG_DIR ${relocated:+CLAUDE_CONFIG_DIR="$relocated"} HOME="$home" \
-    COLLECTOR="$ROOT/bin/omarchy-agent-usage-claude" CLAUDE_DIR="$dir" python3 - <<'PY'
+    COLLECTOR="$ROOT/bin/helios-agent-usage-claude" CLAUDE_DIR="$dir" python3 - <<'PY'
 import importlib.machinery, importlib.util, os, pathlib
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -101,7 +101,7 @@ second_home=$(mktemp -d "$SANDBOX/home.XXXXXX")
 mkdir -p "$second_home/.claude" "$second_home/accounts/work"
 printf '%s' "$upgraded" >"$second_home/.claude.json"
 printf '%s' "$credentials" >"$second_home/accounts/work/.credentials.json"
-plan=$(env -u CLAUDE_CONFIG_DIR HOME="$second_home" COLLECTOR="$ROOT/bin/omarchy-agent-usage-claude" \
+plan=$(env -u CLAUDE_CONFIG_DIR HOME="$second_home" COLLECTOR="$ROOT/bin/helios-agent-usage-claude" \
   CLAUDE_DIR="$second_home/accounts/work" python3 - <<'PY'
 import importlib.machinery, importlib.util, os, pathlib
 

@@ -1,5 +1,5 @@
 {
-  "name": "Omarchy",
+  "name": "HeliOS",
   "base": "{{ theme_type }}",
   "overrides": {
     "claude": "{{ accent }}",

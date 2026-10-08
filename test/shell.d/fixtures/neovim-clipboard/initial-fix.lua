@@ -66,7 +66,7 @@ function M.setup()
         vim.fn.system(cmd, lines)
       end
 
-      if vim.g.omarchy_remote_clipboard_osc52 ~= false then
+      if vim.g.helios_remote_clipboard_osc52 ~= false then
         emit(lines)
       end
     end
@@ -92,7 +92,7 @@ function M.setup()
   vim.opt.clipboard = "unnamedplus"
 
   vim.g.clipboard = {
-    name = "OmarchyRemoteClipboard",
+    name = "HeliOSRemoteClipboard",
     copy = { ["+"] = copy("+"), ["*"] = copy("*") },
     paste = { ["+"] = paste("+"), ["*"] = paste("*") },
     cache_enabled = 0,

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# helios:summary=Take a screenshot
+# helios:group=capture
+# helios:args=[smart|region|windows|fullscreen|scroll] [copy|save]
+# helios:examples=helios screenshot | helios capture screenshot region
+# helios:aliases=helios screenshot
+
+if [[ -n ${HELIOS_SCREENSHOT_DIR:-} && -z ${OMASNAP_SCREENSHOT_DIR:-} ]]; then
+  export OMASNAP_SCREENSHOT_DIR="$HELIOS_SCREENSHOT_DIR"
+fi
+
+omasnap_args=()
+for arg in "$@"; do
+  case "$arg" in
+    copy) omasnap_args+=(--copy) ;;
+    save) omasnap_args+=(--save) ;;
+    slurp) ;;
+    *) omasnap_args+=("$arg") ;;
+  esac
+done
+
+exec omasnap "${omasnap_args[@]}"

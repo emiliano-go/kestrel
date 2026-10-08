@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# helios:summary=Check whether Tailscale is installed and running
+# helios:hidden=true
+
+set -euo pipefail
+
+if helios-cmd-present tailscale && tailscale status --json >/dev/null 2>&1; then
+  exit 0
+fi
+
+systemctl is-active --quiet tailscaled.service >/dev/null 2>&1 || pgrep -x tailscaled >/dev/null 2>&1

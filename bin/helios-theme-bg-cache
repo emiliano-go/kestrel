@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# helios:summary=Cache background switcher thumbnails for the current theme
+
+theme_name=$(cat "$HOME/.local/state/helios/current/theme.name" 2>/dev/null)
+
+helios-menu-images \
+  --cache-only \
+  "$HOME/.local/state/helios/current/theme/backgrounds" \
+  "$HOME/.config/helios/backgrounds/$theme_name"

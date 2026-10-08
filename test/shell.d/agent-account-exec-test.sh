@@ -13,7 +13,7 @@ trap 'rm -rf "$test_tmp"' EXIT
 account_test_home="$test_tmp/home"
 real_bin="$test_tmp/real/bin"
 mise_data="$test_tmp/data/mise"
-registry_dir="$account_test_home/.local/state/omarchy/agents/accounts"
+registry_dir="$account_test_home/.local/state/helios/agents/accounts"
 mkdir -p "$account_test_home" "$real_bin" "$registry_dir"
 
 # Use real mise dispatch and real account resolution, with fake agent binaries.
@@ -29,21 +29,21 @@ esac
 if (($#)); then
   printf '%s\n' "$@"
 fi
-if [[ ${OMARCHY_TEST_SWITCH_ACCOUNT:-} == "yes" ]]; then
-  unset OMARCHY_TEST_SWITCH_ACCOUNT
-  omarchy-agent-account-state use "${0##*/}" "${OMARCHY_TEST_SWITCH_TO:-side}" >/dev/null
-  if [[ ${OMARCHY_TEST_NEW_SESSION:-} == "yes" ]]; then
-    omarchy-agent --inline
+if [[ ${HELIOS_TEST_SWITCH_ACCOUNT:-} == "yes" ]]; then
+  unset HELIOS_TEST_SWITCH_ACCOUNT
+  helios-agent-account-state use "${0##*/}" "${HELIOS_TEST_SWITCH_TO:-side}" >/dev/null
+  if [[ ${HELIOS_TEST_NEW_SESSION:-} == "yes" ]]; then
+    helios-agent --inline
   else
     "${0##*/}"
   fi
 fi
-if [[ -n ${OMARCHY_TEST_AGENT_CHILD:-} ]]; then
-  child=$OMARCHY_TEST_AGENT_CHILD
-  unset OMARCHY_TEST_AGENT_CHILD
+if [[ -n ${HELIOS_TEST_AGENT_CHILD:-} ]]; then
+  child=$HELIOS_TEST_AGENT_CHILD
+  unset HELIOS_TEST_AGENT_CHILD
   "$child"
 fi
-exit "${OMARCHY_TEST_AGENT_EXIT:-0}"
+exit "${HELIOS_TEST_AGENT_EXIT:-0}"
 SH
   chmod +x "$real_bin/$provider"
 done
@@ -52,7 +52,7 @@ run_isolated() {
   env -i HOME="$account_test_home" \
     XDG_CONFIG_HOME="$test_tmp/config" XDG_DATA_HOME="$test_tmp/data" XDG_CACHE_HOME="$test_tmp/cache" \
     MISE_DATA_DIR="$mise_data" MISE_SYSTEM_CONFIG_DIR="$ROOT/etc/mise" MISE_OFFLINE=1 \
-    OMARCHY_PATH="$ROOT" PATH="$mise_data/command-wrappers/bin:$ROOT/bin:$real_bin:/usr/bin" \
+    HELIOS_PATH="$ROOT" PATH="$mise_data/command-wrappers/bin:$ROOT/bin:$real_bin:/usr/bin" \
     "$@"
 }
 
@@ -63,7 +63,7 @@ select_account() {
     "$selected" "$test_tmp/accounts/$provider side" >"$registry_dir/$provider.json"
 }
 
-for helper in omarchy-agent-usage-update omarchy-notification-send; do
+for helper in helios-agent-usage-update helios-notification-send; do
   printf '#!/bin/bash\nexit 0\n' >"$real_bin/$helper"
   chmod +x "$real_bin/$helper"
 done
@@ -93,32 +93,32 @@ for provider in claude codex grok; do
   [[ $output == default ]] || fail "$provider picks up switching back to Main without rebuilding shims" "$output"
   pass "$provider picks up switching back to Main without rebuilding shims"
 
-  output=$(run_isolated env OMARCHY_TEST_SWITCH_ACCOUNT=yes "$provider")
+  output=$(run_isolated env HELIOS_TEST_SWITCH_ACCOUNT=yes "$provider")
   [[ $output == $'default\ndefault' ]] || fail "$provider Main sessions keep their account after a switch" "$output"
   pass "$provider Main sessions keep their account after a switch"
 
-  mkdir -p "$account_test_home/.config/omarchy/defaults"
-  printf '%s\n' "$provider" >"$account_test_home/.config/omarchy/defaults/agent"
+  mkdir -p "$account_test_home/.config/helios/defaults"
+  printf '%s\n' "$provider" >"$account_test_home/.config/helios/defaults/agent"
   select_account "$provider" main
-  output=$(run_isolated env OMARCHY_TEST_SWITCH_ACCOUNT=yes OMARCHY_TEST_NEW_SESSION=yes "$provider")
+  output=$(run_isolated env HELIOS_TEST_SWITCH_ACCOUNT=yes HELIOS_TEST_NEW_SESSION=yes "$provider")
   [[ $(sed -n '2p' <<<"$output") == "$account_dir" ]] || fail "$provider new sessions follow a switch from Main" "$output"
   pass "$provider new sessions follow a switch from Main"
 
-  output=$(run_isolated env OMARCHY_TEST_SWITCH_ACCOUNT=yes OMARCHY_TEST_SWITCH_TO=main OMARCHY_TEST_NEW_SESSION=yes "$provider")
+  output=$(run_isolated env HELIOS_TEST_SWITCH_ACCOUNT=yes HELIOS_TEST_SWITCH_TO=main HELIOS_TEST_NEW_SESSION=yes "$provider")
   [[ $(sed -n '2p' <<<"$output") == default ]] || fail "$provider new sessions follow a switch to Main" "$output"
   pass "$provider new sessions follow a switch to Main"
 
   select_account "$provider" side
-  output=$(run_isolated env OMARCHY_TEST_SWITCH_ACCOUNT=yes OMARCHY_TEST_SWITCH_TO=main "$provider")
+  output=$(run_isolated env HELIOS_TEST_SWITCH_ACCOUNT=yes HELIOS_TEST_SWITCH_TO=main "$provider")
   [[ $output == "$(printf '%s\n' "$account_dir" "$account_dir")" ]] || fail "$provider side sessions keep their account after a switch" "$output"
   pass "$provider side sessions keep their account after a switch"
 
-  output=$(run_isolated env "OMARCHY_AGENT_${provider^^}_HOME=" "$account_env=/explicit/account" omarchy-agent --inline)
+  output=$(run_isolated env "HELIOS_AGENT_${provider^^}_HOME=" "$account_env=/explicit/account" helios-agent --inline)
   [[ ${output%%$'\n'*} == /explicit/account ]] || fail "$provider new sessions preserve explicit account overrides" "$output"
   pass "$provider new sessions preserve explicit account overrides"
 
   select_account "$provider" side
-  output=$(run_isolated omarchy-agent-account-add --reauth :primary "$provider" </dev/null)
+  output=$(run_isolated helios-agent-account-add --reauth :primary "$provider" </dev/null)
   grep -Fxq default <<<"$output" || fail "$provider primary reauthentication bypasses the active side account" "$output"
   pass "$provider primary reauthentication bypasses the active side account"
 
@@ -135,7 +135,7 @@ output=$(run_isolated python3 -c 'import subprocess; print(subprocess.check_outp
 pass "a Python subprocess follows the selected Claude subscription"
 
 select_account codex side
-output=$(run_isolated env OMARCHY_TEST_AGENT_CHILD=codex claude)
+output=$(run_isolated env HELIOS_TEST_AGENT_CHILD=codex claude)
 expected=$(printf '%s\n' "$test_tmp/accounts/claude side" "$test_tmp/accounts/codex side")
 [[ $output == "$expected" ]] || fail "an agent's subprocess still dispatches the other provider's selected account" "$output"
 pass "an agent's subprocess still dispatches the other provider's selected account"
@@ -160,7 +160,7 @@ output=$(run_isolated bash -c 'eval "$(mise env -s bash)"; [[ $PATH == *"/instal
 pass "mise PATH activation retains account dispatch"
 
 status=0
-run_isolated env OMARCHY_TEST_AGENT_EXIT=42 claude >/dev/null || status=$?
+run_isolated env HELIOS_TEST_AGENT_EXIT=42 claude >/dev/null || status=$?
 (( status == 42 )) || fail "account dispatch preserves the agent exit status" "$status"
 pass "account dispatch preserves the agent exit status"
 
@@ -170,7 +170,7 @@ cat >"$real_bin/mise" <<'SH'
 #!/bin/bash
 case "$1" in
   use)
-    [[ ${OMARCHY_TEST_INSTALL_FAIL:-} != "yes" ]] || exit 42
+    [[ ${HELIOS_TEST_INSTALL_FAIL:-} != "yes" ]] || exit 42
     [[ $* == "use -g --quiet grok" ]] || exit 99
     cp "$HOME/../grok-fixture" "$HOME/../real/bin/grok"
     ;;
@@ -189,7 +189,7 @@ pass "a dispatcher without a CLI installs it and uses the selected account"
 
 rm "$real_bin/grok"
 status=0
-run_isolated env OMARCHY_TEST_INSTALL_FAIL=yes grok >/dev/null || status=$?
+run_isolated env HELIOS_TEST_INSTALL_FAIL=yes grok >/dev/null || status=$?
 (( status == 42 )) || fail "a failed first-run install stops dispatch" "$status"
 pass "a failed first-run install stops dispatch"
 rm "$real_bin/mise"

@@ -1,7 +1,7 @@
-echo "Relink agent skill symlinks to default/agents/skills/omarchy"
+echo "Relink agent skill symlinks to default/agents/skills/helios"
 
 mkdir -p ~/.agents/skills ~/.claude/skills ~/.codex/skills ~/.pi/agent/skills
-ln -sfn "$OMARCHY_PATH/default/agents/skills/omarchy" ~/.agents/skills/omarchy
-ln -sfn "$OMARCHY_PATH/default/agents/skills/omarchy" ~/.claude/skills/omarchy
-ln -sfn "$OMARCHY_PATH/default/agents/skills/omarchy" ~/.codex/skills/omarchy
-ln -sfn "$OMARCHY_PATH/default/agents/skills/omarchy" ~/.pi/agent/skills/omarchy
+ln -sfn "$HELIOS_PATH/default/agents/skills/helios" ~/.agents/skills/helios
+ln -sfn "$HELIOS_PATH/default/agents/skills/helios" ~/.claude/skills/helios
+ln -sfn "$HELIOS_PATH/default/agents/skills/helios" ~/.codex/skills/helios
+ln -sfn "$HELIOS_PATH/default/agents/skills/helios" ~/.pi/agent/skills/helios

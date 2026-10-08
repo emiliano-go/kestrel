@@ -1,1 +1,1 @@
-omarchy-apply-lock
+helios-apply-lock

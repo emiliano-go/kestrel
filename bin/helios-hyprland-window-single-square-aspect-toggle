@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# helios:summary=Toggle single-window square aspect ratio.
+
+case $(helios-hyprland-toggle single-window-aspect-ratio) in
+  on) helios-notification-send -g  "Enable single-window square aspect ratio" ;;
+  off) helios-notification-send -g  "Disable single-window square aspect ratio" ;;
+esac

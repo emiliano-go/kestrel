@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# helios:summary=Install a packaged app, surfacing the install in a floating terminal
+# helios:args=<display-name> <packages>
+# helios:examples=helios install app 'LM Studio' lmstudio-bin
+
+name="${1-}"
+packages="${2-}"
+
+if [[ -z $name || -z $packages ]]; then
+  echo "Usage: helios-install-app <display-name> <packages>" >&2
+  exit 1
+fi
+
+printf -v install_message '%q' "Installing ${name}..."
+
+# The list has to reach helios-pkg-add as several words, so each word is quoted
+# rather than the whole string; -d '' reads past newlines and always ends at EOF.
+read -r -d '' -a package_list <<<"$packages" || true
+printf -v packages_arg '%q ' "${package_list[@]}"
+packages_arg="${packages_arg% }"
+
+exec helios-launch-floating-terminal-with-presentation \
+  "echo ${install_message}; helios-pkg-add ${packages_arg}"

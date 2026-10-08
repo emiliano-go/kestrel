@@ -13,12 +13,12 @@ printf 'P6\n1 1\n255\n\377\377\377' >"$stage/cover.ppm"
 cp "$ROOT/shell/services/BackgroundIntro.qml" "$stage/services/"
 ln -s "$ROOT/shell/Commons" "$stage/Commons"
 cp "$SHELL_TEST_DIR/fixtures/background-intro-lifecycle/shell.qml" "$stage/shell.qml"
-cat >"$stage/bin/omarchy-theme-bg-boot-intro" <<'SH'
+cat >"$stage/bin/helios-theme-bg-boot-intro" <<'SH'
 #!/bin/bash
 printf 'intro\n' >>"$INTRO_TEST_LOG"
 sleep 2
 SH
-chmod +x "$stage/bin/omarchy-theme-bg-boot-intro"
+chmod +x "$stage/bin/helios-theme-bg-boot-intro"
 cat >"$stage/bin/owe" <<'SH'
 #!/bin/bash
 if [[ -f $INTRO_TEST_FRAME_READY ]]; then

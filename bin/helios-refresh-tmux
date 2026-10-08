@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# helios:summary=Overwrite the user tmux config with the HeliOS default and reload tmux.
+
+helios-refresh-config tmux/tmux.conf
+helios-restart-tmux

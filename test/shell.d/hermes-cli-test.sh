@@ -16,17 +16,17 @@ pkg_log="$test_tmp/pkg-log"
 mkdir -p "$mock_bin" "$test_home/.local/bin"
 : >"$mise_log"
 
-cat >"$mock_bin/omarchy-pkg-present" <<'SH'
+cat >"$mock_bin/helios-pkg-present" <<'SH'
 #!/bin/bash
-[[ ${OMARCHY_TEST_DESKTOP_INSTALLED:-0} == 1 ]]
+[[ ${HELIOS_TEST_DESKTOP_INSTALLED:-0} == 1 ]]
 SH
 
 # Installing the package is the first thing the runtime setup does, so a mock
 # that fails there proves the installer would have installed without running
 # the rest of the setup, which hermes-desktop-install-test.sh covers.
-cat >"$mock_bin/omarchy-pkg-add" <<'SH'
+cat >"$mock_bin/helios-pkg-add" <<'SH'
 #!/bin/bash
-printf '%s\n' "$*" >>"$OMARCHY_TEST_PKG_LOG"
+printf '%s\n' "$*" >>"$HELIOS_TEST_PKG_LOG"
 exit 1
 SH
 
@@ -36,53 +36,53 @@ SH
 # until uninstalled and unrequested respectively. Every call is logged.
 cat >"$mock_bin/mise" <<'SH'
 #!/bin/bash
-printf 'mise %s\n' "$*" >>"$OMARCHY_TEST_MISE_LOG"
+printf 'mise %s\n' "$*" >>"$HELIOS_TEST_MISE_LOG"
 case "$1" in
   where)
-    [[ ${OMARCHY_TEST_MISE_BUILT:-0} == 1 && ! -e $OMARCHY_TEST_MISE_LOG.removed ]]
+    [[ ${HELIOS_TEST_MISE_BUILT:-0} == 1 && ! -e $HELIOS_TEST_MISE_LOG.removed ]]
     ;;
   ls)
-    if [[ ${OMARCHY_TEST_MISE_BUILT:-0} == 1 && ! -e $OMARCHY_TEST_MISE_LOG.unrequested ]]; then
+    if [[ ${HELIOS_TEST_MISE_BUILT:-0} == 1 && ! -e $HELIOS_TEST_MISE_LOG.unrequested ]]; then
       echo '{"pipx:hermes-agent[extras=all]": [{"version": "latest"}]}'
-    elif [[ ${OMARCHY_TEST_MISE_SIBLING:-0} == 1 ]]; then
+    elif [[ ${HELIOS_TEST_MISE_SIBLING:-0} == 1 ]]; then
       echo '{"pipx:hermes-agent-tools": [{"version": "latest"}]}'
     else
       echo '{}'
     fi
     ;;
   rm)
-    touch "$OMARCHY_TEST_MISE_LOG.unrequested"
+    touch "$HELIOS_TEST_MISE_LOG.unrequested"
     ;;
   uninstall)
-    touch "$OMARCHY_TEST_MISE_LOG.removed"
-    rm -f "${OMARCHY_TEST_SHIM:-}"
+    touch "$HELIOS_TEST_MISE_LOG.removed"
+    rm -f "${HELIOS_TEST_SHIM:-}"
     ;;
 esac
 SH
 
 chmod +x "$mock_bin"/*
 
-# ~/.local/bin is on PATH the way Omarchy puts it there, after the mocks, so
+# ~/.local/bin is on PATH the way HeliOS puts it there, after the mocks, so
 # `hermes` resolves to the command under test unless a test shadows it.
 run_installer() {
-  OMARCHY_TEST_DESKTOP_INSTALLED="${OMARCHY_TEST_DESKTOP_INSTALLED:-0}" \
-    OMARCHY_TEST_MISE_LOG="$mise_log" \
-    OMARCHY_TEST_PKG_LOG="$pkg_log" \
-    OMARCHY_TEST_RAN="$ran" \
+  HELIOS_TEST_DESKTOP_INSTALLED="${HELIOS_TEST_DESKTOP_INSTALLED:-0}" \
+    HELIOS_TEST_MISE_LOG="$mise_log" \
+    HELIOS_TEST_PKG_LOG="$pkg_log" \
+    HELIOS_TEST_RAN="$ran" \
     HOME="$test_home" \
     PATH="$mock_bin:$test_home/.local/bin:$PATH" \
-    bash "$ROOT/bin/omarchy-install-hermes-cli" "$@" >"$test_tmp/output" 2>&1
+    bash "$ROOT/bin/helios-install-hermes-cli" "$@" >"$test_tmp/output" 2>&1
 }
 
-# A hermes that runs, defines the flags omarchy-agent passes unless a test says
+# A hermes that runs, defines the flags helios-agent passes unless a test says
 # otherwise, and records that it ran. With "ours" it names the runtime the way
 # upstream's launcher does; without, it is a command from somewhere else.
 write_hermes() {
   cat >"$hermes" <<'SH'
 #!/bin/bash
-touch "$OMARCHY_TEST_RAN"
+touch "$HELIOS_TEST_RAN"
 if [[ ${1:-} == "chat" && ${2:-} == "--help" ]]; then
-  printf '%s\n' "${OMARCHY_TEST_HERMES_HELP-[-q QUERY, --query QUERY] [--tui]}"
+  printf '%s\n' "${HELIOS_TEST_HERMES_HELP-[-q QUERY, --query QUERY] [--tui]}"
 else
   echo "hermes-agent 0.0.0-test"
 fi
@@ -93,10 +93,10 @@ SH
   chmod +x "$hermes"
 }
 
-legacy_marker="# Written by omarchy-install-hermes-cli."
+legacy_marker="# Written by helios-install-hermes-cli."
 
 write_legacy_stub() {
-  printf '%s\n' "#!/bin/bash" "$legacy_marker" 'touch "$OMARCHY_TEST_RAN"' >"$1"
+  printf '%s\n' "#!/bin/bash" "$legacy_marker" 'touch "$HELIOS_TEST_RAN"' >"$1"
   chmod +x "$1"
 }
 
@@ -159,42 +159,42 @@ pass "--now installs over the retired mise wrapper without running it"
 runtime="$test_home/.hermes/hermes-agent"
 native="$runtime/apps/desktop/release/linux-unpacked/resources"
 write_hermes ours
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check calls an app with no runtime installed"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check calls an app with no runtime installed"
 mkdir -p "$runtime" "$native"
 touch "$runtime/.hermes-bootstrap-complete"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check calls an app whose packaged build is not seeded installed"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check calls an app whose packaged build is not seeded installed"
 touch "$native/app.asar" "$native/install-stamp.json"
 printf '#!/bin/bash\nexit 0\n' >"$native/../Hermes"
 chmod +x "$native/../Hermes"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check || fail "--check follows a finished install"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check || fail "--check follows a finished install"
 pass "--check says no while --now still has work to do behind the app"
 
 # With the app installed, the terminal has to be on the app's Hermes: a working
 # command from somewhere else beside a finished runtime is not installed, so
 # --now gets to put the runtime's own command back.
 write_hermes
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check calls the app installed while the command is somebody else's"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check calls the app installed while the command is somebody else's"
 write_hermes ours
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check || fail "--check follows the runtime's own command"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check || fail "--check follows the runtime's own command"
 pass "--check needs the app's own command once the app is installed"
 
 # The flags have to be defined by the help, not merely mentioned in it, and
-# both of them: omarchy-agent passes --query to seed the session and --tui to
+# both of them: helios-agent passes --query to seed the session and --tui to
 # keep it interactive.
-OMARCHY_TEST_DESKTOP_INSTALLED=1 OMARCHY_TEST_HERMES_HELP='Run with --tui for a terminal session; see --query in the docs.' run_installer --check &&
+HELIOS_TEST_DESKTOP_INSTALLED=1 HELIOS_TEST_HERMES_HELP='Run with --tui for a terminal session; see --query in the docs.' run_installer --check &&
   fail "--check accepts flags that are only mentioned"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 OMARCHY_TEST_HERMES_HELP='[--tui]' run_installer --check && fail "--check accepts a hermes without --query"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 OMARCHY_TEST_HERMES_HELP='[-q QUERY, --query QUERY]' run_installer --check && fail "--check accepts a hermes without --tui"
+HELIOS_TEST_DESKTOP_INSTALLED=1 HELIOS_TEST_HERMES_HELP='[--tui]' run_installer --check && fail "--check accepts a hermes without --query"
+HELIOS_TEST_DESKTOP_INSTALLED=1 HELIOS_TEST_HERMES_HELP='[-q QUERY, --query QUERY]' run_installer --check && fail "--check accepts a hermes without --tui"
 pass "--check needs both flags defined, not mentioned"
 
 chmod -x "$hermes"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check accepts a hermes that is not executable"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check accepts a hermes that is not executable"
 rm -f "$hermes"
 mkdir "$hermes"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check accepts a directory at the command's path"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check accepts a directory at the command's path"
 rmdir "$hermes"
 ln -s "$test_tmp/nowhere" "$hermes"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check accepts a dangling link"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check accepts a dangling link"
 rm -f "$hermes"
 write_hermes ours
 pass "--check rejects what is not a command that runs"
@@ -202,7 +202,7 @@ pass "--check rejects what is not a command that runs"
 # Installed and finished: nothing to do, and quickly, because choosing the
 # agent from the menu runs this.
 : >"$pkg_log"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --now || fail "--now accepts a finished install" "$(cat "$test_tmp/output")"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --now || fail "--now accepts a finished install" "$(cat "$test_tmp/output")"
 [[ ! -s $pkg_log && ! -s $test_tmp/output ]] || fail "a finished install is set up again" "$(cat "$test_tmp/output")"
 pass "--now has nothing to do once the app and its runtime are in"
 
@@ -212,23 +212,23 @@ pass "Hermes never goes through mise"
 # A PATH that finds no hermes at all is not in the way: the theme unit asks
 # from a service whose PATH has no ~/.local/bin and runs the command by path.
 run_installer_bare_path() {
-  OMARCHY_TEST_DESKTOP_INSTALLED="${OMARCHY_TEST_DESKTOP_INSTALLED:-0}" \
-    OMARCHY_TEST_MISE_LOG="$mise_log" OMARCHY_TEST_PKG_LOG="$pkg_log" OMARCHY_TEST_RAN="$ran" \
+  HELIOS_TEST_DESKTOP_INSTALLED="${HELIOS_TEST_DESKTOP_INSTALLED:-0}" \
+    HELIOS_TEST_MISE_LOG="$mise_log" HELIOS_TEST_PKG_LOG="$pkg_log" HELIOS_TEST_RAN="$ran" \
     HOME="$test_home" PATH="$mock_bin:/usr/bin" \
-    bash "$ROOT/bin/omarchy-install-hermes-cli" "$@" >"$test_tmp/output" 2>&1
+    bash "$ROOT/bin/helios-install-hermes-cli" "$@" >"$test_tmp/output" 2>&1
 }
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer_bare_path --check || fail "--check from a PATH without ~/.local/bin still follows a finished install" "$(cat "$test_tmp/output")"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer_bare_path --check || fail "--check from a PATH without ~/.local/bin still follows a finished install" "$(cat "$test_tmp/output")"
 pass "--check does not need ~/.local/bin on the caller's PATH"
 
-# What omarchy-agent runs is whichever hermes PATH finds first, and Omarchy
+# What helios-agent runs is whichever hermes PATH finds first, and HeliOS
 # puts mise's shims ahead of ~/.local/bin. A command ahead of the one the probe
 # vets means the agent would run something else, so it is not installed, and
 # --now says what is in the way rather than reporting a Hermes that is not the
 # one the agent gets.
 cp "$hermes" "$mock_bin/hermes"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check calls a shadowed command installed"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check && fail "--check calls a shadowed command installed"
 rm -f "$mock_bin/hermes"
-OMARCHY_TEST_DESKTOP_INSTALLED=1 run_installer --check || fail "--check follows the command once nothing shadows it"
+HELIOS_TEST_DESKTOP_INSTALLED=1 run_installer --check || fail "--check follows the command once nothing shadows it"
 pass "a hermes ahead of ~/.local/bin on PATH is not the one the agent gets"
 
 # The retired wrapper's environment goes with the wrapper's proof, wherever
@@ -237,20 +237,20 @@ pass "a hermes ahead of ~/.local/bin on PATH is not the one the agent gets"
 # before their migration ran is not left with mise's shim answering `hermes`.
 write_legacy_stub "$hermes"
 : >"$mise_log"; rm -f "$mise_log.removed" "$mise_log.unrequested"
-OMARCHY_TEST_MISE_BUILT=1 run_installer --retire-mise || fail "--retire-mise succeeds over the wrapper" "$(cat "$test_tmp/output")"
+HELIOS_TEST_MISE_BUILT=1 run_installer --retire-mise || fail "--retire-mise succeeds over the wrapper" "$(cat "$test_tmp/output")"
 [[ ! -e $hermes ]] || fail "--retire-mise removes the wrapper"
 grep -qF "mise rm -g pipx:hermes-agent[extras=all]" "$mise_log" || fail "--retire-mise removes the global mise Hermes" "$(cat "$mise_log")"
 grep -qF "mise uninstall --all pipx:hermes-agent[extras=all]" "$mise_log" || fail "--retire-mise uninstalls the mise Hermes" "$(cat "$mise_log")"
 : >"$mise_log"
-run_installer --retire-mise || fail "--retire-mise succeeds with nothing of Omarchy's"
-[[ ! -s $mise_log ]] || fail "--retire-mise asks mise about an environment nothing proves Omarchy's" "$(cat "$mise_log")"
+run_installer --retire-mise || fail "--retire-mise succeeds with nothing of HeliOS's"
+[[ ! -s $mise_log ]] || fail "--retire-mise asks mise about an environment nothing proves HeliOS's" "$(cat "$mise_log")"
 pass "--retire-mise removes the wrapper and the environment it built, and only with proof"
 
 # A global tool whose name merely starts the same way is not the retired one;
 # read as it, it could never be removed and the migration would stay pending.
 write_legacy_stub "$hermes"
 : >"$mise_log"
-OMARCHY_TEST_MISE_SIBLING=1 run_installer --retire-mise || fail "--retire-mise succeeds beside a tool named like the retired one" "$(cat "$test_tmp/output")"
+HELIOS_TEST_MISE_SIBLING=1 run_installer --retire-mise || fail "--retire-mise succeeds beside a tool named like the retired one" "$(cat "$test_tmp/output")"
 [[ ! -e $hermes ]] || fail "the wrapper goes when only a similarly named tool is requested"
 ! grep -q '^mise rm' "$mise_log" || fail "a similarly named tool is taken for the retired one" "$(cat "$mise_log")"
 pass "a mise tool named like the retired one does not keep the migration pending"

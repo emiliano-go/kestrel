@@ -7,11 +7,11 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 test_tmp=$(mktemp -d)
 trap 'rm -rf "$test_tmp"' EXIT
 home="$test_tmp/home"
-state="$home/.local/state/omarchy/current"
-themes="$home/.config/omarchy/themes"
+state="$home/.local/state/helios/current"
+themes="$home/.config/helios/themes"
 commands="$test_tmp/bin"
 log="$test_tmp/commands"
-mkdir -p "$state" "$commands" "$home/.local/state/omarchy/theme-backgrounds"
+mkdir -p "$state" "$commands" "$home/.local/state/helios/theme-backgrounds"
 for theme in alpha beta; do
   mkdir -p "$themes/$theme/backgrounds/intros"
   cp "$ROOT/themes/tokyo-night/colors.toml" "$themes/$theme/colors.toml"
@@ -22,8 +22,8 @@ done
 cp -r "$themes/alpha" "$state/theme"
 printf 'alpha\n' >"$state/theme.name"
 ln -s "$state/theme/backgrounds/1-sky.webp" "$state/background"
-printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/omarchy/theme-backgrounds/beta"
-printf 'already-consumed\n' >"$home/.local/state/omarchy/background-intro.session-id"
+printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/helios/theme-backgrounds/beta"
+printf 'already-consumed\n' >"$home/.local/state/helios/background-intro.session-id"
 
 cat >"$commands/noop" <<'STUB'
 #!/bin/bash
@@ -31,16 +31,16 @@ exit 0
 STUB
 chmod +x "$commands/noop"
 # Post-theme retints run through bash -lc; this fixture only exercises selection and presentation.
-for command in omarchy-theme-set-templates omarchy-hook omarchy-theme-set-herdr-machines omarchy-theme-bg-cache; do
+for command in helios-theme-set-templates helios-hook helios-theme-set-herdr-machines helios-theme-bg-cache; do
   ln -s noop "$commands/$command"
 done
 cat >"$commands/bash" <<'STUB'
 #!/bin/bash
-if [[ $1 == "-lc" && $2 == "omarchy-restart-hyprctl" ]]; then
-  omarchy-restart-hyprctl
+if [[ $1 == "-lc" && $2 == "helios-restart-hyprctl" ]]; then
+  helios-restart-hyprctl
 fi
 STUB
-cat >"$commands/omarchy-restart-hyprctl" <<'STUB'
+cat >"$commands/helios-restart-hyprctl" <<'STUB'
 #!/bin/bash
 echo "hypr-reload" >>"$TEST_LOG"
 STUB
@@ -48,7 +48,7 @@ cat >"$commands/hyprctl" <<'STUB'
 #!/bin/bash
 printf '{"bool":%s}\n' "${TEST_ANIMATIONS:-true}"
 STUB
-cat >"$commands/omarchy-shell" <<'STUB'
+cat >"$commands/helios-shell" <<'STUB'
 #!/bin/bash
 printf 'shell: %s\n' "$*" >>"$TEST_LOG"
 if [[ -n ${TEST_GATE_DIR:-} ]]; then
@@ -98,12 +98,12 @@ if [[ $1 == intro && -n ${TEST_RELEASE:-} ]]; then
   exit 1
 fi
 STUB
-chmod +x "$commands/bash" "$commands/omarchy-restart-hyprctl" "$commands/hyprctl" "$commands/omarchy-shell" "$commands/owe"
+chmod +x "$commands/bash" "$commands/helios-restart-hyprctl" "$commands/hyprctl" "$commands/helios-shell" "$commands/owe"
 
 set_theme() {
   : >"$log"
-  HOME="$home" OMARCHY_PATH="$ROOT" PATH="$commands:$ROOT/bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" TEST_LOG="$log" \
-    /bin/bash "$ROOT/bin/omarchy-theme-set" "$1" >"$test_tmp/stdout" 2>"$test_tmp/stderr" || fail "theme selection completes" "$(cat "$test_tmp/stderr")"
+  HOME="$home" HELIOS_PATH="$ROOT" PATH="$commands:$ROOT/bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" TEST_LOG="$log" \
+    /bin/bash "$ROOT/bin/helios-theme-set" "$1" >"$test_tmp/stdout" 2>"$test_tmp/stderr" || fail "theme selection completes" "$(cat "$test_tmp/stderr")"
 }
 wait_command() {
   for attempt in {1..100}; do
@@ -118,48 +118,48 @@ wait_command '^owe: intro '
 grep -Fxq "owe: intro --start first-frame --refresh $state/theme/backgrounds/intros/2-road.mp4" "$log" || fail "a theme switch plays the remembered background's matching prepared intro"
 [[ $(readlink "$state/background") == "$state/theme/backgrounds/2-road.webp" ]] || fail "the remembered background is selected"
 ! grep -qE '^shell: background (prepare|themeTransition)' "$log" || fail "an intro replaces the normal still transition"
-[[ $(<"$home/.local/state/omarchy/background-intro.session-id") == already-consumed ]] || fail "a theme switch leaves login consumption unchanged"
+[[ $(<"$home/.local/state/helios/background-intro.session-id") == already-consumed ]] || fail "a theme switch leaves login consumption unchanged"
 pass "switching themes plays the matching intro for the remembered background"
 
 set_theme beta
 [[ $(readlink "$state/background") == "$state/theme/backgrounds/1-sky.webp" ]] || fail "reselecting the current theme cycles its background"
 grep -q '^shell: background themeTransition ' "$log" || fail "same-theme cycling uses the normal still transition"
 ! grep -q '^owe: intro ' "$log" || fail "same-theme cycling does not play an intro"
-OMARCHY_THEME_SKIP_BACKGROUND=1 set_theme alpha
+HELIOS_THEME_SKIP_BACKGROUND=1 set_theme alpha
 ! grep -q '^owe: intro ' "$log" || fail "theme refresh does not play an intro"
 pass "same-theme cycling and refresh keep the normal background behavior"
 
-printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/omarchy/theme-backgrounds/beta"
-mkdir -p "$home/.local/state/omarchy/toggles"
-touch "$home/.local/state/omarchy/toggles/background-intros-off"
+printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/helios/theme-backgrounds/beta"
+mkdir -p "$home/.local/state/helios/toggles"
+touch "$home/.local/state/helios/toggles/background-intros-off"
 set_theme beta
 grep -q '^shell: background themeTransition ' "$log" || fail "disabled intros use the normal still transition"
 ! grep -q '^owe: intro ' "$log" || fail "disabled intros do not play on theme selection"
-rm "$home/.local/state/omarchy/toggles/background-intros-off"
-printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/omarchy/theme-backgrounds/alpha"
+rm "$home/.local/state/helios/toggles/background-intros-off"
+printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/helios/theme-backgrounds/alpha"
 TEST_ANIMATIONS=false set_theme alpha
 grep -q '^shell: background themeTransition ' "$log" || fail "disabled animations use the normal still transition"
 ! grep -q '^owe: intro ' "$log" || fail "disabled animations do not play an intro"
-OMARCHY_THEME_HEADLESS=1 set_theme beta
+HELIOS_THEME_HEADLESS=1 set_theme beta
 ! grep -q '^owe: intro ' "$log" || fail "headless theme setup does not play an intro"
 pass "theme intros respect the global toggle, disabled animations, and headless setup"
 
 # Alpha's remembered image must have a clip for these presentation checks.
-printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/omarchy/theme-backgrounds/alpha"
+printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/helios/theme-backgrounds/alpha"
 TEST_OWE_FAIL=true set_theme alpha
 wait_command '^shell: background setInstant '
 wait_command '^hypr-reload$'
 ! grep -q '^owe: intro ' "$log" || fail "an unavailable renderer falls back to the still"
 pass "unavailable OWE falls back to the selected still image"
 
-printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/omarchy/theme-backgrounds/beta"
+printf '%s\n' "$state/theme/backgrounds/2-road.webp" >"$home/.local/state/helios/theme-backgrounds/beta"
 release="$test_tmp/release"
 TEST_LIVE_FRAME=true TEST_INTRO_PID="$test_tmp/intro.pid" TEST_RELEASE="$release" set_theme beta
 wait_command '^owe: intro '
 cover=$(awk '/^shell: shell prepareThemeIntro / { print $4; exit }' "$log")
 [[ -f $cover && $(<"$cover") == "live video frame" ]] || fail "an interrupted video supplies the outgoing cover instead of its final still"
 kill -0 "$(<"$test_tmp/intro.pid")" || fail "the fake renderer is still playing during the lock check"
-timeout 1 flock "$test_tmp/omarchy-theme-set.lock" true || fail "theme playback does not retain the theme selection lock"
+timeout 1 flock "$test_tmp/helios-theme-set.lock" true || fail "theme playback does not retain the theme selection lock"
 touch "$release"
 pass "interrupted playback uses its current frame and releases the theme selection lock"
 
@@ -191,7 +191,7 @@ TEST_INTRO_PID="$test_tmp/intro.pid" TEST_RELEASE="$release" set_theme beta
 wait_command '^owe: intro '
 cover=$(awk '/^shell: shell prepareThemeIntro / { print $4; exit }' "$log")
 ! grep -q '^hypr-reload$' "$log" || fail "the held intro has not reloaded the compositor"
-OMARCHY_THEME_SKIP_BACKGROUND=1 set_theme alpha
+HELIOS_THEME_SKIP_BACKGROUND=1 set_theme alpha
 grep -q '^hypr-reload$' "$log" || fail "a theme refresh reloads the compositor immediately"
 touch "$release"
 for attempt in {1..100}; do

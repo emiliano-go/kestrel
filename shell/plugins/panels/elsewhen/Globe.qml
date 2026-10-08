@@ -196,7 +196,7 @@ Item {
   readonly property var sub: Solar.subsolarPoint(nowMs)
 
   // FileView, not XMLHttpRequest: XHR on file:// comes back empty in the shell.
-  readonly property string pluginDir: Quickshell.env("OMARCHY_PATH") + "/shell/plugins/panels/elsewhen"
+  readonly property string pluginDir: Quickshell.env("HELIOS_PATH") + "/shell/plugins/panels/elsewhen"
 
   // "UTC+2" or "+9h", per the panel's setting, exactly as the rows print it.
   function offsetLabelFor(zone) {

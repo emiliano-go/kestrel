@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# helios:summary=Toggle notification do-not-disturb mode
+
+state=$(helios-shell notifications toggleDnd 2>/dev/null || echo "")
+helios-shell -q helios.indicators refresh

@@ -1,6 +1,6 @@
 echo "Enable Dell XPS 13 sidecar speaker amplifiers"
 
-if omarchy-hw-dell-xps13-sidecar-amps; then
-  source "$OMARCHY_PATH/install/hardware/dell-xps13-sidecar-amps.sh"
-  omarchy-state set reboot-required
+if helios-hw-dell-xps13-sidecar-amps; then
+  source "$HELIOS_PATH/install/hardware/dell-xps13-sidecar-amps.sh"
+  helios-state set reboot-required
 fi

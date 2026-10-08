@@ -1,6 +1,6 @@
 # Shell Tools
 
-In addition to the standard Linux tools, Omarchy also ships with a bunch of enhanced shell tools. Here are the key ones.
+In addition to the standard Linux tools, HeliOS also ships with a bunch of enhanced shell tools. Here are the key ones.
 
 ## fzf
 
@@ -14,7 +14,7 @@ The full manual can be found via `man fzf`.
 
 ## Zoxide
 
-[Zoxide](https://github.com/ajeetdsouza/zoxide) is a replacement for cd. It remembers the directories you've been in, so you can more easily jump to them next time. Say you do `cd ~/.config/omarchy` once. Next time, you can just do `cd omarchy` (or even just `cd oma`), and Zoxide will take you directly there.
+[Zoxide](https://github.com/ajeetdsouza/zoxide) is a replacement for cd. It remembers the directories you've been in, so you can more easily jump to them next time. Say you do `cd ~/.config/helios` once. Next time, you can just do `cd helios` (or even just `cd oma`), and Zoxide will take you directly there.
 
 The full manual can be found via `man zoxide`.
 
@@ -58,4 +58,4 @@ The full manual can be found via `man yt-dlp`.
 
 [try](https://github.com/tobi/try) makes it easy to manage programming experiments with date-stamped directories. All experiments live in `~/Work/tries` and you can access them via `try`.
 
-Omarchy does not add a project's `bin/` directory to `PATH` automatically. Run trusted project-local tools with an explicit relative path, such as `bin/rails` or `./bin/dev`.
+HeliOS does not add a project's `bin/` directory to `PATH` automatically. Run trusted project-local tools with an explicit relative path, such as `bin/rails` or `./bin/dev`.

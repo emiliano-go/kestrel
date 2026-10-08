@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# helios:summary=Open the HeliOS Discord community in the Discord app or a browser.
+
+invite="https://discord.gg/tXFUdasqhY"
+
+if helios-cmd-present discord; then
+  exec setsid uwsm-app -- discord --url -- "discord://-/invite/${invite##*/}"
+else
+  exec helios-launch-webapp "$invite"
+fi

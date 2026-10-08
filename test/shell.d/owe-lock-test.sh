@@ -17,7 +17,7 @@ ln -s "$ROOT/shell/Commons" "$work/config/Commons"
 # Offscreen rendering exercises the real QML bindings without taking a lock
 # or connecting to the user's compositor.
 HOME="$work/home" XDG_RUNTIME_DIR="$work/runtime" \
-  OMARCHY_PATH="$ROOT" QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME= \
+  HELIOS_PATH="$ROOT" QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME= \
   QT_STYLE_OVERRIDE= QT_QUICK_BACKEND=software \
   timeout 15 quickshell -p "$work/config" --no-color >"$work/log" 2>&1 || {
     cat "$work/log" >&2

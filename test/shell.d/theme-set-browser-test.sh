@@ -20,12 +20,12 @@ FAKE
 chmod +x "$TMP_BIN/ps"
 
 # Stub the privileged writer so we can observe whether the setter calls it.
-cat > "$TMP_BIN/omarchy-theme-set-browser-policy" <<'FAKE'
+cat > "$TMP_BIN/helios-theme-set-browser-policy" <<'FAKE'
 #!/bin/bash
 printf '%s\n' "$*" >> "${CALL_LOG:?}"
 exit 0
 FAKE
-chmod +x "$TMP_BIN/omarchy-theme-set-browser-policy"
+chmod +x "$TMP_BIN/helios-theme-set-browser-policy"
 
 # A policy directory that already carries the target color, so the setter can
 # skip everything.
@@ -44,9 +44,9 @@ FAKE
 chmod +x "$stat_bin/stat"
 
 # No theme file -> fallback color #1c2027, which matches the fixture.
-HOME="$TMPDIR" PATH="$stat_bin:$TMP_BIN:$ROOT/bin:$PATH" OMARCHY_PATH="$ROOT" STAT_OWNER="root:root 644" \
-  OMARCHY_BROWSER_POLICY_DIRS="$policy_tmp" CALL_LOG="$CALL_LOG" \
-  bash "$ROOT/bin/omarchy-theme-set-browser" >/dev/null
+HOME="$TMPDIR" PATH="$stat_bin:$TMP_BIN:$ROOT/bin:$PATH" HELIOS_PATH="$ROOT" STAT_OWNER="root:root 644" \
+  HELIOS_BROWSER_POLICY_DIRS="$policy_tmp" CALL_LOG="$CALL_LOG" \
+  bash "$ROOT/bin/helios-theme-set-browser" >/dev/null
 
 if [[ -e $CALL_LOG ]]; then
   fail "setter skipped the privileged write when color.json already matches"
@@ -54,9 +54,9 @@ fi
 pass "setter skips the privileged write when color.json already matches"
 
 # The same color in a file the writer did not leave behind is not trusted.
-HOME="$TMPDIR" PATH="$stat_bin:$TMP_BIN:$ROOT/bin:$PATH" OMARCHY_PATH="$ROOT" STAT_OWNER="user:user 666" \
-  OMARCHY_BROWSER_POLICY_DIRS="$policy_tmp" CALL_LOG="$CALL_LOG" \
-  bash "$ROOT/bin/omarchy-theme-set-browser" >/dev/null
+HOME="$TMPDIR" PATH="$stat_bin:$TMP_BIN:$ROOT/bin:$PATH" HELIOS_PATH="$ROOT" STAT_OWNER="user:user 666" \
+  HELIOS_BROWSER_POLICY_DIRS="$policy_tmp" CALL_LOG="$CALL_LOG" \
+  bash "$ROOT/bin/helios-theme-set-browser" >/dev/null
 
 if [[ ! -e $CALL_LOG ]]; then
   fail "setter rewrites a matching color.json that is not root-owned 0644"
@@ -67,9 +67,9 @@ pass "setter rewrites a matching color.json that is not root-owned 0644"
 rm -f "$CALL_LOG"
 printf '{"BrowserThemeColor": "#ff0000"}\n' > "$policy_tmp/color.json"
 
-HOME="$TMPDIR" PATH="$TMP_BIN:$ROOT/bin:$PATH" OMARCHY_PATH="$ROOT" \
-  OMARCHY_BROWSER_POLICY_DIRS="$policy_tmp" CALL_LOG="$CALL_LOG" \
-  bash "$ROOT/bin/omarchy-theme-set-browser" >/dev/null
+HOME="$TMPDIR" PATH="$TMP_BIN:$ROOT/bin:$PATH" HELIOS_PATH="$ROOT" \
+  HELIOS_BROWSER_POLICY_DIRS="$policy_tmp" CALL_LOG="$CALL_LOG" \
+  bash "$ROOT/bin/helios-theme-set-browser" >/dev/null
 
 if [[ ! -e $CALL_LOG ]]; then
   fail "setter invoked the privileged writer when color.json mismatched"
@@ -79,9 +79,9 @@ pass "setter invokes the privileged writer when color.json mismatches"
 # No managed policy dirs at all must not vacuously skip the writer.
 rm -f "$CALL_LOG"
 
-HOME="$TMPDIR" PATH="$TMP_BIN:$ROOT/bin:$PATH" OMARCHY_PATH="$ROOT" \
-  OMARCHY_BROWSER_POLICY_DIRS="$TMPDIR/nonexistent" CALL_LOG="$CALL_LOG" \
-  bash "$ROOT/bin/omarchy-theme-set-browser" >/dev/null
+HOME="$TMPDIR" PATH="$TMP_BIN:$ROOT/bin:$PATH" HELIOS_PATH="$ROOT" \
+  HELIOS_BROWSER_POLICY_DIRS="$TMPDIR/nonexistent" CALL_LOG="$CALL_LOG" \
+  bash "$ROOT/bin/helios-theme-set-browser" >/dev/null
 
 if [[ ! -e $CALL_LOG ]]; then
   fail "setter invoked the privileged writer when no managed dirs exist"
@@ -105,7 +105,7 @@ for command in chromium google-chrome microsoft-edge-stable brave brave-origin; 
 done
 # Only the stubs count as installed, so a real browser on the host, such as
 # google-chrome-stable, is neither preferred nor launched.
-cat >"$browser_bin/omarchy-cmd-present" <<'FAKE'
+cat >"$browser_bin/helios-cmd-present" <<'FAKE'
 #!/bin/bash
 [[ -x ${BROWSER_BIN:?}/$1 ]]
 FAKE
@@ -113,9 +113,9 @@ chmod +x "$browser_bin"/*
 
 printf '{"BrowserThemeColor": "#ff0000"}\n' >"$policy_tmp/color.json"
 refresh_log="$TMPDIR/refreshes"
-HOME="$TMPDIR" PATH="$browser_bin:$TMP_BIN:$ROOT/bin:$PATH" OMARCHY_PATH="$ROOT" \
-  OMARCHY_BROWSER_POLICY_DIRS="$policy_tmp" CALL_LOG="$CALL_LOG" REFRESH_LOG="$refresh_log" BROWSER_BIN="$browser_bin" \
-  bash "$ROOT/bin/omarchy-theme-set-browser" >/dev/null
+HOME="$TMPDIR" PATH="$browser_bin:$TMP_BIN:$ROOT/bin:$PATH" HELIOS_PATH="$ROOT" \
+  HELIOS_BROWSER_POLICY_DIRS="$policy_tmp" CALL_LOG="$CALL_LOG" REFRESH_LOG="$refresh_log" BROWSER_BIN="$browser_bin" \
+  bash "$ROOT/bin/helios-theme-set-browser" >/dev/null
 
 refreshed=$(sort "$refresh_log" | tr '\n' ' ')
 # Chrome running as plain google-chrome is refreshed through that name; Edge is
@@ -125,6 +125,6 @@ refreshed=$(sort "$refresh_log" | tr '\n' ' ')
   fail "setter refreshes exactly the running browsers (got: $refreshed)"
 pass "setter refreshes exactly the running browsers"
 
-grep -q '<&0 &$' "$ROOT/bin/omarchy-theme-set-browser" ||
+grep -q '<&0 &$' "$ROOT/bin/helios-theme-set-browser" ||
   fail "setter keeps stdin for the backgrounded policy writer"
 pass "setter keeps stdin for the backgrounded policy writer"

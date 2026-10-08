@@ -1,0 +1,6 @@
+#!/bin/bash
+# helios:summary=Launch the clipboard manager
+# helios:group=menu
+# helios:examples=helios menu clipboard
+
+helios-shell shell toggle helios.clipboard

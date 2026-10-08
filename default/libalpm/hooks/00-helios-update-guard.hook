@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = *
+
+[Action]
+Description = Checking HeliOS update entrypoint...
+When = PreTransaction
+Depends = helios
+Exec = /usr/bin/helios-update-pacman-guard
+AbortOnFail

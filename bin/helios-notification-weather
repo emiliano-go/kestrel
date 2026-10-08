@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# helios:summary=Toggle the current weather panel
+
+helios-shell shell toggle helios.weather

@@ -1,8 +1,8 @@
 # Elsewhen
 
-A world clock for the Omarchy shell: a globe in the bar that opens a panel of clocks, one row per city, with a spinnable globe behind it. It lives in `shell/plugins/panels/elsewhen/` under the plugin id `omarchy.elsewhen`, and file names below are relative to that directory. Its checks live in `test/shell.d/elsewhen/` and run as part of `./test/shell` through `test/shell.d/elsewhen-test.sh`.
+A world clock for the HeliOS shell: a globe in the bar that opens a panel of clocks, one row per city, with a spinnable globe behind it. It lives in `shell/plugins/panels/elsewhen/` under the plugin id `helios.elsewhen`, and file names below are relative to that directory. Its checks live in `test/shell.d/elsewhen/` and run as part of `./test/shell` through `test/shell.d/elsewhen-test.sh`.
 
-Everything it needs is already on an Omarchy install: `date` and `timedatectl` for zone offsets, and `curl` for weather. Weather is the only thing that touches the network: [Open-Meteo](https://open-meteo.com) geocoding and forecasts, without an API key. The globe's coastlines are [Natural Earth](https://www.naturalearthdata.com) 110m (public domain), shipped as `world.json`. Settings live inline on the widget's `shell.json` entry; see [Settings](#settings).
+Everything it needs is already on an HeliOS install: `date` and `timedatectl` for zone offsets, and `curl` for weather. Weather is the only thing that touches the network: [Open-Meteo](https://open-meteo.com) geocoding and forecasts, without an API key. The globe's coastlines are [Natural Earth](https://www.naturalearthdata.com) 110m (public domain), shipped as `world.json`. Settings live inline on the widget's `shell.json` entry; see [Settings](#settings).
 
 ## Why it shells out to `date`
 
@@ -38,7 +38,7 @@ Everything is written to `shell.json` as a normal list, so the first thing anyon
 
 ## Adding and removing cities
 
-`+ Add a city` opens an inline search over the system's zone list. Clicking a result adds it; hovering a row reveals a `×` in its top-right corner to remove it. The last row cannot be removed. Changes are written straight back to this widget's entry in `~/.config/omarchy/shell.json`, so they survive a restart.
+`+ Add a city` opens an inline search over the system's zone list. Clicking a result adds it; hovering a row reveals a `×` in its top-right corner to remove it. The last row cannot be removed. Changes are written straight back to this widget's entry in `~/.config/helios/shell.json`, so they survive a restart.
 
 The search is driven from the keyboard: type, walk the results with the up and down arrows, Return adds the highlighted one, Escape closes. The selection starts on the first match, so the common case - type three letters, press Return - never needs an arrow at all, and it wraps at both ends because the list is six long and entirely on screen. A changed query puts the selection back on the first row: the list under it has been replaced, and Return should not add a city nobody looked at.
 
@@ -375,10 +375,10 @@ Inline on the widget's `shell.json` entry:
 ## IPC
 
 ```bash
-omarchy-shell omarchy.elsewhen toggle
-omarchy-shell omarchy.elsewhen globe                            # switch between list and globe
-omarchy-shell omarchy.elsewhen times                            # JSON, one entry per row
-omarchy-shell omarchy.elsewhen add America/New_York Miami
-omarchy-shell omarchy.elsewhen remove America/New_York
-omarchy-shell omarchy.elsewhen refresh                          # re-probe offsets
+helios-shell helios.elsewhen toggle
+helios-shell helios.elsewhen globe                            # switch between list and globe
+helios-shell helios.elsewhen times                            # JSON, one entry per row
+helios-shell helios.elsewhen add America/New_York Miami
+helios-shell helios.elsewhen remove America/New_York
+helios-shell helios.elsewhen refresh                          # re-probe offsets
 ```

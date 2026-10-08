@@ -1,6 +1,6 @@
 # Visual Verification
 
-Read this before finishing any change with a visual effect: Omarchy shell
+Read this before finishing any change with a visual effect: HeliOS shell
 styling and layout, panels, menus, notifications, desktop appearance,
 animations, transitions, screenshots, and screen recording flows.
 
@@ -12,18 +12,18 @@ regressions before finishing.
 Take a full-screen screenshot without opening the editor:
 
 ```bash
-omarchy capture screenshot fullscreen save
+helios capture screenshot fullscreen save
 ```
 
-The command writes to Omasnap's configured screenshot directory. Use `omarchy screenshot` for the interactive capture flow, which copies the capture and shows a timed preview. Use `omarchy screenshot --editor=overlay` to test annotation before output. Capture reference and candidate states as separate images when changing a layer-shell surface or layout, then compare both.
+The command writes to Omasnap's configured screenshot directory. Use `helios screenshot` for the interactive capture flow, which copies the capture and shows a timed preview. Use `helios screenshot --editor=overlay` to test annotation before output. Capture reference and candidate states as separate images when changing a layer-shell surface or layout, then compare both.
 
 Record a short full-screen video for animation, transition, timing, capture, or
 screen-recording changes:
 
 ```bash
-omarchy screenrecord --fullscreen
+helios screenrecord --fullscreen
 # Exercise the changed behavior.
-omarchy screenrecord --stop-recording
+helios screenrecord --stop-recording
 ```
 
 The stop command prints the saved video path in the configured Videos

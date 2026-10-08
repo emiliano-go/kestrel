@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# helios:summary=Toggle a full screen desktop: hide the top bar and remove the window gaps together
+# helios:args=[toggle|on|off]
+# helios:examples=helios toggle fullscreen desktop | helios toggle fullscreen desktop off | helios toggle fullscreen desktop on
+
+ACTION="${1:-toggle}"
+
+case $ACTION in
+  toggle|"")
+    # Only leave full screen when both halves are already in it, so a lone bar
+    # or a lone gap toggle is pulled into line rather than flipped away.
+    if helios-toggle-enabled bar-off && helios-hyprland-toggle-enabled window-no-gaps; then
+      ACTION="off"
+    else
+      ACTION="on"
+    fi
+    ;;
+  on|off) ;;
+  *)
+    echo "Usage: helios-toggle-fullscreen-desktop [toggle|on|off]" >&2
+    exit 1
+    ;;
+esac
+
+helios-toggle-bar "$ACTION"
+helios-hyprland-toggle window-no-gaps "$ACTION"

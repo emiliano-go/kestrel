@@ -51,9 +51,9 @@ ForceCommand /bin/bash {remote}
   UserKnownHostsFile {stage / 'known_hosts'}
 ''')
   home = stage / 'home'
-  current = home / '.local/state/omarchy/current'
+  current = home / '.local/state/helios/current'
   current.mkdir(parents=True)
-  toggles = home / '.local/state/omarchy/toggles'
+  toggles = home / '.local/state/helios/toggles'
   toggles.mkdir()
   (toggles / 'herdr-theme-sync').touch()
   runtime = stage / 'run'
@@ -86,20 +86,20 @@ ForceCommand /bin/bash {remote}
           time.sleep(0.05)
       for theme in ('tokyo-night', 'nord'):
         (current / 'theme.name').write_text(theme + '\n')
-        result = subprocess.run([str(root / 'bin/omarchy-theme-set-herdr-machines')], env=environment, capture_output=True, text=True, timeout=10)
+        result = subprocess.run([str(root / 'bin/helios-theme-set-herdr-machines')], env=environment, capture_output=True, text=True, timeout=10)
         assert result.returncode == 0 and 'theme-received' in result.stdout, (result.stdout, result.stderr, log_path.read_text())
         if theme == 'tokyo-night':
           (stage / 'identity').rename(stage / 'identity-unavailable')
       assert log_path.read_text().count('Accepted publickey') == 1, log_path.read_text()
       received = (stage / 'received').read_text()
       assert 'theme=tokyo-night' in received and 'theme=nord' in received
-      assert (runtime / 'omarchy-theme-sync').stat().st_mode & 0o777 == 0o700
-      lock = runtime / 'omarchy-theme-set-herdr-machines.lock'
+      assert (runtime / 'helios-theme-sync').stat().st_mode & 0o777 == 0o700
+      lock = runtime / 'helios-theme-set-herdr-machines.lock'
       assert subprocess.run(['flock', '-n', str(lock), 'true']).returncode == 0, 'SSH master retained the theme sync lock'
       print('ok - two theme syncs authenticate once, even with the key removed before the second sync')
       print('ok - persistent SSH master leaves the sync lock available')
     finally:
-      subprocess.run(['/usr/bin/ssh', '-F', str(client_config), '-o', 'ControlPath=' + str(runtime / 'omarchy-theme-sync/%C'), '-O', 'exit', 'fixture'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
+      subprocess.run(['/usr/bin/ssh', '-F', str(client_config), '-o', 'ControlPath=' + str(runtime / 'helios-theme-sync/%C'), '-O', 'exit', 'fixture'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
       if server.poll() is None:
         os.killpg(server.pid, signal.SIGTERM)
       server.wait(timeout=5)

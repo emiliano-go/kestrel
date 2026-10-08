@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# helios:summary=Install a Nerd Font package and switch the system to it
+# helios:args=<display-name> <package> <family>
+# helios:examples=helios install font 'Cascadia Mono' ttf-cascadia-mono-nerd 'CaskaydiaMono Nerd Font'
+
+name="${1-}"
+package="${2-}"
+family="${3-}"
+
+if [[ -z $name || -z $package || -z $family ]]; then
+  echo "Usage: helios-install-font <display-name> <package> <family>" >&2
+  exit 1
+fi
+
+printf -v install_message '%q' "Installing ${name}..."
+printf -v package_arg '%q' "$package"
+printf -v family_arg '%q' "$family"
+
+exec helios-launch-floating-terminal-with-presentation \
+  "echo ${install_message}; helios-pkg-add ${package_arg} && sleep 2 && helios-font-set ${family_arg}"

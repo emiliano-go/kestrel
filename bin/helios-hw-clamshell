@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# helios:summary=Returns true when clamshell mode is active
+# helios:hidden=true
+
+# Clamshell = lid closed while driving one or more external monitors.
+helios-hw-laptop-closed && helios-hw-external-monitors

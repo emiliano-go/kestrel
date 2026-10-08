@@ -7,7 +7,7 @@ import "clone" as Clone
 ShellRoot {
   id: test
   property var services: ({ "intro-test.background": background })
-  function firstPartyServiceFor(id) { return id === "omarchy.background" ? background : null }
+  function firstPartyServiceFor(id) { return id === "helios.background" ? background : null }
 
   PluginShellApi { id: facade; pluginId: "intro-test.background" }
   Clone.Background { id: background; shell: facade }

@@ -1,0 +1,12 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = helios-settings
+Target = helios-settings-dev
+
+[Action]
+Description = Pausing Hyprland config auto-reload for HeliOS settings update...
+When = PreTransaction
+Depends = helios
+Exec = /usr/bin/helios-hyprland-reload-guard pause

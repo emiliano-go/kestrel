@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# helios:summary=List themes that can style the Plymouth boot screen
+# helios:examples=helios plymouth list
+
+{
+  find ~/.config/helios/themes/ -mindepth 1 -maxdepth 1 \( -type d -o -type l \) -printf '%f\n' 2>/dev/null
+  find "$HELIOS_PATH/themes/" -mindepth 1 -maxdepth 1 -type d -printf '%f\n'
+} | sort -u | while read -r name; do
+  if [[ -f $(helios-theme-dir "$name")/preview-unlock.png ]]; then
+    echo "$name"
+  fi
+done

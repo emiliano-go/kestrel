@@ -14,13 +14,13 @@ cleanup() {
   rm -rf "$stage"
 }
 trap cleanup EXIT
-mkdir -p "$stage/home/.local/state/omarchy/current"
+mkdir -p "$stage/home/.local/state/helios/current"
 ln -s "$ROOT/shell/plugins/background" "$stage/background"
 ln -s "$ROOT/shell/Commons" "$stage/Commons"
 ln -s "$ROOT/shell/Ui" "$stage/Ui"
 cp "$SHELL_TEST_DIR/fixtures/background-instant-reload/shell.qml" "$stage/shell.qml"
 magick -size 128x128 xc:magenta "$stage/still.png"
-ln -s "$stage/still.png" "$stage/home/.local/state/omarchy/current/background"
+ln -s "$stage/still.png" "$stage/home/.local/state/helios/current/background"
 : >"$stage/command"
 HOME="$stage/home" RELOAD_TEST_COMMAND="$stage/command" RELOAD_TEST_RESULT="$stage/result" \
   quickshell -p "$stage" --no-color >"$stage/quickshell.log" 2>&1 &

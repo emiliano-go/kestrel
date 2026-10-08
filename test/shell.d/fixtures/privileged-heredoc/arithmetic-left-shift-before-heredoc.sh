@@ -1,5 +1,5 @@
 mask=$((1 << bits))
 
-cat >/etc/omarchy/agent.conf <<EOF
-helper=$HOME/.local/share/omarchy/bin/omarchy-agent
+cat >/etc/helios/agent.conf <<EOF
+helper=$HOME/.local/share/helios/bin/helios-agent
 EOF

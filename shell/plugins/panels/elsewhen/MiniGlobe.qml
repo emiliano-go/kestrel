@@ -28,7 +28,7 @@ Item {
   property color markerColor: Commons.Color.accent
 
   readonly property real radius: Math.min(width, height) / 2 - 1
-  readonly property string pluginDir: Quickshell.env("OMARCHY_PATH") + "/shell/plugins/panels/elsewhen"
+  readonly property string pluginDir: Quickshell.env("HELIOS_PATH") + "/shell/plugins/panels/elsewhen"
 
   onSpinChanged: canvas.requestPaint()
   onColorChanged: canvas.requestPaint()

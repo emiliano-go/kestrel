@@ -15,29 +15,29 @@ for command in xdg-user-dirs-update xdg-settings xdg-mime; do
 done
 chmod +x "$mock_bin"/*
 
-# Provisioning prepends $OMARCHY_PATH/bin, which shadows a mock for anything
-# Omarchy ships, so the install suite is stubbed out at its path instead. The
+# Provisioning prepends $HELIOS_PATH/bin, which shadows a mock for anything
+# HeliOS ships, so the install suite is stubbed out at its path instead. The
 # real one rethemes the session it runs in: hyprctl reload against the live
 # compositor, gsettings against the live desktop, and a global Node install.
 mkdir -p "$test_tmp/install/user"
 : >"$test_tmp/install/user/all.sh"
 
-HOME="$test_tmp/home" PATH="$mock_bin:$ROOT/bin:$PATH" OMARCHY_PATH="$ROOT" \
-  OMARCHY_INSTALL="$test_tmp/install" bash "$ROOT/bin/omarchy-provision-user" >/dev/null ||
-  fail "omarchy-provision-user finishes"
+HOME="$test_tmp/home" PATH="$mock_bin:$ROOT/bin:$PATH" HELIOS_PATH="$ROOT" \
+  HELIOS_INSTALL="$test_tmp/install" bash "$ROOT/bin/helios-provision-user" >/dev/null ||
+  fail "helios-provision-user finishes"
 
-for skill in omarchy diagnose-crash; do
+for skill in helios diagnose-crash; do
   link="$test_tmp/home/.gemini/config/skills/$skill"
   [[ -L $link && $(readlink "$link") == "$ROOT/default/agents/skills/$skill" ]] ||
-    fail "omarchy-provision-user provisions the $skill skill for Antigravity"
+    fail "helios-provision-user provisions the $skill skill for Antigravity"
 
   link="$test_tmp/home/.hermes/skills/$skill"
   [[ -L $link && $(readlink "$link") == "$ROOT/default/agents/skills/$skill" ]] ||
-    fail "omarchy-provision-user provisions the $skill skill for Hermes"
+    fail "helios-provision-user provisions the $skill skill for Hermes"
 
   link="$test_tmp/home/.hermes/profiles/james/skills/$skill"
   [[ -L $link && $(readlink "$link") == "$ROOT/default/agents/skills/$skill" ]] ||
-    fail "omarchy-provision-user provisions the $skill skill for a Hermes profile"
+    fail "helios-provision-user provisions the $skill skill for a Hermes profile"
 done
 
-pass "omarchy-provision-user provisions Antigravity and Hermes skills"
+pass "helios-provision-user provisions Antigravity and Hermes skills"

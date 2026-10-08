@@ -10,11 +10,11 @@ import "Model.js" as Model
 
 Panel {
   id: root
-  moduleName: "omarchy.dropbox"
-  ipcTarget: "omarchy.dropbox"
+  moduleName: "helios.dropbox"
+  ipcTarget: "helios.dropbox"
   manageIpc: false
 
-  property string omarchyPath: Quickshell.env("OMARCHY_PATH")
+  property string heliosPath: Quickshell.env("HELIOS_PATH")
   property string focusSection: "login"
   property int fileIndex: 0
   property bool cursorActive: false
@@ -147,7 +147,7 @@ Panel {
   Service {
     id: dropbox
     settings: root.settings
-    omarchyPath: root.omarchyPath
+    heliosPath: root.heliosPath
   }
 
   Connections {

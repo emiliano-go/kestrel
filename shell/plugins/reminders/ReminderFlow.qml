@@ -9,7 +9,7 @@ import "ReminderFlowModel.js" as ReminderFlowModel
 Item {
   id: root
 
-  property string omarchyPath: Quickshell.env("OMARCHY_PATH")
+  property string heliosPath: Quickshell.env("HELIOS_PATH")
   property var shell: null
   property var manifest: null
 
@@ -51,7 +51,7 @@ Item {
   function dismiss() {
     root.opened = false
     if (root.shell && typeof root.shell.hide === "function")
-      root.shell.hide((root.manifest && root.manifest.id) || "omarchy.reminders")
+      root.shell.hide((root.manifest && root.manifest.id) || "helios.reminders")
   }
 
   function toggle() {
@@ -75,7 +75,7 @@ Item {
       }
 
       if (!nextMinutes) {
-        Quickshell.execDetached([root.omarchyPath + "/bin/omarchy-notification-send", "Invalid reminder", "Enter the number of minutes"])
+        Quickshell.execDetached([root.heliosPath + "/bin/helios-notification-send", "Invalid reminder", "Enter the number of minutes"])
         return
       }
 
@@ -87,7 +87,7 @@ Item {
     }
 
     if (root.step === "message") {
-      var args = [root.omarchyPath + "/bin/omarchy-reminder"].concat(ReminderFlowModel.reminderArgs(root.minutes, selection))
+      var args = [root.heliosPath + "/bin/helios-reminder"].concat(ReminderFlowModel.reminderArgs(root.minutes, selection))
       root.dismiss()
       Quickshell.execDetached(args)
     }
@@ -96,7 +96,7 @@ Item {
   OverlayWindow {
     id: panel
     shown: root.opened
-    WlrLayershell.namespace: "omarchy-reminders"
+    WlrLayershell.namespace: "helios-reminders"
 
     Rectangle {
       anchors.fill: parent

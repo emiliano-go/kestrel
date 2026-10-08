@@ -32,7 +32,7 @@ SH
 chmod +x "$tmp_dir/bin/"*
 
 migration="$ROOT/migrations/1789444024.sh"
-for kernels in linux-omarchy linux-t2 'linux-omarchy linux-t2'; do
+for kernels in linux-helios linux-t2 'linux-helios linux-t2'; do
   read -ra installed <<< "$kernels"
   printf '%s\n' linux linux-headers "${installed[@]}" > "$INSTALLED_PACKAGES"
   : > "$CALL_LOG"
@@ -52,7 +52,7 @@ bash -euo pipefail "$migration" >/dev/null
 [[ ! -s $CALL_LOG ]] || fail "header repair skips unrelated kernels"
 pass "header repair skips unrelated kernels"
 
-echo linux-omarchy > "$INSTALLED_PACKAGES"
+echo linux-helios > "$INSTALLED_PACKAGES"
 if FAIL_INSTALL=1 bash -euo pipefail "$migration" >/dev/null; then
   fail "a failed header installation must leave the migration pending"
 fi

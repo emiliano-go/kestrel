@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# helios:summary=Reload btop configuration (used by the HeliOS theme switching).
+
+pkill -SIGUSR2 btop

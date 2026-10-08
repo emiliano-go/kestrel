@@ -50,16 +50,16 @@ chmod +x "$src"
 dst="$TMPDIR/system-sleep/fprintd-resume"
 dropin_src="$TMPDIR/10-stop-timeout.conf"
 printf '[Service]\nTimeoutStopSec=3s\n' >"$dropin_src"
-lock_pam="$TMPDIR/omarchy-lock-fingerprint"
+lock_pam="$TMPDIR/helios-lock-fingerprint"
 
-# omarchy-migrate runs each migration with `bash -euo pipefail`; match it.
+# helios-migrate runs each migration with `bash -euo pipefail`; match it.
 run_migration() {
   PATH="$stub_bin:$PATH" \
-    OMARCHY_FPRINTD_RESUME_SRC="$src" \
-    OMARCHY_FPRINTD_RESUME_DST="$dst" \
-    OMARCHY_FPRINTD_STOP_TIMEOUT_SRC="$dropin_src" \
-    OMARCHY_FPRINTD_STOP_TIMEOUT_DST="$dropin_dst" \
-    OMARCHY_LOCK_FINGERPRINT_PAM="$lock_pam" \
+    HELIOS_FPRINTD_RESUME_SRC="$src" \
+    HELIOS_FPRINTD_RESUME_DST="$dst" \
+    HELIOS_FPRINTD_STOP_TIMEOUT_SRC="$dropin_src" \
+    HELIOS_FPRINTD_STOP_TIMEOUT_DST="$dropin_dst" \
+    HELIOS_LOCK_FINGERPRINT_PAM="$lock_pam" \
     bash -euo pipefail "$migration" >/dev/null
 }
 
@@ -69,10 +69,10 @@ run_migration() {
 rm -rf "$TMPDIR/system-sleep" "$TMPDIR/fprintd.service.d"
 : >"$lock_pam"
 PATH="$stub_bin:$PATH" \
-  OMARCHY_PATH="$ROOT" \
-  OMARCHY_FPRINTD_RESUME_DST="$dst" \
-  OMARCHY_FPRINTD_STOP_TIMEOUT_DST="$dropin_dst" \
-  OMARCHY_LOCK_FINGERPRINT_PAM="$lock_pam" \
+  HELIOS_PATH="$ROOT" \
+  HELIOS_FPRINTD_RESUME_DST="$dst" \
+  HELIOS_FPRINTD_STOP_TIMEOUT_DST="$dropin_dst" \
+  HELIOS_LOCK_FINGERPRINT_PAM="$lock_pam" \
   bash -euo pipefail "$migration" >/dev/null ||
   fail "migration exits clean from its default sources"
 [[ -x $dst ]] || fail "migration finds the hook at its default source path" "dst: $(stat -c '%A' "$dst" 2>/dev/null || echo missing)"

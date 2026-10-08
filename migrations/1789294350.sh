@@ -8,4 +8,4 @@ if [[ $(sysctl -n net.ipv4.tcp_congestion_control) == "bbr" && $(sysctl -n net.c
   exit 0
 fi
 
-sudo sysctl -p /etc/sysctl.d/99-omarchy-sysctl.conf >/dev/null || omarchy-state set reboot-required
+sudo sysctl -p /etc/sysctl.d/99-helios-sysctl.conf >/dev/null || helios-state set reboot-required

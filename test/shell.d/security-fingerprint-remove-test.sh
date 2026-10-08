@@ -4,8 +4,8 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
-remove="$ROOT/bin/omarchy-remove-security-fingerprint"
-test_tmp=$(mktemp -d /tmp/omarchy-fingerprint-remove.XXXXXX)
+remove="$ROOT/bin/helios-remove-security-fingerprint"
+test_tmp=$(mktemp -d /tmp/helios-fingerprint-remove.XXXXXX)
 trap 'rm -rf "$test_tmp"' EXIT
 mkdir -p "$test_tmp/bin" "$test_tmp/etc/pam.d" "$test_tmp/fprint"
 copy="$test_tmp/remove.sh"
@@ -43,7 +43,7 @@ printf 'sudo %s\n' "$*" >>"$TEST_LOG"
 [[ ${TEST_DELETE_FAIL:-0} == 0 ]] || exit 92
 exec /usr/bin/rm -rf -- "$4"
 SH
-cat >"$test_tmp/bin/omarchy-pkg-drop" <<'SH'
+cat >"$test_tmp/bin/helios-pkg-drop" <<'SH'
 #!/bin/bash
 printf 'package %s\n' "$*" >>"$TEST_LOG"
 [[ ${TEST_PACKAGE_FAIL:-0} == 0 ]]

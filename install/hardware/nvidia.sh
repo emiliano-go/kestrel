@@ -1,7 +1,7 @@
 if lspci | grep -qi 'nvidia'; then
-  if omarchy-hw-nvidia-gsp; then
+  if helios-hw-nvidia-gsp; then
     PACKAGES=(nvidia-open-dkms nvidia-utils lib32-nvidia-utils libva-nvidia-driver)
-  elif omarchy-hw-nvidia-without-gsp; then
+  elif helios-hw-nvidia-without-gsp; then
     PACKAGES=(nvidia-580xx-dkms nvidia-580xx-utils lib32-nvidia-580xx-utils)
   fi
 
@@ -11,7 +11,7 @@ if lspci | grep -qi 'nvidia'; then
     exit 0
   fi
 
-  omarchy-pkg-add "${PACKAGES[@]}"
+  helios-pkg-add "${PACKAGES[@]}"
 
   # Per-session Hyprland NVIDIA env vars are handled by default/hypr/nvidia.lua.
 

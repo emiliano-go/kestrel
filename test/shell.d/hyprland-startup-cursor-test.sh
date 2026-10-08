@@ -25,7 +25,7 @@ hl = {
     recovery = callback
   end,
   exec_cmd = function(value)
-    if value == "omarchy-launch-shell" then
+    if value == "helios-launch-shell" then
       assert(config.invisible and env.XCURSOR_THEME == "my-xcursor", "hide the compositor cursor while restoring application settings before launch")
     end
     command = value
@@ -37,8 +37,8 @@ require("default.hypr.autostart")
 assert(not config.invisible, "loading the module must wait for user configuration")
 events["config.reloaded"]()
 assert(config.invisible and not config.enable_hyprcursor and not config.sync_gsettings_theme)
-assert(env.XCURSOR_THEME == "omarchy-startup" and env.XCURSOR_PATH:match("/default/hypr/cursors:/my/icons$"))
-assert(omarchy_startup_cursor_pending, "the first compositor frame must use the blank cursor")
+assert(env.XCURSOR_THEME == "helios-startup" and env.XCURSOR_PATH:match("/default/hypr/cursors:/my/icons$"))
+assert(helios_startup_cursor_pending, "the first compositor frame must use the blank cursor")
 events["hyprland.start"]()
 assert(env.XCURSOR_THEME == "my-xcursor" and env.XCURSOR_PATH == "/my/icons", "applications must inherit the user's cursor")
 assert(config.invisible, "starting applications must not reveal the cursor")
@@ -49,7 +49,7 @@ assert(recovery ~= previous_recovery and config.invisible, "a config reload must
 recovery()
 assert(command:match("setcursor 'my%-xcursor'"), "restore the Xcursor fallback before revealing the pointer")
 assert(config.invisible, "wait for the normal theme before restoring visibility")
-omarchy_startup_cursor_restore(true)
+helios_startup_cursor_restore(true)
 assert(not config.invisible and config.enable_hyprcursor and config.sync_gsettings_theme)
 assert(command:match("setcursor 'my%-hyprcursor'"), "restore the user's Hyprcursor theme")
 local previous_command = command
@@ -58,9 +58,9 @@ assert(command == previous_command, "recovery must not change a revealed cursor"
 events["config.reloaded"]()
 assert(not config.invisible and env.XCURSOR_THEME == "my-xcursor", "ordinary config reloads must not hide the cursor")
 
-omarchy_startup_cursor_pending = nil
+helios_startup_cursor_pending = nil
 monitors = { {} }
 events["config.reloaded"]()
-assert(not omarchy_startup_cursor_pending and not config.invisible, "installing the fix in a running compositor must leave its cursor alone")
+assert(not helios_startup_cursor_pending and not config.invisible, "installing the fix in a running compositor must leave its cursor alone")
 LUA
 pass "the first compositor frame starts blank and the reveal restores user cursor settings"

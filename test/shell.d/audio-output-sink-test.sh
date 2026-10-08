@@ -33,7 +33,7 @@ physical=alsa_output.pci-0000_00_1f.3.analog-surround-40
 
 resolve() {
   HOME="$test_home" XDG_CONFIG_HOME="$test_home/.config" TEST_DATA="$test_home/data" \
-    PATH="$test_bin:$PATH" bash "$ROOT/bin/omarchy-audio-output-sink" "$@"
+    PATH="$test_bin:$PATH" bash "$ROOT/bin/helios-audio-output-sink" "$@"
 }
 
 reset_scenario() {
@@ -95,25 +95,25 @@ pass "missing configured device falls back to the DSP sink"
 
 # The stream-based resolution (filter-chain tunings) still comes first.
 reset_scenario
-printf '%s\n' omarchy_speaker_tuning >"$test_home/data/default-sink"
+printf '%s\n' helios_speaker_tuning >"$test_home/data/default-sink"
 cat >"$test_home/data/sink-inputs" <<INPUTS
 Sink Input #42
 	Sink: 267
 	Properties:
-		node.name = "omarchy_speaker_tuning.stream"
+		node.name = "helios_speaker_tuning.stream"
 INPUTS
 [[ $(resolve) == "$physical" ]] || fail "a filter-chain tuning still resolves through its stream"
 pass "filter-chain tuning resolves through its stream"
 
 # The shipped tuning uses an underscore before its output stream suffix.
 reset_scenario
-printf '%s\n' omarchy_speaker_tuning >"$test_home/data/default-sink"
-printf 'Sink Input #42\n  Sink: 267\n  node.name = "omarchy_speaker_tuning_output"\n' >"$test_home/data/sink-inputs"
+printf '%s\n' helios_speaker_tuning >"$test_home/data/default-sink"
+printf 'Sink Input #42\n  Sink: 267\n  node.name = "helios_speaker_tuning_output"\n' >"$test_home/data/sink-inputs"
 [[ $(resolve) == "$physical" ]] || fail "the shipped tuning output still resolves through its stream"
 pass "shipped tuning output resolves through its stream"
 
 # Keep custom stream suffixes that the existing prefix rule already handles.
-printf 'Sink Input #42\n  Sink: 267\n  node.name = "omarchy_speaker_tuning-playback"\n' >"$test_home/data/sink-inputs"
+printf 'Sink Input #42\n  Sink: 267\n  node.name = "helios_speaker_tuning-playback"\n' >"$test_home/data/sink-inputs"
 [[ $(resolve) == "$physical" ]] || fail "custom legacy tuning suffixes still resolve"
 pass "custom legacy tuning suffixes still resolve"
 

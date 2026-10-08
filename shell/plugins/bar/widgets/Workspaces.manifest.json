@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "omarchy.workspaces",
+  "id": "helios.workspaces",
   "name": "Workspaces",
   "version": "1.0.0",
-  "author": "Omarchy",
+  "author": "HeliOS",
   "description": "Workspace number indicators",
   "kinds": [
     "bar-widget"

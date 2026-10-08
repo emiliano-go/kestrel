@@ -1,6 +1,6 @@
 echo "Replace Satty and Tensaku with Omasnap"
 
-omarchy-pkg-add omasnap
+helios-pkg-add omasnap
 
 # The old source installer left a NoDisplay entry that overrides the packaged launcher.
 rm -f "$HOME/.local/share/applications/omasnap.desktop"
@@ -15,4 +15,4 @@ if [[ -f $imv_config ]]; then
     "$imv_config"
 fi
 
-omarchy-pkg-drop satty tensaku
+helios-pkg-drop satty tensaku

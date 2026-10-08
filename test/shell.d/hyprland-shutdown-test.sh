@@ -11,7 +11,7 @@ require_command python3
 require_command systemd-run
 
 test_tmp=$(mktemp -d)
-unit="omarchy-test-hyprland-shutdown-$$.service"
+unit="helios-test-hyprland-shutdown-$$.service"
 trap 'systemctl --user stop "$unit" >/dev/null 2>&1; rm -rf "$test_tmp"' EXIT
 
 cat >"$test_tmp/compositor.py" <<'PY'

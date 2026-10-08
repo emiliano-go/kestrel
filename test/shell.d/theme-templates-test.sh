@@ -8,8 +8,8 @@ test_tmp=$(mktemp -d)
 trap 'rm -rf "$test_tmp"' EXIT
 
 home="$test_tmp/home"
-next="$home/.local/state/omarchy/current/next-theme"
-themed="$home/.config/omarchy/themed"
+next="$home/.local/state/helios/current/next-theme"
+themed="$home/.config/helios/themed"
 mkdir -p "$next" "$themed"
 
 cat >"$next/colors.toml" <<'EOF'
@@ -41,7 +41,7 @@ printf 'no newline {{ accent }}' >"$themed/tail.txt.tpl"
 # Function arguments may be separated by any whitespace, tabs included.
 printf '{{ mix\tbackground accent 30%% }} {{\tmix_rgb red\tblue 50%%\t}} {{ gradient_start\thyprland_active_border accent }}\n' >"$themed/tabs.txt.tpl"
 
-HOME="$home" OMARCHY_PATH="$ROOT" PATH="$ROOT/bin:$PATH" "$ROOT/bin/omarchy-theme-set-templates"
+HOME="$home" HELIOS_PATH="$ROOT" PATH="$ROOT/bin:$PATH" "$ROOT/bin/helios-theme-set-templates"
 
 # Expected values were produced by the sed-based renderer this replaced, so
 # every theme keeps rendering byte for byte the same.

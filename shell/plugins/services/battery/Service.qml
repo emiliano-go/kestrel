@@ -8,7 +8,7 @@ Item {
   id: root
 
   property var shell: null
-  property string omarchyPath: Quickshell.env("OMARCHY_PATH")
+  property string heliosPath: Quickshell.env("HELIOS_PATH")
 
   readonly property int batteryThreshold: 10
   property string pendingPowerSource: ""
@@ -17,7 +17,7 @@ Item {
 
   PersistentProperties {
     id: persisted
-    reloadableId: "omarchy-battery"
+    reloadableId: "helios-battery"
     property bool notifiedLowBattery: false
   }
 
@@ -38,7 +38,7 @@ Item {
   function sendLowBatteryWarning(level) {
     if (warningProcess.running) return
     warningProcess.command = [
-      "omarchy-battery-low",
+      "helios-battery-low",
       String(level)
     ]
     warningProcess.running = true
@@ -50,7 +50,7 @@ Item {
   }
 
   function runPendingPowerProfile() {
-    powerProfileProcess.command = ["omarchy-powerprofiles-set", pendingPowerSource]
+    powerProfileProcess.command = ["helios-powerprofiles-set", pendingPowerSource]
     pendingPowerSource = ""
     powerProfileProcess.running = true
   }

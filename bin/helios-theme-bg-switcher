@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# helios:summary=Open the HeliOS background switcher
+# helios:group=theme
+# helios:name=bg-switcher
+# helios:aliases=helios background
+
+theme_name=$(cat "$HOME/.local/state/helios/current/theme.name" 2>/dev/null)
+current_background=$(readlink -f "$HOME/.local/state/helios/current/background" 2>/dev/null)
+
+helios-menu-images \
+  --selected "$current_background" \
+  "$HOME/.local/state/helios/current/theme/backgrounds" \
+  "$HOME/.config/helios/backgrounds/$theme_name"

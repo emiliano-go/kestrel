@@ -16,8 +16,8 @@ chmod +x "$tmp_dir/setsid"
 export TEST_LOG="$tmp_dir/log"
 export PATH="$tmp_dir:$ROOT/bin:$PATH"
 
-"$ROOT/bin/omarchy-launch-floating-terminal-with-presentation" "echo hello"
+"$ROOT/bin/helios-launch-floating-terminal-with-presentation" "echo hello"
 
 launch=$(<"$TEST_LOG")
-[[ $launch == *"xdg-terminal-exec --app-id=org.omarchy.terminal"* ]] || fail "floating terminal launches Omarchy terminal" "$launch"
-pass "floating terminal launches Omarchy terminal"
+[[ $launch == *"xdg-terminal-exec --app-id=org.helios.terminal"* ]] || fail "floating terminal launches HeliOS terminal" "$launch"
+pass "floating terminal launches HeliOS terminal"

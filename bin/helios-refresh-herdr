@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# helios:summary=Overwrite the user herdr config with the HeliOS default and reload herdr.
+
+helios-refresh-config herdr/config.toml
+helios-restart-herdr

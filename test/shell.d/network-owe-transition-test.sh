@@ -28,7 +28,7 @@ fs.writeFileSync(`${stage}/network/Panel.qml`, source)
 JS
 printf '#!/bin/bash\nexit 0\n' > "$stage/bin/noop"
 chmod +x "$stage/bin/noop"
-for command in omarchy-dns omarchy-network-band omarchy-network-status; do
+for command in helios-dns helios-network-band helios-network-status; do
   ln -s noop "$stage/bin/$command"
 done
 # Answers in call order: 57, then a slow stale 11, then 33. Never touches the
@@ -45,7 +45,7 @@ esac
 SH
 chmod +x "$stage/bin/nmcli"
 
-output=$(HOME="$stage/home" OMARCHY_PATH="$ROOT" PATH="$stage/bin:$PATH" \
+output=$(HOME="$stage/home" HELIOS_PATH="$ROOT" PATH="$stage/bin:$PATH" \
   NETWORK_TEST_NMCLI_LOG="$stage/nmcli.log" \
   timeout 30 quickshell -p "$stage" --no-color 2>&1) || fail "network OWE fixture exits cleanly" "$output"
 [[ $output == *"RESULT pass"* ]] || fail "network OWE runtime assertions pass" "$output"

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "omarchy.system-update",
-  "name": "Omarchy update",
+  "id": "helios.system-update",
+  "name": "HeliOS update",
   "version": "1.0.0",
-  "author": "Omarchy",
-  "description": "Indicates available Omarchy updates",
+  "author": "HeliOS",
+  "description": "Indicates available HeliOS updates",
   "kinds": [
     "bar-widget"
   ],
@@ -12,8 +12,8 @@
     "barWidget": "SystemUpdate.qml"
   },
   "barWidget": {
-    "displayName": "Omarchy update",
-    "description": "Indicates available Omarchy updates",
+    "displayName": "HeliOS update",
+    "description": "Indicates available HeliOS updates",
     "category": "System",
     "allowMultiple": false
   }

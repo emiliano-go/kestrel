@@ -1,14 +1,14 @@
-# Omarchy
+# HeliOS
 
-Omarchy is a beautiful, fun & agentic Linux distribution by DHH.
+HeliOS is a beautiful, fun & agentic Linux distribution by DHH.
 
 Read more at [omarchy.org](https://omarchy.org).
 
-## The Omarchy Manual
+## The HeliOS Manual
 
 The manual lives in [`manual/`](manual/), which is its authoritative source.
 
-- [Welcome to Omarchy!](manual/01-welcome-to-omarchy.md)
+- [Welcome to HeliOS!](manual/01-welcome-to-helios.md)
 
 **The Basics**
 
@@ -24,7 +24,7 @@ The manual lives in [`manual/`](manual/), which is its authoritative source.
 - [Text Extraction & Dictation](manual/11-text-extraction-dictation.md)
 - [Screenshots & Recording](manual/12-screenshots-recording.md)
 - [Toggles, idle & screensaver](manual/13-toggles-idle-screensaver.md)
-- [Omarchy CLI](manual/14-omarchy-cli.md)
+- [HeliOS CLI](manual/14-helios-cli.md)
 
 **The Applications**
 
@@ -68,10 +68,10 @@ The manual lives in [`manual/`](manual/), which is its authoritative source.
 - [FAQ](manual/46-faq.md)
 - [System snapshots](manual/47-system-snapshots.md)
 - [Security](manual/48-security.md)
-- [Omarchy on...](manual/49-omarchy-on.md)
+- [HeliOS on...](manual/49-helios-on.md)
 - [Dual Boot Install](manual/50-dual-boot-install.md)
 - [Unattended Installs](manual/51-unattended-installs.md)
 
 ## License
 
-Omarchy is released under the [MIT License](https://opensource.org/licenses/MIT).
+HeliOS is released under the [MIT License](https://opensource.org/licenses/MIT).

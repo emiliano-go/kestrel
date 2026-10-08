@@ -128,7 +128,7 @@ Item {
     id: panel
     shown: root.opened
     shownKeyboardFocus: WlrKeyboardFocus.None
-    WlrLayershell.namespace: "omarchy-osd"
+    WlrLayershell.namespace: "helios-osd"
     // Visual-only surface: keep the layer-shell input region empty so the OSD
     // never blocks clicks to the desktop below it.
     mask: Region {}

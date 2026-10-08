@@ -20,9 +20,9 @@ polkit=/etc/pam.d/polkit-1
 # carries other directives. The repair replaces only the bare pam_unix lines, so
 # comments and the hardware-auth lines are preserved verbatim.
 
-is_omarchy_vulnerable_stack() {
+is_helios_vulnerable_stack() {
   local file=$1 line
-  local re_gate='^auth[[:space:]]+\[success=1 default=ignore\][[:space:]]+pam_exec\.so quiet /usr/bin/omarchy-hw-laptop-closed[[:space:]]*$'
+  local re_gate='^auth[[:space:]]+\[success=1 default=ignore\][[:space:]]+pam_exec\.so quiet /usr/bin/helios-hw-laptop-closed[[:space:]]*$'
   local re_fprintd='^auth[[:space:]]+sufficient[[:space:]]+pam_fprintd\.so[[:space:]]*$'
   local re_u2f='^auth[[:space:]]+sufficient[[:space:]]+pam_u2f\.so cue authfile=/etc/fido2/fido2[[:space:]]*$'
   local re_bare='^(auth|account|password|session)[[:space:]]+required[[:space:]]+pam_unix\.so[[:space:]]*$'
@@ -38,7 +38,7 @@ is_omarchy_vulnerable_stack() {
     grep -qE "^${phase}[[:space:]]+required[[:space:]]+pam_unix\.so[[:space:]]*\$" "$file" || return 1
   done
 
-  # Every meaningful line must be one Omarchy itself wrote; anything else means
+  # Every meaningful line must be one HeliOS itself wrote; anything else means
   # an administrator has edited this file, so it is not ours to rewrite.
   while IFS= read -r line || [[ -n $line ]]; do
     [[ -z ${line//[[:space:]]/} ]] && continue
@@ -50,10 +50,10 @@ is_omarchy_vulnerable_stack() {
   return 0
 }
 
-if [[ -f $polkit ]] && is_omarchy_vulnerable_stack "$polkit"; then
+if [[ -f $polkit ]] && is_helios_vulnerable_stack "$polkit"; then
   echo "Rewriting $polkit to defer to system-auth (restores pam_faillock lockout)..."
 
-  backup="$polkit.omarchy-bak.$(date +%s)"
+  backup="$polkit.helios-bak.$(date +%s)"
   if ! sudo cp -a "$polkit" "$backup"; then
     echo "Could not back up $polkit; leaving it unchanged so the migration retries." >&2
     exit 1

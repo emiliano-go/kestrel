@@ -160,7 +160,7 @@ assertEqual(menuPanel.maxRowsHeight, -1, 'moving an open menu drops the old outp
 assert(menuPanel.shown, 'resetting the layout keeps the menu open')
 
 // Fullscreen overlays open without an additional compositor animation.
-const shellRules = read('default/hypr/apps/omarchy-shell.lua')
+const shellRules = read('default/hypr/apps/helios-shell.lua')
 const noAnim = /namespace = "\^\(([^)]*)\)\$" \}, no_anim = true/.exec(shellRules)
 assert(noAnim, 'the shell overlays share one no-animation layer rule')
 const unanimated = noAnim ? noAnim[1].split('|') : []

@@ -8,21 +8,21 @@ run_node_test <<'JS'
 const fs = require('fs')
 const menu = requireFromRoot('shell/plugins/menu/MenuModel.js')
 const menuQml = fs.readFileSync(path.join(root, 'shell/plugins/menu/Menu.qml'), 'utf8')
-const defaultMenuJsonc = fs.readFileSync(path.join(root, 'default/omarchy/omarchy-menu.jsonc'), 'utf8')
+const defaultMenuJsonc = fs.readFileSync(path.join(root, 'default/helios/helios-menu.jsonc'), 'utf8')
 
 assertDeepEqual(
-  menu.summonAction("omarchy-shell shell summon omarchy.speedtest"),
-  { id: 'omarchy.speedtest', payload: '{}' },
+  menu.summonAction("helios-shell shell summon helios.speedtest"),
+  { id: 'helios.speedtest', payload: '{}' },
   'menu runs a bare summon action in-process'
 )
 assertDeepEqual(
-  menu.summonAction(`omarchy-shell shell summon omarchy.image-picker '{"source":"themes"}'`),
-  { id: 'omarchy.image-picker', payload: '{"source":"themes"}' },
+  menu.summonAction(`helios-shell shell summon helios.image-picker '{"source":"themes"}'`),
+  { id: 'helios.image-picker', payload: '{"source":"themes"}' },
   'menu keeps a single-quoted summon payload'
 )
-assertEqual(menu.summonAction("omarchy-shell shell summon omarchy.speedtest && echo done"), null, 'menu leaves compound summon commands to bash')
-assertEqual(menu.summonAction(`omarchy-shell shell summon omarchy.x "$(id)"`), null, 'menu leaves shell-expanded payloads to bash')
-assertEqual(menu.summonAction("omarchy-theme-set nord"), null, 'menu leaves ordinary actions to bash')
+assertEqual(menu.summonAction("helios-shell shell summon helios.speedtest && echo done"), null, 'menu leaves compound summon commands to bash')
+assertEqual(menu.summonAction(`helios-shell shell summon helios.x "$(id)"`), null, 'menu leaves shell-expanded payloads to bash')
+assertEqual(menu.summonAction("helios-theme-set nord"), null, 'menu leaves ordinary actions to bash')
 assert(
   /var summon = MenuModel\.summonAction\(command\)\s*if \(summon && root\.shell && root\.shell\.summon\(summon\.id, summon\.payload\)\) return\s*Util\.execDetached\(command\)/.test(menuQml),
   'menu falls back to bash when an in-process summon is refused'
@@ -38,7 +38,7 @@ const parsed = menu.parseMenuJsonc(`
       "label": "Themes",
       "aliases": "theme",
       "description": "appearance colors",
-      "action": "omarchy-theme-set"
+      "action": "helios-theme-set"
     },
   },
 }
@@ -57,7 +57,7 @@ assertDeepEqual(
     title: '',
     target: '',
     description: 'appearance colors',
-    action: 'omarchy-theme-set',
+    action: 'helios-theme-set',
     provider: '',
     aliases: ['theme'],
     when: '',
@@ -101,7 +101,7 @@ assert(menu.isVisible(visibilityItems, visibilityOrder, {}, visibilityItems.dyna
 
 // `disabled:` is the softer guard: the row stays listed and only loses the
 // cursor, which is how an already-installed app keeps its place in Install.
-const installed = menu.normalizeItem('install.browser.zen', { label: 'Zen', disabled: 'omarchy-pkg-present zen-browser-bin', action: 'install-zen' })
+const installed = menu.normalizeItem('install.browser.zen', { label: 'Zen', disabled: 'helios-pkg-present zen-browser-bin', action: 'install-zen' })
 assert(menu.isVisible({ 'install.browser.zen': installed }, ['install.browser.zen'], { 'install.browser.zen': false }, installed), 'menu keeps a disabled row visible')
 assert(menu.isDisabled({ 'install.browser.zen': true }, installed), 'menu disables a row whose disabled: succeeded')
 assert(!menu.isDisabled({ 'install.browser.zen': false }, installed), 'menu leaves a row selectable when its disabled: failed')
@@ -199,20 +199,20 @@ assertEqual(
 )
 assertEqual(
   defaultById['trigger.emoji'].action,
-  'omarchy-menu-emoji',
+  'helios-menu-emoji',
   'menu opens the emoji picker from Trigger'
 )
 assert(
-  defaultById['update.omarchy'].icon === '\ue900',
-  'menu update Omarchy entry uses the Omarchy glyph'
+  defaultById['update.helios'].icon === '\ue900',
+  'menu update HeliOS entry uses the HeliOS glyph'
 )
 assert(
-  defaultById['update.omarchy'].iconFont === 'omarchy',
-  'menu update Omarchy entry renders the private glyph with the Omarchy font'
+  defaultById['update.helios'].iconFont === 'helios',
+  'menu update HeliOS entry renders the private glyph with the HeliOS font'
 )
 assertEqual(
   defaultById['update.themes'].when,
-  'omarchy-theme-extras',
+  'helios-theme-extras',
   'menu hides Extra Themes until a theme cloned from git is there to update'
 )
 assert(
@@ -220,11 +220,11 @@ assert(
   'menu keeps Input as a direct config action'
 )
 assert(
-  defaultById['setup.direct-boot'].action.includes('omarchy-setup-direct-boot'),
+  defaultById['setup.direct-boot'].action.includes('helios-setup-direct-boot'),
   'menu places Direct Boot directly under Setup'
 )
 assert(
-  defaultById['setup.reset'].action.includes('omarchy-system-factory-reset'),
+  defaultById['setup.reset'].action.includes('helios-system-factory-reset'),
   'menu exposes Reset Computer under Setup'
 )
 const setupEntries = defaultItems.filter(item => item.parent === 'setup')
@@ -235,19 +235,19 @@ assertEqual(
 )
 const expectedAgents = {
   agy: { icon: '󰫢', label: 'Antigravity' },
-  pi: { icon: '\ue901', iconFont: 'omarchy', label: 'Pi' },
-  omp: { icon: '\ue903', iconFont: 'omarchy', label: 'omp' },
-  opencode: { icon: '\ue902', iconFont: 'omarchy', label: 'OpenCode' },
-  ori: { icon: '\ue909', iconFont: 'omarchy', label: 'Ori' },
+  pi: { icon: '\ue901', iconFont: 'helios', label: 'Pi' },
+  omp: { icon: '\ue903', iconFont: 'helios', label: 'omp' },
+  opencode: { icon: '\ue902', iconFont: 'helios', label: 'OpenCode' },
+  ori: { icon: '\ue909', iconFont: 'helios', label: 'Ori' },
   claude: { icon: '󰛄', label: 'Claude' },
-  codex: { icon: '\ue905', iconFont: 'omarchy', label: 'Codex' },
-  grok: { icon: '\ue904', iconFont: 'omarchy', label: 'Grok' },
-  hermes: { icon: '\ue90a', iconFont: 'omarchy', label: 'Hermes' },
-  openclaw: { icon: '\ue90c', iconFont: 'omarchy', label: 'OpenClaw' },
+  codex: { icon: '\ue905', iconFont: 'helios', label: 'Codex' },
+  grok: { icon: '\ue904', iconFont: 'helios', label: 'Grok' },
+  hermes: { icon: '\ue90a', iconFont: 'helios', label: 'Hermes' },
+  openclaw: { icon: '\ue90c', iconFont: 'helios', label: 'OpenClaw' },
   copilot: { icon: '', label: 'Copilot' },
   crush: { icon: '󰋑', label: 'Crush' },
   muse: { icon: '󰛤', label: 'Muse Code' },
-  'cursor-agent': { icon: '\ue90d', iconFont: 'omarchy', label: 'Cursor CLI' },
+  'cursor-agent': { icon: '\ue90d', iconFont: 'helios', label: 'Cursor CLI' },
 
 }
 assert(
@@ -257,7 +257,7 @@ assert(
       && entry.icon === expected.icon
       && entry.iconFont === (expected.iconFont || '')
       && entry.label === expected.label
-      && entry.action === `omarchy-default-agent ${agent}`
+      && entry.action === `helios-default-agent ${agent}`
       && !entry.when
       && entry.checked.includes(`== \"${agent}\"`)
   }),
@@ -285,7 +285,7 @@ assert(
 )
 assert(!defaultById['install.ai.crush'], 'menu removes Crush from Install > AI')
 // Software you already have keeps its place in Install, dimmed rather than
-// dropped, so the list reads as a catalog of what Omarchy can install.
+// dropped, so the list reads as a catalog of what HeliOS can install.
 // Chromium Account is the sole Install row with anything left to hide for, so
 // any other `when:` here is a row that went back to vanishing once installed.
 assertDeepEqual(
@@ -303,7 +303,7 @@ assert(
 )
 assertEqual(
   defaultById['install.browser.zen'].disabled,
-  'omarchy-pkg-present zen-browser-bin',
+  'helios-pkg-present zen-browser-bin',
   'menu asks the same presence question it used to hide the row with'
 )
 // A guard can still be about something other than having the software: no
@@ -315,7 +315,7 @@ assert(
 )
 assert(
   defaultItems.filter(item => item.id.startsWith('remove.')).every(item => !item.disabled)
-    && defaultById['remove.browser.zen'].when === 'omarchy-pkg-present zen-browser-bin',
+    && defaultById['remove.browser.zen'].when === 'helios-pkg-present zen-browser-bin',
   'menu still hides Remove rows for software that is not installed'
 )
 assertDeepEqual(
@@ -340,7 +340,7 @@ assertDeepEqual(
   'menu keeps the Remove category order'
 )
 assert(
-  defaultById['setup.security.passwordless-sudo'].action.includes('omarchy-sudo-passwordless'),
+  defaultById['setup.security.passwordless-sudo'].action.includes('helios-sudo-passwordless'),
   'menu places Passwordless Sudo under Setup > Security'
 )
 assert(
@@ -352,17 +352,17 @@ assert(
   'menu groups Menu Bar positions in a submenu'
 )
 assert(
-  ['top', 'bottom', 'left', 'right'].every(position => defaultById[`style.bar.position.${position}`].action === `omarchy-bar position ${position}`),
+  ['top', 'bottom', 'left', 'right'].every(position => defaultById[`style.bar.position.${position}`].action === `helios-bar position ${position}`),
   'menu lists all Menu Bar positions under Position'
 )
 assertEqual(
   defaultById['style.bar.transparency'].action,
-  'omarchy-bar transparent toggle',
+  'helios-bar transparent toggle',
   'menu exposes Menu Bar transparency as a toggle'
 )
 assert(
   !defaultItems.some(item => item.id.startsWith('style.background-intro'))
-    && defaultById['trigger.toggle.animations'].action === 'omarchy-toggle-animations',
+    && defaultById['trigger.toggle.animations'].action === 'helios-toggle-animations',
   'menu uses the existing animations toggle without separate background intro controls'
 )
 assertDeepEqual(
@@ -372,7 +372,7 @@ assertDeepEqual(
 )
 assert(
   ['enable', 'disable', 'clone', 'remove'].every(
-    verb => defaultById[`setup.plugin.${verb}`].action === `omarchy-menu-plugin ${verb}`
+    verb => defaultById[`setup.plugin.${verb}`].action === `helios-menu-plugin ${verb}`
   ),
   'menu picks a plugin the way it already picks a theme or a timezone'
 )
@@ -381,15 +381,15 @@ assert(
   'menu always offers Enable and Disable, which cover the built-in plugins too'
 )
 assert(
-  defaultById['setup.plugin.remove'].when.includes('.config/omarchy/plugins'),
+  defaultById['setup.plugin.remove'].when.includes('.config/helios/plugins'),
   'menu hides Remove until a plugin the user installed exists to delete'
 )
 assert(
-  defaultById['setup.plugin.add'].action.includes('omarchy-plugin-add'),
+  defaultById['setup.plugin.add'].action.includes('helios-plugin-add'),
   'menu adds a plugin through the CLI, where the trust warning and clone output are visible'
 )
 
-const pluginPicker = fs.readFileSync(path.join(root, 'bin/omarchy-menu-plugin'), 'utf8')
+const pluginPicker = fs.readFileSync(path.join(root, 'bin/helios-menu-plugin'), 'utf8')
 assert(
   /enable\).*\(\.enabled \| not\)/.test(pluginPicker) && /disable\).*\.canDisable and \.enabled/.test(pluginPicker),
   'plugin picker offers what each verb can act on'
@@ -401,11 +401,11 @@ assert(
   'plugin picker leaves plugin-kind decisions to its data and the plugin command'
 )
 
-const pluginAdd = fs.readFileSync(path.join(root, 'bin/omarchy-plugin-add'), 'utf8')
-const pluginEnable = fs.readFileSync(path.join(root, 'bin/omarchy-plugin-enable'), 'utf8')
+const pluginAdd = fs.readFileSync(path.join(root, 'bin/helios-plugin-add'), 'utf8')
+const pluginEnable = fs.readFileSync(path.join(root, 'bin/helios-plugin-enable'), 'utf8')
 assert(
   /Now using \$id as the bar/.test(pluginEnable)
-    && /omarchy-plugin-enable "\$id" "\$\{ENABLE_PLACEMENT\[@\]\}"/.test(pluginAdd),
+    && /helios-plugin-enable "\$id" "\$\{ENABLE_PLACEMENT\[@\]\}"/.test(pluginAdd),
   'plugin enable reports a bar as replacing the one in use, whether enabled or freshly added'
 )
 assert(
@@ -414,7 +414,7 @@ assert(
   'interactive plugin add selects the manifest placement or center fallback by default'
 )
 assert(
-  /"omarchy-plugin-\$1" "\$id"/.test(pluginPicker),
+  /"helios-plugin-\$1" "\$id"/.test(pluginPicker),
   'plugin picker delegates enable and disable without interpreting plugin kinds'
 )
 // Icons ride along as "<glyph>\tlabel\tsubtext"; the menu shows the glyph,
@@ -431,7 +431,7 @@ assert(
   'menu select mode reads a leading icon and a trailing subtext off an option'
 )
 assert(
-  /omarchy-launch-floating-terminal-with-presentation "omarchy-plugin-remove/.test(pluginPicker),
+  /helios-launch-floating-terminal-with-presentation "helios-plugin-remove/.test(pluginPicker),
   'plugin picker removes where the confirmation and backup path are visible'
 )
 
@@ -454,17 +454,17 @@ assert(
 )
 assertEqual(
   defaultById['trigger.hardware.laptop-display'].when,
-  'omarchy-hw-laptop',
+  'helios-hw-laptop',
   'menu only shows Laptop Display on laptops'
 )
 assertEqual(
   defaultById['trigger.hardware.mirror-display'].when,
-  'omarchy-hw-laptop',
+  'helios-hw-laptop',
   'menu only shows Mirror Display on laptops'
 )
 assertEqual(
   defaultById['trigger.capture.screenrecord.webcam'].when,
-  'omarchy-hw-webcam',
+  'helios-hw-webcam',
   'menu only shows webcam screen recording when a webcam is available'
 )
 assert(
@@ -664,6 +664,6 @@ assert(
 )
 JS
 
-font_charset=$(fc-query --format='%{charset}' "$ROOT/default/fonts/omarchy/omarchy.ttf")
-[[ $font_charset == *"e900-e90e"* ]] || fail "Omarchy icon font includes every custom menu glyph"
-pass "Omarchy icon font includes the official agent marks"
+font_charset=$(fc-query --format='%{charset}' "$ROOT/default/fonts/helios/helios.ttf")
+[[ $font_charset == *"e900-e90e"* ]] || fail "HeliOS icon font includes every custom menu glyph"
+pass "HeliOS icon font includes the official agent marks"

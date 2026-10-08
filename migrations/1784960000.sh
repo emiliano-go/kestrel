@@ -4,7 +4,7 @@ echo "Install the speaker tuning for XPS 2026 14/16"
 # predicate, so this is a no-op on machines without one. The limiter is an LV2
 # plugin and the graph will not instantiate without it.
 
-if omarchy-audio-tuning match >/dev/null 2>&1; then
-  omarchy-pkg-add lsp-plugins-lv2
-  omarchy-audio-tuning on
+if helios-audio-tuning match >/dev/null 2>&1; then
+  helios-pkg-add lsp-plugins-lv2
+  helios-audio-tuning on
 fi

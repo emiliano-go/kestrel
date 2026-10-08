@@ -18,7 +18,7 @@ run_migration() {
     XDG_CONFIG_HOME="$test_home/.config" \
     XDG_DATA_HOME="$test_home/.local/share" \
     XDG_STATE_HOME="$test_home/.local/state" \
-    MISE_PARANOID="${OMARCHY_TEST_MISE_PARANOID:-false}" \
+    MISE_PARANOID="${HELIOS_TEST_MISE_PARANOID:-false}" \
     PATH=/usr/bin \
     bash -euo pipefail "$migration"
 }
@@ -33,7 +33,7 @@ run_mise() {
     XDG_CONFIG_HOME="$test_home/.config" \
     XDG_DATA_HOME="$test_home/.local/share" \
     XDG_STATE_HOME="$test_home/.local/state" \
-    MISE_PARANOID="${OMARCHY_TEST_MISE_PARANOID:-false}" \
+    MISE_PARANOID="${HELIOS_TEST_MISE_PARANOID:-false}" \
     PATH=/usr/bin \
     mise "$@"
 }
@@ -91,7 +91,7 @@ chmod +x "$test_dir/bin/mise"
 env \
   HOME="$install_home" \
   MISE_TEST_LOG="$install_log" \
-  OMARCHY_SETUP_CONTEXT=runtime \
+  HELIOS_SETUP_CONTEXT=runtime \
   PATH="$test_dir/bin:/usr/bin" \
   bash -euo pipefail -c 'source "$1"' bash "$ROOT/install/user/mise-work.sh"
 
@@ -125,7 +125,7 @@ run_migration "$stock_home" >/dev/null
 [[ ! -e $stock_config ]] || fail "stock migration is idempotent"
 pass "migration removes the repository bin directory and revokes the Work trust root"
 
-assert_unsafe_variant_removed inline-comment '_.path = "{{ cwd }}/bin" # Omarchy default'
+assert_unsafe_variant_removed inline-comment '_.path = "{{ cwd }}/bin" # HeliOS default'
 assert_unsafe_variant_removed single-quoted "_.path = '{{ cwd }}/bin'"
 pass "migration removes annotated and single-quoted project bin paths"
 
@@ -213,15 +213,15 @@ paranoid_config="$paranoid_work/.mise.toml"
 paranoid_project="$paranoid_work/tries/untrusted-repository"
 mkdir -p "$paranoid_project/bin"
 printf '[env]\n_.path = "{{ cwd }}/bin"\n' >"$paranoid_config"
-OMARCHY_TEST_MISE_PARANOID=true run_mise "$paranoid_home" trust "$paranoid_config" >/dev/null
-OMARCHY_TEST_MISE_PARANOID=true mise_path_active "$paranoid_home" "$paranoid_project" || fail "paranoid legacy config prepends the repository bin directory"
+HELIOS_TEST_MISE_PARANOID=true run_mise "$paranoid_home" trust "$paranoid_config" >/dev/null
+HELIOS_TEST_MISE_PARANOID=true mise_path_active "$paranoid_home" "$paranoid_project" || fail "paranoid legacy config prepends the repository bin directory"
 rm -r "$paranoid_work"
 
-OMARCHY_TEST_MISE_PARANOID=true run_migration "$paranoid_home" >/dev/null
+HELIOS_TEST_MISE_PARANOID=true run_migration "$paranoid_home" >/dev/null
 [[ ! -e $paranoid_work ]] || fail "paranoid migration removes its temporary Work directory"
 mkdir -p "$paranoid_project/bin"
 printf '[env]\n_.path = "{{ cwd }}/bin"\n' >"$paranoid_config"
-if OMARCHY_TEST_MISE_PARANOID=true mise_path_active "$paranoid_home" "$paranoid_project"; then
+if HELIOS_TEST_MISE_PARANOID=true mise_path_active "$paranoid_home" "$paranoid_project"; then
   fail "paranoid migration retains content-bound trust for the deleted legacy config"
 fi
 pass "migration revokes stale content-bound trust in Mise paranoid mode"

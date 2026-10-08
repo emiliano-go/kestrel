@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# helios:summary=Show the current battery status notification
+
+helios-notification-send -g 󰁹 -u low "$(helios-battery-status)"

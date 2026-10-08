@@ -12,8 +12,8 @@ list_bindings() {
   local home="$1"
   local epilogue="${2:-}"
 
-  HOME="$home" XDG_CONFIG_HOME="$home/.config" XDG_STATE_HOME="$home/.local/state" OMARCHY_PATH="$ROOT" OMARCHY_BINDING_EPILOGUE="$epilogue" lua <<'LUA'
-package.path = os.getenv("HOME") .. "/.config/?.lua;" .. os.getenv("OMARCHY_PATH") .. "/?.lua;" .. package.path
+  HOME="$home" XDG_CONFIG_HOME="$home/.config" XDG_STATE_HOME="$home/.local/state" HELIOS_PATH="$ROOT" HELIOS_BINDING_EPILOGUE="$epilogue" lua <<'LUA'
+package.path = os.getenv("HOME") .. "/.config/?.lua;" .. os.getenv("HELIOS_PATH") .. "/?.lua;" .. package.path
 
 local function proxy()
   return setmetatable({}, {
@@ -70,14 +70,14 @@ hl = setmetatable({
   end,
 })
 
-require("default.hypr.omarchy")
+require("default.hypr.helios")
 
-local epilogue = os.getenv("OMARCHY_BINDING_EPILOGUE") or ""
+local epilogue = os.getenv("HELIOS_BINDING_EPILOGUE") or ""
 if epilogue ~= "" then
   assert(load(epilogue))()
 end
 
--- X11 keycodes are evdev codes plus 8. Only the rows Omarchy binds by code
+-- X11 keycodes are evdev codes plus 8. Only the rows HeliOS binds by code
 -- need naming; anything else keeps its code: form and still compares exactly.
 local keycode_keysyms = {
   [10] = "1", [11] = "2", [12] = "3", [13] = "4", [14] = "5",
@@ -147,11 +147,11 @@ trap 'rm -rf "$tmpdir"' EXIT
 home="$tmpdir/home"
 stub_bin="$tmpdir/bin"
 mkdir -p "$home" "$stub_bin"
-cat > "$stub_bin/omarchy-default-dictation" <<'SH'
+cat > "$stub_bin/helios-default-dictation" <<'SH'
 #!/bin/bash
 echo voxtype
 SH
-chmod +x "$stub_bin/omarchy-default-dictation"
+chmod +x "$stub_bin/helios-default-dictation"
 
 bindings=$(PATH="$stub_bin:$PATH" list_bindings "$home")
 [[ -n $bindings ]] || fail "default bindings load for the conflict check"

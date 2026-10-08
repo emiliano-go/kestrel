@@ -1,3 +1,3 @@
-if omarchy-hw-framework16; then
-  omarchy-pkg-add qmk-hid
+if helios-hw-framework16; then
+  helios-pkg-add qmk-hid
 fi

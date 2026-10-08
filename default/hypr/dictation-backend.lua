@@ -1,7 +1,7 @@
 -- Backends may supply their own desktop integration without editing the
--- user's Hyprland config. Recording bindings remain owned by Omarchy.
+-- user's Hyprland config. Recording bindings remain owned by HeliOS.
 local paths = require("default.hypr.paths")
-local pipe = io.popen("omarchy-default-dictation 2>/dev/null", "r")
+local pipe = io.popen("helios-default-dictation 2>/dev/null", "r")
 if not pipe then
   return
 end
@@ -9,7 +9,7 @@ end
 local backend = pipe:read("*l")
 pipe:close()
 
-if not backend or not backend:match("^[%w%-]+$") or o.cmd_missing("omarchy-dictation-" .. backend) then
+if not backend or not backend:match("^[%w%-]+$") or o.cmd_missing("helios-dictation-" .. backend) then
   return
 end
 

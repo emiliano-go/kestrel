@@ -1,4 +1,4 @@
 cat <<EOF |
-command=$HOME/.local/share/omarchy/bin/example
+command=$HOME/.local/share/helios/bin/example
 EOF
-  sudo tee /etc/omarchy/example.conf
+  sudo tee /etc/helios/example.conf

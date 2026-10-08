@@ -12,13 +12,13 @@ const mediaQml = fs.readFileSync(path.join(root, 'shell/Ui/BackgroundMedia.qml')
 const backgroundQml = fs.readFileSync(path.join(root, 'shell/plugins/background/Background.qml'), 'utf8')
 const lockQml = fs.readFileSync(path.join(root, 'shell/plugins/lock/LockView.qml'), 'utf8')
 const lockFeedQml = fs.readFileSync(path.join(root, 'shell/plugins/lock/LockFeedSurface.qml'), 'utf8')
-const themeSwitcher = fs.readFileSync(path.join(root, 'bin/omarchy-theme-switcher'), 'utf8')
-const quattroUpgrade = fs.readFileSync(path.join(root, 'bin/omarchy-upgrade-to-quattro'), 'utf8')
-const barTextColor = fs.readFileSync(path.join(root, 'bin/omarchy-bar-text-color'), 'utf8')
-const menuImages = fs.readFileSync(path.join(root, 'bin/omarchy-menu-images'), 'utf8')
+const themeSwitcher = fs.readFileSync(path.join(root, 'bin/helios-theme-switcher'), 'utf8')
+const quattroUpgrade = fs.readFileSync(path.join(root, 'bin/helios-upgrade-to-quattro'), 'utf8')
+const barTextColor = fs.readFileSync(path.join(root, 'bin/helios-bar-text-color'), 'utf8')
+const menuImages = fs.readFileSync(path.join(root, 'bin/helios-menu-images'), 'utf8')
 const lockService = fs.readFileSync(path.join(root, 'shell/plugins/lock/Service.qml'), 'utf8')
 const batteryService = fs.readFileSync(path.join(root, 'shell/plugins/services/battery/Service.qml'), 'utf8')
-const themeSet = fs.readFileSync(path.join(root, 'bin/omarchy-theme-set'), 'utf8')
+const themeSet = fs.readFileSync(path.join(root, 'bin/helios-theme-set'), 'utf8')
 const directImageList = fs.readFileSync(path.join(root, 'shell/plugins/image-picker/list.sh'), 'utf8')
 
 assert(
@@ -85,8 +85,8 @@ assert(
     !backgroundQml.includes('sessionObscured') &&
     !backgroundQml.includes('fullscreenHere') &&
     !backgroundQml.includes('Hyprland.monitorFor') &&
-    !backgroundQml.includes('omarchy.lock') &&
-    !backgroundQml.includes('omarchy.battery'),
+    !backgroundQml.includes('helios.lock') &&
+    !backgroundQml.includes('helios.battery'),
   'the desktop no longer carries the shell video pause policy'
 )
 assert(
@@ -191,9 +191,9 @@ chmod +x "$test_tmp/bin/md5sum"
 
 md5_file_calls="$test_tmp/md5-file-calls"
 PATH="$test_tmp/bin:$PATH" XDG_CACHE_HOME="$test_tmp/generator-cache" MD5_FILE_CALLS="$md5_file_calls" \
-  "$ROOT/bin/omarchy-menu-images" --prepare-only "$test_tmp/backgrounds"
+  "$ROOT/bin/helios-menu-images" --prepare-only "$test_tmp/backgrounds"
 
-generator_thumbnail=$(find "$test_tmp/generator-cache/omarchy/image-selector" -maxdepth 1 -type f -name '*.jpg' -print -quit)
+generator_thumbnail=$(find "$test_tmp/generator-cache/helios/image-selector" -maxdepth 1 -type f -name '*.jpg' -print -quit)
 [[ -s $generator_thumbnail ]] || fail "menu image generator creates a video thumbnail"
 
 generator_row=$(XDG_CACHE_HOME="$test_tmp/generator-cache" "$ROOT/shell/plugins/image-picker/list.sh" "$test_tmp/backgrounds")
@@ -226,7 +226,7 @@ failed_rows=$(PATH="$test_tmp/bin:$PATH" XDG_CACHE_HOME="$failed_cache" MD5_FILE
   "$ROOT/shell/plugins/image-picker/list.sh" "$failed_backgrounds")
 [[ -z $failed_rows ]] || fail "direct picker omits a video whose thumbnail fails" "$failed_rows"
 
-failed_marker=$(find "$failed_cache/omarchy/image-selector" -maxdepth 1 -type f -name '*.failed' -print -quit)
+failed_marker=$(find "$failed_cache/helios/image-selector" -maxdepth 1 -type f -name '*.failed' -print -quit)
 [[ -n $failed_marker ]] || fail "direct picker remembers a video the converter rejected"
 
 thumbnailer_calls="$test_tmp/thumbnailer-calls"
@@ -242,13 +242,13 @@ failed_rows=$(PATH="$test_tmp/bin:$PATH" XDG_CACHE_HOME="$failed_cache" THUMBNAI
 
 generator_failed_cache="$test_tmp/generator-failed-cache"
 PATH="$test_tmp/bin:$PATH" XDG_CACHE_HOME="$generator_failed_cache" THUMBNAILER_CALLS="$thumbnailer_calls" \
-  "$ROOT/bin/omarchy-menu-images" --prepare-only "$failed_backgrounds"
+  "$ROOT/bin/helios-menu-images" --prepare-only "$failed_backgrounds"
 [[ -s $thumbnailer_calls ]] || fail "menu image generator tries a video it has not seen"
-generator_marker=$(find "$generator_failed_cache/omarchy/image-selector" -maxdepth 1 -type f -name '*.failed' -print -quit)
+generator_marker=$(find "$generator_failed_cache/helios/image-selector" -maxdepth 1 -type f -name '*.failed' -print -quit)
 [[ -n $generator_marker ]] || fail "menu image generator remembers a video the converter rejected"
 rm -f "$thumbnailer_calls"
 PATH="$test_tmp/bin:$PATH" XDG_CACHE_HOME="$generator_failed_cache" THUMBNAILER_CALLS="$thumbnailer_calls" \
-  "$ROOT/bin/omarchy-menu-images" --prepare-only "$failed_backgrounds"
+  "$ROOT/bin/helios-menu-images" --prepare-only "$failed_backgrounds"
 [[ ! -e $thumbnailer_calls ]] || fail "menu image generator skips a rejected video on the next open" "$(<"$thumbnailer_calls")"
 
 # A repaired file gets a fresh key, so the old marker no longer applies, and
@@ -256,7 +256,7 @@ PATH="$test_tmp/bin:$PATH" XDG_CACHE_HOME="$generator_failed_cache" THUMBNAILER_
 # the directory's mtime alone is still noticed.
 touch -d '2 minutes' "$failed_backgrounds/broken.mp4"
 PATH="$test_tmp/bin:$PATH" XDG_CACHE_HOME="$generator_failed_cache" THUMBNAILER_CALLS="$thumbnailer_calls" \
-  "$ROOT/bin/omarchy-menu-images" --prepare-only "$failed_backgrounds"
+  "$ROOT/bin/helios-menu-images" --prepare-only "$failed_backgrounds"
 [[ -s $thumbnailer_calls ]] || fail "menu image generator retries a video that changed since it was rejected"
 
 timeout_backgrounds="$test_tmp/timeout-backgrounds"
@@ -270,11 +270,11 @@ SH
 timeout_rows=$(PATH="$test_tmp/bin:$PATH" XDG_CACHE_HOME="$timeout_cache" \
   "$ROOT/shell/plugins/image-picker/list.sh" "$timeout_backgrounds")
 [[ -z $timeout_rows ]] || fail "direct picker omits a video whose thumbnail timed out" "$timeout_rows"
-timeout_marker=$(find "$timeout_cache/omarchy/image-selector" -maxdepth 1 -type f -name '*.failed' -print -quit)
+timeout_marker=$(find "$timeout_cache/helios/image-selector" -maxdepth 1 -type f -name '*.failed' -print -quit)
 [[ -z $timeout_marker ]] || fail "a timed out video is left to retry rather than remembered as failed"
 
-grep -qx 'owe' "$ROOT/install/omarchy-base.packages" || fail "OWE is a base package"
-grep -qx 'owe-lockfeed' "$ROOT/install/omarchy-base.packages" || fail "the OWE lock feed module is a base package"
+grep -qx 'owe' "$ROOT/install/helios-base.packages" || fail "OWE is a base package"
+grep -qx 'owe-lockfeed' "$ROOT/install/helios-base.packages" || fail "the OWE lock feed module is a base package"
 # Qt Multimedia ships for building apps; the shell itself plays video through OWE.
 if grep -rqs 'import QtMultimedia' "$ROOT/shell"; then
   fail "Qt Multimedia is no longer needed by the shell"
@@ -292,17 +292,17 @@ source <(awk '
   /^(is_video_path|snapshot_background_path|background_transition_uses_snapshots|choose_theme_background|choose_staged_theme_background|set_theme_background)\(\) \{/ { copying=1 }
   copying { print }
   copying && /^}$/ { copying=0 }
-' "$ROOT/bin/omarchy-theme-set")
+' "$ROOT/bin/helios-theme-set")
 
 transition_home="$test_tmp/transition-home"
-CURRENT_THEME_PATH="$transition_home/.local/state/omarchy/current/theme"
-NEXT_THEME_PATH="$transition_home/.local/state/omarchy/current/next-theme"
-CURRENT_BACKGROUND_LINK="$transition_home/.local/state/omarchy/current/background"
-BACKGROUND_TRANSITION_CACHE="$transition_home/.cache/omarchy/background-transitions"
+CURRENT_THEME_PATH="$transition_home/.local/state/helios/current/theme"
+NEXT_THEME_PATH="$transition_home/.local/state/helios/current/next-theme"
+CURRENT_BACKGROUND_LINK="$transition_home/.local/state/helios/current/background"
+BACKGROUND_TRANSITION_CACHE="$transition_home/.cache/helios/background-transitions"
 THEME_NAME="video-test"
 PREVIOUS_THEME_NAME="$THEME_NAME"
 HOME="$transition_home"
-mkdir -p "$CURRENT_THEME_PATH/backgrounds" "$NEXT_THEME_PATH/backgrounds" "$HOME/.config/omarchy/backgrounds/$THEME_NAME"
+mkdir -p "$CURRENT_THEME_PATH/backgrounds" "$NEXT_THEME_PATH/backgrounds" "$HOME/.config/helios/backgrounds/$THEME_NAME"
 printf 'old image\n' >"$CURRENT_THEME_PATH/backgrounds/old.png"
 printf 'old image staged\n' >"$NEXT_THEME_PATH/backgrounds/old.png"
 printf 'new video\n' >"$NEXT_THEME_PATH/backgrounds/new.mp4"

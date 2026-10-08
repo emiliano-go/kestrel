@@ -18,15 +18,15 @@ pass "duration and account validation retains bounded inputs and trailing-dollar
 (
   source "$library"
   assert_status 2 root_dispatch __status 1000
-  assert_status 2 env TEST_EUID=0 SUDO_UID=1001 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" __status 1000
-  assert_status 3 env TEST_EUID=0 SUDO_UID=1000 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" __status 1000
+  assert_status 2 env TEST_EUID=0 SUDO_UID=1001 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" __status 1000
+  assert_status 3 env TEST_EUID=0 SUDO_UID=1000 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" __status 1000
 )
 pass "internal actions reject missing root and mismatched sudo identity"
 
 for status in 1 2 3; do
   : >"$test_tmp/commands"
   result=0
-  TEST_STATUS=$status /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" 15 >"$test_tmp/public.log" 2>&1 || result=$?
+  TEST_STATUS=$status /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" 15 >"$test_tmp/public.log" 2>&1 || result=$?
   if (( status == 3 )); then
     (( result == 0 )) && grep -q '^gum confirm ' "$test_tmp/commands" || fail "inactive status must allow confirmation"
   else
@@ -39,7 +39,7 @@ pass "public status distinguishes inactive from errors and revokes authorization
 
 printf ': >"$TEST_STARTUP_MARKER"\nset -o privileged\nunset BASH_ENV\n' >"$test_tmp/startup"
 : >"$test_tmp/commands"
-if TEST_STARTUP_MARKER="$test_tmp/startup-ran" BASH_ENV="$test_tmp/startup" bash "$test_tmp/omarchy-sudo-passwordless" -p >/dev/null 2>&1; then
+if TEST_STARTUP_MARKER="$test_tmp/startup-ran" BASH_ENV="$test_tmp/startup" bash "$test_tmp/helios-sudo-passwordless" -p >/dev/null 2>&1; then
   fail "ordinary Bash with a decoy -p was accepted"
 fi
 [[ -f $test_tmp/startup-ran && ! -s $test_tmp/commands ]] || fail "startup rejection must precede sudo"
@@ -53,14 +53,14 @@ pass "startup validation rejects ordinary Bash before authorization"
   /usr/sbin/visudo -cf "$(rule_file 1000)" >/dev/null
   expiry=$(sed -n 's/^systemd-run .*--on-calendar=@\([0-9]*\).*$/\1/p' "$test_tmp/commands" | tail -1)
   [[ $GRANT_DEADLINE == "$(/usr/bin/date -u -d "@$expiry" +%Y%m%d%H%M%SZ)" ]]
-  if [[ -n ${OMARCHY_TEST_SUDOERS:-} ]]; then
-    [[ -x $OMARCHY_TEST_SUDOERS ]] || fail "OMARCHY_TEST_SUDOERS must name an executable"
+  if [[ -n ${HELIOS_TEST_SUDOERS:-} ]]; then
+    [[ -x $HELIOS_TEST_SUDOERS ]] || fail "HELIOS_TEST_SUDOERS must name an executable"
     printf 'root:x:0:0:root:/root:/bin/bash\naudituser:x:1000:1000:Test:/nonexistent:/bin/bash\n' >"$test_tmp/passwd"
     printf 'root:x:0:\naudituser:x:1000:\n' >"$test_tmp/group"
     { printf 'audituser ALL=(ALL) ALL\n'; cat "$(rule_file 1000)"; } >"$test_tmp/policy"
     for offset in -1 1; do
       when=$(/usr/bin/date -u -d "@$((expiry + offset))" +%Y%m%d%H%M%SZ)
-      "$OMARCHY_TEST_SUDOERS" -p "$test_tmp/passwd" -P "$test_tmp/group" -T "$when" audituser /usr/bin/true <"$test_tmp/policy" >"$test_tmp/policy-result"
+      "$HELIOS_TEST_SUDOERS" -p "$test_tmp/passwd" -P "$test_tmp/group" -T "$when" audituser /usr/bin/true <"$test_tmp/policy" >"$test_tmp/policy-result"
       if (( offset < 0 )); then
         ! grep -q 'Password required' "$test_tmp/policy-result" || fail "native policy requires a password before expiry"
       else
@@ -71,15 +71,15 @@ pass "startup validation rejects ordinary Bash before authorization"
   fi
   assert_status 0 status_locked 1000
   TEST_INACTIVE_TIMER=1 assert_status 0 status_locked 1000
-  [[ ! -e $test_tmp/var/lib/omarchy/sudo-passwordless ]]
-  ! compgen -G "$test_tmp/etc/sudoers.d/.omarchy-nopasswd.*"
+  [[ ! -e $test_tmp/var/lib/helios/sudo-passwordless ]]
+  ! compgen -G "$test_tmp/etc/sudoers.d/.helios-nopasswd.*"
 )
 pass "one complete mode-0440 sudoers rule holds the deadline with no separate grant state"
 
 (
   source "$library"
   before=$(cat "$(rule_file 1000)")
-  expire_locked 1000 omarchy-nopasswd-expire-1000-ffffffffffffffffffffffffffffffff
+  expire_locked 1000 helios-nopasswd-expire-1000-ffffffffffffffffffffffffffffffff
   [[ $(cat "$(rule_file 1000)") == "$before" ]]
   enable_locked 1000 30
   renewed=$(cat "$(rule_file 1000)")
@@ -94,7 +94,7 @@ pass "legacy and current callbacks preserve renewed grants and remove expired on
 (
   source "$library"
   enable_locked 1000 1
-  assert_status 2 env TEST_EXPIRED=1 TEST_DELETE_FAIL=1 TEST_EUID=0 SUDO_UID=1000 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" __status 1000
+  assert_status 2 env TEST_EXPIRED=1 TEST_DELETE_FAIL=1 TEST_EUID=0 SUDO_UID=1000 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" __status 1000
   [[ -e $(rule_file 1000) ]]
   TEST_EXPIRED=1 assert_status 3 status_locked 1000
   [[ ! -e $(rule_file 1000) ]]
@@ -108,7 +108,7 @@ for failure in TEST_TIMER_FAIL TEST_INACTIVE_TIMER TEST_PUBLISH_FAIL TEST_POST_P
   (
     source "$library"
     enable_locked 1000 15
-    assert_status "$expected" env "$failure=1" TEST_EUID=0 SUDO_UID=1000 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" __enable 1000 30
+    assert_status "$expected" env "$failure=1" TEST_EUID=0 SUDO_UID=1000 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" __enable 1000 30
     [[ ! -e $(rule_file 1000) ]]
   )
 done
@@ -151,7 +151,7 @@ reset_grant
 pass "publication requires trusted paths and the packaged cleanup hook"
 
 reset_grant
-cp "$ROOT/default/libalpm/hooks/05-omarchy-passwordless-revoke.hook" "$test_tmp/hooks/"
+cp "$ROOT/default/libalpm/hooks/05-helios-passwordless-revoke.hook" "$test_tmp/hooks/"
 (
   source "$library"
   TEST_ACCOUNT='buildbot$' enable_locked 1000 15
@@ -179,7 +179,7 @@ reset_grant
   TEST_EXPIRED=1 status_locked 1000
   TEST_EXPIRED=1 expire_locked 1000
   cleanup_all_locked
-  /usr/bin/systemd-tmpfiles --root="$test_tmp" --remove --boot --inline 'r! /etc/sudoers.d/99-omarchy-nopasswd-*'
+  /usr/bin/systemd-tmpfiles --root="$test_tmp" --remove --boot --inline 'r! /etc/sudoers.d/99-helios-nopasswd-*'
   [[ -f $(rule_file 1000 permanent) ]]
   cleanup_uid_locked 1000
   assert_status 3 status_locked 1000
@@ -226,7 +226,7 @@ for choice in '15 minutes' '1 Hour' '1 Day' Permanently; do
     Permanently) expected=permanent ;;
   esac
   : >"$test_tmp/commands"
-  TEST_CHOICE="$choice" TEST_CONFIRM_STATUS=0 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" >"$test_tmp/public.log" 2>&1
+  TEST_CHOICE="$choice" TEST_CONFIRM_STATUS=0 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" >"$test_tmp/public.log" 2>&1
   grep -q '^gum choose .*15 minutes 1 Hour 1 Day Permanently$' "$test_tmp/commands"
   grep -q "^sudo -N -- .* __enable .* $expected$" "$test_tmp/commands"
   [[ $(tail -1 "$test_tmp/commands") == 'sudo -k' ]]
@@ -238,18 +238,18 @@ done
 pass "each duration choice dispatches its exact grant duration with permanent-specific copy"
 
 : >"$test_tmp/commands"
-assert_status 130 env TEST_CHOICE_CANCEL=1 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" >"$test_tmp/public.log" 2>&1
+assert_status 130 env TEST_CHOICE_CANCEL=1 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" >"$test_tmp/public.log" 2>&1
 ! grep -q '__enable\|^gum confirm ' "$test_tmp/commands" || fail "cancelled picker continued enablement"
 [[ $(tail -1 "$test_tmp/commands") == 'sudo -k' ]]
 : >"$test_tmp/commands"
-TEST_STATUS=0 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" >"$test_tmp/public.log" 2>&1
+TEST_STATUS=0 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" >"$test_tmp/public.log" 2>&1
 ! grep -q '^gum ' "$test_tmp/commands" || fail "disabling access offered a picker"
 grep -q '__disable ' "$test_tmp/commands"
 pass "cancelling the picker grants nothing and active access still toggles off"
 
 for confirm_status in 0 1; do
   : >"$test_tmp/commands"
-  TEST_STATUS=0 TEST_CONFIRM_STATUS=$confirm_status /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" permanent >"$test_tmp/public.log" 2>&1
+  TEST_STATUS=0 TEST_CONFIRM_STATUS=$confirm_status /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" permanent >"$test_tmp/public.log" 2>&1
   grep -q '^gum confirm Enable passwordless sudo permanently?' "$test_tmp/commands"
   if (( confirm_status == 0 )); then
     grep -q '__enable .* permanent$' "$test_tmp/commands"
@@ -268,7 +268,7 @@ reset_grant
   enable_locked 01000 permanent
   status_locked 1000
   [[ -e $(rule_file 1000 permanent) ]]
-  [[ ! -e $test_tmp/etc/sudoers.d/99-omarchy-permanent-nopasswd-01000 ]]
+  [[ ! -e $test_tmp/etc/sudoers.d/99-helios-permanent-nopasswd-01000 ]]
   cleanup_uid_locked 1000
   assert_status 3 status_locked 01000
 )
@@ -279,16 +279,16 @@ for policy in '    Options: !authenticate' '    Options: authenticate'; do
   : >"$test_tmp/commands"
   expected=1
   [[ $policy != *'!authenticate'* ]] || expected=0
-  assert_status "$expected" env TEST_POLICY="$policy" /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" --active
+  assert_status "$expected" env TEST_POLICY="$policy" /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" --active
   [[ $(wc -l <"$test_tmp/commands") == 1 ]]
   grep -q '^sudo -n -N -l -l -- .* __status ' "$test_tmp/commands"
 done
-assert_status 1 env TEST_POLICY_FAILURE=1 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" --active
+assert_status 1 env TEST_POLICY_FAILURE=1 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" --active
 pass "menu probe reads policy tags without executing a privileged action or changing the timestamp"
 
 for status in 0 3; do
   : >"$test_tmp/commands"
-  TEST_STATUS=$status /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" --disable >"$test_tmp/public.log" 2>&1
+  TEST_STATUS=$status /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" --disable >"$test_tmp/public.log" 2>&1
   ! grep -q '^gum\|__enable ' "$test_tmp/commands" || fail "explicit disable offered enablement"
   if (( status == 0 )); then
     grep -q '__disable ' "$test_tmp/commands"
@@ -297,7 +297,7 @@ done
 pass "explicit disable never enables access even when a displayed grant has expired"
 
 : >"$test_tmp/commands"
-TEST_STATUS=3 TEST_CHOICE='15 minutes' TEST_CONFIRM_STATUS=0 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" >"$test_tmp/public.log" 2>&1
+TEST_STATUS=3 TEST_CHOICE='15 minutes' TEST_CONFIRM_STATUS=0 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" >"$test_tmp/public.log" 2>&1
 [[ $(grep -c '^sudo -N -- ' "$test_tmp/commands") == 1 ]] || fail "enable must authenticate exactly one sudo call"
 grep -q '^sudo -N -- .* __enable .* 15$' "$test_tmp/commands"
 ! grep -q '^sudo -n -N -- .* __status ' "$test_tmp/commands" || fail "inactive flow attempted root status"
@@ -305,7 +305,7 @@ grep -q '^sudo -N -- .* __enable .* 15$' "$test_tmp/commands"
 pass "enabling from inactive policy has exactly one password-capable sudo invocation"
 
 : >"$test_tmp/commands"
-TEST_STATUS=0 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" --disable >"$test_tmp/public.log" 2>&1
+TEST_STATUS=0 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" --disable >"$test_tmp/public.log" 2>&1
 grep -q '^sudo -n -N -- .* __disable ' "$test_tmp/commands" || fail "disable must refuse interactive authentication"
 ! grep -q '^sudo -N -- ' "$test_tmp/commands" || fail "disable attempted an interactive sudo command"
 pass "disabling active access is fully noninteractive"
@@ -319,7 +319,7 @@ for duration in permanent 15; do
     else
       enable_locked 1000 permanent
     fi
-    assert_status 137 env TEST_KILL_AFTER_PUBLISH=1 TEST_EUID=0 SUDO_UID=1000 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" __enable 1000 "$duration"
+    assert_status 137 env TEST_KILL_AFTER_PUBLISH=1 TEST_EUID=0 SUDO_UID=1000 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" __enable 1000 "$duration"
     [[ -f $(rule_file 1000) && -f $(rule_file 1000 permanent) ]]
     status_locked 1000
     TEST_EXPIRED=1 expire_locked 1000
@@ -351,22 +351,22 @@ reset_grant
 pass "paired policy recovery rejects mismatched or unsafe rules and allows a complete duration change"
 
 : >"$test_tmp/commands"
-TEST_POLICY_FAILURE=1 TEST_STATUS=0 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" --disable >"$test_tmp/public.log" 2>&1
+TEST_POLICY_FAILURE=1 TEST_STATUS=0 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" --disable >"$test_tmp/public.log" 2>&1
 grep -q '^sudo -n -N -- .* __disable ' "$test_tmp/commands"
 ! grep -q '^gum\|^sudo -N -- ' "$test_tmp/commands" || fail "listpw=always disable prompted"
-TEST_POLICY_FAILURE=1 TEST_STATUS=0 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" --active
-assert_status 1 env TEST_POLICY_FAILURE=1 TEST_STATUS=1 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" --active
+TEST_POLICY_FAILURE=1 TEST_STATUS=0 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" --active
+assert_status 1 env TEST_POLICY_FAILURE=1 TEST_STATUS=1 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" --active
 : >"$test_tmp/commands"
-TEST_POLICY_FAILURE=1 TEST_STATUS=1 TEST_CONFIRM_STATUS=0 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" 15 >"$test_tmp/public.log" 2>&1
+TEST_POLICY_FAILURE=1 TEST_STATUS=1 TEST_CONFIRM_STATUS=0 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" 15 >"$test_tmp/public.log" 2>&1
 [[ $(grep -c '^sudo -N -- ' "$test_tmp/commands") == 1 ]] || fail "listing failure must leave one enable authentication"
 grep -q '^sudo -N -- .* __enable .* 15$' "$test_tmp/commands"
 : >"$test_tmp/commands"
-assert_status 1 env TEST_POLICY_FAILURE=1 TEST_STATUS=2 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" 15 >"$test_tmp/public.log" 2>&1
+assert_status 1 env TEST_POLICY_FAILURE=1 TEST_STATUS=2 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" 15 >"$test_tmp/public.log" 2>&1
 ! grep -q '^gum\|__enable ' "$test_tmp/commands" || fail "unsafe grant was offered enablement"
 pass "password-required listings do not block enabling, disabling, or active detection"
 
 : >"$test_tmp/commands"
-TEST_POLICY_FAILURE=1 TEST_STATUS=2 /usr/bin/bash -p "$test_tmp/omarchy-sudo-passwordless" --active
+TEST_POLICY_FAILURE=1 TEST_STATUS=2 /usr/bin/bash -p "$test_tmp/helios-sudo-passwordless" --active
 grep -q '^sudo -kn -- .* __status ' "$test_tmp/commands" || fail "fallback probe must ignore cached credentials"
 (
   source "$library"

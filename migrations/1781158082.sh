@@ -1,10 +1,10 @@
-echo "Relink Neovim theme to Omarchy current state"
+echo "Relink Neovim theme to HeliOS current state"
 
 theme_link="$HOME/.config/nvim/lua/plugins/theme.lua"
-legacy_absolute_target="$HOME/.config/omarchy/current/theme/neovim.lua"
-legacy_relative_target="../../../omarchy/current/theme/neovim.lua"
-legacy_home_target="~/.config/omarchy/current/theme/neovim.lua"
-current_relative_target="../../../../.local/state/omarchy/current/theme/neovim.lua"
+legacy_absolute_target="$HOME/.config/helios/current/theme/neovim.lua"
+legacy_relative_target="../../../helios/current/theme/neovim.lua"
+legacy_home_target="~/.config/helios/current/theme/neovim.lua"
+current_relative_target="../../../../.local/state/helios/current/theme/neovim.lua"
 
 [[ -L $theme_link ]] || exit 0
 

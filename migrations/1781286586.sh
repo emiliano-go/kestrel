@@ -1,4 +1,4 @@
 echo "Replace Satty with Tensaku"
 
-omarchy-pkg-add tensaku
-omarchy-pkg-drop satty
+helios-pkg-add tensaku
+helios-pkg-drop satty

@@ -8,8 +8,8 @@ import qs.Ui
 
 Panel {
   id: root
-  moduleName: "omarchy.agents"
-  ipcTarget: "omarchy.agents"
+  moduleName: "helios.agents"
+  ipcTarget: "helios.agents"
   manageIpc: false
 
   readonly property color foreground: bar ? bar.foreground : Commons.Color.foreground
@@ -228,7 +228,7 @@ Panel {
   //
   // Adding a subscription happens right here: pick a provider, name it if
   // it's a second account, then sign in through the browser while the panel
-  // follows omarchy-agent-account-add --events. The browser taking focus may
+  // follows helios-agent-account-add --events. The browser taking focus may
   // close the panel; the login carries on, and its result arrives as a
   // notification too.
 
@@ -281,7 +281,7 @@ Panel {
     addNeedsPaste = addProvider === "claude"
     addResult = ""
     addStage = "running"
-    addProcess.command = ["omarchy-agent-account-add", "--events", addProvider].concat(label !== "" ? [label] : [])
+    addProcess.command = ["helios-agent-account-add", "--events", addProvider].concat(label !== "" ? [label] : [])
     addProcess.running = true
   }
 
@@ -306,7 +306,7 @@ Panel {
   // browser (Grok), and an invitation to paste one back (Claude).
   function handleAddLine(line) {
     var text = String(line).replace(/\u001b\[[0-9;]*m/g, "")
-    var tagged = text.match(/^@@omarchy (status|done|error) (.*)$/)
+    var tagged = text.match(/^@@helios (status|done|error) (.*)$/)
     if (tagged) {
       if (tagged[1] === "status") {
         addStatus = tagged[2]
@@ -334,29 +334,29 @@ Panel {
 
   function reopenSignIn() {
     if (addUrl === "") return
-    Util.execArgv(addPrivate ? ["omarchy-launch-browser", "--private", addUrl] : ["omarchy-launch-browser", addUrl])
+    Util.execArgv(addPrivate ? ["helios-launch-browser", "--private", addUrl] : ["helios-launch-browser", addUrl])
   }
 
-  // A few ways into making Omarchy your own, handed to the default agent.
+  // A few ways into making HeliOS your own, handed to the default agent.
   readonly property var starterPrompts: [
-    { glyph: "󰏘", label: "Theme", prompt: "Make me a new Omarchy theme. Ask me what look or inspiration I have in mind, then build it following the Omarchy skill's theming guide and switch to it." },
-    { glyph: "󰐱", label: "Plugin", prompt: "Make me a new Omarchy shell plugin. Ask me what I'd like it to do, then build it following the Omarchy skill's plugin guide and enable it." },
-    { glyph: "󰣆", label: "App", prompt: "Make me a new app for my Omarchy desktop. Ask me what it should do, then build it following the omarchy-app skill and install it so it shows up in the app launcher." }
+    { glyph: "󰏘", label: "Theme", prompt: "Make me a new HeliOS theme. Ask me what look or inspiration I have in mind, then build it following the HeliOS skill's theming guide and switch to it." },
+    { glyph: "󰐱", label: "Plugin", prompt: "Make me a new HeliOS shell plugin. Ask me what I'd like it to do, then build it following the HeliOS skill's plugin guide and enable it." },
+    { glyph: "󰣆", label: "App", prompt: "Make me a new app for my HeliOS desktop. Ask me what it should do, then build it following the helios-app skill and install it so it shows up in the app launcher." }
   ]
 
   function startPrompt(prompt) {
     root.close()
-    Util.execArgv(["omarchy-agent-prompt", prompt])
+    Util.execArgv(["helios-agent-prompt", prompt])
   }
 
   function renameAccount(p, account, label) {
     if (!p || !account) return
-    Util.execArgv(["omarchy-agent-account-rename", p.providerId, String(account.id), label])
+    Util.execArgv(["helios-agent-account-rename", p.providerId, String(account.id), label])
   }
 
   function useAccount(p, account) {
     if (!p || !account || account.active) return
-    Util.execArgv(["omarchy-agent-account-use", p.providerId, String(account.id)])
+    Util.execArgv(["helios-agent-account-use", p.providerId, String(account.id)])
   }
 
   function autoSwitchFor(p) {
@@ -369,8 +369,8 @@ Panel {
 
   function setSwitchMode(p, mode) {
     if (!p || providerAccounts(p).length < 2 || mode === (autoSwitchFor(p) ? "auto" : "manual")) return
-    Util.execArgv(["bash", "-c", 'omarchy-agent-account-mode "$1" "$2" >/dev/null && omarchy-agent-usage-update --limits-only "$1"',
-                   "omarchy-agent-account-mode", p.providerId, mode])
+    Util.execArgv(["bash", "-c", 'helios-agent-account-mode "$1" "$2" >/dev/null && helios-agent-usage-update --limits-only "$1"',
+                   "helios-agent-account-mode", p.providerId, mode])
   }
 
   // `m` flips autoswitch for the picked account's provider, or the first
@@ -442,7 +442,7 @@ Panel {
     addNeedsPaste = addProvider === "claude"
     addResult = ""
     addStage = "running"
-    addProcess.command = ["omarchy-agent-account-add", "--events", "--reauth",
+    addProcess.command = ["helios-agent-account-add", "--events", "--reauth",
       account && account.primary !== true ? String(account.id) : ":primary", p.providerId]
     addProcess.running = true
   }
@@ -462,7 +462,7 @@ Panel {
   }
 
   function launchAgent() {
-    if (root.bar) root.bar.run("omarchy-agent --pick")
+    if (root.bar) root.bar.run("helios-agent --pick")
     root.close()
   }
 
@@ -785,7 +785,7 @@ Panel {
   Process {
     id: checkProcess
     running: false
-    command: ["omarchy-agent-account-add", "--check"]
+    command: ["helios-agent-account-add", "--check"]
     stdout: SplitParser {
       onRead: function(line) {
         var parts = String(line).trim().split(" ")

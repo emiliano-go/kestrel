@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# helios:summary=Enable, disable, or toggle the touch functionality of the screen
+# helios:args=[on|off|toggle]
+
+exec helios-toggle-input-device touchscreen "${1:-toggle}"

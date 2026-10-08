@@ -12,7 +12,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 # polkit prompts would have no brute-force lockout and their failures would not
 # count toward the shared tally. Assert the created stack defers to system-auth.
 
-for setup in omarchy-setup-security-fingerprint omarchy-setup-security-fido2; do
+for setup in helios-setup-security-fingerprint helios-setup-security-fido2; do
   script="$ROOT/bin/$setup"
 
   # Pull the here-doc body the setup writes to /etc/pam.d/polkit-1.

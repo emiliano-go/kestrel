@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "omarchy.bluetooth",
+  "id": "helios.bluetooth",
   "name": "Bluetooth",
   "version": "1.0.0",
-  "author": "Omarchy",
+  "author": "HeliOS",
   "description": "Bluetooth device list with connect/disconnect",
   "kinds": [
     "bar-widget"

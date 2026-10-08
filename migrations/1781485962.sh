@@ -9,10 +9,10 @@ file_sha() {
 }
 
 packaged_hypr_config() {
-  local omarchy_config="$OMARCHY_PATH/config/hypr/$1"
+  local helios_config="$HELIOS_PATH/config/hypr/$1"
 
-  if [[ -f $omarchy_config ]]; then
-    printf '%s\n' "$omarchy_config"
+  if [[ -f $helios_config ]]; then
+    printf '%s\n' "$helios_config"
   else
     printf '/etc/skel/.config/hypr/%s\n' "$1"
   fi
@@ -100,8 +100,8 @@ if [[ -f $bindings_file ]]; then
       replace_with_packaged_config bindings.lua
       ;;
     "$plain_bindings_sha")
-      mkdir -p "$HOME/.local/state/omarchy"
-      touch "$HOME/.local/state/omarchy/preinstalls-removed"
+      mkdir -p "$HOME/.local/state/helios"
+      touch "$HOME/.local/state/helios/preinstalls-removed"
       replace_with_packaged_config bindings.lua
       ;;
   esac

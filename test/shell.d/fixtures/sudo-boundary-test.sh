@@ -4,13 +4,13 @@
 # stand-ins. No host sudo, package transaction, namespace root, or exploit runs.
 boundary_tmp=$(mktemp -d)
 trap 'rm -rf "$boundary_tmp"' EXIT
-export SUDO_TEST_ROOT="$boundary_tmp/omarchy"
+export SUDO_TEST_ROOT="$boundary_tmp/helios"
 export SUDO_TEST_LOG="$boundary_tmp/events"
 export SUDO_TEST_CACHE="$boundary_tmp/cache"
-export OMARCHY_PATH="$SUDO_TEST_ROOT"
+export HELIOS_PATH="$SUDO_TEST_ROOT"
 export SUDO_TEST_HOME="$boundary_tmp/home"
 mkdir -p "$SUDO_TEST_HOME"
-mkdir -p "$SUDO_TEST_ROOT/bin" "$SUDO_TEST_ROOT/mock" "$SUDO_TEST_ROOT/default/omarchy/sudo-no-update"
+mkdir -p "$SUDO_TEST_ROOT/bin" "$SUDO_TEST_ROOT/mock" "$SUDO_TEST_ROOT/default/helios/sudo-no-update"
 : >"$SUDO_TEST_LOG"
 
 copy_boundary_file() {
@@ -21,7 +21,7 @@ source, target, name = map(Path,sys.argv[1:])
 p=target/name
 p.parent.mkdir(parents=True,exist_ok=True)
 s=(source/name).read_text().replace('$HOME', '$SUDO_TEST_HOME')
-for command in ['sudo','pkexec','pacman','omarchy-pkg-missing','systemd-inhibit','setpriv','snapper']:
+for command in ['sudo','pkexec','pacman','helios-pkg-missing','systemd-inhibit','setpriv','snapper']:
  s=s.replace('/usr/bin/'+command, str(target/'mock'/command))
 s=s.replace('PATH=/usr/bin:/usr/sbin:/bin:/sbin', 'PATH="'+str(target/'bin')+':/usr/bin:/usr/sbin:/bin:/sbin"')
 p.write_text(s)
@@ -29,9 +29,9 @@ p.chmod((source/name).stat().st_mode & 0o777)
 PY
 }
 
-copy_boundary_file bin/omarchy-security-functions
-copy_boundary_file bin/omarchy-update-pacman
-copy_boundary_file default/omarchy/sudo-no-update/sudo
+copy_boundary_file bin/helios-security-functions
+copy_boundary_file bin/helios-update-pacman
+copy_boundary_file default/helios/sudo-no-update/sudo
 
 cat >"$SUDO_TEST_ROOT/mock/sudo" <<'STUB'
 #!/bin/bash
@@ -91,22 +91,22 @@ set -euo pipefail
 step=${0##*/}
 printf 'step:%s %s\n' "$step" "$*" >>"$SUDO_TEST_LOG"
 if [[ $step == "systemd-run" ]]; then
-  # omarchy-update-pacman registers the transaction as a PID 1 scope on booted
+  # helios-update-pacman registers the transaction as a PID 1 scope on booted
   # hosts. Run the wrapped command in place so the pacman step still executes.
   while (( $# )) && [[ $1 == -* ]]; do shift; done
   exec "$@"
 fi
-# omarchy update shares one authorization with its post-update hook and mise.
+# helios update shares one authorization with its post-update hook and mise.
 # Standalone hooks, such as the pre-refresh one, and AUR builds run cold.
-if [[ $step == "omarchy-hook" && ${1:-} == "post-update" ]] || [[ $step == "omarchy-update-mise" ]]; then
+if [[ $step == "helios-hook" && ${1:-} == "post-update" ]] || [[ $step == "helios-update-mise" ]]; then
   [[ -e $SUDO_TEST_CACHE ]] || exit 94
-elif [[ $step == "omarchy-hook" || $step == "yay" ]]; then
+elif [[ $step == "helios-hook" || $step == "yay" ]]; then
   [[ ! -e $SUDO_TEST_CACHE ]] || exit 91
 fi
 if [[ -n ${SUDO_TEST_REMOVE_WRAPPER_STEP:-} && "$step $*" == $SUDO_TEST_REMOVE_WRAPPER_STEP ]]; then
   # Model a package transaction replacing the running tree with a release
   # that predates the wrapper.
-  /usr/bin/rm -f "$OMARCHY_PATH/default/omarchy/sudo-no-update/sudo"
+  /usr/bin/rm -f "$HELIOS_PATH/default/helios/sudo-no-update/sudo"
 fi
 if [[ ${SUDO_TEST_FAIL_STEP:-} == "$step" ]]; then
   # Model a misbehaving child leaving state behind, then failing. Cleanup must
@@ -120,19 +120,19 @@ if [[ ${SUDO_TEST_SIGNAL_STEP:-} == "$step" ]]; then
   exit 0
 fi
 case "$step" in
-  omarchy-update-system-pkgs|omarchy-update-keyring|omarchy-snapshot)
+  helios-update-system-pkgs|helios-update-keyring|helios-snapshot)
     sudo /usr/bin/true
     ;;
   pacman) exit 0 ;;
   yay)
-    [[ $* == *"--sudo $OMARCHY_PATH/default/omarchy/sudo-no-update/sudo"* ]] || exit 92
+    [[ $* == *"--sudo $HELIOS_PATH/default/helios/sudo-no-update/sudo"* ]] || exit 92
     [[ $* == *"--sudoloop=false"* ]] || exit 93
-    [[ $(command -v sudo) == "$OMARCHY_PATH/default/omarchy/sudo-no-update/sudo" ]] || exit 95
+    [[ $(command -v sudo) == "$HELIOS_PATH/default/helios/sudo-no-update/sudo" ]] || exit 95
     ;;
 esac
 STUB
 chmod +x "$SUDO_TEST_ROOT/bin/test-step"
-for step in omarchy-update-lock omarchy-update-requires-free-space omarchy-update-confirm omarchy-update-pkg-prune omarchy-snapshot omarchy-update-stay-awake omarchy-update-dev omarchy-update-keyring omarchy-update-system-pkgs omarchy-migrate omarchy-hook omarchy-update-aur-pkgs omarchy-update-mise omarchy-update-orphan-pkgs omarchy-update-analyze-logs omarchy-update-status omarchy-update-restart omarchy-pkg-aur-accessible omarchy-notification-dismiss pacman systemd-run cp yay; do
+for step in helios-update-lock helios-update-requires-free-space helios-update-confirm helios-update-pkg-prune helios-snapshot helios-update-stay-awake helios-update-dev helios-update-keyring helios-update-system-pkgs helios-migrate helios-hook helios-update-aur-pkgs helios-update-mise helios-update-orphan-pkgs helios-update-analyze-logs helios-update-status helios-update-restart helios-pkg-aur-accessible helios-notification-dismiss pacman systemd-run cp yay; do
   ln -s test-step "$SUDO_TEST_ROOT/bin/$step"
 done
 ln -s ../bin/test-step "$SUDO_TEST_ROOT/mock/pacman"

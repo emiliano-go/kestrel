@@ -6,7 +6,7 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/bin" "$work/home"
 export TEST_CALLS="$work/calls"
-for command in omarchy-pkg-add omarchy-hook-install systemctl; do
+for command in helios-pkg-add helios-hook-install systemctl; do
   cat >"$work/bin/$command" <<'SH'
 #!/bin/bash
 printf '%s %s\n' "${0##*/}" "$*" >>"$TEST_CALLS"
@@ -26,8 +26,8 @@ run_migration() {
 }
 run_migration
 run_migration
-grep -Fx 'omarchy-pkg-add owe owe-lockfeed' "$TEST_CALLS" >/dev/null
-grep -Fx 'omarchy-hook-install theme-set /usr/share/owe/10-owe-sync' "$TEST_CALLS" >/dev/null
+grep -Fx 'helios-pkg-add owe owe-lockfeed' "$TEST_CALLS" >/dev/null
+grep -Fx 'helios-hook-install theme-set /usr/share/owe/10-owe-sync' "$TEST_CALLS" >/dev/null
 grep -Fx 'systemctl --user start owed.service' "$TEST_CALLS" >/dev/null
 pass "migration installs OWE, its theme refresh hook, and starts the graphical session service"
 
@@ -41,7 +41,7 @@ fi
 pass "TTY migrations enable the next login without starting a renderer"
 
 : >"$TEST_CALLS"
-OMARCHY_UPGRADE_TO_QUATTRO_LIVE=1 run_migration
+HELIOS_UPGRADE_TO_QUATTRO_LIVE=1 run_migration
 if grep -F 'systemctl --user start' "$TEST_CALLS" >/dev/null; then
   fail "Quattro upgrade must defer OWE until the new graphical session"
 fi
@@ -55,7 +55,7 @@ pass "a failed live service start fails the migration"
 : >"$TEST_CALLS"
 HOME="$work/home" PATH="$work/bin:$PATH" bash "$ROOT/install/user/first-run/enable-user-units.sh"
 grep -E '^systemctl --user enable --now .*owed.service' "$TEST_CALLS" >/dev/null
-grep -Fx 'omarchy-hook-install theme-set /usr/share/owe/10-owe-sync' "$TEST_CALLS" >/dev/null
+grep -Fx 'helios-hook-install theme-set /usr/share/owe/10-owe-sync' "$TEST_CALLS" >/dev/null
 pass "fresh installs enable OWE and install the theme refresh hook"
 
 cat >"$work/bin/ffmpegthumbnailer" <<'SH'

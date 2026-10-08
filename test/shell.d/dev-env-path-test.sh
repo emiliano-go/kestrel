@@ -15,7 +15,7 @@ run_bootstrap() {
   shell_bin=$(command -v "$shell_bin")
   HOME="$home" PATH="$path_value" "$shell_bin" -c '
     . "$1"
-    printf "%s\n%s\n" "$OMARCHY_PATH" "$PATH"
+    printf "%s\n%s\n" "$HELIOS_PATH" "$PATH"
   ' sh "$bootstrap"
 }
 
@@ -45,27 +45,27 @@ trap 'rm -rf "$tmpdir"' EXIT
 home="$tmpdir/home"
 mkdir -p "$tmpdir/active/bin" "$tmpdir/unrelated/bin"
 
-# Test against a copy so the test controls /etc/omarchy.conf without mutating the host.
+# Test against a copy so the test controls /etc/helios.conf without mutating the host.
 bootstrap="$tmpdir/env-bootstrap"
-sed "s#/etc/omarchy.conf#$tmpdir/omarchy.conf#g" "$ROOT/default/bash/env-bootstrap" >"$bootstrap"
+sed "s#/etc/helios.conf#$tmpdir/helios.conf#g" "$ROOT/default/bash/env-bootstrap" >"$bootstrap"
 
-printf 'export OMARCHY_PATH="/usr/share/omarchy"\n' >"$tmpdir/omarchy.conf"
+printf 'export HELIOS_PATH="/usr/share/helios"\n' >"$tmpdir/helios.conf"
 mapfile -t default_result < <(run_bootstrap bash "$bootstrap" "$home" "$tmpdir/unrelated/bin:/usr/bin")
 default_path=${default_result[1]}
 
-[[ ${default_result[0]} == /usr/share/omarchy ]] || fail "env-bootstrap resolves default OMARCHY_PATH" "actual: ${default_result[0]}"
-pass "env-bootstrap resolves default OMARCHY_PATH"
+[[ ${default_result[0]} == /usr/share/helios ]] || fail "env-bootstrap resolves default HELIOS_PATH" "actual: ${default_result[0]}"
+pass "env-bootstrap resolves default HELIOS_PATH"
 assert_path_present "$default_path" "$tmpdir/unrelated/bin" "env-bootstrap preserves PATH entries in default mode"
 assert_path_present "$default_path" "$home/.local/share/mise/shims" "env-bootstrap appends mise shims"
 assert_path_present "$default_path" "$home/.local/bin" "env-bootstrap appends ~/.local/bin"
 assert_path_first "$default_path" "$home/.local/share/mise/command-wrappers/bin" "env-bootstrap puts command wrappers ahead of inherited tool binaries"
 
-printf 'export OMARCHY_PATH="%s"\n' "$tmpdir/active" >"$tmpdir/omarchy.conf"
+printf 'export HELIOS_PATH="%s"\n' "$tmpdir/active" >"$tmpdir/helios.conf"
 mapfile -t linked_result < <(run_bootstrap bash "$bootstrap" "$home" "$tmpdir/unrelated/bin:/usr/bin")
 linked_path=${linked_result[1]}
 
-[[ ${linked_result[0]} == "$tmpdir/active" ]] || fail "env-bootstrap resolves linked OMARCHY_PATH" "actual: ${linked_result[0]}"
-pass "env-bootstrap resolves linked OMARCHY_PATH"
+[[ ${linked_result[0]} == "$tmpdir/active" ]] || fail "env-bootstrap resolves linked HELIOS_PATH" "actual: ${linked_result[0]}"
+pass "env-bootstrap resolves linked HELIOS_PATH"
 assert_path_first "$linked_path" "$home/.local/share/mise/command-wrappers/bin" "env-bootstrap keeps command wrappers first in linked mode"
 assert_path_present "$linked_path" "$tmpdir/active/bin" "env-bootstrap includes the active checkout bin in linked mode"
 assert_path_present "$linked_path" "$tmpdir/unrelated/bin" "env-bootstrap preserves unrelated PATH entries in linked mode"

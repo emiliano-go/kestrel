@@ -6,7 +6,7 @@ import "background" as BackgroundPlugin
 
 ShellRoot {
   id: shell
-  function firstPartyServiceFor(id) { return id === "omarchy.background" ? background : null }
+  function firstPartyServiceFor(id) { return id === "helios.background" ? background : null }
   BackgroundPlugin.Background { id: background }
 
   // APPLY_THEME_FUNCTION

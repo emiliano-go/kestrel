@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# helios:summary=Toggle mirroring theme changes to and from your herdr machines
+
+helios-toggle herdr-theme-sync
+
+if helios-toggle-enabled herdr-theme-sync; then
+  helios-notification-send -g 󰸌 "Herdr theme sync enabled"
+else
+  helios-notification-send -g 󰸌 "Herdr theme sync disabled"
+fi

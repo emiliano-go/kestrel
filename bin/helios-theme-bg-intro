@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# helios:summary=Enable or disable background intros
+# helios:args=<enable|disable|toggle|status>
+# helios:examples=helios theme bg intro toggle | helios theme bg intro disable
+
+set -euo pipefail
+
+toggle="$HOME/.local/state/helios/toggles/background-intros-off"
+case ${1:-} in
+  enable)
+    rm -f "$toggle"
+    helios-notification-send "Background Intros" "Enabled"
+    ;;
+  disable)
+    mkdir -p "$(dirname "$toggle")"
+    touch "$toggle"
+    helios-notification-send "Background Intros" "Disabled"
+    ;;
+  toggle)
+    if [[ -f $toggle ]]; then
+      helios-theme-bg-intro enable
+    else
+      helios-theme-bg-intro disable
+    fi
+    ;;
+  status)
+    [[ ! -f $toggle ]]
+    ;;
+  *)
+    echo "Usage: helios-theme-bg-intro <enable|disable|toggle|status>" >&2
+    exit 1
+    ;;
+esac

@@ -15,7 +15,7 @@ if [[ -f $wrapper && ! -L $wrapper ]] && grep -Fq "$npm_grok" "$wrapper"; then
 fi
 
 drop_npm_grok() {
-  omarchy-cmd-present mise || return 0
+  helios-cmd-present mise || return 0
   if [[ -n $(mise ls -g "$npm_grok") ]]; then
     mise unuse -y -g "$npm_grok"
   fi
@@ -24,21 +24,21 @@ drop_npm_grok() {
   fi
 }
 
-if [[ ! -f $HOME/.local/state/omarchy/preinstalls-removed ]]; then
+if [[ ! -f $HOME/.local/state/helios/preinstalls-removed ]]; then
   # The shim is ahead of ~/.local/bin, so drop the npm tool before looking for
   # grok. A removed wrapper still looks installed until the tool is gone.
   drop_npm_grok
-  if [[ $npm_stub == true ]] || omarchy-cmd-missing grok; then
-    omarchy-mise-install grok
+  if [[ $npm_stub == true ]] || helios-cmd-missing grok; then
+    helios-mise-install grok
   fi
 elif [[ $npm_stub == true ]]; then
-  # After an opt-out, only a wrapper Omarchy wrote proves the tool is ours.
+  # After an opt-out, only a wrapper HeliOS wrote proves the tool is ours.
   rm -f "$wrapper"
   drop_npm_grok
 fi
 
 # The npm launcher unpacked its binary into ~/.grok/bin, where x.ai's installer
-# also puts its copy and a PATH entry ahead of mise. With Omarchy's wrapper
+# also puts its copy and a PATH entry ahead of mise. With HeliOS's wrapper
 # gone, nothing of ours runs from there, and a copy left behind would keep
 # shadowing the mise tool.
 if [[ $npm_stub == true ]]; then

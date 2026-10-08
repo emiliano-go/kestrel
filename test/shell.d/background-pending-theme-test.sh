@@ -9,12 +9,12 @@ require_command magick
 
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
-mkdir -p "$stage/home/.local/state/omarchy/current"
+mkdir -p "$stage/home/.local/state/helios/current"
 ln -s "$ROOT/shell/plugins/background" "$stage/background"
 ln -s "$ROOT/shell/Commons" "$stage/Commons"
 ln -s "$ROOT/shell/Ui" "$stage/Ui"
 magick -size 128x128 xc:magenta "$stage/still.png"
-ln -s "$stage/still.png" "$stage/home/.local/state/omarchy/current/background"
+ln -s "$stage/still.png" "$stage/home/.local/state/helios/current/background"
 python3 - "$ROOT/shell/shell.qml" "$SHELL_TEST_DIR/fixtures/background-pending-theme/shell.qml" "$stage/shell.qml" <<'PY'
 import re
 import sys

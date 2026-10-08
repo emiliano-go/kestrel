@@ -1,0 +1,6 @@
+#!/bin/bash
+# helios:summary=Launch emojis
+# helios:group=menu
+# helios:examples=helios menu emoji
+
+helios-shell shell toggle helios.emojis

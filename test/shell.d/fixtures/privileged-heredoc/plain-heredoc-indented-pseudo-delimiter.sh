@@ -1,5 +1,5 @@
-cat >/etc/omarchy/agent.conf <<EOF
+cat >/etc/helios/agent.conf <<EOF
 enabled=true
   EOF
-helper=$HOME/.local/share/omarchy/bin/omarchy-agent
+helper=$HOME/.local/share/helios/bin/helios-agent
 EOF

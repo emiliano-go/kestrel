@@ -1,16 +1,16 @@
-echo "Link the omarchy-app agent skill for building apps"
+echo "Link the helios-app agent skill for building apps"
 
-# omarchy-provision-user links every skill, but only once per user, so
+# helios-provision-user links every skill, but only once per user, so
 # existing installs get the new one here, in the same places. A skill of the
 # user's own by that name is left where it is.
-skill="$OMARCHY_PATH/default/agents/skills/omarchy-app"
+skill="$HELIOS_PATH/default/agents/skills/helios-app"
 
 link_skill() {
   mkdir -p "$1"
-  if [[ -e $1/omarchy-app && ! -L $1/omarchy-app ]]; then
-    echo "Leaving your own $1/omarchy-app in place"
+  if [[ -e $1/helios-app && ! -L $1/helios-app ]]; then
+    echo "Leaving your own $1/helios-app in place"
   else
-    ln -sfn "$skill" "$1/omarchy-app"
+    ln -sfn "$skill" "$1/helios-app"
   fi
 }
 

@@ -9,8 +9,8 @@ import qs.Ui
 
 Panel {
   id: root
-  moduleName: "omarchy.tailscale"
-  ipcTarget: "omarchy.tailscale"
+  moduleName: "helios.tailscale"
+  ipcTarget: "helios.tailscale"
   manageIpc: false
 
   property string focusSection: "header"

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "omarchy.dropbox",
+  "id": "helios.dropbox",
   "name": "Dropbox",
   "version": "1.0.0",
-  "author": "Omarchy",
+  "author": "HeliOS",
   "license": "MIT",
-  "description": "Dropbox status, storage usage, login, and recent synced files in the Omarchy bar.",
+  "description": "Dropbox status, storage usage, login, and recent synced files in the HeliOS bar.",
   "kinds": [
     "bar-widget"
   ],

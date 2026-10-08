@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# helios:summary=Edit, set, or reset screensaver branding
+# helios:group=branding
+# helios:name=screensaver
+# helios:args=<image|text|reset>
+# helios:examples=helios branding screensaver image | helios branding screensaver text | helios branding screensaver reset
+
+set -euo pipefail
+
+case "${1:-}" in
+image)
+  image=$(helios-file-select --title "Pick PNG or SVG for screensaver" --extensions "png svg")
+  if helios-transcode-ascii "$image" ~/.config/helios/branding/screensaver.txt; then
+    helios-launch-screensaver force >/dev/null 2>&1
+  fi
+  ;;
+text)
+  helios-launch-editor ~/.config/helios/branding/screensaver.txt >/dev/null 2>&1 && helios-launch-screensaver force >/dev/null 2>&1
+  ;;
+reset)
+  cp "$HELIOS_PATH/logo.txt" ~/.config/helios/branding/screensaver.txt && helios-launch-screensaver force >/dev/null 2>&1
+  ;;
+*)
+  echo "Usage: helios-branding-screensaver <image|text|reset>" >&2
+  exit 1
+  ;;
+esac

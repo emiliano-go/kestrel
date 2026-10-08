@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=HeliOS (Hyprland uwsm)
+Comment=HeliOS Hyprland session managed by uwsm
+Exec=uwsm start -g -1 -e -D Hyprland hyprland.desktop
+TryExec=uwsm
+Type=Application

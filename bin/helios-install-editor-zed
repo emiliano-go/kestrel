@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# helios:summary=Install Zed Editor and configure it with the current HeliOS theme
+
+echo "Installing Zed Editor..."
+helios-pkg-add zed omazed
+
+# Apply HeliOS theme to Zed
+omazed setup
+
+setsid uwsm-app -- gtk-launch dev.zed.Zed >/dev/null 2>&1 &

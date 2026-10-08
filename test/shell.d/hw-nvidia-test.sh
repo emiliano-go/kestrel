@@ -7,7 +7,7 @@ require_command lua
 
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
-export OMARCHY_PCI_DEVICES_PATH="$tmp_dir/devices" OMARCHY_PATH="$ROOT" PATH="$ROOT/bin:$PATH"
+export HELIOS_PCI_DEVICES_PATH="$tmp_dir/devices" HELIOS_PATH="$ROOT" PATH="$ROOT/bin:$PATH"
 
 # Exit statuses, expected NVD_BACKEND/LIBVA/GLX values, then vendor:device:class[:boot_vga].
 while IFS='|' read -r description nvidia gsp without_gsp display expected_env devices; do
@@ -29,7 +29,7 @@ while IFS='|' read -r description nvidia gsp without_gsp display expected_env de
 
   for check in "nvidia:$nvidia" "nvidia-gsp:$gsp" "nvidia-without-gsp:$without_gsp" "nvidia-display:$display"; do
     status=0
-    "omarchy-hw-${check%:*}" || status=$?
+    "helios-hw-${check%:*}" || status=$?
     [[ $status == "${check#*:}" ]] || fail "$description: ${check%:*}" "expected ${check#*:}, got $status"
   done
 

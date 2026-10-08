@@ -1,13 +1,13 @@
-SNAPPER_CONFIG_PATH="${OMARCHY_SNAPPER_CONFIG_PATH:-/etc/snapper/configs/root}"
-SNAPPER_CONF_PATH="${OMARCHY_SNAPPER_CONF_PATH:-/etc/conf.d/snapper}"
-template="${OMARCHY_SNAPPER_TEMPLATE:-${OMARCHY_PATH:-/usr/share/omarchy}/default/snapper/root}"
+SNAPPER_CONFIG_PATH="${HELIOS_SNAPPER_CONFIG_PATH:-/etc/snapper/configs/root}"
+SNAPPER_CONF_PATH="${HELIOS_SNAPPER_CONF_PATH:-/etc/conf.d/snapper}"
+template="${HELIOS_SNAPPER_TEMPLATE:-${HELIOS_PATH:-/usr/share/helios}/default/snapper/root}"
 
-echo "Configuring Omarchy Snapper snapshot retention"
+echo "Configuring HeliOS Snapper snapshot retention"
 
 if [[ ! -f $SNAPPER_CONFIG_PATH ]]; then
   mkdir -p "$(dirname "$SNAPPER_CONFIG_PATH")"
 
-  if [[ ${OMARCHY_SNAPPER_CONFIGURE_TEST:-0} == "1" ]]; then
+  if [[ ${HELIOS_SNAPPER_CONFIGURE_TEST:-0} == "1" ]]; then
     : >"$SNAPPER_CONFIG_PATH"
   else
     snapper --no-dbus -c root create-config / >/dev/null 2>&1 || snapper -c root create-config / >/dev/null

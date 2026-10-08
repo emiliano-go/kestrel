@@ -1,4 +1,4 @@
 # A plain redirect into /etc, no sudo: the command re-execs itself as root.
-cat >/etc/omarchy/agent.conf <<EOF
-helper=$HOME/.local/share/omarchy/bin/omarchy-agent
+cat >/etc/helios/agent.conf <<EOF
+helper=$HOME/.local/share/helios/bin/helios-agent
 EOF

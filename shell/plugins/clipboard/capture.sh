@@ -6,7 +6,7 @@
 
 set -o pipefail
 
-STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/helios"
 IMAGE_DIR="$STATE_DIR/clipboard-images"
 mkdir -p "$IMAGE_DIR"
 

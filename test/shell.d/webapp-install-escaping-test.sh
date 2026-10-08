@@ -12,20 +12,20 @@ trap 'rm -rf "$test_tmp"' EXIT
 mock_bin="$test_tmp/bin"
 mkdir -p "$mock_bin"
 
-cat >"$mock_bin/omarchy-launch-webapp" <<'SH'
+cat >"$mock_bin/helios-launch-webapp" <<'SH'
 #!/bin/bash
-printf '%s\n' "$@" >>"$OMARCHY_TEST_ARGV"
+printf '%s\n' "$@" >>"$HELIOS_TEST_ARGV"
 SH
 chmod +x "$mock_bin"/*
 
 export HOME="$test_tmp/home"
 export PATH="$mock_bin:$PATH"
-export OMARCHY_TEST_ARGV="$test_tmp/argv"
+export HELIOS_TEST_ARGV="$test_tmp/argv"
 
 applications="$HOME/.local/share/applications"
 
 install_webapp() {
-  bash "$ROOT/bin/omarchy-webapp-install" "$@" >/dev/null
+  bash "$ROOT/bin/helios-webapp-install" "$@" >/dev/null
 }
 
 desktop_value() {
@@ -37,14 +37,14 @@ desktop_value() {
 launched_argument() {
   local file="$1" attempt
 
-  : >"$OMARCHY_TEST_ARGV"
+  : >"$HELIOS_TEST_ARGV"
   gio launch "$file" >/dev/null 2>&1 || return 1
   for ((attempt = 0; attempt < 200; attempt++)); do
-    [[ -s $OMARCHY_TEST_ARGV ]] && break
+    [[ -s $HELIOS_TEST_ARGV ]] && break
     sleep 0.01
   done
 
-  head -1 "$OMARCHY_TEST_ARGV"
+  head -1 "$HELIOS_TEST_ARGV"
 }
 
 # The Exec quoting escapes a dollar sign with a backslash, and the file syntax has
@@ -55,7 +55,7 @@ dollar_file="$applications/Dollar App.desktop"
 
 [[ -f $dollar_file ]] || fail "web app install writes a desktop entry"
 
-[[ $(desktop_value "$dollar_file" Exec) == 'omarchy-launch-webapp "https://example.com/a\\$b"' ]] ||
+[[ $(desktop_value "$dollar_file" Exec) == 'helios-launch-webapp "https://example.com/a\\$b"' ]] ||
   fail "Exec escapes the backslash its own quoting introduced" "$(desktop_value "$dollar_file" Exec)"
 pass "Exec escapes the backslash its own quoting introduced"
 

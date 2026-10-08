@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "omarchy.dev-gallery",
+  "id": "helios.dev-gallery",
   "name": "Dev gallery",
   "version": "1.0.0",
-  "author": "Omarchy",
-  "description": "Visual reference for omarchy-shell common UI components. Summon with: omarchy-shell shell summon omarchy.dev-gallery '{}' (or run: omarchy dev ui-preview).",
+  "author": "HeliOS",
+  "description": "Visual reference for helios-shell common UI components. Summon with: helios-shell shell summon helios.dev-gallery '{}' (or run: helios dev ui-preview).",
   "kinds": [
     "panel"
   ],

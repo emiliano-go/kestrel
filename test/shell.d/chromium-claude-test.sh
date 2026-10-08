@@ -13,7 +13,7 @@ fi
 test_tmp=$(mktemp -d)
 trap 'rm -rf "$test_tmp"' EXIT
 mkdir -p "$test_tmp/share" "$test_tmp/bin"
-installer="$ROOT/bin/omarchy-install-chromium-claude"
+installer="$ROOT/bin/helios-install-chromium-claude"
 extension_id=fcoeoabgfenejglbffodgkkbkcdhcgfn
 sandbox=(bwrap --ro-bind / / --bind "$test_tmp" "$test_tmp" --dev /dev --proc /proc --unshare-user)
 
@@ -45,6 +45,6 @@ rm "$test_tmp/share/google-chrome/extensions/$extension_id.json"
 status=0
 "${sandbox[@]}" --uid 1000 --gid 1000 --ro-bind "$test_tmp/share" /usr/share bash "$installer" </dev/null || status=$?
 [[ $status == 42 ]] || fail "Claude extension installer propagates authentication failure"
-[[ $(cat "$AUTH_LOG") == "/usr/bin/omarchy-install-chromium-claude" ]] ||
+[[ $(cat "$AUTH_LOG") == "/usr/bin/helios-install-chromium-claude" ]] ||
   fail "menu installation elevates only the packaged installer"
 pass "missing registration uses pkexec and propagates authentication failure"

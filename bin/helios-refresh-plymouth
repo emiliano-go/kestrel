@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# helios:summary=Overwrite the user config for the Plymouth drive decryption and boot sequence with the HeliOS default and rebuild it.
+# helios:requires-sudo=true
+
+# Reuse the fixed-file publisher so root never resolves the source checkout or
+# follows a destination symlink while restoring the packaged assets.
+exec "$HELIOS_PATH/bin/helios-plymouth-set" --refresh-default

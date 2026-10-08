@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# helios:summary=Open a config file in the user's editor and surface a toast
+# helios:args=<path>
+# helios:examples=helios launch config-editor ~/.config/hypr/hyprland.lua
+
+path="${1-}"
+
+if [[ -z $path ]]; then
+  echo "Usage: helios-launch-config-editor <path>" >&2
+  exit 1
+fi
+
+helios-notification-send -u low "Editing config file" "$path"
+exec helios-launch-editor "$path"

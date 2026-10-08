@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# helios:summary=Refresh the current theme from its templates.
+
+THEME_NAME_PATH="$HOME/.local/state/helios/current/theme.name"
+
+if [[ -f $THEME_NAME_PATH ]]; then
+  HELIOS_THEME_SKIP_BACKGROUND=1 helios-theme-set "$(cat $THEME_NAME_PATH)"
+fi

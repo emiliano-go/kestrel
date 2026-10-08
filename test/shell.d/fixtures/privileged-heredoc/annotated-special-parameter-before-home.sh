@@ -1,5 +1,5 @@
-# omarchy:heredoc-expands paths=none -- the positional argument is a scalar
-sudo tee /etc/omarchy/example.conf <<EOF
+# helios:heredoc-expands paths=none -- the positional argument is a scalar
+sudo tee /etc/helios/example.conf <<EOF
 argument=$1
-command=$HOME/.local/share/omarchy/bin/example
+command=$HOME/.local/share/helios/bin/example
 EOF

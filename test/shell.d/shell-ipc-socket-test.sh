@@ -19,7 +19,7 @@ run_dir="$test_tmp/run"
 stub_bin="$test_tmp/bin"
 mkdir -p "$root_dir/shell" "$run_dir" "$stub_bin"
 touch "$root_dir/shell/shell.qml"
-# The shell names its socket after its config and display, as omarchy-shell
+# The shell names its socket after its config and display, as helios-shell
 # derives it.
 display="test-display"
 socket=$(XDG_RUNTIME_DIR="$run_dir" WAYLAND_DISPLAY="$display" shell_ipc_socket "$root_dir")
@@ -58,8 +58,8 @@ for _ in $(seq 50); do [[ -S $socket ]] && break; sleep 0.05; done
 
 shell_call() {
   : >"$calls"
-  PATH="$stub_bin:$PATH" OMARCHY_PATH="$root_dir" XDG_RUNTIME_DIR="$run_dir" WAYLAND_DISPLAY="$display" QS_CALLS="$calls" \
-    OMARCHY_SHELL_IPC_TIMEOUT="${IPC_TIMEOUT:-2s}" "$ROOT/bin/omarchy-shell" "$@"
+  PATH="$stub_bin:$PATH" HELIOS_PATH="$root_dir" XDG_RUNTIME_DIR="$run_dir" WAYLAND_DISPLAY="$display" QS_CALLS="$calls" \
+    HELIOS_SHELL_IPC_TIMEOUT="${IPC_TIMEOUT:-2s}" "$ROOT/bin/helios-shell" "$@"
 }
 
 printf 'ok' >"$mode"
@@ -91,19 +91,19 @@ pass "an argument holding a separator goes straight to qs ipc"
 
 printf 'hang' >"$mode"
 output=$(IPC_TIMEOUT=0.5s shell_call shell ping 2>&1) && fail "a shell that never replies fails the call"
-[[ $output == "omarchy-shell is not responding" && ! -s $calls ]] ||
+[[ $output == "helios-shell is not responding" && ! -s $calls ]] ||
   fail "a call that may have run is reported, not retried through qs ipc" "got: $output"
 pass "a call that may have run is reported as unresponsive, not retried"
 
 printf 'close' >"$mode"
 output=$(shell_call shell ping 2>&1) && fail "a shell that closes without answering fails the call"
-[[ $output == "omarchy-shell is not responding" && ! -s $calls ]] ||
+[[ $output == "helios-shell is not responding" && ! -s $calls ]] ||
   fail "a connection closed without an answer is reported, not retried" "got: $output"
 pass "a connection closed without an answer is reported, not retried"
 
 printf 'partial' >"$mode"
 output=$(shell_call shell listPlugins 2>&1) && fail "a reply cut off before its end fails the call"
-[[ $output == "omarchy-shell is not responding" && ! -s $calls ]] ||
+[[ $output == "helios-shell is not responding" && ! -s $calls ]] ||
   fail "a reply cut off before its end is reported, not taken or retried" "got: $output"
 pass "a reply cut off before its end is reported, not taken or retried"
 
@@ -154,7 +154,7 @@ assert(
   'the socket answers only declared functions with their exact argument count'
 )
 assert(
-  shellQml.includes('+ Qt.md5(shell.omarchyPath + "/shell\\n" + Quickshell.env("WAYLAND_DISPLAY")).slice(0, 16) + ".sock"'),
-  'the shell names its socket after its config and display, as omarchy-shell does'
+  shellQml.includes('+ Qt.md5(shell.heliosPath + "/shell\\n" + Quickshell.env("WAYLAND_DISPLAY")).slice(0, 16) + ".sock"'),
+  'the shell names its socket after its config and display, as helios-shell does'
 )
 JS

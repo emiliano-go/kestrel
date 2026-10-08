@@ -30,7 +30,7 @@ ShellRoot {
     onTriggered: {
       try {
         if (root.step === 0) {
-          var component = Qt.createComponent("file://" + Quickshell.env("OMARCHY_PATH") + "/shell/plugins/lock/LockView.qml")
+          var component = Qt.createComponent("file://" + Quickshell.env("HELIOS_PATH") + "/shell/plugins/lock/LockView.qml")
           check(component.status === Component.Ready, component.errorString())
           root.view = component.createObject(host, {width: 1000, height: 700, backgroundPath: "/still.png", loadBackground: false})
           check(root.view !== null, component.errorString())

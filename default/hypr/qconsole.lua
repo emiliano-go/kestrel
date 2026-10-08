@@ -17,10 +17,10 @@ local SCRATCHPAD = "special:scratchpad"
 -- at boot, so nothing is running until it is wanted. The exec rule has to pin
 -- the workspace itself: Hyprland only tags a spawn with the workspace it came
 -- from while misc.initial_workspace_tracking is on, and looknfeel turns it off.
--- Omarchy ships without a default agent, and omarchy-agent exits without
+-- HeliOS ships without a default agent, and helios-agent exits without
 -- opening anything when none is set, so until one is picked this just opens an
 -- empty console.
-local seed = "[workspace special:scratchpad silent] omarchy-agent"
+local seed = "[workspace special:scratchpad silent] helios-agent"
 
 -- Dimming only applies while a special workspace is open, so the console gets
 -- its separation from the workspace underneath without costing anything the

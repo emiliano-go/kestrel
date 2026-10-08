@@ -7,7 +7,7 @@ import "services"
 ShellRoot {
   id: test
   property var bar: ({})
-  property var services: ({ "omarchy.background": background })
+  property var services: ({ "helios.background": background })
   function firstPartyServiceFor(id) { return background }
   QtObject { id: background; property bool suspended: false; property bool ready: false }
   BackgroundIntro {

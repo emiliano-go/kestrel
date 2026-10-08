@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# helios:summary=Show which theme is styling the Plymouth boot screen
+# helios:examples=helios plymouth current
+
+# helios-plymouth-set installs the theme's unlock.png as a byte-for-byte
+# copy of logo.png, so matching it back identifies the current theme.
+installed_logo=/usr/share/plymouth/themes/helios/logo.png
+
+if cmp -s "$HELIOS_PATH/default/plymouth/logo.png" "$installed_logo"; then
+  echo default
+  exit
+fi
+
+helios-plymouth-list | while read -r name; do
+  if cmp -s "$(helios-theme-dir "$name")/unlock.png" "$installed_logo"; then
+    echo "$name"
+    exit
+  fi
+done
