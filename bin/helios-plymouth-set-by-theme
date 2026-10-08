@@ -50,4 +50,11 @@ theme_color() {
 bg=$(theme_color background)
 text=$(theme_color foreground)
 
-exec helios-plymouth-set "$bg" "$text" "$theme_dir/unlock.png"
+# Themes may ship an optional full-screen LUKS background. Pass it through when
+# present; otherwise helios-plymouth-set clears any stale background so the
+# theme's solid color shows.
+if [[ -f $theme_dir/unlock-background.png ]]; then
+  exec helios-plymouth-set "$bg" "$text" "$theme_dir/unlock.png" "$theme_dir/unlock-background.png"
+else
+  exec helios-plymouth-set "$bg" "$text" "$theme_dir/unlock.png"
+fi

@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# helios:summary=Set the Plymouth boot theme colors and logo
-# helios:args=<background-hex> <text-hex> <path-to-logo.png>
+# helios:summary=Set the Plymouth boot theme colors, logo and optional LUKS background
+# helios:args=<background-hex> <text-hex> <path-to-logo.png> [path-to-background.png]
 # helios:examples=helios plymouth set '#1d2021' '#ebdbb2' ~/.local/state/helios/current/theme/plymouth/logo.png
+# helios:examples=helios plymouth set '#1d2021' '#ebdbb2' unlock.png ~/Pictures/luks-background.png
 # helios:requires-sudo=true
 
 set -euo pipefail
@@ -16,7 +17,7 @@ usage() {
   exit 1
 }
 
-if (( $# == 3 )); then
+if (( $# == 3 || $# == 4 )); then
   mode=set
 elif (( $# == 1 )); then
   case "$1" in
@@ -39,7 +40,7 @@ if (( EUID == 0 )); then
   exit 1
 fi
 
-logo_fd=
+background_path=
 if [[ $mode != "set" ]]; then
   bg_hex=
   text_hex=
@@ -47,6 +48,7 @@ else
   bg_hex="${1#\#}"
   text_hex="${2#\#}"
   logo_path="$3"
+  background_path="${4:-}"
 
   if ! [[ $bg_hex =~ ^[0-9a-fA-F]{6}$ ]]; then
     echo "Invalid background color: $1 (expected #RRGGBB)" >&2
@@ -68,15 +70,18 @@ else
     exit 1
   fi
 
-  # Open the logo while still unprivileged. A replacement symlink to a root-only
-  # file therefore fails here instead of being followed after sudo starts.
-  if ! exec {logo_fd}<"$logo_path"; then
-    echo "Unable to open logo file as the current user: $logo_path" >&2
-    exit 1
-  fi
-  if [[ ! -f /proc/$$/fd/$logo_fd ]]; then
-    echo "Logo input is no longer a regular file: $logo_path" >&2
-    exit 1
+  # The selected images are streamed by this unprivileged process, so a symlink
+  # swapped in after validation is read as the user and can never publish a
+  # root-only file. The privileged side reads only from that stream.
+  if [[ -n $background_path ]]; then
+    if [[ ! -f $background_path ]]; then
+      echo "Background file not found: $background_path" >&2
+      exit 1
+    fi
+    if [[ -L $background_path ]]; then
+      echo "Background file is a symlink, which is not accepted: $background_path" >&2
+      exit 1
+    fi
   fi
 fi
 
@@ -267,16 +272,40 @@ run_root_transaction() {
       copy_trusted_file "$source_root/default/plymouth/$asset" "$plymouth_stage/$asset"
     done
 
+    background_size=0
     if [[ $mode == "set" ]]; then
-      # stdin was opened by the unprivileged caller. Read no more than the
-      # documented limit into the root-owned stage before doing other work.
-      failure_context="the selected logo (expected 1 to $max_asset_size bytes)"
-      head -c "$((max_asset_size + 1))" >"$plymouth_stage/logo.png"
-      logo_size=$(stat -c %s -- "$plymouth_stage/logo.png")
+      # stdin is a framed stream built by the unprivileged caller: a 16-byte
+      # magic, a 10-byte logo size, a 10-byte background size, then the logo
+      # and optional background bytes. Buffer it under the documented limit
+      # before doing other work, then split it.
+      failure_context="the framed image payload from the calling user"
+      head -c "$((36 + 2 * max_asset_size))" >"$staging_dir/payload.bin"
+      plymouth_frame_magic=$(head -c 16 -- "$staging_dir/payload.bin")
+      [[ $plymouth_frame_magic == "HELIOSPLY-FRAME1" ]]
+      logo_size_text=$(dd if="$staging_dir/payload.bin" bs=1 skip=16 count=10 status=none)
+      background_size_text=$(dd if="$staging_dir/payload.bin" bs=1 skip=26 count=10 status=none)
+      [[ $logo_size_text =~ ^[0-9]{10}$ ]]
+      [[ $background_size_text =~ ^[0-9]{10}$ ]]
+      logo_size=$((10#$logo_size_text))
+      background_size=$((10#$background_size_text))
       (( logo_size > 0 && logo_size <= max_asset_size ))
+      (( background_size >= 0 && background_size <= max_asset_size ))
+      (( $(stat -c %s -- "$staging_dir/payload.bin") >= 36 + logo_size + background_size ))
+
+      failure_context="the selected logo (expected 1 to $max_asset_size bytes)"
+      tail -c +37 -- "$staging_dir/payload.bin" | head -c "$logo_size" >"$plymouth_stage/logo.png"
+      (( $(stat -c %s -- "$plymouth_stage/logo.png") == logo_size ))
       chown 0:0 -- "$plymouth_stage/logo.png"
       chmod 0600 -- "$plymouth_stage/logo.png"
       cp --reflink=never -- "$plymouth_stage/logo.png" "$sddm_stage/logo.png"
+
+      if (( background_size > 0 )); then
+        failure_context="the selected LUKS background (expected 1 to $max_asset_size bytes)"
+        tail -c +$((37 + logo_size)) -- "$staging_dir/payload.bin" >"$plymouth_stage/background.png"
+        (( $(stat -c %s -- "$plymouth_stage/background.png") == background_size ))
+        chown 0:0 -- "$plymouth_stage/background.png"
+        chmod 0600 -- "$plymouth_stage/background.png"
+      fi
 
       bg_r=$(awk -v n=$((16#${bg_hex:0:2})) "BEGIN{printf \"%.3f\", n/255}")
       bg_g=$(awk -v n=$((16#${bg_hex:2:2})) "BEGIN{printf \"%.3f\", n/255}")
@@ -352,6 +381,15 @@ run_root_transaction() {
       for asset in "${plymouth_assets[@]}"; do
         publish_asset "$plymouth_stage/$asset" "$theme_dir/$asset"
       done
+
+      # The background is optional and never part of the packaged asset list:
+      # publish it when supplied, otherwise remove any stale one so the solid
+      # color fallback shows.
+      if (( background_size > 0 )); then
+        publish_asset "$plymouth_stage/background.png" "$theme_dir/background.png"
+      else
+        rm -f -- "$theme_dir/background.png"
+      fi
     fi
 
     if (( ${#sddm_assets[@]} )); then
@@ -365,7 +403,22 @@ run_root_transaction() {
 }
 
 if [[ $mode == "set" ]]; then
-  run_root_transaction <&"$logo_fd"
+  logo_size=$(stat -c %s -- "$logo_path")
+  if [[ -n $background_path ]]; then
+    background_size=$(stat -c %s -- "$background_path")
+  else
+    background_size=0
+  fi
+
+  {
+    printf 'HELIOSPLY-FRAME1'
+    printf '%010d' "$logo_size"
+    printf '%010d' "$background_size"
+    cat -- "$logo_path"
+    if (( background_size > 0 )); then
+      cat -- "$background_path"
+    fi
+  } | run_root_transaction
 else
   run_root_transaction </dev/null
 fi

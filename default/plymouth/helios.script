@@ -3,6 +3,17 @@
 Window.SetBackgroundTopColor(0.101, 0.105, 0.149);
 Window.SetBackgroundBottomColor(0.101, 0.105, 0.149);
 
+# Optional full-window background image for the LUKS unlock screen. When
+# background.png is absent or empty, the solid Window colors above show
+# through, so the theme still works without a background asset.
+background.image = Image("background.png");
+global.background_present = 0;
+if (background.image.GetWidth() > 0 && background.image.GetHeight() > 0) {
+  global.background_present = 1;
+  background.sprite = Sprite(background.image);
+  background.sprite.SetOpacity(1);
+}
+
 logo.image = Image("logo.png");
 logo.sprite = Sprite(logo.image);
 logo.sprite.SetOpacity(1);
@@ -216,6 +227,21 @@ Plymouth.SetBootProgressFunction(progress_callback);
 fun layout() {
   global.layout_width = Window.GetWidth();
   global.layout_height = Window.GetHeight();
+
+  # Scale the optional background to cover the window, centered, behind
+  # everything else (negative Z).
+  if (global.background_present == 1) {
+    image_width = background.image.GetWidth();
+    image_height = background.image.GetHeight();
+    scale_x = global.layout_width / image_width;
+    scale_y = global.layout_height / image_height;
+    scale = scale_x;
+    if (scale_y > scale_x) scale = scale_y;
+    background.width = Math.Int(image_width * scale);
+    background.height = Math.Int(image_height * scale);
+    background.sprite.SetImage(background.image.Scale(background.width, background.height));
+    background.sprite.SetPosition((global.layout_width - background.width) / 2, (global.layout_height - background.height) / 2, -1000);
+  }
 
   logo.sprite.SetX(global.layout_width / 2 - logo.image.GetWidth() / 2);
   logo.sprite.SetY(global.layout_height / 2 - logo.image.GetHeight() / 2);
