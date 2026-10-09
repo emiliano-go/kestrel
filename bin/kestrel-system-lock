@@ -8,7 +8,7 @@
 kestrel-shell lock lock >/dev/null
 
 # Set keyboard layout to default (first layout)
-hyprctl switchxkblayout all 0 > /dev/null 2>&1
+mmsg dispatch switch_keyboard_layout,0 >/dev/null 2>&1
 
 # Ensure 1password is locked. Use timeout because `1password --lock` can
 # otherwise leave a full Electron helper tree running after each lock.

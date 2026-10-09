@@ -3,11 +3,10 @@
 # kestrel:summary=Run the Kestrel screensaver using random effects from TTE.
 
 screensaver_in_focus() {
-  hyprctl activewindow -j | jq -e '.class == "org.kestrel.screensaver"' >/dev/null 2>&1
+  mmsg get focusing-client 2>/dev/null | jq -e '.appid == "org.kestrel.screensaver"' >/dev/null 2>&1
 }
 
 exit_screensaver() {
-  hyprctl eval 'hl.config({ cursor = { invisible = false } })' &>/dev/null || hyprctl keyword cursor:invisible false &>/dev/null || true
   pkill -x ttfx 2>/dev/null
   pkill -f '[o]rg.kestrel.screensaver' 2>/dev/null
   exit 0
@@ -18,7 +17,8 @@ trap exit_screensaver SIGINT SIGTERM SIGHUP SIGQUIT
 
 printf '\033]11;rgb:00/00/00\007'  # Set background color to black
 
-hyprctl eval 'hl.config({ cursor = { invisible = true } })' &>/dev/null || hyprctl keyword cursor:invisible true &>/dev/null
+# Mango exposes no runtime cursor-invisible option (Hyprland's cursor:invisible),
+# so the pointer is left as-is over the screensaver surface.
 
 tty=$(tty 2>/dev/null)
 

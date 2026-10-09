@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# kestrel:summary=Reload hyprland configuration (used by the Kestrel theme switching).
+# kestrel:summary=Reload the Mango configuration (used by the Kestrel theme switching).
 
-hyprctl reload >/dev/null
+mmsg dispatch reload_config >/dev/null 2>&1
