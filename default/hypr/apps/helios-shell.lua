@@ -11,10 +11,8 @@ hl.layer_rule({ match = { namespace = "helios-bar" }, no_anim = true, animation 
 -- for normal open/close, and skip it for panel handoff.
 hl.layer_rule({ match = { namespace = "^(helios-menu|helios-image-selector|helios-emojis|helios-clipboard|helios-keyboard-panel|helios-osd|helios-reminders|helios-network-qr)$" }, no_anim = true, animation = "none" })
 
--- A boot intro hands the desktop between OWE's video layer and the shell's
--- background layer. The media fades itself, so a compositor fade on either
--- layer only dips the screen toward the empty desktop during the handoff.
-hl.layer_rule({ match = { namespace = "^(helios-background|owe-background)$" }, no_anim = true, animation = "none" })
+-- Keep the shell background layer instant; it fades itself.
+hl.layer_rule({ match = { namespace = "^helios-background$" }, no_anim = true, animation = "none" })
 
 -- Dev gallery is the main shell workbench; open it maximized like
 -- SUPER+ALT+F so component previews have the whole workspace.

@@ -398,7 +398,6 @@ var GUARD_READERS = [
   "helios-default-browser",
   "helios-default-editor",
   "helios-default-terminal",
-  "helios-default-dictation",
   "helios-dns"
 ]
 

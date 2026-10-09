@@ -13,20 +13,14 @@ if gum confirm "Are you sure you want to restore all preinstalled web apps, TUI 
   # Mirrors the list in helios-remove-preinstalls; both track helios-base.packages.
   # AUR-only apps are routed through the AUR by helios-pkg-add-any.
   if ! helios-pkg-add-any \
-    aether \
-    cliamp \
+    zuno \
     libreoffice-fresh \
     xournalpp \
     pinta \
     obsidian \
     obs-studio \
     kdenlive \
-    moonlight-qt \
-    omacut \
-    monologue \
-    omacalc \
-    omawrite \
-    hype; then
+    moonlight-qt; then
     echo -e "\nPreinstalls are still marked as removed. Fix the errors above and try again."
     exit 1
   fi

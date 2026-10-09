@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Match the Dell XPS 13 DX13260 with an Intel Panther Lake GPU.
-
-helios-hw-match "DX13260" && helios-hw-intel-ptl

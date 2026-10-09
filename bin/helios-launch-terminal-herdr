@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Launch or attach to the persistent herdr session in a terminal
-
-exec helios-launch-terminal herdr

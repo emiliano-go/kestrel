@@ -10,15 +10,12 @@ o.bind("SUPER + SHIFT + N", "Editor", { helios = "editor" })
 if o.preinstalled_bindings_enabled() then
   -- Bindings for preinstalled HeliOS applications, TUIs, and web apps.
   o.bind("SUPER + ALT + RETURN", "Tmux", { helios = "terminal-tmux" })
-  o.bind("SUPER + CTRL + RETURN", "Herdr", { helios = "terminal-herdr" })
-  o.bind("SUPER + SHIFT + M", "Music", { helios = "spotify" })
-  o.bind("SUPER + SHIFT + ALT + M", "Music TUI", { tui = "cliamp", focus = true })
+  o.bind("SUPER + SHIFT + M", "Music", { launch = "zuno", focus = "^[Zz]uno$" })
   if o.cmd_present("lazydocker") then
     o.bind("SUPER + SHIFT + D", "Docker", { tui = "helios-launch-docker-tui" })
   end
   o.bind("SUPER + SHIFT + G", "Signal", { helios = "signal" })
   o.bind("SUPER + SHIFT + O", "Obsidian", { launch = "obsidian", focus = "^obsidian$" })
-  o.bind("SUPER + SHIFT + W", "Omawrite", { launch = "omawrite" })
   o.bind("SUPER + SHIFT + SLASH", "Passwords", { helios = "1password" })
 
   o.bind("SUPER + SHIFT + A", "ChatGPT", { webapp = "https://chatgpt.com" })

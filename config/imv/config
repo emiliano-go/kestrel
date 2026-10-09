@@ -13,4 +13,4 @@
 <Ctrl+r> = exec mogrify -rotate 90 "$imv_current_file"
 
 # Edit the current image in Omasnap and quit the viewer
-<Ctrl+e> = exec omasnap "$imv_current_file" & ; quit
+<Ctrl+e> = exec satty "$imv_current_file" & ; quit

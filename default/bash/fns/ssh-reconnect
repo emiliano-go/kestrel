@@ -1,6 +1,6 @@
 # Wrap ssh to clean up the terminal and reconnect when a connection drops.
 #
-# A remote tmux, herdr, or editor arms terminal modes over the SSH pipe (mouse
+# A remote tmux, tmux, or editor arms terminal modes over the SSH pipe (mouse
 # tracking, focus reporting, the alternate screen) that only it can disarm. If
 # the connection dies instead of exiting cleanly, those modes stay armed on the
 # local terminal, and every mouse move floods the prompt with escape junk.

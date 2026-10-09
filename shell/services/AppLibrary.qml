@@ -16,7 +16,7 @@ Item {
   property var configuredHiddenEntryIds: ({})
   property var desktopHiddenEntryIds: ({})
 
-  // Maps an icon name to a file on disk (e.g. "omacut" -> ".../apps/omacut.svg").
+  // Maps an icon name to a file on disk (e.g. "satty" -> ".../apps/satty.svg").
   // Used as a fallback for icons that Qt's themed lookup misses because they were
   // installed after this process started (its icon cache never re-scans). Refreshed
   // whenever the app list changes, so newly installed apps get their icon live.

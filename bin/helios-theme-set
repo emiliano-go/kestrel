@@ -77,18 +77,11 @@ snapshot_background_path() {
 }
 
 snapshot_current_background() {
-  local current_background snapshot
+  local current_background
 
-  # An interrupted intro is still moving; its final still would flash as a
-  # cover. Capture the frame already playing instead, when OWE supports it.
   mkdir -p "$BACKGROUND_TRANSITION_CACHE"
-  snapshot="$BACKGROUND_TRANSITION_CACHE/previous-$$.ppm"
-  if owe render "$(jq -nc --arg path "$snapshot" '{cmd: "snapshot", path: $path}')" >/dev/null 2>&1; then
-    echo "$snapshot"
-  else
-    current_background=$(readlink -f "$CURRENT_BACKGROUND_LINK" 2>/dev/null || true)
-    snapshot_background_path "$current_background" "previous"
-  fi
+  current_background=$(readlink -f "$CURRENT_BACKGROUND_LINK" 2>/dev/null || true)
+  snapshot_background_path "$current_background" "previous"
 }
 
 theme_background_state_file() {
@@ -424,17 +417,7 @@ if [[ $THEME_HEADLESS != "1" && $HELIOS_THEME_SKIP_BACKGROUND != "1" ]]; then
   # Resolve the staged choice while the old theme still exists. Video changes
   # switch directly to the durable path in QML, so neither side needs a copy.
   if choose_staged_theme_background; then
-    if [[ $PREVIOUS_THEME_NAME != "$THEME_NAME" && ! -f $HOME/.local/state/helios/toggles/background-intros-off ]] &&
-      [[ $(hyprctl -j getoption animations:enabled 2>/dev/null | jq -r '.bool') == "true" ]]; then
-      THEME_BACKGROUND_INTRO=$(helios-theme-bg-boot-intro --resolve-only "$STAGED_THEME_BACKGROUND")
-    fi
-    if [[ -n $THEME_BACKGROUND_INTRO ]]; then
-      OLD_BACKGROUND_SNAPSHOT=$(snapshot_current_background)
-      # OWE retains the opened clip across the staged directory's rename.
-      owe intro-prepare "$THEME_BACKGROUND_INTRO" >/dev/null 2>&1 9>&- &
-      INTRO_PREPARE_PID=$!
-      shell_ipc shell prepareThemeIntro "$OLD_BACKGROUND_SNAPSHOT" "$(stat -Lc '%d:%i' "$NEXT_THEME_PATH")" "" "" || true
-    elif background_transition_uses_snapshots "$CHOSEN_THEME_BACKGROUND"; then
+    if background_transition_uses_snapshots "$CHOSEN_THEME_BACKGROUND"; then
       OLD_BACKGROUND_SNAPSHOT=$(snapshot_current_background)
 
       # Hand the shell the next background now, so it decodes while the
@@ -453,12 +436,6 @@ fi
 
 # Generate dynamic configs
 helios-theme-set-templates
-
-# Replacing the theme's still can cancel an active OWE intro even before the
-# background link changes. Present its cover before replacing either path.
-if [[ -n $THEME_BACKGROUND_INTRO ]]; then
-  wait_for_theme_intro themeIntroCoverStatus "$(stat -Lc '%d:%i' "$NEXT_THEME_PATH")" "loading"
-fi
 
 # Swap next theme in as current
 rm -rf "$CURRENT_THEME_PATH"
@@ -519,9 +496,6 @@ if [[ $THEME_HEADLESS != "1" ]]; then
 
   # Call hook on theme set
   helios-hook theme-set "$THEME_NAME" >/dev/null
-
-  # Mirror the theme to herdr machines. SSH can take a while, so this never holds up the theme change.
-  setsid helios-theme-set-herdr-machines >>"$HOME/.local/state/helios/theme-set-herdr-machines.log" 2>&1 </dev/null &
 
   # Warm the background selector's thumbnails. The theme picker keeps its own
   # rows in the shell and refreshes them each time it opens.

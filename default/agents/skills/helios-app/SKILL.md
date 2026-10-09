@@ -14,12 +14,7 @@ description: >
 
 HeliOS's own apps are dead simple on purpose: one window, one job, driven
 from the keyboard, following the desktop theme, and installed like any other
-package. Build new ones the same way. `templates.md` has the starter files;
-the published apps are the reference for anything bigger:
-
-- Omacut, a video trimmer: https://github.com/omacom-io/omacut
-- Monologue, a webcam recorder: https://github.com/omacom/monologue
-- Hype, Markdown presentations: https://github.com/omacom/hype
+package. Build new ones the same way. `templates.md` has the starter files.
 
 ## Before writing code
 

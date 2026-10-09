@@ -35,19 +35,12 @@ monitor_is_internal() {
   [[ $monitor =~ ^(eDP|LVDS|DSI)- ]]
 }
 
-use_apple_display() {
-  helios-hyprland-monitor-focused-apple "$monitor"
-}
-
 use_ddc_display() {
   [[ -n $monitor ]] && ! monitor_is_internal
 }
 
 if (( $# == 0 )); then
-  if use_apple_display; then
-    helios-brightness-display-apple
-    exit
-  elif use_ddc_display; then
+  if use_ddc_display; then
     helios-brightness-display-ddc "$monitor"
     exit
   fi
@@ -76,13 +69,7 @@ fi
 exec {lock_fd}>"${XDG_RUNTIME_DIR:-/tmp}/helios-brightness-display.lock"
 flock -n "$lock_fd" || exit 0
 
-if use_apple_display; then
-  if (( no_osd )); then
-    helios-brightness-display-apple --no-osd "$step"
-  else
-    helios-brightness-display-apple "$step"
-  fi
-elif use_ddc_display; then
+if use_ddc_display; then
   brightness="$(helios-brightness-display-ddc "$monitor" "$step")" || exit 1
   (( no_osd )) || helios-osd -i brightness -p "$brightness"
 else

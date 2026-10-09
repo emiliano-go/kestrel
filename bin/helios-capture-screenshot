@@ -6,18 +6,34 @@
 # helios:examples=helios screenshot | helios capture screenshot region
 # helios:aliases=helios screenshot
 
-if [[ -n ${HELIOS_SCREENSHOT_DIR:-} && -z ${OMASNAP_SCREENSHOT_DIR:-} ]]; then
-  export OMASNAP_SCREENSHOT_DIR="$HELIOS_SCREENSHOT_DIR"
-fi
+# grim + slurp capture, satty annotation.
+screenshot_dir="${HELIOS_SCREENSHOT_DIR:-$HOME/Pictures/Screenshots}"
+mkdir -p "$screenshot_dir"
 
-omasnap_args=()
+mode="smart"
+action=""
 for arg in "$@"; do
   case "$arg" in
-    copy) omasnap_args+=(--copy) ;;
-    save) omasnap_args+=(--save) ;;
-    slurp) ;;
-    *) omasnap_args+=("$arg") ;;
+    copy | save) action="$arg" ;;
+    smart | region | windows | fullscreen | scroll) mode="$arg" ;;
   esac
 done
 
-exec omasnap "${omasnap_args[@]}"
+capture() {
+  if [[ $mode == "fullscreen" ]]; then
+    grim -
+  else
+    # smart/region/windows/scroll all start from a slurp selection; satty is the
+    # annotation step.
+    grim -g "$(slurp)" -
+  fi
+}
+
+output="$screenshot_dir/$(date +%Y%m%d%H%M%S).png"
+satty_args=(--filename -)
+case "$action" in
+  copy) satty_args+=(--copy-command wl-copy) ;;
+  save | *) satty_args+=(--output-filename "$output") ;;
+esac
+
+capture | satty "${satty_args[@]}"

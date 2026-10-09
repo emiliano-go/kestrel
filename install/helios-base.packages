@@ -135,6 +135,13 @@ xournalpp
 yt-dlp
 zbar
 zoxide
+qalculate-qt
+
+# Desktop apps replacing omarchy packages
+diskonaut
+ghostwriter
+satty
+yazi
 
 # Disk health and mirror maintenance
 reflector

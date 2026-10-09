@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Open Voxtype configuration
-
-set -e
-
-helios-launch-floating-terminal-with-presentation "voxtype configure"
-helios-restart-shell

@@ -27,7 +27,7 @@ o.window("org.helios.about", { float = true })
 o.window("org.helios.about", { center = true })
 o.window("org.helios.about", { size = { 920, 480 } })
 
-o.window("omacalc", { float = true })
+o.window("qalculate-qt", { float = true })
 
 -- Fullscreen screensaver.
 o.window("org.helios.screensaver", { fullscreen = true })

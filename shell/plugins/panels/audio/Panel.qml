@@ -573,7 +573,7 @@ Panel {
   function unmatchedMprisStreamLabel(label) {
     // Spotify exposes its PipeWire stream as "audio-src". For generic stream
     // names, use the one MPRIS player not already represented by another audio
-    // stream (e.g. Chromium, or ALSA apps like cliamp).
+    // stream (e.g. Chromium, or ALSA apps like spotify-player).
     return Model.unmatchedMprisStreamLabel(label, mprisPlayers, audioStreams)
   }
 

@@ -178,7 +178,10 @@ Item {
 
   Process {
     id: frameStatus
-    command: ["owe", "render-status"]
+    // HeliOS has no video wallpaper engine, so there is never a renderer to
+    // poll. Keep the process as an inert no-op so the intro plumbing stays
+    // harmless until it is removed with the shell in a later milestone.
+    command: ["/bin/true"]
     property string token: ""
     onStarted: token = root.themeToken
     stdout: StdioCollector { id: frameStatusOut }

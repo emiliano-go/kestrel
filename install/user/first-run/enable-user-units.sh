@@ -14,11 +14,8 @@ set -euo pipefail
 systemctl --user daemon-reload
 systemctl --user enable --now \
   bt-agent.service \
-  owed.service \
   helios-recover-internal-monitor.service \
   helios-sleep-lock.service \
   helios-migrate-notify.service \
   helios-fcitx5.service \
   helios-crash-watch.service
-
-helios-hook-install theme-set /usr/share/owe/10-owe-sync
