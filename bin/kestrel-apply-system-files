@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# kestrel:summary=Deploy Kestrel-owned files to their fixed system paths
+# kestrel:group=apply
+# kestrel:requires-sudo=true
+# kestrel:examples=kestrel apply system files
+# kestrel:hidden=true
+
+# The ISO installs Arch and AUR packages, then deploys the Kestrel payload as
+# files (there is no Kestrel package). This command owns the mapping from the
+# payload tree to the fixed paths the running system reads: PATH symlinks for
+# the commands, Kestrel-owned /etc drop-ins, the /etc/skel seed for new users,
+# and the system integration files under /usr. Everything else stays inside
+# $KESTREL_PATH and is read through it.
+#
+# It is idempotent: running it again overwrites the same destinations with the
+# same sources, which is what kestrel-apply-system does during ISO finalization
+# and what a re-run after updating the payload relies on.
+
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage: kestrel apply system files
+
+Deploys the Kestrel payload at \$KESTREL_PATH onto the fixed system paths.
+Must run as root.
+USAGE
+}
+
+if (($#)); then
+  case "$1" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+fi
+
+if ((EUID != 0)); then
+  echo "Error: kestrel-apply-system-files must run as root" >&2
+  exit 1
+fi
+
+export KESTREL_PATH="${KESTREL_PATH:-/usr/share/kestrel}"
+src="$KESTREL_PATH"
+
+[[ -d $src ]] || {
+  echo "Error: Kestrel payload not found at $KESTREL_PATH" >&2
+  exit 1
+}
+
+install_file() { install -Dm644 -- "$1" "$2"; }
+install_exec() { install -Dm755 -- "$1" "$2"; }
+
+# Copy every file under a tree, preserving the relative layout, at one mode.
+copy_tree() {
+  local from="$1" to="$2" mode="$3" file rel
+  [[ -d $from ]] || return 0
+  while IFS= read -r -d '' file; do
+    rel="${file#"$from"/}"
+    install -Dm"$mode" -- "$file" "$to/$rel"
+  done < <(find "$from" -type f -print0)
+}
+
+# --- 1. Commands on PATH -----------------------------------------------------
+# The runtime tree lives at $KESTREL_PATH/bin; expose it via /usr/bin so
+# command lookup and sudo's secure_path both resolve kestrel-*.
+for cmd in "$src"/bin/kestrel-*; do
+  [[ -e $cmd ]] || continue
+  ln -sfn "$cmd" "/usr/bin/${cmd##*/}"
+done
+
+# --- 2. Kestrel-owned /etc drop-ins -----------------------------------------
+# nsswitch.conf, security/faillock.conf, cups/*, plymouth/plymouthd.conf and the
+# systemd drop-ins are ours to own outright on a no-package install.
+copy_tree "$src/etc" /etc 644
+
+# --- 3. /usr integration -----------------------------------------------------
+copy_tree "$src/default/uwsm/env.d" /usr/share/uwsm/env.d 644
+copy_tree "$src/default/environment.d" /usr/lib/environment.d 644
+copy_tree "$src/default/systemd/user" /usr/lib/systemd/user 644
+copy_tree "$src/default/systemd/system" /usr/lib/systemd/system 644
+copy_tree "$src/default/systemd/zram-generator.conf.d" /usr/lib/systemd/zram-generator.conf.d 644
+for hook in "$src"/default/systemd/system-sleep/*; do
+  [[ -f $hook ]] || continue
+  install_exec "$hook" "/usr/lib/systemd/system-sleep/${hook##*/}"
+done
+copy_tree "$src/default/xdg-terminal-exec" /usr/share/xdg-terminal-exec 644
+
+install_file "$src/default/fontconfig/conf.avail/50-kestrel.conf" /usr/share/fontconfig/conf.avail/50-kestrel.conf
+ln -sfn /usr/share/fontconfig/conf.avail/50-kestrel.conf /etc/fonts/conf.d/50-kestrel.conf
+
+install_file "$src/default/applications/mimeapps.list" /usr/share/applications/mimeapps.list
+
+copy_tree "$src/default/fonts/kestrel" /usr/share/fonts/kestrel 644
+copy_tree "$src/default/plymouth" /usr/share/plymouth/themes/kestrel 644
+copy_tree "$src/default/sddm/kestrel" /usr/share/sddm/themes/kestrel 644
+install_file "$src/default/sddm/hyprland.lua" /usr/share/sddm/hyprland.lua
+copy_tree "$src/default/wayland-sessions" /usr/local/share/wayland-sessions 644
+
+install_file "$src/default/limine/limine.conf" /usr/share/kestrel/default/limine/limine.conf
+install_file "$src/default/limine/default.conf" /usr/share/kestrel/default/limine/default.conf
+install_file "$src/default/snapper/root" /etc/snapper/config-templates/kestrel
+
+# Branding: the About and screensaver text are generated from the ascii logo and
+# icon, so seed the same sources the branding commands regenerate from.
+install_file "$src/icon.txt" /etc/skel/.config/kestrel/branding/about.txt
+install_file "$src/logo.txt" /etc/skel/.config/kestrel/branding/screensaver.txt
+install_file "$src/icon.png" /usr/share/pixmaps/kestrel.png
+install_file "$src/icon.png" /usr/share/icons/hicolor/256x256/apps/kestrel.png
+for icon in "$src"/applications/icons/*; do
+  [[ -f $icon ]] || continue
+  install_file "$icon" "/usr/share/icons/hicolor/256x256/apps/${icon##*/}"
+done
+
+# --- 4. /etc/skel seed -------------------------------------------------------
+# new users get these via `useradd -m`. Trailing '.' keeps dotfiles.
+copy_tree "$src/config" /etc/skel/.config 644
+install_file "$src/default/bashrc" /etc/skel/.bashrc
+copy_tree "$src/default/hypr/toggles" /etc/skel/.local/state/kestrel/toggles/hypr 644
+copy_tree "$src/default/nautilus-python/extensions" /etc/skel/.local/share/nautilus-python/extensions 644
+for app in "$src"/applications/*.desktop; do
+  [[ -f $app ]] || continue
+  install_file "$app" "/etc/skel/.local/share/applications/${app##*/}"
+done
+
+echo "Deployed Kestrel system files from $KESTREL_PATH"

@@ -88,6 +88,11 @@ export PATH="$KESTREL_PATH/bin:$PATH"
 source "$KESTREL_INSTALL/helpers/logging.sh"
 start_install_log
 
+# Deploy the payload onto its fixed system paths before any config script reads
+# them. On a package-backed install these are already in place; on the ISO's
+# file deployment this is what puts them there.
+kestrel-apply-system-files
+
 source "$KESTREL_INSTALL/config/all.sh"
 
 if (( defer_provisioning )); then

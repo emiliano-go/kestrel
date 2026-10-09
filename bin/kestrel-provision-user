@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # kestrel:summary=Finalize Kestrel user setup (runtime tweaks /etc/skel can't do)
+# kestrel:group=finalize
+# kestrel:name=user
 # kestrel:hidden=true
 
 set -euo pipefail
