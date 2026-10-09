@@ -1,7 +1,7 @@
 echo "Remember Bluetooth on and off through the rfkill soft block"
 
-marker="${HELIOS_BLUETOOTH_MIGRATION_MARKER:-/var/lib/helios/migrations/1786380259}"
-main_conf="${HELIOS_BLUETOOTH_MAIN_CONF:-/etc/bluetooth/main.conf}"
+marker="${KESTREL_BLUETOOTH_MIGRATION_MARKER:-/var/lib/kestrel/migrations/1786380259}"
+main_conf="${KESTREL_BLUETOOTH_MAIN_CONF:-/etc/bluetooth/main.conf}"
 
 # Machine-wide work, but migration completion is recorded per user, so a second
 # account would run it again and undo whatever an administrator changed in
@@ -18,17 +18,17 @@ fi
 # sudo because this runs machine-wide and /dev/rfkill is only writable without it
 # from an active graphical seat — an update over SSH would otherwise abort here,
 # before the marker, and abort again on every retry.
-if helios-bluetooth-power is-on; then
-  sudo helios-bluetooth-power on
+if kestrel-bluetooth-power is-on; then
+  sudo kestrel-bluetooth-power on
 else
-  sudo helios-bluetooth-power off
+  sudo kestrel-bluetooth-power off
 fi
 
-# HeliOS set AutoEnable=false believing bluetoothd would then restore the last
+# Kestrel set AutoEnable=false believing bluetoothd would then restore the last
 # power state. It has no such behaviour, so all the flag ever did was keep
 # Bluetooth off at every boot. Left in place it would also stop bluetoothd from
 # powering the adapter up when the block above is lifted. Only the exact line
-# HeliOS wrote is reverted, so a hand-edited opt-out survives.
+# Kestrel wrote is reverted, so a hand-edited opt-out survives.
 if [[ -f $main_conf ]]; then
   sudo sed -i 's/^AutoEnable=false$/#AutoEnable=true/' "$main_conf"
 fi

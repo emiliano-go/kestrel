@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# kestrel:summary=Edit, set, or reset screensaver branding
+# kestrel:group=branding
+# kestrel:name=screensaver
+# kestrel:args=<image|text|reset>
+# kestrel:examples=kestrel branding screensaver image | kestrel branding screensaver text | kestrel branding screensaver reset
+
+set -euo pipefail
+
+case "${1:-}" in
+image)
+  image=$(kestrel-file-select --title "Pick PNG or SVG for screensaver" --extensions "png svg")
+  if kestrel-transcode-ascii "$image" ~/.config/kestrel/branding/screensaver.txt; then
+    kestrel-launch-screensaver force >/dev/null 2>&1
+  fi
+  ;;
+text)
+  kestrel-launch-editor ~/.config/kestrel/branding/screensaver.txt >/dev/null 2>&1 && kestrel-launch-screensaver force >/dev/null 2>&1
+  ;;
+reset)
+  cp "$KESTREL_PATH/logo.txt" ~/.config/kestrel/branding/screensaver.txt && kestrel-launch-screensaver force >/dev/null 2>&1
+  ;;
+*)
+  echo "Usage: kestrel-branding-screensaver <image|text|reset>" >&2
+  exit 1
+  ;;
+esac

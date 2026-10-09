@@ -8,4 +8,4 @@ if [[ $(sysctl -n net.ipv4.tcp_congestion_control) == "bbr" && $(sysctl -n net.c
   exit 0
 fi
 
-sudo sysctl -p /etc/sysctl.d/99-helios-sysctl.conf >/dev/null || helios-state set reboot-required
+sudo sysctl -p /etc/sysctl.d/99-kestrel-sysctl.conf >/dev/null || kestrel-state set reboot-required

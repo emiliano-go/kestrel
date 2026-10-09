@@ -10,7 +10,7 @@ import "TrayModel.js" as TrayModel
 
 BarWidget {
   id: root
-  moduleName: "helios.tray"
+  moduleName: "kestrel.tray"
 
   property bool expanded: false
   property bool managePopupOpen: false
@@ -36,7 +36,7 @@ BarWidget {
 
   // Submenu drill-down state. QsMenuEntry.display() renders a *platform* menu,
   // which Quickshell refuses unless the shell root sets `//@ pragma
-  // UseQApplication` - helios's shell.qml does not, so every submenu click was
+  // UseQApplication` - kestrel's shell.qml does not, so every submenu click was
   // a silent no-op ("Cannot display PlatformMenuEntry as quickshell was not
   // started in QApplication mode" in the shell log) and apps whose whole UI is
   // submenus, e.g. radiotray-ng's station list, were unusable. QsMenuEntry
@@ -160,9 +160,9 @@ BarWidget {
     return "drawer"
   }
 
-  function ownedByHeliOS(item) {
+  function ownedByKestrel(item) {
     var layout = root.bar && root.bar.layoutConfig ? root.bar.layoutConfig : null
-    return TrayModel.ownedByHeliOS(item, layout)
+    return TrayModel.ownedByKestrel(item, layout)
   }
 
   function bucket(category) {
@@ -171,7 +171,7 @@ BarWidget {
     for (var i = 0; i < values.length; i++) {
       var item = values[i]
       if (item.status === Status.Passive) continue
-      if (ownedByHeliOS(item)) continue
+      if (ownedByKestrel(item)) continue
       if (category === "all") {
         result.push(item)
         continue
@@ -183,7 +183,7 @@ BarWidget {
 
   function persistTrayState(pinned, hidden) {
     if (!root.bar || !root.bar.shell || typeof root.bar.shell.updateEntryInline !== "function") return
-    var id = root.moduleName || "helios.tray"
+    var id = root.moduleName || "kestrel.tray"
     root.bar.shell.updateEntryInline(id, { id: id, pinned: pinned, hidden: hidden })
   }
 

@@ -1,9 +1,9 @@
-# The HeliOS menu
+# The Kestrel menu
 
-The menu is the `helios.menu` plugin of the Quickshell desktop, with its
-content defined as data in `default/helios/helios-menu.jsonc` (read at
-runtime from `$HELIOS_PATH`) and overlaid by the user's
-`~/.config/helios/extensions/helios-menu.jsonc`. The shell parses both files
+The menu is the `kestrel.menu` plugin of the Quickshell desktop, with its
+content defined as data in `default/kestrel/kestrel-menu.jsonc` (read at
+runtime from `$KESTREL_PATH`) and overlaid by the user's
+`~/.config/kestrel/extensions/kestrel-menu.jsonc`. The shell parses both files
 at startup and watches them for changes, so the keybind → IPC → visible path
 never shells out to parse anything, and edits to either file take effect
 without restarting the shell. Rendering and behavior live in
@@ -33,13 +33,13 @@ submenu. The fields:
 | Field | Meaning |
 |---|---|
 | `icon` | Glyph in the icon column (usually Nerd Font) |
-| `iconFont` | Font family for the glyph when it differs from the menu font — how the private `helios` font's brand glyphs render |
+| `iconFont` | Font family for the glyph when it differs from the menu font — how the private `kestrel` font's brand glyphs render |
 | `label` | Visible row title; defaults to the id |
 | `title` | Header text when the submenu is open; defaults to `label`. Lets a row read "Browser" under Defaults while the open menu says "Default Browser" |
 | `action` | Shell command to run, detached, when selected |
 | `target` | Existing submenu id to open; makes the row a link |
 | `provider` | Runtime row source for this submenu (see Providers) |
-| `aliases` | Alternate `helios menu summon <name>` routes; also searchable |
+| `aliases` | Alternate `kestrel menu summon <name>` routes; also searchable |
 | `description` | Subtitle shown while searching, and extra search text matched by whole word |
 | `when` / `checked` / `disabled` | Shell conditions (see Guards) |
 
@@ -56,7 +56,7 @@ or re-icon a row without re-declaring its action, and an overridden entry
 keeps its original position in the list. New ids append. A `root` entry is
 injected if neither file declares one.
 
-The sample extension at `config/helios/extensions/helios-menu.jsonc`
+The sample extension at `config/kestrel/extensions/kestrel-menu.jsonc`
 (refreshed into `~/.config/`) documents the format in its header and ships
 only comments, so the default state adds nothing.
 
@@ -69,13 +69,13 @@ lines. The menu opens immediately on the previous evaluation's answers, so
 the batch's runtime is exactly how long a row can contradict the state it
 describes — which is why the batch works hard to be fast:
 
-- Package and command presence (`helios-pkg-present` and friends) are
+- Package and command presence (`kestrel-pkg-present` and friends) are
   answered in-process from one `pacman -Q` snapshot instead of a fork per
   row. The snapshot resolves provides too, so gvim answers for vim.
 - Commands that several rows read a value from — every Defaults > Browser row
-  compares against `$(helios-default-browser)` — run once, with the captured
+  compares against `$(kestrel-default-browser)` — run once, with the captured
   answer substituted into each expression. The reader list is
-  `GUARD_READERS` in `MenuModel.js`; a new `$(helios-...)` reader used by
+  `GUARD_READERS` in `MenuModel.js`; a new `$(kestrel-...)` reader used by
   more than one row must be added there, and `menu-guards-test.sh` fails the
   build if it is not.
 
@@ -90,7 +90,7 @@ The three guards differ in what failure means:
   unselectable: cursor, pointer, and Enter all step over it, and search omits
   it. The Install submenus use it so software already on the machine reads as
   installed rather than vanishing from the list it was installed from — the
-  list stays a catalog of what HeliOS can install. Since a dimmed row means
+  list stays a catalog of what Kestrel can install. Since a dimmed row means
   "you already have this", it earns the same ✓ as `checked` does elsewhere.
 
 Install rows should therefore carry `disabled:` with the presence check, not
@@ -132,15 +132,15 @@ it with `provider:`.
 
 ## Driving the menu from the CLI
 
-`bin/helios-menu` is a thin wrapper over the standard plugin IPC surface:
+`bin/kestrel-menu` is a thin wrapper over the standard plugin IPC surface:
 
 ```bash
-helios menu                    # toggle the root menu
-helios menu toggle system      # open at a route, or close if already open
-helios menu summon style.theme # always open (no close-if-visible)
-helios menu close
-helios menu refresh            # re-parse the JSONC files
-helios menu ping
+kestrel menu                    # toggle the root menu
+kestrel menu toggle system      # open at a route, or close if already open
+kestrel menu summon style.theme # always open (no close-if-visible)
+kestrel menu close
+kestrel menu refresh            # re-parse the JSONC files
+kestrel menu ping
 ```
 
 A route is an item id or a declared alias, case-insensitive, with
@@ -155,13 +155,13 @@ link is followed to its target. The default Hyprland bindings in
 
 ## Select and input modes
 
-The same plugin doubles as the system's dmenu. `helios-menu-select` and
-`helios-menu-input` summon it with a `mode: select` or `mode: input`
+The same plugin doubles as the system's dmenu. `kestrel-menu-select` and
+`kestrel-menu-input` summon it with a `mode: select` or `mode: input`
 payload, then block on a tempfile handshake: the shell writes the selection
 to `selectionFile` and touches `doneFile`, and cancellation (empty
 selection) exits 1. A select option is `label`, `glyph\tlabel`, or
 `glyph\tlabel\tsubtext` — the glyph shows but never returns, the subtext
 renders under the label, filters with it, and comes back as
 `label\tsubtext` so callers with same-named rows get a stable key. This is
-how the pickers behind menu actions (`helios-menu-plugin`,
-`helios-menu-timezone`, ...) present lists without owning any UI.
+how the pickers behind menu actions (`kestrel-menu-plugin`,
+`kestrel-menu-timezone`, ...) present lists without owning any UI.

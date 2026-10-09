@@ -21,7 +21,7 @@ cat >"$projects/session.jsonl" <<EOF
 EOF
 
 result=$(HOME="$TEST_HOME" XDG_CACHE_HOME="$TEST_HOME/.cache" XDG_DATA_HOME="$TEST_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --force)
+  "$ROOT/bin/kestrel-agent-usage-claude" --force)
 
 [[ $(jq -r '.todayTotalTokens' <<<"$result") == "58793" ]] ||
   fail "Claude collector counts each API message once" "$result"
@@ -43,13 +43,13 @@ cat >>"$projects/session.jsonl" <<EOF
 EOF
 
 result=$(HOME="$TEST_HOME" XDG_CACHE_HOME="$TEST_HOME/.cache" XDG_DATA_HOME="$TEST_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --cache-seconds 0)
+  "$ROOT/bin/kestrel-agent-usage-claude" --cache-seconds 0)
 
 [[ $(jq -r '.todayTotalTokens' <<<"$result") == "59000" ]] ||
   fail "Claude collector picks up lines appended since the last scan" "$result"
 pass "Claude collector picks up lines appended since the last scan"
 
-index=$(ls "$TEST_HOME"/.cache/helios/agent-usage/claude-index-*.json 2>/dev/null | head -1)
+index=$(ls "$TEST_HOME"/.cache/kestrel/agent-usage/claude-index-*.json 2>/dev/null | head -1)
 [[ -n $index && $(jq -r '.files | to_entries[0].value.records | length' "$index") == "3" ]] ||
   fail "Claude collector keeps one record per API message in the scan index" "$(cat "$index" 2>/dev/null)"
 pass "Claude collector keeps one record per API message in the scan index"
@@ -57,7 +57,7 @@ pass "Claude collector keeps one record per API message in the scan index"
 # An unchanged file is not opened again: its records come from the index.
 chmod 000 "$projects/session.jsonl"
 result=$(HOME="$TEST_HOME" XDG_CACHE_HOME="$TEST_HOME/.cache" XDG_DATA_HOME="$TEST_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --cache-seconds 0 2>/dev/null)
+  "$ROOT/bin/kestrel-agent-usage-claude" --cache-seconds 0 2>/dev/null)
 chmod 644 "$projects/session.jsonl"
 
 [[ $(jq -r '.todayTotalTokens' <<<"$result") == "59000" ]] ||
@@ -68,7 +68,7 @@ pass "Claude collector serves unchanged transcripts from the scan index"
 head -n 1 "$projects/session.jsonl" >"$projects/session.jsonl.new"
 mv "$projects/session.jsonl.new" "$projects/session.jsonl"
 result=$(HOME="$TEST_HOME" XDG_CACHE_HOME="$TEST_HOME/.cache" XDG_DATA_HOME="$TEST_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --cache-seconds 0)
+  "$ROOT/bin/kestrel-agent-usage-claude" --cache-seconds 0)
 
 [[ $(jq -r '.todayTotalTokens' <<<"$result") == "29090" ]] ||
   fail "Claude collector rescans a transcript that was rewritten" "$result"
@@ -85,7 +85,7 @@ index_line() {
 }
 index_scan() {
   HOME="$INDEX_HOME" XDG_CACHE_HOME="$INDEX_HOME/.cache" XDG_DATA_HOME="$INDEX_HOME/.local/share" \
-    "$ROOT/bin/helios-agent-usage-claude" --cache-seconds 0 "$@"
+    "$ROOT/bin/kestrel-agent-usage-claude" --cache-seconds 0 "$@"
 }
 
 index_line old-1 1000 >"$index_projects/session.jsonl"
@@ -144,7 +144,7 @@ cat >"$stream_projects/session.jsonl" <<EOF
 EOF
 
 result=$(HOME="$STREAM_HOME" XDG_CACHE_HOME="$STREAM_HOME/.cache" XDG_DATA_HOME="$STREAM_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --force)
+  "$ROOT/bin/kestrel-agent-usage-claude" --force)
 
 [[ $(jq -c '.modelUsage["claude-test"]' <<<"$result") == '{"cacheCreationInputTokens":100,"cacheReadInputTokens":2000,"inputTokens":8,"outputTokens":260}' ]] ||
   fail "Claude collector counts a streamed message from its final usage line" "$result"
@@ -162,12 +162,12 @@ pass "Claude collector keeps the final line whole after a mid-stream fallback"
 # A stream still being written when the index was taken finishes in lines
 # appended later; the indexed message takes the higher count from them.
 result=$(HOME="$STREAM_HOME" XDG_CACHE_HOME="$STREAM_HOME/.cache" XDG_DATA_HOME="$STREAM_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --cache-seconds 0)
+  "$ROOT/bin/kestrel-agent-usage-claude" --cache-seconds 0)
 cat >>"$stream_projects/session.jsonl" <<EOF
 {"timestamp":"$timestamp","type":"assistant","sessionId":"session-1","uuid":"event-6","message":{"id":"message-2","role":"assistant","model":"claude-fallback","usage":{"input_tokens":10,"cache_creation_input_tokens":0,"cache_read_input_tokens":3500,"output_tokens":90}}}
 EOF
 result=$(HOME="$STREAM_HOME" XDG_CACHE_HOME="$STREAM_HOME/.cache" XDG_DATA_HOME="$STREAM_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --cache-seconds 0)
+  "$ROOT/bin/kestrel-agent-usage-claude" --cache-seconds 0)
 [[ $(jq -c '[.modelUsage["claude-fallback"].outputTokens, .totalPrompts]' <<<"$result") == '[90,2]' ]] ||
   fail "Claude collector takes a streamed message's final count from appended lines" "$result"
 pass "Claude collector takes a streamed message's final count from appended lines"
@@ -178,11 +178,11 @@ pass "Claude collector takes a streamed message's final count from appended line
 cat >>"$projects/session.jsonl" <<EOF
 {"timestamp":"$timestamp","type":"assistant","sessionId":"session-1","uuid":"event-4","message":{"id":"message-3","role":"assistant","model":"claude-test","usage":{"input_tokens":7,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":3}}}
 EOF
-cache_file=$(find "$TEST_HOME/.cache/helios/agent-usage" -name 'claude-scan-*.json' -print -quit)
+cache_file=$(find "$TEST_HOME/.cache/kestrel/agent-usage" -name 'claude-scan-*.json' -print -quit)
 touch -d "@$(( $(date +%s) + 3600 ))" "$cache_file"
 
 result=$(HOME="$TEST_HOME" XDG_CACHE_HOME="$TEST_HOME/.cache" XDG_DATA_HOME="$TEST_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude")
+  "$ROOT/bin/kestrel-agent-usage-claude")
 
 [[ $(jq -r '.todayTotalTokens' <<<"$result") == "29100" ]] ||
   fail "Claude collector treats a future-dated scan cache as a miss" "$result"
@@ -201,7 +201,7 @@ cat >"$HISTORY_HOME/.claude/history.jsonl" <<EOF
 EOF
 
 result=$(HOME="$HISTORY_HOME" XDG_CACHE_HOME="$HISTORY_HOME/.cache" XDG_DATA_HOME="$HISTORY_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --force)
+  "$ROOT/bin/kestrel-agent-usage-claude" --force)
 
 [[ $(jq -r '(.todayPrompts|tostring) + "/" + (.todaySessions|tostring)' <<<"$result") == "2/2" ]] ||
   fail "Claude collector falls back to history.jsonl without a stats-cache" "$result"
@@ -246,7 +246,7 @@ conn.close()
 PY
 
 result=$(HOME="$OPENCODE_HOME" XDG_CACHE_HOME="$OPENCODE_HOME/.cache" XDG_DATA_HOME="$OPENCODE_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --force)
+  "$ROOT/bin/kestrel-agent-usage-claude" --force)
 
 [[ $(jq -r '(.ready|tostring) + "/" + (.todayTotalTokens|tostring)' <<<"$result") == "true/192" ]] ||
   fail "Claude collector counts Anthropic usage, reasoning included, from opencode sessions" "$result"
@@ -301,7 +301,7 @@ conn.close()
 PY
 
 result=$(HOME="$OPENCODE_V2_HOME" XDG_CACHE_HOME="$OPENCODE_V2_HOME/.cache" XDG_DATA_HOME="$OPENCODE_V2_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --force)
+  "$ROOT/bin/kestrel-agent-usage-claude" --force)
 
 [[ $(jq -r '(.todayTotalTokens|tostring) + "/" + (.todaySessions|tostring)' <<<"$result") == "51057/2" ]] ||
   fail "Claude collector counts Anthropic usage from opencode v2 sessions" "$result"
@@ -316,7 +316,7 @@ python3 -c 'import sqlite3, sys; c = sqlite3.connect(sys.argv[1]); c.execute("DR
   "$OPENCODE_V2_HOME/.local/share/opencode/opencode.db"
 
 result=$(HOME="$OPENCODE_V2_HOME" XDG_CACHE_HOME="$OPENCODE_V2_HOME/.cache" XDG_DATA_HOME="$OPENCODE_V2_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --force)
+  "$ROOT/bin/kestrel-agent-usage-claude" --force)
 
 [[ $(jq -r '(.todayTotalTokens|tostring) + "/" + (.todaySessions|tostring)' <<<"$result") == "51055/1" ]] ||
   fail "Claude collector counts a v2-only opencode database" "$result"
@@ -343,7 +343,7 @@ cat >"$PI_HOME/.omp/profiles/work/agent/sessions/project/omp-profile.jsonl" <<EO
 EOF
 
 result=$(HOME="$PI_HOME" XDG_CACHE_HOME="$PI_HOME/.cache" XDG_DATA_HOME="$PI_HOME/.local/share" \
-  "$ROOT/bin/helios-agent-usage-claude" --force)
+  "$ROOT/bin/kestrel-agent-usage-claude" --force)
 
 [[ $(jq -r '.todayTotalTokens' <<<"$result") == "62" ]] ||
   fail "Claude collector counts usage from pi and omp sessions" "$result"
@@ -354,7 +354,7 @@ pass "Claude collector counts pi and omp subscription usage, profiles included"
 # Collectors overlap in practice: the update command backgrounds one per agent
 # while the panel refreshes on its own. Two writers aiming at one cache file
 # must both land, not trip over a shared temp path.
-race_output=$(python3 - "$ROOT/bin/helios-agent-usage-claude" "$TEST_HOME/race.json" <<'PY'
+race_output=$(python3 - "$ROOT/bin/kestrel-agent-usage-claude" "$TEST_HOME/race.json" <<'PY'
 import importlib.util
 import json
 import sys
@@ -413,7 +413,7 @@ touch "$UNREADABLE_DIR/project/unreadable-1.jsonl" \
   "$UNREADABLE_DIR/project/unreadable-4.jsonl" \
   "$UNREADABLE_DIR/project/unreadable-5.jsonl"
 
-warning=$(python3 - "$ROOT/bin/helios-agent-usage-claude" "$UNREADABLE_DIR" <<'PY'
+warning=$(python3 - "$ROOT/bin/kestrel-agent-usage-claude" "$UNREADABLE_DIR" <<'PY'
 import contextlib
 import importlib.util
 import io

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# kestrel:summary=Enable or disable background intros
+# kestrel:args=<enable|disable|toggle|status>
+# kestrel:examples=kestrel theme bg intro toggle | kestrel theme bg intro disable
+
+set -euo pipefail
+
+toggle="$HOME/.local/state/kestrel/toggles/background-intros-off"
+case ${1:-} in
+  enable)
+    rm -f "$toggle"
+    kestrel-notification-send "Background Intros" "Enabled"
+    ;;
+  disable)
+    mkdir -p "$(dirname "$toggle")"
+    touch "$toggle"
+    kestrel-notification-send "Background Intros" "Disabled"
+    ;;
+  toggle)
+    if [[ -f $toggle ]]; then
+      kestrel-theme-bg-intro enable
+    else
+      kestrel-theme-bg-intro disable
+    fi
+    ;;
+  status)
+    [[ ! -f $toggle ]]
+    ;;
+  *)
+    echo "Usage: kestrel-theme-bg-intro <enable|disable|toggle|status>" >&2
+    exit 1
+    ;;
+esac

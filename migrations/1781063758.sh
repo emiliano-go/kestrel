@@ -1,4 +1,4 @@
-echo "Update Hyprland Lua entrypoint to load HeliOS bootstrap"
+echo "Update Hyprland Lua entrypoint to load Kestrel bootstrap"
 
 hyprland_config="$HOME/.config/hypr/hyprland.lua"
 
@@ -10,12 +10,12 @@ if [[ -f $hyprland_config ]] && ! grep -Fq '/default/hypr/bootstrap.lua' "$hyprl
       replaced = 0
     }
 
-    !replaced && $0 == "-- Load user modules from ~/.config and HeliOS defaults from $HELIOS_PATH." {
+    !replaced && $0 == "-- Load user modules from ~/.config and Kestrel defaults from $KESTREL_PATH." {
       comment = $0
       got_next = getline next_line
       if (got_next > 0 && next_line == "package.path = os.getenv(\"HOME\")") {
-        print "-- HeliOS'\''s bootstrap keeps path setup out of this user config."
-        print "dofile((os.getenv(\"HELIOS_PATH\") or \"/usr/share/helios\") .. \"/default/hypr/bootstrap.lua\")"
+        print "-- Kestrel'\''s bootstrap keeps path setup out of this user config."
+        print "dofile((os.getenv(\"KESTREL_PATH\") or \"/usr/share/kestrel\") .. \"/default/hypr/bootstrap.lua\")"
         replaced = 1
 
         while ((getline line) > 0) {

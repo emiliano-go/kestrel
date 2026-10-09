@@ -6,7 +6,7 @@ import qs.Ui
 
 BarWidget {
   id: root
-  moduleName: "helios.workspaces"
+  moduleName: "kestrel.workspaces"
 
   function workspaceById(id) {
     var values = Hyprland.workspaces.values

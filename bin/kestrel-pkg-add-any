@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# kestrel:summary=Install packages from the Arch repositories, falling back to the AUR
+# kestrel:args=<packages...>
+# kestrel:examples=kestrel pkg add-any localsend jq
+# kestrel:requires-sudo=true
+
+# Kestrel no longer ships its own package repository, so a package that used to
+# come from the [kestrel] repo is now either in the Arch repositories or in the
+# AUR. Route each package accordingly.
+rc=0
+for pkg in "$@"; do
+  kestrel-pkg-present "$pkg" && continue
+  if pacman -Si -- "$pkg" &>/dev/null; then
+    kestrel-pkg-add "$pkg" || rc=1
+  else
+    kestrel-pkg-aur-add "$pkg" || rc=1
+  fi
+done
+exit $rc

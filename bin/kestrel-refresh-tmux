@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kestrel:summary=Overwrite the user tmux config with the Kestrel default and reload tmux.
+
+kestrel-refresh-config tmux/tmux.conf
+kestrel-restart-tmux

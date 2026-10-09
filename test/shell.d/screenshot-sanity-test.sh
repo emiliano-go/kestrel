@@ -37,11 +37,11 @@ require_command jq
 require_command python3
 
 shell_ipc() {
-  HELIOS_PATH="$test_root" "$ROOT/bin/helios-shell" "$@"
+  KESTREL_PATH="$test_root" "$ROOT/bin/kestrel-shell" "$@"
 }
 
 shell_ipc_quiet() {
-  HELIOS_PATH="$test_root" "$ROOT/bin/helios-shell" -q "$@"
+  KESTREL_PATH="$test_root" "$ROOT/bin/kestrel-shell" -q "$@"
 }
 
 fail_with_log() {
@@ -52,7 +52,7 @@ fail_with_log() {
 }
 
 TMPDIR=$(mktemp -d)
-test_root="$TMPDIR/helios"
+test_root="$TMPDIR/kestrel"
 test_home="$TMPDIR/home"
 stub_bin="$TMPDIR/bin"
 screenshot_dir="$TMPDIR/screenshots"
@@ -63,12 +63,12 @@ cp -a "$ROOT/shell" "$test_root/shell"
 ln -s "$ROOT/config" "$test_root/config"
 ln -s "$ROOT/bin" "$test_root/bin"
 
-cat >"$stub_bin/helios-update-available" <<'SH'
+cat >"$stub_bin/kestrel-update-available" <<'SH'
 #!/bin/bash
-echo "HeliOS update available (test)"
+echo "Kestrel update available (test)"
 exit 0
 SH
-chmod +x "$stub_bin/helios-update-available"
+chmod +x "$stub_bin/kestrel-update-available"
 
 cat >"$stub_bin/curl" <<'SH'
 #!/bin/bash
@@ -87,7 +87,7 @@ esac
 SH
 chmod +x "$stub_bin/curl"
 
-HELIOS_PATH="$test_root" \
+KESTREL_PATH="$test_root" \
 HOME="$test_home" \
 XDG_CONFIG_HOME="$test_home/.config" \
 XDG_CACHE_HOME="$test_home/.cache" \
@@ -106,24 +106,24 @@ for _ in {1..80}; do
   sleep 0.1
 done
 
-shell_ipc_quiet helios.system-update refresh >/dev/null 2>&1 || true
+shell_ipc_quiet kestrel.system-update refresh >/dev/null 2>&1 || true
 sleep 0.8
 
 geometry=$(shell_ipc shell debugBarGeometry)
 jq -e '
-  any(.[]; .id == "helios.menu" and .visible == true and .width > 0 and .height > 0) and
-  any(.[]; .id == "helios.clock" and .visible == true and .width > 0 and .height > 0)
+  any(.[]; .id == "kestrel.menu" and .visible == true and .width > 0 and .height > 0) and
+  any(.[]; .id == "kestrel.clock" and .visible == true and .width > 0 and .height > 0)
 ' <<<"$geometry" >/dev/null || {
   printf 'Geometry:\n' >&2
   jq . <<<"$geometry" >&2
   fail_with_log "screenshot test shell rendered visible bar widgets"
 }
 
-HELIOS_PATH="$test_root" \
+KESTREL_PATH="$test_root" \
 OMASNAP_SCREENSHOT_DIR="$screenshot_dir" \
 HOME="$test_home" \
 PATH="$stub_bin:$ROOT/bin:$PATH" \
-  "$ROOT/bin/helios" capture screenshot fullscreen save >/dev/null 2>"$screenshot_err"
+  "$ROOT/bin/kestrel" capture screenshot fullscreen save >/dev/null 2>"$screenshot_err"
 
 screenshot=$(find "$screenshot_dir" -maxdepth 1 -type f -name '*.png' -print -quit)
 

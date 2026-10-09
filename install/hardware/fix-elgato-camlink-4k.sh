@@ -3,13 +3,13 @@
 # then gets stretched into a 16:9 tile. The raw node is hidden from users and
 # v4l2-relayd re-exposes it at 1280x720 under the same name.
 
-if helios-hw-elgato-camlink-4k; then
-  helios-pkg-add v4l2loopback-dkms v4l2loopback-utils v4l2-relayd
+if kestrel-hw-elgato-camlink-4k; then
+  kestrel-pkg-add v4l2loopback-dkms v4l2loopback-utils v4l2-relayd
 
-  sudo install -Dm644 "$HELIOS_PATH/default/udev/elgato-camlink-4k.rules" /etc/udev/rules.d/71-elgato-camlink-4k.rules
-  sudo install -Dm644 "$HELIOS_PATH/default/v4l2-relayd/camlink.conf" /etc/v4l2-relayd.d/camlink.conf
-  sudo install -Dm644 "$HELIOS_PATH/default/systemd/system/camlink-4k-loopback.service" /etc/systemd/system/camlink-4k-loopback.service
-  sudo install -Dm644 "$HELIOS_PATH/default/systemd/system/v4l2-relayd@camlink.service.d/camlink.conf" "/etc/systemd/system/v4l2-relayd@camlink.service.d/camlink.conf"
+  sudo install -Dm644 "$KESTREL_PATH/default/udev/elgato-camlink-4k.rules" /etc/udev/rules.d/71-elgato-camlink-4k.rules
+  sudo install -Dm644 "$KESTREL_PATH/default/v4l2-relayd/camlink.conf" /etc/v4l2-relayd.d/camlink.conf
+  sudo install -Dm644 "$KESTREL_PATH/default/systemd/system/camlink-4k-loopback.service" /etc/systemd/system/camlink-4k-loopback.service
+  sudo install -Dm644 "$KESTREL_PATH/default/systemd/system/v4l2-relayd@camlink.service.d/camlink.conf" "/etc/systemd/system/v4l2-relayd@camlink.service.d/camlink.conf"
 
   # The module's own default device would otherwise show up in browsers as
   # "Dummy video device" on machines without another relay.

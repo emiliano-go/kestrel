@@ -1,5 +1,5 @@
 {
-  "name": "HeliOS",
+  "name": "Kestrel",
   "appearance": "{{ mode }}",
   "canvas": "{{ background }}",
   "accent": "{{ accent }}",

@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Restart the hyprsunset service (used for blue light filtering/night light).
-
-helios-restart-app hyprsunset

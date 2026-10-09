@@ -7,6 +7,6 @@ for wrapper in "$HOME/.local/bin"/*; do
   bin=$(sed -n 's/^exec "\(.*\)" "\$@"$/\1/p' "$wrapper")
 
   if [[ -n $package && -n $bin ]]; then
-    helios-mise-install "$package" "$(basename "$wrapper")" "$bin"
+    kestrel-mise-install "$package" "$(basename "$wrapper")" "$bin"
   fi
 done

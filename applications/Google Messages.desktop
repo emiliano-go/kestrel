@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Name=Google Messages
-Exec=helios-launch-webapp https://messages.google.com/web/conversations
+Exec=kestrel-launch-webapp https://messages.google.com/web/conversations
 Terminal=false
 Type=Application
 Icon=google-messages

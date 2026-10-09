@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.weather",
+  "id": "kestrel.weather",
   "name": "Weather",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Weather pill with detail popup",
   "kinds": [
     "bar-widget"

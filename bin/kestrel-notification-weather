@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kestrel:summary=Toggle the current weather panel
+
+kestrel-shell shell toggle kestrel.weather

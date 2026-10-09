@@ -17,7 +17,7 @@ assert(/IpcHandler[\s\S]*?function toggleBluetooth\(\) \{ root\.toggleBluetooth\
 assert(/manageIpc: false/.test(panelSource), 'bluetooth owns its IPC handler so it can extend the target methods')
 
 // Writing adapter.enabled sets BlueZ Powered, which does not survive a reboot.
-assert(/function toggleBluetooth\(\)[\s\S]*?execDetached\(\["helios-bluetooth-power", adapter\.enabled \? "off" : "on"\]\)/.test(panelSource), 'bluetooth toggles the radio through the rfkill soft block')
+assert(/function toggleBluetooth\(\)[\s\S]*?execDetached\(\["kestrel-bluetooth-power", adapter\.enabled \? "off" : "on"\]\)/.test(panelSource), 'bluetooth toggles the radio through the rfkill soft block')
 assert(!/adapter\.enabled = /.test(panelSource), 'bluetooth never writes the adapter power state directly')
 
 // Discovery is a BlueZ session that nothing ends at panel close: it persists
@@ -182,7 +182,7 @@ SH
 
 chmod +x "$mock_bin/bluetoothctl" "$mock_bin/rfkill"
 
-# $ROOT/bin so helios-bluetooth-device resolves the real helios-bluetooth-power.
+# $ROOT/bin so kestrel-bluetooth-device resolves the real kestrel-bluetooth-power.
 bluetooth_run() {
   local powered="$1"
   shift
@@ -190,13 +190,13 @@ bluetooth_run() {
   echo "$powered" >"$POWERED_FILE"
   : >"$device_tmp/log"
   PATH="$mock_bin:$ROOT/bin:$PATH" BLUETOOTHCTL_LOG="$device_tmp/log" \
-    HELIOS_BLUETOOTH_POWER_WAIT_SECONDS=0 "$@" ||
+    KESTREL_BLUETOOTH_POWER_WAIT_SECONDS=0 "$@" ||
     fail "$* exits cleanly with Powered: $powered"
   printf '%s' "$device_tmp/log"
 }
 
 bluetooth_power() {
-  bluetooth_run "$1" "$ROOT/bin/helios-bluetooth-power" "$2"
+  bluetooth_run "$1" "$ROOT/bin/kestrel-bluetooth-power" "$2"
 }
 
 # Off has to be the block. A bluetoothctl power off would read the same until the
@@ -240,7 +240,7 @@ pass "bluetooth toggles an unpowered adapter on"
 # The power-on shortcut is the whole point of skipping the stabilization sleep:
 # pair/connect from the panel run against an adapter that is already powered.
 bluetooth_device_log() {
-  bluetooth_run "$1" "$ROOT/bin/helios-bluetooth-device" connect AA:BB:CC:DD:EE:FF
+  bluetooth_run "$1" "$ROOT/bin/kestrel-bluetooth-device" connect AA:BB:CC:DD:EE:FF
 }
 
 powered_log=$(bluetooth_device_log yes)

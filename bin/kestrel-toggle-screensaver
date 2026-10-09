@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# kestrel:summary=Toggle screensaver availability
+
+kestrel-toggle screensaver-off
+
+if kestrel-toggle-enabled screensaver-off; then
+  kestrel-notification-send -g 󱄄 "Screensaver disabled"
+else
+  kestrel-notification-send -g 󱄄 "Screensaver enabled"
+fi

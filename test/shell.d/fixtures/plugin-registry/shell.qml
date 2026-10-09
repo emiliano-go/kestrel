@@ -5,7 +5,7 @@ import "services"
 ShellRoot {
   id: root
 
-  readonly property string resultPath: Quickshell.env("HELIOS_QML_TEST_RESULT")
+  readonly property string resultPath: Quickshell.env("KESTREL_QML_TEST_RESULT")
   property var failures: []
   property int changeCount: 0
   property var config: ({
@@ -79,41 +79,41 @@ ShellRoot {
 
   function runChecks() {
     var scan = ""
-    scan += block("firstparty", "/first/widgets/clock", manifest("helios.first-widget", ["bar-widget"], { barWidget: "Widget.qml" }))
-    scan += block("firstparty", "/first/bar", manifest("helios.bar", ["bar"], { bar: "Bar.qml" }))
-    scan += block("firstparty", "/first/panels/grouped", manifest("helios.grouped-panel", ["panel"], { panel: "Panel.qml" }))
-    scan += block("firstparty", "/first/hybrid", manifest("helios.hybrid", ["menu", "bar-widget"], { menu: "Menu.qml", barWidget: "Widget.qml" }))
-    var futureAuth = manifest("helios.future-auth", ["service"], { service: "Service.qml" })
-    futureAuth.helios = { capabilities: ["authentication"] }
+    scan += block("firstparty", "/first/widgets/clock", manifest("kestrel.first-widget", ["bar-widget"], { barWidget: "Widget.qml" }))
+    scan += block("firstparty", "/first/bar", manifest("kestrel.bar", ["bar"], { bar: "Bar.qml" }))
+    scan += block("firstparty", "/first/panels/grouped", manifest("kestrel.grouped-panel", ["panel"], { panel: "Panel.qml" }))
+    scan += block("firstparty", "/first/hybrid", manifest("kestrel.hybrid", ["menu", "bar-widget"], { menu: "Menu.qml", barWidget: "Widget.qml" }))
+    var futureAuth = manifest("kestrel.future-auth", ["service"], { service: "Service.qml" })
+    futureAuth.kestrel = { capabilities: ["authentication"] }
     scan += block("firstparty", "/first/future-auth", futureAuth)
     scan += block("thirdparty", "/third/panel", manifest("third.panel", ["panel"], { panel: "Panel.qml" }))
     scan += block("thirdparty", "/third/widget", manifest("third.widget", ["bar-widget"], { barWidget: "Widget.qml" }, { defaultSection: "left" }))
     scan += block("thirdparty", "/third/center-widget", manifest("third.center-widget", ["bar-widget"], { barWidget: "Widget.qml" }))
     scan += block("thirdparty", "/third/right-widget", manifest("third.right-widget", ["bar-widget"], { barWidget: "Widget.qml" }, { defaultSection: "right" }))
     var localWidget = manifest("local.first-widget", ["bar-widget"], { barWidget: "Widget.qml" })
-    localWidget.helios = { clonedFrom: "helios.first-widget" }
+    localWidget.kestrel = { clonedFrom: "kestrel.first-widget" }
     scan += block("thirdparty", "/third/local-widget", localWidget)
     var localWeather = manifest("local.weather", ["bar-widget"], { barWidget: "Widget.qml" })
-    localWeather.helios = { clonedFrom: "helios.weather" }
+    localWeather.kestrel = { clonedFrom: "kestrel.weather" }
     scan += block("thirdparty", "/third/local-weather", localWeather)
     var localHybrid = manifest("local.hybrid", ["menu", "bar-widget"], { menu: "Menu.qml", barWidget: "Widget.qml" })
-    localHybrid.helios = { clonedFrom: "helios.hybrid" }
+    localHybrid.kestrel = { clonedFrom: "kestrel.hybrid" }
     scan += block("thirdparty", "/third/local-hybrid", localHybrid)
     var localPanel = manifest("local.grouped-panel", ["panel"], { panel: "Panel.qml" })
-    localPanel.helios = { clonedFrom: "helios.grouped-panel" }
+    localPanel.kestrel = { clonedFrom: "kestrel.grouped-panel" }
     scan += block("thirdparty", "/third/local-panel", localPanel)
     var localBar = manifest("local.bar", ["bar"], { bar: "Bar.qml" })
-    localBar.helios = { clonedFrom: "helios.bar" }
+    localBar.kestrel = { clonedFrom: "kestrel.bar" }
     scan += block("thirdparty", "/third/local-bar", localBar)
     scan += block("thirdparty", "/third/bar", manifest("third.bar", ["bar"], { bar: "Bar.qml" }))
     var localFutureAuth = manifest("local.future-auth", ["service"], { service: "Service.qml" })
-    localFutureAuth.helios = { clonedFrom: "helios.future-auth" }
+    localFutureAuth.kestrel = { clonedFrom: "kestrel.future-auth" }
     scan += block("thirdparty", "/third/local-future-auth", localFutureAuth)
     var spoofedAuth = manifest("third.spoofed-auth", ["service"], { service: "Service.qml" })
-    spoofedAuth.helios = { capabilities: ["authentication"] }
+    spoofedAuth.kestrel = { capabilities: ["authentication"] }
     scan += block("thirdparty", "/third/spoofed-auth", spoofedAuth)
-    scan += block("thirdparty", "/third/shadow", manifest("helios.first-widget", ["panel"], { panel: "Panel.qml" }))
-    scan += block("thirdparty", "/third/reserved", manifest("helios.reserved", ["panel"], { panel: "Panel.qml" }))
+    scan += block("thirdparty", "/third/shadow", manifest("kestrel.first-widget", ["panel"], { panel: "Panel.qml" }))
+    scan += block("thirdparty", "/third/reserved", manifest("kestrel.reserved", ["panel"], { panel: "Panel.qml" }))
     scan += block("thirdparty", "/third/unsafe", manifest("third.unsafe", ["panel"], { panel: "../Panel.qml" }))
     scan += block("thirdparty", "/third/missing", { schemaVersion: 1, id: "third.missing", name: "missing", version: "1.0.0", kinds: ["panel"] })
     scan += block("thirdparty", "/third/bad-section", manifest("third.bad-section", ["bar-widget"], { barWidget: "Widget.qml" }, { defaultSection: "bottom" }))
@@ -129,11 +129,11 @@ ShellRoot {
       "local.grouped-panel",
       "local.hybrid",
       "local.weather",
-      "helios.bar",
-      "helios.first-widget",
-      "helios.future-auth",
-      "helios.grouped-panel",
-      "helios.hybrid",
+      "kestrel.bar",
+      "kestrel.first-widget",
+      "kestrel.future-auth",
+      "kestrel.grouped-panel",
+      "kestrel.hybrid",
       "third.bar",
       "third.center-widget",
       "third.panel",
@@ -142,34 +142,34 @@ ShellRoot {
       "third.widget"
     ], "registry merges valid first-party and third-party manifests")
 
-    root.assertTrue(registry.installedPlugins["helios.first-widget"].__isFirstParty === true, "first-party manifests are stamped")
+    root.assertTrue(registry.installedPlugins["kestrel.first-widget"].__isFirstParty === true, "first-party manifests are stamped")
     root.assertTrue(registry.installedPlugins["third.panel"].__isFirstParty === false, "third-party manifests are stamped")
-    root.assertDeepEqual(registry.installedPlugins["helios.future-auth"].__hostCapabilities, ["authentication"], "trusted manifests stamp authentication capability")
+    root.assertDeepEqual(registry.installedPlugins["kestrel.future-auth"].__hostCapabilities, ["authentication"], "trusted manifests stamp authentication capability")
     root.assertDeepEqual(registry.installedPlugins["local.future-auth"].__hostCapabilities, ["authentication"], "clones inherit trusted host capabilities")
     root.assertDeepEqual(registry.installedPlugins["third.spoofed-auth"].__hostCapabilities, [], "third-party manifests cannot self-grant host capabilities")
-    root.assertEqual(registry.installedPlugins["helios.grouped-panel"].__sourceDir, "/first/panels/grouped", "grouped plugin source paths are preserved")
+    root.assertEqual(registry.installedPlugins["kestrel.grouped-panel"].__sourceDir, "/first/panels/grouped", "grouped plugin source paths are preserved")
     root.assertEqual(registry.entryPointUrl(registry.installedPlugins["third.panel"], "panel"), "file:///third/panel/Panel.qml", "entryPointUrl resolves plugin-relative paths")
     root.assertEqual(registry.entryPointUrl(registry.installedPlugins["third.widget"], "barWidget"), "file:///third/widget/Widget.qml", "entryPointUrl resolves bar widget paths")
 
-    root.assertTrue(!has("helios.reserved"), "third-party helios namespace ids are rejected")
+    root.assertTrue(!has("kestrel.reserved"), "third-party kestrel namespace ids are rejected")
     root.assertTrue(!has("third.unsafe"), "unsafe entry points are rejected")
     root.assertTrue(!has("third.missing"), "incomplete manifests are rejected")
     root.assertTrue(!has("third.bad-section"), "invalid default bar widget sections are rejected")
     root.assertTrue(!has("third.schema"), "unsupported schema versions are rejected")
 
-    root.assertTrue(registry.isEnabled("helios.first-widget"), "first-party plugins are implicitly enabled")
-    root.assertTrue(registry.isEnabled("helios.bar"), "built-in bar option is active by default")
+    root.assertTrue(registry.isEnabled("kestrel.first-widget"), "first-party plugins are implicitly enabled")
+    root.assertTrue(registry.isEnabled("kestrel.bar"), "built-in bar option is active by default")
     root.assertTrue(!registry.isEnabled("third.bar"), "third-party bar options start inactive")
     root.assertTrue(!registry.isEnabled("third.panel"), "third-party plugins start disabled")
-    root.assertEqual(registry.resolveEnabledId("helios.first-widget"), "helios.first-widget", "inactive clones do not replace their source id")
+    root.assertEqual(registry.resolveEnabledId("kestrel.first-widget"), "kestrel.first-widget", "inactive clones do not replace their source id")
 
     registry.setEnabled("third.bar", true)
     root.assertEqual(root.config.bar.id, "third.bar", "enabling third-party bar options writes bar id")
     root.assertTrue(registry.isEnabled("third.bar"), "selected third-party bar options are enabled")
-    root.assertTrue(!registry.isEnabled("helios.bar"), "selecting third-party bar options deactivates built-in bar")
+    root.assertTrue(!registry.isEnabled("kestrel.bar"), "selecting third-party bar options deactivates built-in bar")
     registry.setEnabled("third.bar", false)
     root.assertTrue(root.config.bar.id === undefined, "disabling active bar options resets to built-in")
-    root.assertTrue(registry.isEnabled("helios.bar"), "built-in bar option returns after reset")
+    root.assertTrue(registry.isEnabled("kestrel.bar"), "built-in bar option returns after reset")
 
     registry.setEnabled("third.panel", true)
     root.assertDeepEqual(root.config.plugins, [{ id: "third.panel" }], "enabling third-party panels writes plugins array")
@@ -187,9 +187,9 @@ ShellRoot {
       version: 1,
       bar: {
         layout: {
-          left: [{ id: "helios.workspaces" }, { id: "helios.menu" }],
-          center: [{ id: "helios.weather" }, { id: "helios.clock" }],
-          right: [{ id: "helios.tray" }]
+          left: [{ id: "kestrel.workspaces" }, { id: "kestrel.menu" }],
+          center: [{ id: "kestrel.weather" }, { id: "kestrel.clock" }],
+          right: [{ id: "kestrel.tray" }]
         }
       },
       plugins: []
@@ -197,19 +197,19 @@ ShellRoot {
     registry.setEnabled("third.widget", true)
     root.assertDeepEqual(
       root.config.bar.layout.left,
-      [{ id: "helios.workspaces" }, { id: "third.widget" }, { id: "helios.menu" }],
+      [{ id: "kestrel.workspaces" }, { id: "third.widget" }, { id: "kestrel.menu" }],
       "enabling a widget inserts it after its section anchor"
     )
     registry.setEnabled("third.center-widget", true)
     root.assertDeepEqual(
       root.config.bar.layout.center,
-      [{ id: "helios.weather" }, { id: "third.center-widget" }, { id: "helios.clock" }],
+      [{ id: "kestrel.weather" }, { id: "third.center-widget" }, { id: "kestrel.clock" }],
       "widgets without a default section use the center anchor"
     )
     registry.setEnabled("third.right-widget", true)
     root.assertDeepEqual(
       root.config.bar.layout.right,
-      [{ id: "helios.tray" }, { id: "third.right-widget" }],
+      [{ id: "kestrel.tray" }, { id: "third.right-widget" }],
       "right widgets use the right anchor"
     )
 
@@ -234,61 +234,61 @@ ShellRoot {
     // A bar the placement's neighbour is not on still gets the widget.
     root.config = {
       version: 1,
-      bar: { layout: { left: [], center: [{ id: "helios.weather" }], right: [] } },
+      bar: { layout: { left: [], center: [{ id: "kestrel.weather" }], right: [] } },
       plugins: []
     }
     root.assertTrue(
-      !registry.setEnabled("third.center-widget", true, { after: "helios.first-widget" }),
+      !registry.setEnabled("third.center-widget", true, { after: "kestrel.first-widget" }),
       "enabling against a widget the bar does not carry is refused"
     )
     root.assertEqual(
       registry.lastEnableError,
-      "could not find target widget helios.first-widget",
+      "could not find target widget kestrel.first-widget",
       "a refused enable names the target it could not find"
     )
-    root.assertDeepEqual(root.config.bar.layout.center, [{ id: "helios.weather" }], "a refused enable places nothing")
+    root.assertDeepEqual(root.config.bar.layout.center, [{ id: "kestrel.weather" }], "a refused enable places nothing")
     root.assertEqual(
-      registry.putBarWidget("third.center-widget", { after: "helios.first-widget" }),
+      registry.putBarWidget("third.center-widget", { after: "kestrel.first-widget" }),
       "",
       "put accepts a placement target the bar does not carry"
     )
     root.assertDeepEqual(
       root.config.bar.layout.center,
-      [{ id: "helios.weather" }, { id: "third.center-widget" }],
+      [{ id: "kestrel.weather" }, { id: "third.center-widget" }],
       "put falls back to the section anchor when its target is missing"
     )
 
     // The anchor sits after the clone, so a fallback would land elsewhere.
     root.config = {
       version: 1,
-      bar: { layout: { left: [], center: [{ id: "local.first-widget" }, { id: "helios.weather" }], right: [] } },
+      bar: { layout: { left: [], center: [{ id: "local.first-widget" }, { id: "kestrel.weather" }], right: [] } },
       plugins: []
     }
     root.assertEqual(
-      registry.putBarWidget("third.center-widget", { after: "helios.first-widget" }),
+      registry.putBarWidget("third.center-widget", { after: "kestrel.first-widget" }),
       "",
       "put places against a target that has been cloned"
     )
     root.assertDeepEqual(
       root.config.bar.layout.center,
-      [{ id: "local.first-widget" }, { id: "third.center-widget" }, { id: "helios.weather" }],
+      [{ id: "local.first-widget" }, { id: "third.center-widget" }, { id: "kestrel.weather" }],
       "a clone stands in for the widget it was cloned from as a placement target"
     )
 
     // The anchor a fallback lands against is as clonable as the target.
     root.config = {
       version: 1,
-      bar: { layout: { left: [], center: [{ id: "local.weather" }, { id: "helios.clock" }], right: [] } },
+      bar: { layout: { left: [], center: [{ id: "local.weather" }, { id: "kestrel.clock" }], right: [] } },
       plugins: []
     }
     root.assertEqual(
-      registry.putBarWidget("third.center-widget", { after: "helios.first-widget" }),
+      registry.putBarWidget("third.center-widget", { after: "kestrel.first-widget" }),
       "",
       "put falls back past a cloned anchor"
     )
     root.assertDeepEqual(
       root.config.bar.layout.center,
-      [{ id: "local.weather" }, { id: "third.center-widget" }, { id: "helios.clock" }],
+      [{ id: "local.weather" }, { id: "third.center-widget" }, { id: "kestrel.clock" }],
       "a cloned anchor still anchors the section it was cloned into"
     )
 
@@ -311,7 +311,7 @@ ShellRoot {
       bar: { layout: { left: [], center: [{ id: "local.first-widget", size: 5 }], right: [] } },
       plugins: []
     }
-    root.assertEqual(registry.putBarWidget("helios.first-widget", {}), "", "put accepts a widget whose clone is on the bar")
+    root.assertEqual(registry.putBarWidget("kestrel.first-widget", {}), "", "put accepts a widget whose clone is on the bar")
     root.assertDeepEqual(
       root.config.bar.layout.center,
       [{ id: "local.first-widget", size: 5 }],
@@ -328,7 +328,7 @@ ShellRoot {
 
     root.config = {
       version: 1,
-      bar: { layout: { left: [], center: [{ id: "helios.first-widget", size: 4 }], right: [] } },
+      bar: { layout: { left: [], center: [{ id: "kestrel.first-widget", size: 4 }], right: [] } },
       plugins: []
     }
     registry.setEnabled("local.first-widget", true)
@@ -337,47 +337,47 @@ ShellRoot {
       [{ id: "local.first-widget", size: 4 }],
       "enabling a widget clone replaces its source in place"
     )
-    root.assertEqual(registry.resolveEnabledId("helios.first-widget"), "local.first-widget", "enabled clones receive calls made to their source id")
-    registry.setEnabled("helios.first-widget", true)
+    root.assertEqual(registry.resolveEnabledId("kestrel.first-widget"), "local.first-widget", "enabled clones receive calls made to their source id")
+    registry.setEnabled("kestrel.first-widget", true)
     root.assertDeepEqual(
       root.config.bar.layout.center,
-      [{ id: "helios.first-widget", size: 4 }],
+      [{ id: "kestrel.first-widget", size: 4 }],
       "enabling a clone source switches back without duplicates"
     )
     registry.setEnabled("local.first-widget", true)
     registry.setEnabled("local.first-widget", false)
     root.assertDeepEqual(
       root.config.bar.layout.center,
-      [{ id: "helios.first-widget", size: 4 }],
+      [{ id: "kestrel.first-widget", size: 4 }],
       "disabling a widget clone restores its source in place"
     )
 
     root.config = {
       version: 1,
-      bar: { layout: { left: [], center: ["helios.first-widget"], right: [] } },
+      bar: { layout: { left: [], center: ["kestrel.first-widget"], right: [] } },
       plugins: []
     }
     registry.setEnabled("local.first-widget", true)
     root.assertDeepEqual(root.config.bar.layout.center, [{ id: "local.first-widget" }], "clone replacement normalizes string entries")
     registry.setEnabled("local.first-widget", false)
-    root.assertDeepEqual(root.config.bar.layout.center, [{ id: "helios.first-widget" }], "clone restoration normalizes string entries")
+    root.assertDeepEqual(root.config.bar.layout.center, [{ id: "kestrel.first-widget" }], "clone restoration normalizes string entries")
 
     root.config = {
       version: 1,
-      bar: { layout: { left: [{ id: "helios.hybrid" }], center: [], right: [] } },
+      bar: { layout: { left: [{ id: "kestrel.hybrid" }], center: [], right: [] } },
       plugins: []
     }
     registry.setEnabled("local.hybrid", true)
     root.assertDeepEqual(root.config.bar.layout.left, [{ id: "local.hybrid" }], "enabling a multi-kind clone replaces its widget")
-    root.assertDeepEqual(root.config.disabledPlugins, ["helios.hybrid"], "enabling a multi-kind clone disables the source")
+    root.assertDeepEqual(root.config.disabledPlugins, ["kestrel.hybrid"], "enabling a multi-kind clone disables the source")
     registry.setEnabled("local.hybrid", false)
-    root.assertDeepEqual(root.config.bar.layout.left, [{ id: "helios.hybrid" }], "disabling a multi-kind clone restores its widget")
+    root.assertDeepEqual(root.config.bar.layout.left, [{ id: "kestrel.hybrid" }], "disabling a multi-kind clone restores its widget")
     root.assertTrue(root.config.disabledPlugins === undefined, "disabling a multi-kind clone enables the source")
 
     root.config = { version: 1, bar: { layout: { left: [], center: [], right: [] } }, plugins: [] }
     registry.setEnabled("local.grouped-panel", true)
     root.assertDeepEqual(root.config.plugins, [{ id: "local.grouped-panel" }], "enabling an ordinary clone adds it")
-    root.assertDeepEqual(root.config.disabledPlugins, ["helios.grouped-panel"], "enabling an ordinary clone disables the source")
+    root.assertDeepEqual(root.config.disabledPlugins, ["kestrel.grouped-panel"], "enabling an ordinary clone disables the source")
     registry.setEnabled("local.grouped-panel", false)
     root.assertDeepEqual(root.config.plugins, [], "disabling an ordinary clone removes it")
     root.assertTrue(root.config.disabledPlugins === undefined, "disabling an ordinary clone restores the source")
@@ -386,13 +386,13 @@ ShellRoot {
       version: 1,
       bar: { layout: { left: [], center: [], right: [] } },
       plugins: [],
-      disabledPlugins: ["helios.grouped-panel"]
+      disabledPlugins: ["kestrel.grouped-panel"]
     }
     registry.setEnabled("local.grouped-panel", true)
-    root.assertDeepEqual(root.config.disabledPlugins, ["helios.grouped-panel"], "cloning an already-disabled source keeps it disabled")
+    root.assertDeepEqual(root.config.disabledPlugins, ["kestrel.grouped-panel"], "cloning an already-disabled source keeps it disabled")
     root.assertTrue(root.config.cloneSourceRestores === undefined, "an already-disabled source is not marked for restoration")
     registry.setEnabled("local.grouped-panel", false)
-    root.assertDeepEqual(root.config.disabledPlugins, ["helios.grouped-panel"], "disabling the clone preserves the source's prior disabled state")
+    root.assertDeepEqual(root.config.disabledPlugins, ["kestrel.grouped-panel"], "disabling the clone preserves the source's prior disabled state")
 
     registry.setEnabled("local.bar", true)
     root.assertEqual(root.config.bar.id, "local.bar", "enabling a cloned bar selects it")
@@ -415,41 +415,41 @@ ShellRoot {
     // A built-in loads by default, so switching one off is recorded the other
     // way round and has to survive round-tripping back on.
     root.config = { version: 1, bar: { layout: { left: [], center: [], right: [] } }, plugins: [] }
-    registry.setEnabled("helios.grouped-panel", false)
-    root.assertDeepEqual(root.config.disabledPlugins, ["helios.grouped-panel"], "disabling a first-party plugin records it")
-    root.assertTrue(!registry.isEnabled("helios.grouped-panel"), "a recorded first-party plugin is disabled")
+    registry.setEnabled("kestrel.grouped-panel", false)
+    root.assertDeepEqual(root.config.disabledPlugins, ["kestrel.grouped-panel"], "disabling a first-party plugin records it")
+    root.assertTrue(!registry.isEnabled("kestrel.grouped-panel"), "a recorded first-party plugin is disabled")
     root.assertDeepEqual(root.config.plugins, [], "disabling a first-party plugin leaves the plugins array alone")
-    registry.setEnabled("helios.grouped-panel", true)
+    registry.setEnabled("kestrel.grouped-panel", true)
     root.assertTrue(root.config.disabledPlugins === undefined, "re-enabling drops the disabled record entirely")
-    root.assertTrue(registry.isEnabled("helios.grouped-panel"), "a first-party plugin returns to enabled")
+    root.assertTrue(registry.isEnabled("kestrel.grouped-panel"), "a first-party plugin returns to enabled")
     root.assertDeepEqual(root.config.plugins, [], "re-enabling a first-party plugin adds no redundant entry")
 
     // A widget's place in the bar is its on/off switch. Loadability must not
-    // follow it down, or a plugin that is both widget and menu (helios.menu)
+    // follow it down, or a plugin that is both widget and menu (kestrel.menu)
     // would be locked out of the shell by taking its button off the bar.
     root.config = {
       version: 1,
-      bar: { layout: { left: [], center: [], right: [{ id: "helios.first-widget" }] } },
+      bar: { layout: { left: [], center: [], right: [{ id: "kestrel.first-widget" }] } },
       plugins: []
     }
-    root.assertTrue(registry.inBar("helios.first-widget"), "inBar sees a widget in the layout")
-    registry.setEnabled("helios.first-widget", false)
+    root.assertTrue(registry.inBar("kestrel.first-widget"), "inBar sees a widget in the layout")
+    registry.setEnabled("kestrel.first-widget", false)
     root.assertDeepEqual(root.config.bar.layout.right, [], "disabling a first-party widget removes its layout entry")
     root.assertTrue(root.config.disabledPlugins === undefined, "disabling a first-party widget records nothing else")
-    root.assertTrue(!registry.inBar("helios.first-widget"), "inBar follows the widget out of the layout")
-    root.assertTrue(registry.isEnabled("helios.first-widget"), "a first-party widget stays loadable off the bar")
-    registry.setEnabled("helios.first-widget", true)
-    root.assertDeepEqual(root.config.bar.layout.center, [{ id: "helios.first-widget" }], "a widget without a default section falls back to center")
+    root.assertTrue(!registry.inBar("kestrel.first-widget"), "inBar follows the widget out of the layout")
+    root.assertTrue(registry.isEnabled("kestrel.first-widget"), "a first-party widget stays loadable off the bar")
+    registry.setEnabled("kestrel.first-widget", true)
+    root.assertDeepEqual(root.config.bar.layout.center, [{ id: "kestrel.first-widget" }], "a widget without a default section falls back to center")
 
     root.config = {
       version: 1,
-      bar: { layout: { left: [{ id: "helios.hybrid" }], center: [], right: [] } },
+      bar: { layout: { left: [{ id: "kestrel.hybrid" }], center: [], right: [] } },
       plugins: []
     }
-    registry.setEnabled("helios.hybrid", false)
+    registry.setEnabled("kestrel.hybrid", false)
     root.assertDeepEqual(root.config.bar.layout.left, [], "disabling a multi-kind built-in removes its widget")
     root.assertTrue(root.config.disabledPlugins === undefined, "disabling a multi-kind widget records nothing else")
-    root.assertTrue(registry.isEnabled("helios.hybrid"), "a multi-kind built-in remains loadable without its widget")
+    root.assertTrue(registry.isEnabled("kestrel.hybrid"), "a multi-kind built-in remains loadable without its widget")
 
     var cloneBase = registry.pluginsDir + "/dhh.clock"
     root.assertEqual(registry.localPluginIdForPath(cloneBase + "/BarWidget.qml"), "dhh.clock", "personal clone changes are watched")
@@ -464,7 +464,7 @@ ShellRoot {
   PluginRegistry {
     id: registry
     firstPartyDir: ""
-    pluginsDir: Quickshell.env("HOME") + "/.config/helios/plugins"
+    pluginsDir: Quickshell.env("HOME") + "/.config/kestrel/plugins"
     shellConfigProvider: function() { return root.config }
     shellConfigMutator: function(mutator) {
       var next = JSON.parse(JSON.stringify(root.config || {}))

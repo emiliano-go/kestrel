@@ -8,7 +8,7 @@ QtObject {
   id: registry
 
   property string home: Quickshell.env("HOME")
-  property string pluginsDir: home + "/.config/helios/plugins"
+  property string pluginsDir: home + "/.config/kestrel/plugins"
 
   // Set by shell.qml at startup so we can also scan bundled first-party plugins.
   property string firstPartyDir: ""
@@ -91,7 +91,7 @@ QtObject {
 
   function trustedCapabilities(manifest) {
     if (!manifest || !manifest.__isFirstParty) return []
-    var metadata = Util.isPlainObject(manifest.helios) ? manifest.helios : null
+    var metadata = Util.isPlainObject(manifest.kestrel) ? manifest.kestrel : null
     var declared = metadata && Array.isArray(metadata.capabilities) ? metadata.capabilities : []
     var out = []
     for (var i = 0; i < declared.length; i++) {
@@ -107,7 +107,7 @@ QtObject {
 
     for (var thirdPartyId in thirdParty) {
       var manifest = thirdParty[thirdPartyId]
-      var metadata = manifest && Util.isPlainObject(manifest.helios) ? manifest.helios : null
+      var metadata = manifest && Util.isPlainObject(manifest.kestrel) ? manifest.kestrel : null
       var clonedFrom = metadata ? String(metadata.clonedFrom || "") : ""
       var source = clonedFrom ? firstParty[clonedFrom] : null
       manifest.__hostCapabilities = source && Array.isArray(source.__hostCapabilities)
@@ -138,12 +138,12 @@ QtObject {
   // overlays, services).
   //
   // Special cases (implicitly always enabled, no shell.json entry needed):
-  //   - the built-in bar option (`helios.bar`) is active when `bar.id` is
-  //     missing or set to `helios.bar`.
+  //   - the built-in bar option (`kestrel.bar`) is active when `bar.id` is
+  //     missing or set to `kestrel.bar`.
   //   - first-party non-bar plugins are shell infrastructure (settings,
   //     image-picker, ...). Requiring users to add them to plugins[] just to
   //     summon them was a footgun: a stock shell.json with `plugins: []` would
-  //     silently make `helios launch bar-settings` a no-op. Turning one off
+  //     silently make `kestrel launch bar-settings` a no-op. Turning one off
   //     is therefore recorded the other way round, in `disabledPlugins[]`.
   function isEnabled(id) {
     var key = String(id)
@@ -154,7 +154,7 @@ QtObject {
         var selectedBar = ""
         if (Util.isPlainObject(config) && Util.isPlainObject(config.bar))
           selectedBar = Util.canonicalWidgetId(String(config.bar.id || ""))
-        if (!selectedBar) selectedBar = "helios.bar"
+        if (!selectedBar) selectedBar = "kestrel.bar"
         return selectedBar === key
       }
       if (isDisabled(config, key)) return false
@@ -174,7 +174,7 @@ QtObject {
     // manifest is the implementation that should receive the call.
     for (var candidate in installedPlugins) {
       var manifest = installedPlugins[candidate]
-      var metadata = manifest && Util.isPlainObject(manifest.helios) ? manifest.helios : null
+      var metadata = manifest && Util.isPlainObject(manifest.kestrel) ? manifest.kestrel : null
       if (metadata && String(metadata.clonedFrom || "") === key && isEnabled(candidate))
         return candidate
     }
@@ -184,7 +184,7 @@ QtObject {
   // A bar widget is on when it sits in the bar, whoever shipped it. That is a
   // different question from isEnabled(), which decides whether the widget's
   // component is loaded at all — a built-in stays loadable so it can be put
-  // back, and so a plugin that is both a widget and a menu (helios.menu)
+  // back, and so a plugin that is both a widget and a menu (kestrel.menu)
   // cannot be locked out of the shell by taking its button off the bar.
   function inBar(id) {
     var config = shellConfigProvider ? shellConfigProvider() : null
@@ -267,7 +267,7 @@ QtObject {
       return { section: section, index: Math.min(requested, config.bar.layout[section].length) }
     }
 
-    var anchors = { left: "helios.workspaces", center: "helios.weather", right: "helios.tray" }
+    var anchors = { left: "kestrel.workspaces", center: "kestrel.weather", right: "kestrel.tray" }
     var anchor = findRelativeBarLocation(config, anchors[section], section)
     return {
       section: section,
@@ -426,8 +426,8 @@ QtObject {
   function activeCloneFor(config, sourceId) {
     for (var candidate in installedPlugins) {
       var candidateManifest = installedPlugins[candidate]
-      var candidateMetadata = candidateManifest && Util.isPlainObject(candidateManifest.helios)
-        ? candidateManifest.helios : null
+      var candidateMetadata = candidateManifest && Util.isPlainObject(candidateManifest.kestrel)
+        ? candidateManifest.kestrel : null
       if (!candidateMetadata || String(candidateMetadata.clonedFrom || "") !== sourceId) continue
       if (Array.isArray(candidateManifest.kinds) && candidateManifest.kinds.indexOf("bar") !== -1) {
         if (Util.canonicalWidgetId(String(config.bar.id || "")) === candidate) return candidate
@@ -443,7 +443,7 @@ QtObject {
     var isBarOption = cloneManifest && Array.isArray(cloneManifest.kinds)
       && cloneManifest.kinds.indexOf("bar") !== -1
     if (isBarOption) {
-      if (sourceId === "helios.bar") delete config.bar.id
+      if (sourceId === "kestrel.bar") delete config.bar.id
       else config.bar.id = sourceId
     } else {
       var cloneLocation = findEntryLocation(config, cloneId)
@@ -487,7 +487,7 @@ QtObject {
     var isBarWidget = manifest && Array.isArray(manifest.kinds) && manifest.kinds.indexOf("bar-widget") !== -1
     var hasNonWidgetKind = manifest && Array.isArray(manifest.kinds)
       && manifest.kinds.some(function(kind) { return kind !== "bar-widget" })
-    var metadata = manifest && Util.isPlainObject(manifest.helios) ? manifest.helios : null
+    var metadata = manifest && Util.isPlainObject(manifest.kestrel) ? manifest.kestrel : null
     var clonedFrom = metadata ? Util.canonicalWidgetId(String(metadata.clonedFrom || "")) : ""
     shellConfigMutator(function(config) {
       ensureConfigShape(config)
@@ -512,7 +512,7 @@ QtObject {
         if (value) {
           config.bar.id = key
         } else if (Util.canonicalWidgetId(String(config.bar.id || "")) === key) {
-          if (clonedFrom && clonedFrom !== "helios.bar") config.bar.id = clonedFrom
+          if (clonedFrom && clonedFrom !== "kestrel.bar") config.bar.id = clonedFrom
           else delete config.bar.id
         }
         return
@@ -624,12 +624,12 @@ QtObject {
     var merged = {}
     for (var fk in firstParty) merged[fk] = firstParty[fk]
     // Third-party plugins never shadow first-party ids. The whole
-    // `helios.*` namespace is reserved for built-ins, including bar widgets
+    // `kestrel.*` namespace is reserved for built-ins, including bar widgets
     // registered outside the manifest-based plugin registry.
     for (var tk in thirdParty) {
-      if (firstParty[tk] || String(tk).indexOf("helios.") === 0) {
+      if (firstParty[tk] || String(tk).indexOf("kestrel.") === 0) {
         console.warn("PluginRegistry: plugin " + tk
-          + " rejected: id is reserved for first-party HeliOS plugins")
+          + " rejected: id is reserved for first-party Kestrel plugins")
         continue
       }
       merged[tk] = thirdParty[tk]
@@ -695,7 +695,7 @@ QtObject {
     // First-party bar widgets can also carry sibling manifests such as
     // widgets/Clock.manifest.json so multiple widgets can live in one source
     // directory without wrapper folders.
-    // Third-party plugins stay at the top level of ~/.config/helios/plugins.
+    // Third-party plugins stay at the top level of ~/.config/kestrel/plugins.
     var script = ""
       + "emit_manifest() { local kind=\"$1\"; local manifest=\"$2\"; local sub; "
       + "  if [[ ${manifest##*/} == \"manifest.json\" ]]; then sub=\"${manifest%/manifest.json}\"; else sub=\"$(dirname -- \"$manifest\")\"; fi; "

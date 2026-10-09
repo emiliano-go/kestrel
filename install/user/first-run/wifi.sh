@@ -1,11 +1,11 @@
 notify_update() {
-  helios-notification-send -u critical -g  "Update System" "Click to update the system." \
-    --exec helios-launch-floating-terminal-with-presentation helios-update
+  kestrel-notification-send -u critical -g  "Update System" "Click to update the system." \
+    --exec kestrel-launch-floating-terminal-with-presentation kestrel-update
 }
 
 notify_wifi() {
-  helios-notification-send -u critical -g 󰖩 "Setup Wi-Fi" "Click to configure the wireless network." \
-    --exec helios-shell shell toggle helios.network
+  kestrel-notification-send -u critical -g 󰖩 "Setup Wi-Fi" "Click to configure the wireless network." \
+    --exec kestrel-shell shell toggle kestrel.network
 }
 
 announce_network() {

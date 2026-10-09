@@ -4,7 +4,7 @@ o.window({ tag = "floating-window" }, { center = true })
 o.window({ tag = "floating-window" }, { size = { 875, 600 } })
 
 o.window(
-  "(org.helios.btop|org.helios.terminal|org.helios.bash|org.codeberg.dnkl.foot|org.gnome.NautilusPreviewer|org.gnome.Evince|HeliOS|About|TUI.float|imv|mpv)",
+  "(org.kestrel.btop|org.kestrel.terminal|org.kestrel.bash|org.codeberg.dnkl.foot|org.gnome.NautilusPreviewer|org.gnome.Evince|Kestrel|About|TUI.float|imv|mpv)",
   {
     tag = "+floating-window",
   }
@@ -20,22 +20,22 @@ o.window({
 }, { tag = "+floating-window" })
 
 -- The About fastfetch layout needs more columns than the standard float provides.
--- This size only covers the first launch: helios-launch-about measures the
+-- This size only covers the first launch: kestrel-launch-about measures the
 -- rendered content, remembers the size that hugs it, and applies that as its own
 -- rule before every later launch.
-o.window("org.helios.about", { float = true })
-o.window("org.helios.about", { center = true })
-o.window("org.helios.about", { size = { 920, 480 } })
+o.window("org.kestrel.about", { float = true })
+o.window("org.kestrel.about", { center = true })
+o.window("org.kestrel.about", { size = { 920, 480 } })
 
 o.window("qalculate-qt", { float = true })
 
 -- Fullscreen screensaver.
-o.window("org.helios.screensaver", { fullscreen = true })
-o.window("org.helios.screensaver", { float = true })
-o.window("org.helios.screensaver", { animation = "slide" })
+o.window("org.kestrel.screensaver", { fullscreen = true })
+o.window("org.kestrel.screensaver", { float = true })
+o.window("org.kestrel.screensaver", { animation = "slide" })
 -- The launcher picks each screensaver's workspace. A terminal mapped again as it closes lands out of sight instead,
 -- where its fullscreen rule cannot take fullscreen from a window.
-o.window("org.helios.screensaver", { workspace = "special:screensaver silent" })
+o.window("org.kestrel.screensaver", { workspace = "special:screensaver silent" })
 
 -- Popped window rounding.
 o.window({ tag = "pop" }, { rounding = 8 })

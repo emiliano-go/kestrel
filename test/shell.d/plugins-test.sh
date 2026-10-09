@@ -109,7 +109,7 @@ for (const manifestPath of manifests) {
     check(typeof manifest[field] === 'string' && manifest[field].length > 0, `${manifest.id || relativePath} must have ${field}`)
   }
 
-  check(String(manifest.id).startsWith('helios.'), `${manifest.id} must use the first-party namespace`)
+  check(String(manifest.id).startsWith('kestrel.'), `${manifest.id} must use the first-party namespace`)
   check(!String(manifest.id).includes('/') && !String(manifest.id).includes('..'), `${manifest.id} must be safe as a plugin id`)
   check(!ids.has(manifest.id), `${manifest.id} must be unique`)
   ids.add(manifest.id)
@@ -157,9 +157,9 @@ for (const manifestPath of manifests) {
     check(JSON.stringify(manifest.kinds) === JSON.stringify(['bar-widget']), `${manifest.id} sibling manifest must be a bar widget`)
   }
 
-  const clonePaths = manifest.helios?.clonePaths
+  const clonePaths = manifest.kestrel?.clonePaths
   if (clonePaths !== undefined) {
-    check(Array.isArray(clonePaths), `${manifest.id} helios.clonePaths must be an array`)
+    check(Array.isArray(clonePaths), `${manifest.id} kestrel.clonePaths must be an array`)
     const cloneTargets = new Set()
     for (const clonePath of Array.isArray(clonePaths) ? clonePaths : []) {
       const valid = isPlainObject(clonePath)
@@ -190,14 +190,14 @@ const byId = Object.fromEntries(manifests.map(manifestPath => {
   return [manifest.id, manifest]
 }))
 for (const [id, section] of Object.entries({
-  'helios.active-window': 'left',
-  'helios.dropbox': 'right'
+  'kestrel.active-window': 'left',
+  'kestrel.dropbox': 'right'
 })) {
   check(byId[id]?.barWidget?.defaultSection === section, `${id} must default to the ${section} bar section`)
 }
-check(byId['helios.media']?.barWidget?.defaultSection === undefined, 'helios.media must use the center fallback')
+check(byId['kestrel.media']?.barWidget?.defaultSection === undefined, 'kestrel.media must use the center fallback')
 
-for (const id of ['helios.lock', 'helios.idle', 'helios.polkit', 'helios.notifications', 'helios.media']) {
+for (const id of ['kestrel.lock', 'kestrel.idle', 'kestrel.polkit', 'kestrel.notifications', 'kestrel.media']) {
   check(byId[id]?.keepLoaded === true, `${id} must stay loaded across plugin reloads`)
 }
 

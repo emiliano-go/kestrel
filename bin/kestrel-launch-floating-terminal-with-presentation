@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# kestrel:summary=Launch a floating terminal with the Kestrel presentation wrapper
+# kestrel:args=<command>
+
+# Export the current theme's gum styling so gum widgets match the active theme
+# even after a theme switch (the inherited environment is captured at login).
+source kestrel-restart-gum
+
+cmd="$*"
+# 130 is the user bailing with Ctrl-C; anything else gets the Done/Failed prompt.
+presentation_script="kestrel-show-logo; $cmd; code=\$?; if (( code != 130 )); then kestrel-show-done \$code; fi"
+
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.kestrel.terminal --title=Kestrel -e bash -c "$presentation_script"

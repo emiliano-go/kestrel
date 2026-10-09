@@ -7,13 +7,13 @@ trap 'rm -rf "$test_home"' EXIT
 provider="$test_home/.config/nvim/lua/config/remote_clipboard.lua"
 mkdir -p "$(dirname "$provider")" "$test_home/bin"
 # Redirect only the packaged source path; run the actual migration logic.
-sed "s@/usr/share/helios-nvim/config/lua/config/remote_clipboard.lua@$test_home/package.lua@" \
+sed "s@/usr/share/kestrel-nvim/config/lua/config/remote_clipboard.lua@$test_home/package.lua@" \
   "$ROOT/migrations/1788996284.sh" >"$test_home/migration.sh"
 printf '%s\n' '-- corrected packaged provider' >"$test_home/package.lua"
 cat >"$test_home/bin/pacman" <<'STUB'
 #!/bin/bash
-[[ $* == '-Q helios-nvim' ]] || exit 1
-printf 'helios-nvim %s\n' "${TEST_NVIM_VERSION:-2026.9.21-2}"
+[[ $* == '-Q kestrel-nvim' ]] || exit 1
+printf 'kestrel-nvim %s\n' "${TEST_NVIM_VERSION:-2026.9.21-2}"
 STUB
 chmod +x "$test_home/bin/pacman"
 run_migration() {

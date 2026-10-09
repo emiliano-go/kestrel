@@ -1,4 +1,4 @@
-general.import = [ "~/.local/state/helios/current/theme/alacritty.toml" ]
+general.import = [ "~/.local/state/kestrel/current/theme/alacritty.toml" ]
 
 [env]
 TERM = "xterm-256color"

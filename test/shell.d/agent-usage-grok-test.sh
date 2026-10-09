@@ -28,7 +28,7 @@ signed_in() {
 
 # xAI answers per token, so each home's probe is told apart by its sign-in.
 collect() {
-  COLLECTOR="$ROOT/bin/helios-agent-usage-grok" python3 - "$@" <<'PY'
+  COLLECTOR="$ROOT/bin/kestrel-agent-usage-grok" python3 - "$@" <<'PY'
 import importlib.machinery, importlib.util, io, json, os, sys
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -50,7 +50,7 @@ def urlopen(request, timeout=None):
   return io.BytesIO(json.dumps({"config": config}).encode())
 
 collector.urllib.request.urlopen = urlopen
-sys.argv = ["helios-agent-usage-grok"] + (os.environ.get("COLLECT_ARGS") or "--force").split()
+sys.argv = ["kestrel-agent-usage-grok"] + (os.environ.get("COLLECT_ARGS") or "--force").split()
 collector.main()
 PY
 }
@@ -67,7 +67,7 @@ record=$(GROK_HOME="$test_tmp/custom-grok" collect)
 [[ $(jq -c '{ready, tierLabel, percent: .limits[0].percent}' <<<"$record") == '{"ready":true,"tierLabel":"SuperGrok","percent":0.42}' ]] ||
   fail "a single Grok account in GROK_HOME is read from there" "$record"
 pass "a single Grok account in GROK_HOME is read from there"
-rm -f "$XDG_CACHE_HOME"/helios/agent-usage/grok-limits-*.json
+rm -f "$XDG_CACHE_HOME"/kestrel/agent-usage/grok-limits-*.json
 
 signed_in "$HOME/.grok" token-main u-main "$future" "X Premium+"
 record=$(collect)
@@ -97,7 +97,7 @@ record=$(collect)
 pass "a lapsed access token with a refresh token keeps showing the last numbers"
 
 # A week that reset while Grok sat idle starts over at 0%, a week later.
-cache=$(ls "$XDG_CACHE_HOME"/helios/agent-usage/grok-limits-*.json | head -1)
+cache=$(ls "$XDG_CACHE_HOME"/kestrel/agent-usage/grok-limits-*.json | head -1)
 reset_past=$(python3 -c 'import datetime as dt; print((dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=1)).isoformat())')
 jq --arg at "$reset_past" '.limits[0].resetsAt = $at' "$cache" >"$test_tmp/cache.json"
 mv "$test_tmp/cache.json" "$cache"
@@ -109,7 +109,7 @@ next_reset=$(jq -r '.limits[0].resetsAt' <<<"$record")
 pass "a week that reset while Grok was idle starts over a week later"
 
 # Without cached numbers there's nothing to show, so it says how to get them.
-rm -f "$XDG_CACHE_HOME"/helios/agent-usage/grok-limits-*.json
+rm -f "$XDG_CACHE_HOME"/kestrel/agent-usage/grok-limits-*.json
 record=$(collect)
 [[ $(jq -c '{usageStatusText, limits}' <<<"$record") == '{"usageStatusText":"Limits paused","limits":[]}' ]] ||
   fail "a lapsed token with nothing cached says to start Grok" "$record"
@@ -126,19 +126,19 @@ pass "a sign-in lapsed past Grok's 30 days asks for a sign-in"
 
 # A period with nothing used yet comes without a percentage.
 signed_in "$HOME/.grok" token-fresh u-main "$future" "X Premium+"
-rm -f "$XDG_CACHE_HOME"/helios/agent-usage/grok-limits-*.json
+rm -f "$XDG_CACHE_HOME"/kestrel/agent-usage/grok-limits-*.json
 record=$(collect)
 [[ $(jq -c '.limits[0] | {label, percent}' <<<"$record") == '{"label":"Weekly","percent":0.0}' ]] ||
   fail "an untouched period reads as 0% rather than nothing known" "$record"
 pass "an untouched period reads as 0% rather than nothing known"
 
 signed_in "$HOME/.grok" token-main u-main "$future" "X Premium+"
-side="$XDG_STATE_HOME/helios/agents/accounts/grok/side"
+side="$XDG_STATE_HOME/kestrel/agents/accounts/grok/side"
 signed_in "$side" token-side u-side "$future" "SuperGrok"
 jq -n --arg side "$side" '{active: "side", switch: "auto", threshold: 90, accounts: [
   {id: "main", label: "Main", home: "", primary: true},
   {id: "side", label: "Side", home: $side, primary: false}
-]}' >"$XDG_STATE_HOME/helios/agents/accounts/grok.json"
+]}' >"$XDG_STATE_HOME/kestrel/agents/accounts/grok.json"
 record=$(collect)
 [[ $(jq -c '{tierLabel, first: .limits[0].percent, accounts: [.accounts[] | {id, active, plan, percent: .limits[0].percent}], switch: .accountSwitch}' <<<"$record") == '{"tierLabel":"SuperGrok","first":0.07,"accounts":[{"id":"main","active":false,"plan":"X Premium+","percent":0.42},{"id":"side","active":true,"plan":"SuperGrok","percent":0.07}],"switch":{"mode":"auto","threshold":90}}' ]] ||
   fail "every Grok account reports its own plan and credits" "$record"
@@ -173,8 +173,8 @@ pass "a limits-only refresh reuses the session scan"
 
 # A scan from another day is never reused, so yesterday's sessions don't
 # count as today's after midnight.
-jq '.day = "2000-01-01"' "$XDG_CACHE_HOME/helios/agent-usage/grok-stats.json" >"$test_tmp/stats.json"
-mv "$test_tmp/stats.json" "$XDG_CACHE_HOME/helios/agent-usage/grok-stats.json"
+jq '.day = "2000-01-01"' "$XDG_CACHE_HOME/kestrel/agent-usage/grok-stats.json" >"$test_tmp/stats.json"
+mv "$test_tmp/stats.json" "$XDG_CACHE_HOME/kestrel/agent-usage/grok-stats.json"
 record=$(COLLECT_ARGS="--limits-only" collect)
 [[ $(jq -r '.totalSessions' <<<"$record") == 4 ]] || fail "a scan from another day is made again" "$record"
 pass "a scan from another day is made again"

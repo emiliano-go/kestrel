@@ -41,7 +41,7 @@ assertEqual(media.labelFor({ trackTitle: 'Song', identity: 'Spotify' }), 'Song',
 assertEqual(media.osdMessage({ trackTitle: 'Song', trackArtist: 'Artist' }, 'Fallback'), 'Song - Artist', 'media builds OSD messages')
 assertEqual(media.osdMessage(null, 'Fallback'), 'Fallback', 'media falls back OSD messages')
 
-// The in-shell volume keys follow helios-audio-output-volume's rules.
+// The in-shell volume keys follow kestrel-audio-output-volume's rules.
 assertDeepEqual(media.volumeKeyStep('raise', 43, true), { percent: 48, muted: false }, 'volume raise steps 5 and unmutes')
 assertDeepEqual(media.volumeKeyStep('lower', 48, true), { percent: 43, muted: false }, 'volume lower steps 5 and unmutes')
 assertDeepEqual(media.volumeKeyStep('raise', 98, false), { percent: 100, muted: false }, 'volume raise clamps at 100')
@@ -55,7 +55,7 @@ assertEqual(media.volumeOsdIcon(48, true), 'volume-muted', 'volume OSD shows mut
 assertEqual(media.volumeOsdIcon(0, false), 'volume-muted', 'volume OSD shows muted at zero')
 
 // Only an ALSA sink is its own physical sink. Any other default sink, a DSP
-// chain or EasyEffects above all, needs helios-audio-output-sink's live
+// chain or EasyEffects above all, needs kestrel-audio-output-sink's live
 // resolution on every press, so its keys fall back to the script.
 const fs = require('fs')
 const serviceQml = fs.readFileSync(path.join(root, 'shell/plugins/services/media/Service.qml'), 'utf8')
@@ -67,7 +67,7 @@ assert(
 )
 const shellQml = fs.readFileSync(path.join(root, 'shell/shell.qml'), 'utf8')
 assert(
-  /if \(!media \|\| !media\.handleVolumeKey\(entry\.target\)\)\s*Util\.execArgv\(\["helios-audio-output-volume", entry\.target\]\)/.test(shellQml),
-  'a volume key the shell declines runs helios-audio-output-volume'
+  /if \(!media \|\| !media\.handleVolumeKey\(entry\.target\)\)\s*Util\.execArgv\(\["kestrel-audio-output-volume", entry\.target\]\)/.test(shellQml),
+  'a volume key the shell declines runs kestrel-audio-output-volume'
 )
 JS

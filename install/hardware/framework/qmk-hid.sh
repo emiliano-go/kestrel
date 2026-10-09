@@ -1,8 +1,8 @@
 # Allow unprivileged access to the Framework 16 keyboard for RGB control via qmk_hid.
 
-if helios-hw-framework16; then
+if kestrel-hw-framework16; then
   sudo mkdir -p /etc/udev/rules.d
   if [[ ! -f /etc/udev/rules.d/50-framework16-qmk-hid.rules ]]; then
-    sudo cp -f "$HELIOS_PATH/default/udev/framework16-qmk-hid.rules" /etc/udev/rules.d/50-framework16-qmk-hid.rules
+    sudo cp -f "$KESTREL_PATH/default/udev/framework16-qmk-hid.rules" /etc/udev/rules.d/50-framework16-qmk-hid.rules
   fi
 fi

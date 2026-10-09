@@ -4,15 +4,15 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
-sleep_monitor="$ROOT/bin/helios-system-sleep-monitor"
+sleep_monitor="$ROOT/bin/kestrel-system-sleep-monitor"
 tmpdir=$(mktemp -d)
 trap 'rm -rf "$tmpdir"' EXIT
 
 mock_bin="$tmpdir/bin"
-mock_helios="$tmpdir/helios"
+mock_kestrel="$tmpdir/kestrel"
 producer_pid_file="$tmpdir/producer-pid"
 lock_log="$tmpdir/lock-log"
-mkdir -p "$mock_bin" "$mock_helios/bin"
+mkdir -p "$mock_bin" "$mock_kestrel/bin"
 
 cat >"$mock_bin/systemd-inhibit" <<'SH'
 #!/bin/bash
@@ -32,7 +32,7 @@ printf '   boolean true\n'
 exec sleep 30
 SH
 
-cat >"$mock_helios/bin/helios-system-sleep-lock" <<'SH'
+cat >"$mock_kestrel/bin/kestrel-system-sleep-lock" <<'SH'
 #!/bin/bash
 
 echo locked >>"$LOCK_LOG"
@@ -41,11 +41,11 @@ SH
 chmod +x \
   "$mock_bin/systemd-inhibit" \
   "$mock_bin/dbus-monitor" \
-  "$mock_helios/bin/helios-system-sleep-lock"
-ln -s "$sleep_monitor" "$mock_helios/bin/helios-system-sleep-monitor"
+  "$mock_kestrel/bin/kestrel-system-sleep-lock"
+ln -s "$sleep_monitor" "$mock_kestrel/bin/kestrel-system-sleep-monitor"
 
 start_us=${EPOCHREALTIME//[!0-9]/}
-HELIOS_PATH="$mock_helios" \
+KESTREL_PATH="$mock_kestrel" \
   PATH="$mock_bin:$PATH" \
   PRODUCER_PID_FILE="$producer_pid_file" \
   LOCK_LOG="$lock_log" \
@@ -78,7 +78,7 @@ SH
 chmod +x "$mock_bin/dbus-monitor"
 rm -f "$producer_pid_file"
 
-HELIOS_PATH="$mock_helios" \
+KESTREL_PATH="$mock_kestrel" \
   PATH="$mock_bin:$PATH" \
   PRODUCER_PID_FILE="$producer_pid_file" \
   LOCK_LOG="$lock_log" \

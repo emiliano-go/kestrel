@@ -1,6 +1,6 @@
 echo "Add WhatsApp Slim extension to Brave Origin flags for existing installs"
 
-WHATSAPP_SLIM_EXT="$HELIOS_PATH/default/chromium/extensions/whatsapp-slim"
+WHATSAPP_SLIM_EXT="$KESTREL_PATH/default/chromium/extensions/whatsapp-slim"
 
 add_whatsapp_slim_extension() {
   local file=$1

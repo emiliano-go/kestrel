@@ -62,9 +62,9 @@ cp "$SHELL_TEST_DIR/fixtures/bar-widget-contract/shell.qml" "$config_dir/shell.q
 ln -s "$ROOT/shell/Ui" "$config_dir/Ui"
 ln -s "$ROOT/shell/Commons" "$config_dir/Commons"
 
-HELIOS_PATH="$ROOT" \
-HELIOS_QML_TEST_RESULT="$result" \
-HELIOS_QML_BAR_WIDGETS="$bar_widgets" \
+KESTREL_PATH="$ROOT" \
+KESTREL_QML_TEST_RESULT="$result" \
+KESTREL_QML_BAR_WIDGETS="$bar_widgets" \
 HOME="$TMPDIR/home" \
 XDG_CONFIG_HOME="$TMPDIR/home/.config" \
 XDG_CACHE_HOME="$TMPDIR/home/.cache" \

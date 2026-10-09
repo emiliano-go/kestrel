@@ -48,7 +48,7 @@ for _ in $(seq 100); do
   sleep 0.02
 done
 
-(cd "$test_tmp" && "$ROOT/bin/helios-cmd-browser-handoff" chromium --app="https://example.test/a b") ||
+(cd "$test_tmp" && "$ROOT/bin/kestrel-cmd-browser-handoff" chromium --app="https://example.test/a b") ||
   fail "the running browser acknowledges a handed off command line"
 
 expected=$(printf 'START\0%s\0browser\0--app=https://example.test/a b' "$test_tmp" | od -c)
@@ -56,30 +56,30 @@ expected=$(printf 'START\0%s\0browser\0--app=https://example.test/a b' "$test_tm
   fail "the handoff sends the working directory and arguments as Chromium's singleton expects" "$(od -c <"$received")"
 pass "a command line is handed to the running browser over its singleton socket"
 
-! "$ROOT/bin/helios-cmd-browser-handoff" chromium --user-data-dir=/elsewhere https://example.test ||
+! "$ROOT/bin/kestrel-cmd-browser-handoff" chromium --user-data-dir=/elsewhere https://example.test ||
   fail "another data directory is left to a browser of its own"
 mkdir -p "$test_tmp/wrapper"
 printf '#!/bin/bash\nexec /usr/bin/chromium --profile-directory=Work "$@"\n' >"$test_tmp/wrapper/chromium"
 chmod +x "$test_tmp/wrapper/chromium"
-! PATH="$test_tmp/wrapper:$PATH" "$ROOT/bin/helios-cmd-browser-handoff" chromium https://example.test ||
+! PATH="$test_tmp/wrapper:$PATH" "$ROOT/bin/kestrel-cmd-browser-handoff" chromium https://example.test ||
   fail "a wrapper standing in for the browser is left to run"
-! CHROME_USER_DATA_DIR=/elsewhere "$ROOT/bin/helios-cmd-browser-handoff" chromium https://example.test ||
+! CHROME_USER_DATA_DIR=/elsewhere "$ROOT/bin/kestrel-cmd-browser-handoff" chromium https://example.test ||
   fail "a data directory from the environment is left to a browser of its own"
 
-# The handoff forwards no flags file, so any flag beyond HeliOS's own, which
+# The handoff forwards no flags file, so any flag beyond Kestrel's own, which
 # may be meant for each launch, needs the launcher.
 for flag in '--new-window' '--enable-features=A --profile-directory="Profile 1"'; do
   cp "$ROOT/config/chromium-flags.conf" "$flags_file"
   echo "$flag" >>"$flags_file"
-  ! "$ROOT/bin/helios-cmd-browser-handoff" chromium https://example.test ||
+  ! "$ROOT/bin/kestrel-cmd-browser-handoff" chromium https://example.test ||
     fail "a flags file with $flag is left to the launcher"
 done
 
 # The browser is gone but its socket file is left, as after a crash.
 kill "$server"
 wait "$server" 2>/dev/null || true
-! "$ROOT/bin/helios-cmd-browser-handoff" chromium --app=https://example.test ||
+! "$ROOT/bin/kestrel-cmd-browser-handoff" chromium --app=https://example.test ||
   fail "a socket no browser answers on fails the handoff"
-! "$ROOT/bin/helios-cmd-browser-handoff" firefox https://example.test ||
+! "$ROOT/bin/kestrel-cmd-browser-handoff" firefox https://example.test ||
   fail "a browser without a singleton socket fails the handoff"
 pass "the handoff fails when no Chromium-based browser answers, so the caller launches one"

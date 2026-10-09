@@ -1,6 +1,6 @@
 # Visual Verification
 
-Read this before finishing any change with a visual effect: HeliOS shell
+Read this before finishing any change with a visual effect: Kestrel shell
 styling and layout, panels, menus, notifications, desktop appearance,
 animations, transitions, screenshots, and screen recording flows.
 
@@ -12,18 +12,18 @@ regressions before finishing.
 Take a full-screen screenshot without opening the editor:
 
 ```bash
-helios capture screenshot fullscreen save
+kestrel capture screenshot fullscreen save
 ```
 
-The command writes to Omasnap's configured screenshot directory. Use `helios screenshot` for the interactive capture flow, which copies the capture and shows a timed preview. Use `helios screenshot --editor=overlay` to test annotation before output. Capture reference and candidate states as separate images when changing a layer-shell surface or layout, then compare both.
+The command writes to Omasnap's configured screenshot directory. Use `kestrel screenshot` for the interactive capture flow, which copies the capture and shows a timed preview. Use `kestrel screenshot --editor=overlay` to test annotation before output. Capture reference and candidate states as separate images when changing a layer-shell surface or layout, then compare both.
 
 Record a short full-screen video for animation, transition, timing, capture, or
 screen-recording changes:
 
 ```bash
-helios screenrecord --fullscreen
+kestrel screenrecord --fullscreen
 # Exercise the changed behavior.
-helios screenrecord --stop-recording
+kestrel screenrecord --stop-recording
 ```
 
 The stop command prints the saved video path in the configured Videos

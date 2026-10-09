@@ -11,4 +11,4 @@
 
 set -euo pipefail
 
-helios-audio-tuning on
+kestrel-audio-tuning on

@@ -1,6 +1,6 @@
 # Shell Functions
 
-HeliOS comes with a set of shell functions to simplify common tasks and encapsulate convoluted parameter calls.
+Kestrel comes with a set of shell functions to simplify common tasks and encapsulate convoluted parameter calls.
 
 ## Compression
 

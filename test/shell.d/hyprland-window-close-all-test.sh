@@ -20,7 +20,7 @@ fi
 SH
 chmod +x "$mock_bin/hyprctl"
 
-PATH="$mock_bin:$PATH" HYPRCTL_LOG="$hyprctl_log" "$ROOT/bin/helios-hyprland-window-close-all"
+PATH="$mock_bin:$PATH" HYPRCTL_LOG="$hyprctl_log" "$ROOT/bin/kestrel-hyprland-window-close-all"
 
 expected_log="$test_tmp/expected.log"
 cat >"$expected_log" <<'EOF'

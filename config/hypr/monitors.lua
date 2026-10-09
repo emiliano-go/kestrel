@@ -4,8 +4,8 @@
 -- Monitor scale is Hyprland's scale for the output. It sizes everything
 -- Wayland-native, accepts fractions (1.6, 1.75), and applies immediately.
 -- "auto" lets Hyprland pick per display.
-local helios_monitor_scale = "auto"
-hl.monitor({ output = "", mode = "preferred", position = "auto", scale = helios_monitor_scale })
+local kestrel_monitor_scale = "auto"
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = kestrel_monitor_scale })
 
 -- Configure a specific monitor.
 -- hl.monitor({ output = "DP-2", mode = "2560x1440@144", position = "0x0", scale = 1 })
@@ -14,9 +14,9 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = helios_
 -- hl.monitor({ output = "DP-2", mode = "preferred", position = "auto", scale = 1, transform = 1 })
 
 -- GDK scale is GDK_SCALE, the factor GTK draws its own UI at. It's what
--- sizes X11/XWayland windows, which HeliOS leaves unscaled so they stay
+-- sizes X11/XWayland windows, which Kestrel leaves unscaled so they stay
 -- crisp instead of being stretched by the compositor. GTK only honors whole
 -- numbers, so use the nearest integer to the monitor scale, and restart an
 -- app for a change to reach it.
-local helios_gdk_scale = 2
-hl.env("GDK_SCALE", tostring(helios_gdk_scale))
+local kestrel_gdk_scale = 2
+hl.env("GDK_SCALE", tostring(kestrel_gdk_scale))

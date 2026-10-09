@@ -17,53 +17,53 @@ setup_log="$test_tmp/setup-log"
 browser_file="$test_tmp/browser"
 mkdir -p "$mock_bin" "$test_home/.config" "$installed_dir"
 
-cat >"$mock_bin/helios-cmd-missing" <<'SH'
+cat >"$mock_bin/kestrel-cmd-missing" <<'SH'
 #!/bin/bash
-[[ ! -e $HELIOS_TEST_INSTALLED_DIR/$1 ]]
+[[ ! -e $KESTREL_TEST_INSTALLED_DIR/$1 ]]
 SH
 
-cat >"$mock_bin/helios-launch-floating-terminal-with-presentation" <<'SH'
+cat >"$mock_bin/kestrel-launch-floating-terminal-with-presentation" <<'SH'
 #!/bin/bash
-printf '%s\0' "$@" >"$HELIOS_TEST_TERMINAL_LOG"
+printf '%s\0' "$@" >"$KESTREL_TEST_TERMINAL_LOG"
 SH
 
-cat >"$mock_bin/helios-notification-send" <<'SH'
+cat >"$mock_bin/kestrel-notification-send" <<'SH'
 #!/bin/bash
-printf '%s\0' "$@" >>"$HELIOS_TEST_NOTIFICATION_LOG"
+printf '%s\0' "$@" >>"$KESTREL_TEST_NOTIFICATION_LOG"
 SH
 
-cat >"$mock_bin/helios-test-setup-call" <<'SH'
+cat >"$mock_bin/kestrel-test-setup-call" <<'SH'
 #!/bin/bash
-printf '%s:%s\n' "${0##*/}" "$*" >>"$HELIOS_TEST_SETUP_LOG"
-[[ ${HELIOS_TEST_SETUP_FAIL:-} != "${0##*/}" ]]
+printf '%s:%s\n' "${0##*/}" "$*" >>"$KESTREL_TEST_SETUP_LOG"
+[[ ${KESTREL_TEST_SETUP_FAIL:-} != "${0##*/}" ]]
 SH
 
 cat >"$mock_bin/sudo" <<'SH'
 #!/bin/bash
-printf 'sudo:%s\n' "$*" >>"$HELIOS_TEST_SETUP_LOG"
-[[ ${HELIOS_TEST_SETUP_FAIL:-} != "sudo" ]]
+printf 'sudo:%s\n' "$*" >>"$KESTREL_TEST_SETUP_LOG"
+[[ ${KESTREL_TEST_SETUP_FAIL:-} != "sudo" ]]
 SH
 
 cat >"$mock_bin/xdg-settings" <<'SH'
 #!/bin/bash
 case $1 in
-get) [[ -f $HELIOS_TEST_BROWSER_FILE ]] && cat "$HELIOS_TEST_BROWSER_FILE" ;;
-set) printf '%s\n' "$3" >"$HELIOS_TEST_BROWSER_FILE" ;;
+get) [[ -f $KESTREL_TEST_BROWSER_FILE ]] && cat "$KESTREL_TEST_BROWSER_FILE" ;;
+set) printf '%s\n' "$3" >"$KESTREL_TEST_BROWSER_FILE" ;;
 esac
 SH
 
-cat >"$mock_bin/helios-test-installer" <<'SH'
+cat >"$mock_bin/kestrel-test-installer" <<'SH'
 #!/bin/bash
 installer=${0##*/}
 
-if [[ $installer == "helios-install-browser" && ${HELIOS_TEST_REAL_BROWSER_INSTALL:-false} == "true" ]]; then
-  exec "$ROOT/bin/helios-install-browser" "$@"
+if [[ $installer == "kestrel-install-browser" && ${KESTREL_TEST_REAL_BROWSER_INSTALL:-false} == "true" ]]; then
+  exec "$ROOT/bin/kestrel-install-browser" "$@"
 fi
 
 case $installer in
-helios-pkg-add|helios-pkg-aur-add)
+kestrel-pkg-add|kestrel-pkg-aur-add)
   package=$1
-  printf 'pkg:%s\n' "$package" >>"$HELIOS_TEST_INSTALL_LOG"
+  printf 'pkg:%s\n' "$package" >>"$KESTREL_TEST_INSTALL_LOG"
   case $package in
   chromium) command=chromium ;;
   firefox) command=firefox ;;
@@ -74,9 +74,9 @@ helios-pkg-add|helios-pkg-aur-add)
   neovim) command=nvim ;;
   esac
   ;;
-helios-install-browser)
+kestrel-install-browser)
   selection=$1
-  printf 'browser:%s\n' "$selection" >>"$HELIOS_TEST_INSTALL_LOG"
+  printf 'browser:%s\n' "$selection" >>"$KESTREL_TEST_INSTALL_LOG"
   case $selection in
   chromium) command=chromium ;;
   chrome) command=google-chrome-stable ;;
@@ -87,13 +87,13 @@ helios-install-browser)
   zen) command=zen-browser ;;
   esac
   ;;
-helios-install-terminal)
+kestrel-install-terminal)
   command=$1
-  printf 'terminal:%s\n' "$command" >>"$HELIOS_TEST_INSTALL_LOG"
+  printf 'terminal:%s\n' "$command" >>"$KESTREL_TEST_INSTALL_LOG"
   ;;
-helios-install-editor-*)
-  editor=${installer#helios-install-editor-}
-  printf 'editor:%s\n' "$editor" >>"$HELIOS_TEST_INSTALL_LOG"
+kestrel-install-editor-*)
+  editor=${installer#kestrel-install-editor-}
+  printf 'editor:%s\n' "$editor" >>"$KESTREL_TEST_INSTALL_LOG"
   case $editor in
   vscode) command=code ;;
   zed) command=zeditor ;;
@@ -103,48 +103,48 @@ helios-install-editor-*)
   ;;
 esac
 
-[[ ${HELIOS_TEST_INSTALL_FAIL:-false} != "true" ]] || exit 1
-touch "$HELIOS_TEST_INSTALLED_DIR/$command"
+[[ ${KESTREL_TEST_INSTALL_FAIL:-false} != "true" ]] || exit 1
+touch "$KESTREL_TEST_INSTALLED_DIR/$command"
 SH
 
 for installer in \
-  helios-pkg-add \
-  helios-pkg-aur-add \
-  helios-install-browser \
-  helios-install-terminal \
-  helios-install-editor-vscode \
-  helios-install-editor-zed \
-  helios-install-editor-helix \
-  helios-install-editor-emacs; do
-  ln -s helios-test-installer "$mock_bin/$installer"
+  kestrel-pkg-add \
+  kestrel-pkg-aur-add \
+  kestrel-install-browser \
+  kestrel-install-terminal \
+  kestrel-install-editor-vscode \
+  kestrel-install-editor-zed \
+  kestrel-install-editor-helix \
+  kestrel-install-editor-emacs; do
+  ln -s kestrel-test-installer "$mock_bin/$installer"
 done
 for setup_command in \
-  helios-install-chromium-copy-url \
-  helios-install-chromium-ytdlp \
-  helios-theme-set-browser; do
-  ln -s helios-test-setup-call "$mock_bin/$setup_command"
+  kestrel-install-chromium-copy-url \
+  kestrel-install-chromium-ytdlp \
+  kestrel-theme-set-browser; do
+  ln -s kestrel-test-setup-call "$mock_bin/$setup_command"
 done
 
 chmod +x "$mock_bin"/*
 
 export HOME="$test_home"
 export PATH="$mock_bin:$ROOT/bin:$PATH"
-export HELIOS_PATH="$ROOT"
-export HELIOS_TEST_INSTALLED_DIR="$installed_dir"
-export HELIOS_TEST_INSTALL_LOG="$install_log"
-export HELIOS_TEST_TERMINAL_LOG="$terminal_log"
-export HELIOS_TEST_NOTIFICATION_LOG="$notification_log"
-export HELIOS_TEST_SETUP_LOG="$setup_log"
-export HELIOS_TEST_BROWSER_FILE="$browser_file"
+export KESTREL_PATH="$ROOT"
+export KESTREL_TEST_INSTALLED_DIR="$installed_dir"
+export KESTREL_TEST_INSTALL_LOG="$install_log"
+export KESTREL_TEST_TERMINAL_LOG="$terminal_log"
+export KESTREL_TEST_NOTIFICATION_LOG="$notification_log"
+export KESTREL_TEST_SETUP_LOG="$setup_log"
+export KESTREL_TEST_BROWSER_FILE="$browser_file"
 
 assert_missing_opens_installer() {
   local type=$1
   local selection=$2
 
   : >"$terminal_log"
-  "helios-default-$type" "$selection"
+  "kestrel-default-$type" "$selection"
   mapfile -d '' -t terminal_args <"$terminal_log"
-  [[ ${terminal_args[*]} == "helios-default-$type --install $selection" ]] ||
+  [[ ${terminal_args[*]} == "kestrel-default-$type --install $selection" ]] ||
     fail "missing $selection opens its default installer in a terminal"
 }
 
@@ -194,18 +194,18 @@ for entry in "${browser_cases[@]}"; do
   read -r selection command installer <<<"$entry"
   rm -f "$installed_dir/$command"
   : >"$install_log"
-  helios-default-browser --install "$selection"
+  kestrel-default-browser --install "$selection"
   [[ $(<"$install_log") == "$installer" ]] || fail "$selection uses its browser installer"
-  [[ $(helios-default-browser) == "$selection" ]] || fail "$selection becomes the default browser after installation"
+  [[ $(kestrel-default-browser) == "$selection" ]] || fail "$selection becomes the default browser after installation"
 done
 pass "browser defaults install every missing browser before selection"
 
 : >"$install_log"
 : >"$setup_log"
 rm -f "$installed_dir/chromium"
-HELIOS_TEST_REAL_BROWSER_INSTALL=true helios-default-browser --install chromium >/dev/null
+KESTREL_TEST_REAL_BROWSER_INSTALL=true kestrel-default-browser --install chromium >/dev/null
 [[ $(<"$install_log") == "pkg:chromium" ]] || fail "Chromium browser installer installs the package"
-[[ $(helios-default-browser) == "chromium" ]] || fail "Chromium becomes the default after its full installer succeeds"
+[[ $(kestrel-default-browser) == "chromium" ]] || fail "Chromium becomes the default after its full installer succeeds"
 cmp -s "$ROOT/config/chromium-flags.conf" "$test_home/.config/chromium-flags.conf" ||
   fail "Chromium browser installer copies the default flags"
 grep -Fxq 'sudo:install -d -m 0755 -o root -g root /etc/chromium' "$setup_log" ||
@@ -216,23 +216,23 @@ grep -Fxq 'sudo:install -d -m 0755 -o root -g root /etc/chromium/policies/manage
   fail "Chromium browser installer creates a root-owned managed policy directory"
 grep -Fxq 'sudo:find /etc/chromium/policies/managed -mindepth 1 -maxdepth 1 ! -user root -exec rm -rf -- {} +' "$setup_log" ||
   fail "Chromium browser installer drops non-root files from its policy directory"
-if grep -E 'groupadd|usermod|helios-browser-policy' "$setup_log" >/dev/null; then
+if grep -E 'groupadd|usermod|kestrel-browser-policy' "$setup_log" >/dev/null; then
   fail "Chromium browser installer does not create a browser-policy group" "$(cat "$setup_log")"
 fi
-grep -Fxq 'helios-install-chromium-copy-url:' "$setup_log" ||
+grep -Fxq 'kestrel-install-chromium-copy-url:' "$setup_log" ||
   fail "Chromium browser installer registers the Copy URL host"
-grep -Fxq 'helios-install-chromium-ytdlp:' "$setup_log" ||
+grep -Fxq 'kestrel-install-chromium-ytdlp:' "$setup_log" ||
   fail "Chromium browser installer registers the yt-dlp host"
-grep -Fxq 'helios-theme-set-browser:' "$setup_log" ||
+grep -Fxq 'kestrel-theme-set-browser:' "$setup_log" ||
   fail "Chromium browser installer applies the current theme"
-pass "Chromium browser installer restores the complete HeliOS setup"
+pass "Chromium browser installer restores the complete Kestrel setup"
 
 : >"$install_log"
 : >"$setup_log"
 rm -f "$installed_dir/firefox"
-HELIOS_TEST_REAL_BROWSER_INSTALL=true helios-default-browser --install firefox >/dev/null
+KESTREL_TEST_REAL_BROWSER_INSTALL=true kestrel-default-browser --install firefox >/dev/null
 [[ $(<"$install_log") == "pkg:firefox" ]] || fail "Firefox browser installer installs the package"
-[[ $(helios-default-browser) == "firefox" ]] || fail "Firefox becomes the default after its full installer succeeds"
+[[ $(kestrel-default-browser) == "firefox" ]] || fail "Firefox becomes the default after its full installer succeeds"
 grep -Fxq 'sudo:install -d -m 0755 -o root -g root /usr/lib/firefox/distribution' "$setup_log" ||
   fail "Firefox browser installer creates its distribution directory"
 grep -Fxq 'sudo:find /usr/lib/firefox/distribution -mindepth 1 -maxdepth 1 ! -user root -exec rm -rf -- {} +' "$setup_log" ||
@@ -240,14 +240,14 @@ grep -Fxq 'sudo:find /usr/lib/firefox/distribution -mindepth 1 -maxdepth 1 ! -us
 grep -Fxq "sudo:install -m 644 -o root -g root -T $ROOT/default/firefox/policies.json /usr/lib/firefox/distribution/policies.json" "$setup_log" ||
   fail "Firefox browser installer copies policies.json without following a destination symlink"
 [[ -e $installed_dir/firefox ]] || fail "Firefox browser installer marks firefox installed"
-pass "Firefox browser installer restores the complete HeliOS setup"
+pass "Firefox browser installer restores the complete Kestrel setup"
 
 : >"$install_log"
 : >"$setup_log"
 rm -f "$installed_dir/zen-browser"
-HELIOS_TEST_REAL_BROWSER_INSTALL=true helios-default-browser --install zen >/dev/null
+KESTREL_TEST_REAL_BROWSER_INSTALL=true kestrel-default-browser --install zen >/dev/null
 [[ $(<"$install_log") == "pkg:zen-browser-bin" ]] || fail "Zen browser installer installs the package"
-[[ $(helios-default-browser) == "zen" ]] || fail "Zen becomes the default after its full installer succeeds"
+[[ $(kestrel-default-browser) == "zen" ]] || fail "Zen becomes the default after its full installer succeeds"
 grep -Fxq 'sudo:install -d -m 0755 -o root -g root /opt/zen-browser/distribution' "$setup_log" ||
   fail "Zen browser installer creates its distribution directory"
 grep -Fxq 'sudo:find /opt/zen-browser/distribution -mindepth 1 -maxdepth 1 ! -user root -exec rm -rf -- {} +' "$setup_log" ||
@@ -255,23 +255,23 @@ grep -Fxq 'sudo:find /opt/zen-browser/distribution -mindepth 1 -maxdepth 1 ! -us
 grep -Fxq "sudo:install -m 644 -o root -g root -T $ROOT/default/firefox/policies.json /opt/zen-browser/distribution/policies.json" "$setup_log" ||
   fail "Zen browser installer copies policies.json without following a destination symlink"
 [[ -e $installed_dir/zen-browser ]] || fail "Zen browser installer marks zen-browser installed"
-pass "Zen browser installer restores the complete HeliOS setup"
+pass "Zen browser installer restores the complete Kestrel setup"
 
-helios-default-browser zen
+kestrel-default-browser zen
 rm -f "$installed_dir/chromium"
-if HELIOS_TEST_REAL_BROWSER_INSTALL=true HELIOS_TEST_INSTALL_FAIL=true \
-  helios-default-browser --install chromium >"$test_tmp/browser-package-failure" 2>&1; then
+if KESTREL_TEST_REAL_BROWSER_INSTALL=true KESTREL_TEST_INSTALL_FAIL=true \
+  kestrel-default-browser --install chromium >"$test_tmp/browser-package-failure" 2>&1; then
   fail "failed Chromium package installation returns an error"
 fi
-[[ $(helios-default-browser) == "zen" ]] || fail "failed Chromium package installation preserves the default browser"
+[[ $(kestrel-default-browser) == "zen" ]] || fail "failed Chromium package installation preserves the default browser"
 [[ ! -e $installed_dir/chromium ]] || fail "failed Chromium package installation does not mark it installed"
 pass "failed Chromium package installation preserves the current default"
 
-if HELIOS_TEST_REAL_BROWSER_INSTALL=true HELIOS_TEST_SETUP_FAIL=sudo \
-  helios-default-browser --install chromium >"$test_tmp/browser-install-failure" 2>&1; then
+if KESTREL_TEST_REAL_BROWSER_INSTALL=true KESTREL_TEST_SETUP_FAIL=sudo \
+  kestrel-default-browser --install chromium >"$test_tmp/browser-install-failure" 2>&1; then
   fail "failed Chromium setup returns an error"
 fi
-[[ $(helios-default-browser) == "zen" ]] || fail "failed Chromium setup preserves the default browser"
+[[ $(kestrel-default-browser) == "zen" ]] || fail "failed Chromium setup preserves the default browser"
 grep -Fq 'Installing Chromium' "$test_tmp/browser-install-failure" ||
   fail "failed Chromium setup keeps progress visible in the terminal"
 pass "failed Chromium setup preserves the current default"
@@ -280,7 +280,7 @@ for entry in "${terminal_cases[@]}"; do
   read -r selection desktop_id <<<"$entry"
   rm -f "$installed_dir/$selection"
   : >"$install_log"
-  helios-default-terminal --install "$selection"
+  kestrel-default-terminal --install "$selection"
   [[ $(<"$install_log") == "terminal:$selection" ]] || fail "$selection uses the terminal installer"
   [[ $(tail -n 1 "$test_home/.config/xdg-terminals.list") == "$desktop_id" ]] ||
     fail "$selection becomes the default terminal after installation"
@@ -291,24 +291,24 @@ for entry in "${editor_cases[@]}"; do
   read -r selection command installer <<<"$entry"
   rm -f "$installed_dir/$command"
   : >"$install_log"
-  helios-default-editor --install "$selection"
+  kestrel-default-editor --install "$selection"
   [[ $(<"$install_log") == "$installer" ]] || fail "$selection uses its editor installer"
-  [[ $(helios-default-editor) == "$command" ]] || fail "$selection becomes the default editor after installation"
+  [[ $(kestrel-default-editor) == "$command" ]] || fail "$selection becomes the default editor after installation"
 done
 pass "editor defaults install every missing editor before selection"
 
 : >"$install_log"
 : >"$terminal_log"
-helios-default-browser zen
-helios-default-terminal kitty
-helios-default-editor nvim
+kestrel-default-browser zen
+kestrel-default-terminal kitty
+kestrel-default-editor nvim
 [[ ! -s $install_log && ! -s $terminal_log ]] || fail "installed defaults skip installation"
 pass "installed defaults are selected immediately"
 
-previous_editor=$(helios-default-editor)
+previous_editor=$(kestrel-default-editor)
 rm -f "$installed_dir/vim"
-if HELIOS_TEST_INSTALL_FAIL=true helios-default-editor --install vim >"$test_tmp/install-failure" 2>&1; then
+if KESTREL_TEST_INSTALL_FAIL=true kestrel-default-editor --install vim >"$test_tmp/install-failure" 2>&1; then
   fail "failed default installation returns an error"
 fi
-[[ $(helios-default-editor) == "$previous_editor" ]] || fail "failed installation preserves the default"
+[[ $(kestrel-default-editor) == "$previous_editor" ]] || fail "failed installation preserves the default"
 pass "failed installation preserves the current default"

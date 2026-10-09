@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# kestrel:summary=Print the installed Kestrel version
+
+kestrel_path=${KESTREL_PATH:-/usr/share/kestrel}
+kestrel_path=${kestrel_path%/}
+
+if [[ $kestrel_path != "/usr/share/kestrel" ]]; then
+  hash=$(git -C "$kestrel_path" rev-parse --short HEAD 2>/dev/null || true)
+
+  if [[ -n $hash ]]; then
+    echo "dev ($hash)"
+  else
+    echo "dev"
+  fi
+
+  exit 0
+fi
+
+# The edge channel installs kestrel-dev instead of kestrel, so check both.
+for package in kestrel-dev kestrel; do
+  version=$(pacman -Q "$package" 2>/dev/null | awk '{ print $2 }')
+  [[ -n $version ]] && break
+done
+
+[[ -n $version ]] || exit 1
+
+echo "$version"

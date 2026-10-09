@@ -6,7 +6,7 @@ echo "Tune reclaim for swap on zram"
 
 # Load our file specifically rather than --system, which returns nonzero for
 # any invalid key in any admin sysctl file on the machine.
-sudo sysctl -p /etc/sysctl.d/99-helios-sysctl.conf >/dev/null || true
+sudo sysctl -p /etc/sysctl.d/99-kestrel-sysctl.conf >/dev/null || true
 
 if sudo systemctl daemon-reload; then
   # Resizing swaps the device off first, which faults every stored page back
@@ -21,4 +21,4 @@ if sudo systemctl daemon-reload; then
   fi
 fi
 
-helios-state set reboot-required
+kestrel-state set reboot-required

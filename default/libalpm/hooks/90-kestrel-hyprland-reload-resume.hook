@@ -1,0 +1,12 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = kestrel-settings
+Target = kestrel-settings-dev
+
+[Action]
+Description = Reloading Hyprland after Kestrel settings update...
+When = PostTransaction
+Depends = kestrel
+Exec = /usr/bin/kestrel-hyprland-reload-guard resume

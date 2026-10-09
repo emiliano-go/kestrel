@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# kestrel:summary=Control the Kestrel menu (toggle / summon / close / refresh)
+# kestrel:args=[toggle|summon|close|refresh|ping] [route]
+# kestrel:examples=kestrel menu | kestrel menu toggle system | kestrel menu summon style.theme | kestrel menu refresh
+
+# Thin wrapper around the standard plugin IPC surface. The menu is the
+# first-party `kestrel.menu` plugin; routes are passed as JSON payload.
+
+set -euo pipefail
+
+verb="${1-toggle}"
+route="${2-root}"
+
+menu_payload() {
+  jq -nc --arg menu "$1" '{ menu: $menu }'
+}
+
+case "$verb" in
+  toggle)
+    exec kestrel-shell shell toggle kestrel.menu "$(menu_payload "$route")"
+    ;;
+  summon)
+    exec kestrel-shell shell summon kestrel.menu "$(menu_payload "$route")"
+    ;;
+  close)
+    exec kestrel-shell shell hide kestrel.menu
+    ;;
+  refresh | ping)
+    exec kestrel-shell shell call kestrel.menu "$verb" "{}"
+    ;;
+  -h | --help | help)
+    cat <<USAGE
+Usage: kestrel menu [verb] [route]
+
+Verbs:
+  toggle [route]   Open the menu at <route>, or close it if already open. Default verb.
+  summon [route]   Always open the menu (no close-if-visible toggle).
+  close            Close the menu if it is visible.
+  refresh          Re-parse the menu JSONC files.
+  ping             Health check.
+
+Route is an item id (e.g. setup.power) or alias (e.g. power). Defaults to
+"root", which opens the top-level menu.
+USAGE
+    exit 0
+    ;;
+  *)
+    echo "kestrel-menu: unknown verb '$verb'. Try 'kestrel menu --help'." >&2
+    exit 2
+    ;;
+esac

@@ -56,10 +56,10 @@ vm.runInContext(
   store
 )
 const service = { destroy() {} }
-store.put('helios.lock', service)
-store.destroy('helios.lock')
+store.put('kestrel.lock', service)
+store.destroy('kestrel.lock')
 assert(
-  !store.has('helios.lock') && store.isTrusted('helios.lock'),
+  !store.has('kestrel.lock') && store.isTrusted('kestrel.lock'),
   'authentication classification survives service teardown'
 )
 JS
@@ -139,9 +139,9 @@ tr '\n\r\t' '   ' <<<"$bar_entry_shell" |
   fail "built-in clones in replacement bars cannot summon their existing auxiliary UI"
 qml_matches "$shell_qml" 'shell\.pluginCloneMaySummon\( *currentManifest\( *\), *requestedId *\)' ||
   fail "built-in clones cannot summon their existing auxiliary UI"
-qml_matches "$shell_qml" '"helios\.media": *\["helios\.osd"\]' ||
+qml_matches "$shell_qml" '"kestrel\.media": *\["kestrel\.osd"\]' ||
   fail "media clones cannot summon their existing OSD target"
-qml_matches "$shell_qml" '"helios\.network": *\["helios\.speedtest", *"helios\.wifiqr"\]' ||
+qml_matches "$shell_qml" '"kestrel\.network": *\["kestrel\.speedtest", *"kestrel\.wifiqr"\]' ||
   fail "network clones cannot summon their existing auxiliary panels"
 pass "built-in service and widget clones retain narrow configuration and UI integration"
 
@@ -170,7 +170,7 @@ mkdir -p "$config_dir" "$TMPDIR/home"
 cp "$SHELL_TEST_DIR/fixtures/plugin-auth-boundary/"*.qml "$config_dir/"
 ln -s "$ROOT/shell/services" "$config_dir/services"
 
-HELIOS_QML_TEST_RESULT="$result" \
+KESTREL_QML_TEST_RESULT="$result" \
 HOME="$TMPDIR/home" \
 XDG_CONFIG_HOME="$TMPDIR/home/.config" \
 XDG_CACHE_HOME="$TMPDIR/home/.cache" \

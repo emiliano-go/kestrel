@@ -1,8 +1,8 @@
-# Security at HeliOS
+# Security at Kestrel
 
 ## Report a vulnerability
 
-If you believe you’ve found a security vulnerability in HeliOS, please tell the [HeliOS Security Team](https://omarchy.org/teams/#security) privately so we have an opportunity to investigate and fix it before it is made public.
+If you believe you’ve found a security vulnerability in Kestrel, please tell the [Kestrel Security Team](https://omarchy.org/teams/#security) privately so we have an opportunity to investigate and fix it before it is made public.
 
 [security@omarchy.org](mailto:security@omarchy.org?subject=Security%20report)
 
@@ -20,7 +20,7 @@ Eligibility for our [security credits](https://omarchy.org/security/credits/) pa
 
 Give us enough information to understand and reproduce the issue:
 
-- The affected component and HeliOS version.
+- The affected component and Kestrel version.
 - An explanation of what an attacker can do before and after exploitation.
 - Steps to reproduce the issue and any proof of concept.
 - Your preferred contact details for follow-up.
@@ -44,4 +44,4 @@ Credits link to each reporter’s X profile and show their avatar. For duplicate
 
 ## Regular bugs and support
 
-For anything that isn’t a security vulnerability, please use the [HeliOS issue tracker](https://github.com/omacom/omarchy/issues).
+For anything that isn’t a security vulnerability, please use the [Kestrel issue tracker](https://github.com/omacom/omarchy/issues).

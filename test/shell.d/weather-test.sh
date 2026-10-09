@@ -163,14 +163,14 @@ weather_location() {
 }
 
 weather_location --set "Malibu" "34.02577,-118.7804"
-[[ $(jq -c . "$test_tmp/.local/state/helios/settings/weather.json") == '{"name":"Malibu","latitude":34.02577,"longitude":-118.7804}' ]] || fail "weather location stores name and coordinates as JSON"
+[[ $(jq -c . "$test_tmp/.local/state/kestrel/settings/weather.json") == '{"name":"Malibu","latitude":34.02577,"longitude":-118.7804}' ]] || fail "weather location stores name and coordinates as JSON"
 pass "weather location stores name and coordinates as JSON"
 
 [[ $(weather_location) == "Malibu" ]] || fail "weather location returns the stored name"
 pass "weather location returns the stored name"
 
 weather_location --set "New York"
-[[ $(jq -c . "$test_tmp/.local/state/helios/settings/weather.json") == '{"name":"New York"}' ]] || fail "weather location stores a bare name as JSON"
+[[ $(jq -c . "$test_tmp/.local/state/kestrel/settings/weather.json") == '{"name":"New York"}' ]] || fail "weather location stores a bare name as JSON"
 [[ $(weather_location) == "New York" ]] || fail "weather location returns a bare stored name"
 pass "weather location stores and returns a bare name"
 
@@ -180,5 +180,5 @@ fi
 pass "weather location rejects malformed coordinates"
 
 weather_location --clear
-[[ ! -e "$test_tmp/.local/state/helios/settings/weather.json" ]] || fail "weather location clear removes the state file"
+[[ ! -e "$test_tmp/.local/state/kestrel/settings/weather.json" ]] || fail "weather location clear removes the state file"
 pass "weather location clear removes the state file"

@@ -1,5 +1,5 @@
 {
-  "name": "HeliOS",
+  "name": "Kestrel",
   "base": "{{ theme_type }}",
   "overrides": {
     "claude": "{{ accent }}",

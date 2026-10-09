@@ -4,32 +4,32 @@ Read this before writing or running the graphical acceptance suite under
 `test/acceptance.d/`.
 
 The graphical acceptance suite lives in `test/acceptance` with test files under
-`test/acceptance.d/*-test.sh`. It exercises a real installed HeliOS desktop,
+`test/acceptance.d/*-test.sh`. It exercises a real installed Kestrel desktop,
 including session health, shell surfaces, panels, keyboard navigation,
 representative applications, and system setup. Source
 `test/acceptance.d/base-test.sh` for the shared helpers.
 
-Run acceptance tests in a disposable VM through the sibling `helios-iso`
+Run acceptance tests in a disposable VM through the sibling `kestrel-iso`
 repository, not in the active development session. The suite opens and closes
 applications and temporarily changes desktop configuration.
 
 For acceptance-test-only changes, reuse an installed base and sync the suite:
 
 ```bash
-cd ../helios-iso
-./bin/helios-iso-test release/<iso>.iso --reuse-base --sync-helios ../helios --no-preview
+cd ../kestrel-iso
+./bin/kestrel-iso-test release/<iso>.iso --reuse-base --sync-kestrel ../kestrel --no-preview
 ```
 
-Use `--sync-all ../helios` instead of `--sync-helios ../helios` when the
+Use `--sync-all ../kestrel` instead of `--sync-kestrel ../kestrel` when the
 acceptance run must exercise local `bin/`, `config/`, or `shell/` source too.
 Changes to package manifests, installation, finalization, or shipped defaults
 require a fresh ISO built from the local checkouts and a run without
 `--reuse-base`:
 
 ```bash
-cd ../helios-iso
-./bin/helios-iso-make --no-boot-offer --local-source ../helios ../helios-pkgs
-./bin/helios-iso-test release/<generated-iso>.iso --no-preview
+cd ../kestrel-iso
+./bin/kestrel-iso-make --no-boot-offer --local-source ../kestrel ../kestrel-pkgs
+./bin/kestrel-iso-test release/<generated-iso>.iso --no-preview
 ```
 
 Keep unrelated acceptance workflows in separate test files. The runner records

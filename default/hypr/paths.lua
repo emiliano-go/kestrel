@@ -1,4 +1,4 @@
--- Shared path constants for HeliOS's Hyprland Lua modules.
+-- Shared path constants for Kestrel's Hyprland Lua modules.
 -- Lua files loaded with require() have separate local scopes, so modules that
 -- need these paths import this table instead of repeating os.getenv() lookups.
 
@@ -18,5 +18,5 @@ return {
   home = home,
   config_home = env_or("XDG_CONFIG_HOME", home .. "/.config"),
   state_home = env_or("XDG_STATE_HOME", home .. "/.local/state"),
-  helios_path = env_or("HELIOS_PATH", "/usr/share/helios"),
+  kestrel_path = env_or("KESTREL_PATH", "/usr/share/kestrel"),
 }

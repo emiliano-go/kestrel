@@ -4,15 +4,15 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 source "$SHELL_TEST_DIR/fixtures/sudo-boundary-test.sh"
-copy_boundary_file bin/helios-update
-copy_boundary_file bin/helios-refresh-pacman
+copy_boundary_file bin/kestrel-update
+copy_boundary_file bin/kestrel-refresh-pacman
 # Replace the step symlink, preserving the real fixture dispatcher.
-rm "$SUDO_TEST_ROOT/bin/helios-update-aur-pkgs"
-copy_boundary_file bin/helios-update-aur-pkgs
-export HELIOS_UPDATE_LOGGED=1
+rm "$SUDO_TEST_ROOT/bin/kestrel-update-aur-pkgs"
+copy_boundary_file bin/kestrel-update-aur-pkgs
+export KESTREL_UPDATE_LOGGED=1
 
 run_update() {
-  "$SUDO_TEST_ROOT/bin/helios-update" "$@" >"$boundary_tmp/output" 2>&1
+  "$SUDO_TEST_ROOT/bin/kestrel-update" "$@" >"$boundary_tmp/output" 2>&1
 }
 
 for args in '-y' ''; do
@@ -27,12 +27,12 @@ s=open(sys.argv[1]).read().splitlines()
 # authorizes exactly once before any step that could need sudo.
 assert s[0]=='sudo -k', s
 # Authorization runs a command (sudo -v prompts even with passwordless sudo).
-prune=s.index('step:helios-update-pkg-prune ')
+prune=s.index('step:kestrel-update-pkg-prune ')
 auth=s.index('sudo /usr/bin/true')
 assert auth < prune, s
 assert [l for l in s[:prune] if l.startswith('sudo ') and l not in ('sudo -k','sudo -h')]==['sudo /usr/bin/true'], s
 assert 'sudo -v' not in s, s
-positions=[next(i for i,line in enumerate(s) if line.startswith(prefix)) for prefix in ['step:helios-update-system-pkgs','step:helios-migrate','step:helios-update-restart --services-only','step:helios-hook post-update','step:helios-update-mise','step:yay','step:helios-update-stay-awake stop','step:helios-update-restart --reboot-only']]
+positions=[next(i for i,line in enumerate(s) if line.startswith(prefix)) for prefix in ['step:kestrel-update-system-pkgs','step:kestrel-migrate','step:kestrel-update-restart --services-only','step:kestrel-hook post-update','step:kestrel-update-mise','step:yay','step:kestrel-update-stay-awake stop','step:kestrel-update-restart --reboot-only']]
 assert positions==sorted(positions), s
 yay=positions[5]
 # Everything before AUR shares the one authorization: plain sudo, no revokes.
@@ -45,7 +45,7 @@ PY
   pass "update $args authorizes once for everything but AUR, which runs cold last, and exits cold"
 done
 
-for step in helios-update-system-pkgs yay helios-hook helios-update-mise; do
+for step in kestrel-update-system-pkgs yay kestrel-hook kestrel-update-mise; do
   reset_boundary
   export SUDO_TEST_FAIL_STEP=$step
   if run_update -y; then fail "$step failure must fail the update"; fi
@@ -54,13 +54,13 @@ for step in helios-update-system-pkgs yay helios-hook helios-update-mise; do
 import sys
 s=open(sys.argv[1]).read().splitlines()
 for i,line in enumerate(s):
- if line=='step:helios-update-stay-awake stop': assert i>0 and s[i-1]=='sudo -k',s
+ if line=='step:kestrel-update-stay-awake stop': assert i>0 and s[i-1]=='sudo -k',s
 PY
   pass "update revokes credentials after $step fails"
 done
 
 reset_boundary
-export SUDO_TEST_SIGNAL_STEP=helios-hook
+export SUDO_TEST_SIGNAL_STEP=kestrel-hook
 if run_update -y; then fail "interrupted update must fail"; fi
 assert_boundary_cold "interrupted update"
 pass "update revokes credentials on TERM"
@@ -78,12 +78,12 @@ assert_boundary_cold "unsupported sudo"
 pass "unsupported sudo fails without running update steps"
 
 reset_boundary
-"$SUDO_TEST_ROOT/bin/helios-refresh-pacman" stable >"$boundary_tmp/output" 2>&1 || fail "refresh failed" "$(<"$boundary_tmp/output")"
+"$SUDO_TEST_ROOT/bin/kestrel-refresh-pacman" stable >"$boundary_tmp/output" 2>&1 || fail "refresh failed" "$(<"$boundary_tmp/output")"
 assert_boundary_cold "refresh"
 python3 - "$SUDO_TEST_LOG" <<'PY'
 import sys
 s=open(sys.argv[1]).read().splitlines()
-hook=next(i for i,l in enumerate(s) if l=='step:helios-hook pre-refresh-pacman')
+hook=next(i for i,l in enumerate(s) if l=='step:kestrel-hook pre-refresh-pacman')
 copies=[i for i,l in enumerate(s) if l.startswith('sudo -N cp ')]
 transaction=next(i for i,l in enumerate(s) if l.startswith('step:pacman '))
 assert len(copies)==4 and max(copies) < hook < transaction, s
@@ -92,10 +92,10 @@ assert all(l in ('sudo -h','sudo -k') or l.startswith('sudo -N ') for l in s if 
 PY
 pass "refresh runs the hook cold between the config re-sync and the transaction"
 
-for step in pacman helios-hook; do
+for step in pacman kestrel-hook; do
   reset_boundary
   export SUDO_TEST_FAIL_STEP=$step
-  if "$SUDO_TEST_ROOT/bin/helios-refresh-pacman" stable >"$boundary_tmp/output" 2>&1; then fail "refresh must propagate $step failure"; fi
+  if "$SUDO_TEST_ROOT/bin/kestrel-refresh-pacman" stable >"$boundary_tmp/output" 2>&1; then fail "refresh must propagate $step failure"; fi
   assert_boundary_cold "failed refresh $step"
   pass "refresh revokes after $step failure"
 done
@@ -104,7 +104,7 @@ done
 # explicit --, while standalone timestamp maintenance cannot be combined with N.
 for args in '-v' '-n /usr/bin/true' '--user test -- /usr/bin/true' '-- /usr/bin/true' '-k' '-K'; do
   reset_boundary
-  "$SUDO_TEST_ROOT/default/helios/sudo-no-update/sudo" $args
+  "$SUDO_TEST_ROOT/default/kestrel/sudo-no-update/sudo" $args
   case "$args" in
     -k|-K) expected="sudo $args" ;;
     *) expected="sudo -N $args" ;;
@@ -114,7 +114,7 @@ for args in '-v' '-n /usr/bin/true' '--user test -- /usr/bin/true' '-- /usr/bin/
   pass "sudo wrapper preserves $args"
 done
 
-for script in bin/helios-update bin/helios-refresh-pacman default/helios/sudo-no-update/sudo; do
+for script in bin/kestrel-update bin/kestrel-refresh-pacman default/kestrel/sudo-no-update/sudo; do
   reset_boundary
   if /usr/bin/bash "$SUDO_TEST_ROOT/$script" -p >"$boundary_tmp/output" 2>&1; then fail "$script accepted an ordinary Bash launch"; fi
   [[ ! -s $SUDO_TEST_LOG ]] || fail "$script reached sudo through an invalid interpreter"

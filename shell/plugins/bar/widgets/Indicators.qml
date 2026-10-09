@@ -6,7 +6,7 @@ import qs.Ui
 
 BarWidget {
   id: root
-  moduleName: "helios.indicators"
+  moduleName: "kestrel.indicators"
 
   readonly property var defaultIndicatorEntries: [ "PasswordlessSudo", "ScreenRecording", "Reminder", "NightLight", "Dnd", "StayAwake" ]
   readonly property var indicatorEntries: indicatorEntriesFromSettings(settings)
@@ -166,7 +166,7 @@ BarWidget {
   implicitHeight: orientationLoader.item ? orientationLoader.item.implicitHeight : 0
 
   ShellIpc {
-    target: "helios.indicators"
+    target: "kestrel.indicators"
 
     function refresh(): void {
       root.broadcast("refresh")

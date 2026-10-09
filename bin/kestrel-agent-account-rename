@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# kestrel:summary=Rename a Claude, Codex, or Grok subscription account
+# kestrel:args=[claude|codex|grok] <account> <name>
+# kestrel:examples=kestrel agent account rename primary Hey | kestrel agent account rename codex side Side project
+
+set -uo pipefail
+
+# The provider can be left out when it's your default agent:
+# `kestrel agent account rename primary Hey`.
+if [[ ${1:-} != "claude" && ${1:-} != "codex" && ${1:-} != "grok" ]]; then
+  default=$(kestrel-default-agent)
+  [[ $default == "claude" || $default == "codex" || $default == "grok" ]] && set -- "$default" "$@"
+fi
+
+if [[ ${1:-} != "claude" && ${1:-} != "codex" && ${1:-} != "grok" ]] || (( $# < 3 )); then
+  echo "Usage: kestrel-agent-account-rename [claude|codex|grok] <account> <name>" >&2
+  exit 1
+fi
+
+account=$(kestrel-agent-account-state rename "$@") || exit 1
+echo "Renamed to $(jq -r .label <<<"$account"). Switch to it with: kestrel agent account use $(jq -r .id <<<"$account")"
+# The panel reads account names from the usage record.
+kestrel-agent-usage-update --limits-only "$1" >/dev/null 2>&1 &

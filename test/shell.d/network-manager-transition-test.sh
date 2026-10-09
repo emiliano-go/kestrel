@@ -4,11 +4,11 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
-dns="$ROOT/bin/helios-dns"
+dns="$ROOT/bin/kestrel-dns"
 hardware_network="$ROOT/install/hardware/network.sh"
 
-! grep -F 'systemd-networkd' "$dns" >/dev/null || fail "helios-dns no longer restarts systemd-networkd"
-grep -F 'NetworkManager/conf.d/20-helios-dns.conf' "$dns" >/dev/null
+! grep -F 'systemd-networkd' "$dns" >/dev/null || fail "kestrel-dns no longer restarts systemd-networkd"
+grep -F 'NetworkManager/conf.d/20-kestrel-dns.conf' "$dns" >/dev/null
 grep -F '[global-dns-domain-*]' "$dns" >/dev/null
 grep -F 'ipv4.ignore-auto-dns yes' "$dns" >/dev/null
 grep -F 'ipv4.ignore-auto-dns no' "$dns" >/dev/null
@@ -16,12 +16,12 @@ grep -F 'nmcli device reapply' "$dns" >/dev/null
 grep -F 'nmcli general reload conf' "$dns" >/dev/null
 grep -F 'nmcli general reload dns-full' "$dns" >/dev/null
 if grep -F 'nmcli general reload conf,dns-full' "$dns" >/dev/null; then
-  fail "helios-dns must not push DNS before reapplying active profiles"
+  fail "kestrel-dns must not push DNS before reapplying active profiles"
 fi
-pass "helios-dns configures DNS through NetworkManager"
+pass "kestrel-dns configures DNS through NetworkManager"
 
 grep -F 'systemd-networkd.service' "$hardware_network" >/dev/null
 grep -F 'systemd-networkd.socket' "$hardware_network" >/dev/null
 grep -F '20-wlan.network' "$hardware_network" >/dev/null
-grep -F 'helios-networkd-retired' "$hardware_network" >/dev/null
+grep -F 'kestrel-networkd-retired' "$hardware_network" >/dev/null
 pass "hardware setup retires archinstall networkd state"

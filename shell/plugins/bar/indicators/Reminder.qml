@@ -20,7 +20,7 @@ BarIndicator {
   }
 
   function openReminderFlow() {
-    Quickshell.execDetached(["helios-reminder", "-i"])
+    Quickshell.execDetached(["kestrel-reminder", "-i"])
   }
 
   function update(raw) {
@@ -39,7 +39,7 @@ BarIndicator {
 
   Process {
     id: jsonProc
-    command: ["helios-reminder", "show", "--json"]
+    command: ["kestrel-reminder", "show", "--json"]
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: root.update(text)
@@ -53,7 +53,7 @@ BarIndicator {
   }
 
   onPressed: function() {
-    if (root.reminderCount > 0) Quickshell.execDetached(["helios-reminder", "show"])
+    if (root.reminderCount > 0) Quickshell.execDetached(["kestrel-reminder", "show"])
     else root.openReminderFlow()
   }
 }

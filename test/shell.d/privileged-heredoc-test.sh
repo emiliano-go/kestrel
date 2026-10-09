@@ -4,7 +4,7 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
-# HeliOS does not write a root-owned file through a heredoc whose delimiter is
+# Kestrel does not write a root-owned file through a heredoc whose delimiter is
 # unquoted, and this check enforces that.
 #
 # With an unquoted delimiter (<<EOF rather than <<'EOF') the *installing user's*
@@ -16,11 +16,11 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 # Worked example -- an installer emitting a udev rule:
 #
 #   sudo tee /etc/udev/rules.d/99-power-profile.rules <<EOF
-#   ACTION=="change", SUBSYSTEM=="power_supply", RUN+="$HOME/.local/share/helios/bin/helios-power-profile"
+#   ACTION=="change", SUBSYSTEM=="power_supply", RUN+="$HOME/.local/share/kestrel/bin/kestrel-power-profile"
 #   EOF
 #
 # The delimiter is unquoted, so the rule that lands names
-# /home/<user>/.local/share/helios/bin/..., and ~/.local/share/helios is a
+# /home/<user>/.local/share/kestrel/bin/..., and ~/.local/share/kestrel is a
 # symlink that same user owns. Replacing the symlink and provoking a
 # power_supply event gets their code run by udev as root. Quote the delimiter
 # and the rule names a literal $HOME instead, which udev never expands, so
@@ -39,9 +39,9 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 PRIVILEGED_PREFIXES=(/etc /usr /opt /srv /boot /var/lib)
 
 # Path roots the installing user can replace outright -- by editing the
-# directory, or by swapping a symlink like ~/.local/share/helios. An expansion
+# directory, or by swapping a symlink like ~/.local/share/kestrel. An expansion
 # anchored in one of these is the shape this check exists to catch.
-USER_WRITABLE_VARS=(HOME PWD OLDPWD TMPDIR HELIOS_PATH HELIOS_INSTALL
+USER_WRITABLE_VARS=(HOME PWD OLDPWD TMPDIR KESTREL_PATH KESTREL_INSTALL
   XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME XDG_STATE_HOME XDG_RUNTIME_DIR)
 
 # Commands that carry a heredoc's output to its destination, and the ones that
@@ -65,15 +65,15 @@ COMMAND_SUBSTITUTION="command-substitution"
 # Sites that legitimately need install-time expansion declare it in a comment
 # immediately above the heredoc:
 #
-#   # helios:heredoc-expands paths=none -- $servers is a validated IP list
-#   # helios:heredoc-expands paths=storage,shared -- checked by valid_path
+#   # kestrel:heredoc-expands paths=none -- $servers is a validated IP list
+#   # kestrel:heredoc-expands paths=storage,shared -- checked by valid_path
 #
 # `paths=` is the machine-checked half, and is what keeps this from being a
 # rubber stamp: it must name exactly the expansions that are path-shaped, so
 # adding a "$HOME/..." to an already-annotated heredoc makes the declaration
 # false and trips the check again instead of inheriting the old exemption. The
 # reason after `--` is for the reviewer.
-ANNOTATION_RE='^[[:space:]]*#[[:space:]]*helios:heredoc-expands[[:space:]]+paths=([A-Za-z_][A-Za-z0-9_-]*(,[A-Za-z_][A-Za-z0-9_-]*)*|none)[[:space:]]+--[[:space:]]+([^[:space:]].*)$'
+ANNOTATION_RE='^[[:space:]]*#[[:space:]]*kestrel:heredoc-expands[[:space:]]+paths=([A-Za-z_][A-Za-z0-9_-]*(,[A-Za-z_][A-Za-z0-9_-]*)*|none)[[:space:]]+--[[:space:]]+([^[:space:]].*)$'
 
 FINDINGS=()
 
@@ -227,7 +227,7 @@ collect_vars() {
 
 # Expand what can be expanded from the file's own assignments. ${NAME:-default}
 # falls back to the default, which is how RUNTIME_DIR reaches
-# /var/lib/helios/windows; mktemp is unwrapped to the template it is handed, so
+# /var/lib/kestrel/windows; mktemp is unwrapped to the template it is handed, so
 # a scratch file inside a privileged directory still reads as privileged.
 resolve_value() {
   local value="$1" outer=0 inner before name default replacement
@@ -298,8 +298,8 @@ mentions_user_writable_root() {
   local text="$1" name pattern
 
   for name in "${USER_WRITABLE_VARS[@]}"; do
-    # Whole name only. A prefix match would read ${HELIOS_INSTALL_USER:-}, which
-    # holds a username, as HELIOS_INSTALL, which holds a path.
+    # Whole name only. A prefix match would read ${KESTREL_INSTALL_USER:-}, which
+    # holds a username, as KESTREL_INSTALL, which holds a path.
     pattern='\$\{?'"$name"'([^A-Za-z0-9_]|$)'
     [[ $text =~ $pattern ]] && return 0
   done
@@ -341,12 +341,12 @@ classify_expansion() {
   # When the token itself is not a path and the shape came only from the
   # assigned value, a variable holding root-owned absolute paths is not baking
   # anything user-writable in: that is how $fprintd_gate carries
-  # /usr/bin/helios-hw-laptop-closed. This rescue deliberately does not apply
+  # /usr/bin/kestrel-hw-laptop-closed. This rescue deliberately does not apply
   # when the token is a path, so "$storage:/storage" stays flagged.
   #
   # It also does not apply to a value this scan could not finish resolving whose
   # unresolved part reaches a root the user can replace. One hop is all it takes
-  # to hide the shape: helper="$HOME/.local/share/helios/bin/agent" followed by
+  # to hide the shape: helper="$HOME/.local/share/kestrel/bin/agent" followed by
   # ExecStart=$helper puts no slash in the token and no literal path in the value,
   # so rescuing it would exempt exactly the write this check exists to catch. A
   # value that merely fails to resolve -- a kernel parameter list, an escaped
@@ -762,7 +762,7 @@ scan_file() {
       1. quote the delimiter (<<'$delim') so nothing expands at install time;
       2. hardcode an absolute root-owned path instead of expanding one;
       3. if the expansion is genuinely required, declare it above the heredoc:
-           # helios:heredoc-expands paths=<expansions used as paths, or none> -- <why this is safe>
+           # kestrel:heredoc-expands paths=<expansions used as paths, or none> -- <why this is safe>
          Decide that list yourself. The scan's own reading of it is above, and
          where the scan is most likely wrong is exactly here -- a path it could
          not follow reads as an ordinary value -- so pasting its verdict back
@@ -939,8 +939,8 @@ fixture_flags nested-parameter-default.sh \
   "path-shaped expansions are HOME"
 
 mapfile -t dd_destinations < <(command_destinations \
-  'sudo dd if=/tmp/input bs=4M status=none of=/etc/helios/image')
-[[ ${dd_destinations[0]:-} == "/etc/helios/image" && ${dd_destinations[1]:-} == $'\002elevated' && ${#dd_destinations[@]} == 2 ]] ||
+  'sudo dd if=/tmp/input bs=4M status=none of=/etc/kestrel/image')
+[[ ${dd_destinations[0]:-} == "/etc/kestrel/image" && ${dd_destinations[1]:-} == $'\002elevated' && ${#dd_destinations[@]} == 2 ]] ||
   fail "dd emits only its of= destination" "$(printf '%q\n' "${dd_destinations[@]:-}")"
 pass "dd emits only its of= destination"
 

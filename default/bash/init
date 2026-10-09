@@ -26,4 +26,4 @@ if command -v fzf &> /dev/null; then
   fi
 fi
 
-source "$HELIOS_PATH/default/bash/completions"
+source "$KESTREL_PATH/default/bash/completions"

@@ -16,5 +16,5 @@ for vendor in "${!VULKAN_DRIVERS[@]}"; do
 done
 
 if (( ${#PACKAGES[@]} > 0 )); then
-  helios-pkg-add "${PACKAGES[@]}"
+  kestrel-pkg-add "${PACKAGES[@]}"
 fi

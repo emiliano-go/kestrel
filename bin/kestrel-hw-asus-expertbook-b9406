@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kestrel:summary=Detect ASUS ExpertBook B9406 series laptops on Intel Panther Lake.
+
+kestrel-hw-match "B9406" && kestrel-hw-intel-ptl

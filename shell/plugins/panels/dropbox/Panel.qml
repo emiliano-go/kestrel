@@ -10,11 +10,11 @@ import "Model.js" as Model
 
 Panel {
   id: root
-  moduleName: "helios.dropbox"
-  ipcTarget: "helios.dropbox"
+  moduleName: "kestrel.dropbox"
+  ipcTarget: "kestrel.dropbox"
   manageIpc: false
 
-  property string heliosPath: Quickshell.env("HELIOS_PATH")
+  property string kestrelPath: Quickshell.env("KESTREL_PATH")
   property string focusSection: "login"
   property int fileIndex: 0
   property bool cursorActive: false
@@ -147,7 +147,7 @@ Panel {
   Service {
     id: dropbox
     settings: root.settings
-    heliosPath: root.heliosPath
+    kestrelPath: root.kestrelPath
   }
 
   Connections {

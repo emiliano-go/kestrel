@@ -17,8 +17,8 @@ SUPPORTED_EXTENSIONS = {
 
 class TranscodeAction(GObject.GObject, Nautilus.MenuProvider):
     def _launch_transcode(self, paths):
-        wrapper = shutil.which("helios-launch-floating-terminal-with-presentation")
-        binary = shutil.which("helios-transcode")
+        wrapper = shutil.which("kestrel-launch-floating-terminal-with-presentation")
+        binary = shutil.which("kestrel-transcode")
         if not wrapper or not binary:
             return
 
@@ -66,7 +66,7 @@ class TranscodeAction(GObject.GObject, Nautilus.MenuProvider):
     def _make_item(self, paths):
         label = "Transcode" if len(paths) == 1 else f"Transcode {len(paths)} items"
         item = Nautilus.MenuItem(
-            name="HeliOSTranscodeNautilus::transcode",
+            name="KestrelTranscodeNautilus::transcode",
             label=label,
             icon="media-playback-start",
         )
@@ -78,8 +78,8 @@ class TranscodeAction(GObject.GObject, Nautilus.MenuProvider):
 
     def _tools_available(self):
         return bool(
-            shutil.which("helios-launch-floating-terminal-with-presentation")
-            and shutil.which("helios-transcode")
+            shutil.which("kestrel-launch-floating-terminal-with-presentation")
+            and shutil.which("kestrel-transcode")
         )
 
     def get_file_items(self, *args):

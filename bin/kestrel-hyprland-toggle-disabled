@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kestrel:summary=Check if a Hyprland toggle is currently disabled (missing).
+# kestrel:args=<flag-name>
+
+[[ ! -f "$HOME/.local/state/kestrel/toggles/hypr/$1.lua" ]]

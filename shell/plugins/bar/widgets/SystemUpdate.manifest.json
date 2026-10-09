@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "helios.system-update",
-  "name": "HeliOS update",
+  "id": "kestrel.system-update",
+  "name": "Kestrel update",
   "version": "1.0.0",
-  "author": "HeliOS",
-  "description": "Indicates available HeliOS updates",
+  "author": "Kestrel",
+  "description": "Indicates available Kestrel updates",
   "kinds": [
     "bar-widget"
   ],
@@ -12,8 +12,8 @@
     "barWidget": "SystemUpdate.qml"
   },
   "barWidget": {
-    "displayName": "HeliOS update",
-    "description": "Indicates available HeliOS updates",
+    "displayName": "Kestrel update",
+    "description": "Indicates available Kestrel updates",
     "category": "System",
     "allowMultiple": false
   }

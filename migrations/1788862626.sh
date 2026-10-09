@@ -1,7 +1,7 @@
 echo "Expose the Elgato Cam Link 4K as a 16:9 virtual camera"
 
-if helios-hw-elgato-camlink-4k; then
-  source "$HELIOS_PATH/install/hardware/fix-elgato-camlink-4k.sh"
+if kestrel-hw-elgato-camlink-4k; then
+  source "$KESTREL_PATH/install/hardware/fix-elgato-camlink-4k.sh"
 
   sudo systemctl daemon-reload
   sudo udevadm control --reload

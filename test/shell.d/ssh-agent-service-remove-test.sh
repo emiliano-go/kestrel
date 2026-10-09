@@ -15,7 +15,7 @@ mkdir -p "$mock_bin"
 # environment.d on every reload, which disable triggers.
 cat >"$mock_bin/systemctl" <<'SH'
 #!/bin/bash
-state=$HELIOS_TEST_MANAGER
+state=$KESTREL_TEST_MANAGER
 case $2 in
   disable)
     if [[ -f $HOME/.config/environment.d/90-gcr-ssh-agent.conf ]]; then
@@ -34,14 +34,14 @@ chmod +x "$mock_bin/systemctl"
 run_remove() {
   local explicit="$1"
 
-  export HOME="$test_tmp/home" XDG_RUNTIME_DIR="$test_tmp/run" HELIOS_TEST_MANAGER="$test_tmp/manager"
-  rm -rf "$HOME" "$HELIOS_TEST_MANAGER"
-  mkdir -p "$HOME/.config/environment.d" "$HELIOS_TEST_MANAGER"
+  export HOME="$test_tmp/home" XDG_RUNTIME_DIR="$test_tmp/run" KESTREL_TEST_MANAGER="$test_tmp/manager"
+  rm -rf "$HOME" "$KESTREL_TEST_MANAGER"
+  mkdir -p "$HOME/.config/environment.d" "$KESTREL_TEST_MANAGER"
   echo 'SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh' >"$HOME/.config/environment.d/90-gcr-ssh-agent.conf"
-  echo "SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh" >"$HELIOS_TEST_MANAGER/generated"
-  echo "$explicit" >"$HELIOS_TEST_MANAGER/explicit"
+  echo "SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gcr/ssh" >"$KESTREL_TEST_MANAGER/generated"
+  echo "$explicit" >"$KESTREL_TEST_MANAGER/explicit"
 
-  PATH="$mock_bin:$PATH" "$ROOT/bin/helios-remove-service-ssh-agent" >/dev/null
+  PATH="$mock_bin:$PATH" "$ROOT/bin/kestrel-remove-service-ssh-agent" >/dev/null
   PATH="$mock_bin:$PATH" systemctl --user show-environment
 }
 

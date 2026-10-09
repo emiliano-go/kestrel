@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kestrel:summary=Show the current battery status notification
+
+kestrel-notification-send -g 󰁹 -u low "$(kestrel-battery-status)"

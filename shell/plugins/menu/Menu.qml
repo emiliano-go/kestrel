@@ -10,13 +10,13 @@ import "MenuModel.js" as MenuModel
 Item {
   id: root
 
-  // Injected by helios-shell when this plugin is summoned.
-  property string heliosPath: Quickshell.env("HELIOS_PATH")
+  // Injected by kestrel-shell when this plugin is summoned.
+  property string kestrelPath: Quickshell.env("KESTREL_PATH")
   property var shell: null
   property var manifest: null
 
   // Plugin lifecycle hooks. The host calls open(payloadJson) after
-  // `helios-shell shell summon helios.menu ...` and close() when hidden.
+  // `kestrel-shell shell summon kestrel.menu ...` and close() when hidden.
   property string pendingInitialMenu: "root"
 
   function open(payloadJson) {
@@ -48,8 +48,8 @@ Item {
   // JSONC menu definitions. The shell parses both at startup and merges
   // the user file on top of the defaults, so the keybind → IPC → visible
   // path doesn't have to shell out to bash + jq on every open.
-  property string defaultMenuPath: heliosPath + "/default/helios/helios-menu.jsonc"
-  property string userMenuPath: Quickshell.env("HOME") + "/.config/helios/extensions/helios-menu.jsonc"
+  property string defaultMenuPath: kestrelPath + "/default/kestrel/kestrel-menu.jsonc"
+  property string userMenuPath: Quickshell.env("HOME") + "/.config/kestrel/extensions/kestrel-menu.jsonc"
   property var defaultMenuItems: []
   property var userMenuItems: []
   property bool opened: false
@@ -272,15 +272,15 @@ Item {
   // shell started shows up without restarting it.
   readonly property var providers: ({
     "fonts": {
-      script: "current=$(helios-font-current 2>/dev/null); helios-font-list 2>/dev/null | while read -r f; do [[ -z $f ]] && continue; printf '%s\\t%s\\t%s\\n' \"$f\" \"$f\" \"$current\"; done",
+      script: "current=$(kestrel-font-current 2>/dev/null); kestrel-font-list 2>/dev/null | while read -r f; do [[ -z $f ]] && continue; printf '%s\\t%s\\t%s\\n' \"$f\" \"$f\" \"$current\"; done",
       icon: "",
       volatile: true,
-      actionFor: function(value) { return "helios-font-set " + Util.shellQuote(value) }
+      actionFor: function(value) { return "kestrel-font-set " + Util.shellQuote(value) }
     },
     "power-profiles": {
-      script: "current=$(powerprofilesctl get 2>/dev/null); helios-powerprofiles-list 2>/dev/null | while read -r p; do [[ -z $p ]] && continue; printf '%s\\t%s\\t%s\\n' \"$p\" \"$p\" \"$current\"; done",
+      script: "current=$(powerprofilesctl get 2>/dev/null); kestrel-powerprofiles-list 2>/dev/null | while read -r p; do [[ -z $p ]] && continue; printf '%s\\t%s\\t%s\\n' \"$p\" \"$p\" \"$current\"; done",
       icon: "\udb81\udc0b",
-      actionFor: function(value) { return "helios-powerprofiles-set autodetect " + Util.shellQuote(value) }
+      actionFor: function(value) { return "kestrel-powerprofiles-set autodetect " + Util.shellQuote(value) }
     }
   })
 
@@ -888,7 +888,7 @@ Item {
   // ----------------------------------------------------------- route surface
   //
   // The menu is opened through the standard plugin lifecycle:
-  // `helios-shell shell summon helios.menu '{"menu":"system"}'`.
+  // `kestrel-shell shell summon kestrel.menu '{"menu":"system"}'`.
   // Callers may pass a real id (`system`, `setup.power`) or an alias declared
   // in JSONC (`power`, `reminder-set`). Unknown strings fall through to the
   // id-as-route behavior so misspellings still attempt to open the literal id.
@@ -900,7 +900,7 @@ Item {
     var id = root.resolveRoute(initialMenu)
     var entry = root.items[id]
     // If the resolved id is an action (i.e. the user invoked an alias for
-    // a leaf, e.g. `helios menu summon screenrecord-stop`), run it directly
+    // a leaf, e.g. `kestrel menu summon screenrecord-stop`), run it directly
     // instead of opening an action with no children.
     if (entry && entry.kind === "action" && entry.action) {
       root.cancel()
@@ -964,7 +964,7 @@ Item {
   }
 
   // The JSONC sources are watched so live edits to the default file (or the
-  // user extension at ~/.config/helios/extensions/helios-menu.jsonc) take
+  // user extension at ~/.config/kestrel/extensions/kestrel-menu.jsonc) take
   // effect without restarting the shell.
   FileView {
     id: defaultMenuFile
@@ -1069,7 +1069,7 @@ Item {
   OverlayWindow {
     id: panel
     shown: root.opened && root.rowsLoaded
-    WlrLayershell.namespace: "helios-menu"
+    WlrLayershell.namespace: "kestrel-menu"
 
     // The card opens centered exactly as always. The first search keystroke
     // or submenu move freezes the top line where it currently sits — from

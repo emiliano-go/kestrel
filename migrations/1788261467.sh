@@ -13,7 +13,7 @@ elif [[ -e $generic_config || -L $generic_config ]]; then
   exit 0
 fi
 
-install -Dm644 "$HELIOS_PATH/config/xdg-desktop-portal/hyprland-portals.conf" "$portal_config"
+install -Dm644 "$KESTREL_PATH/config/xdg-desktop-portal/hyprland-portals.conf" "$portal_config"
 
 # Activate the backend immediately in a live desktop
 if systemctl --user is-active --quiet xdg-desktop-portal.service 2>/dev/null; then

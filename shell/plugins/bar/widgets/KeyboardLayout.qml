@@ -8,7 +8,7 @@ import "KeyboardLayoutModel.js" as KeyboardLayoutModel
 
 BarWidget {
   id: root
-  moduleName: "helios.keyboard-layout"
+  moduleName: "kestrel.keyboard-layout"
 
 
   property string layoutFull: ""

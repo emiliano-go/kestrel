@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kestrel:summary=Detect ASUS Zenbook UX5406AA series laptops on Intel Panther Lake.
+
+kestrel-hw-match "ux5406aa" && kestrel-hw-intel-ptl

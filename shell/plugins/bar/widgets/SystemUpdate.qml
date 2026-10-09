@@ -6,7 +6,7 @@ import qs.Ui
 
 BarWidget {
   id: root
-  moduleName: "helios.system-update"
+  moduleName: "kestrel.system-update"
 
   property bool updateAvailable: false
 
@@ -17,7 +17,7 @@ BarWidget {
   function clear() { updateAvailable = false }
 
   function runUpdate() {
-    if (root.bar) root.bar.run("helios-launch-floating-terminal-with-presentation helios-update")
+    if (root.bar) root.bar.run("kestrel-launch-floating-terminal-with-presentation kestrel-update")
   }
 
   visible: updateAvailable
@@ -25,7 +25,7 @@ BarWidget {
   implicitHeight: button.implicitHeight
 
   ShellIpc {
-    target: "helios.system-update"
+    target: "kestrel.system-update"
 
     function refresh(): void {
       root.broadcast("refresh")
@@ -38,7 +38,7 @@ BarWidget {
 
   Process {
     id: updateProc
-    command: ["helios-update-available"]
+    command: ["kestrel-update-available"]
     onExited: function(exitCode) {
       root.updateAvailable = exitCode === 0
     }
@@ -59,7 +59,7 @@ BarWidget {
     text: "\uf021"
     slotSize: Style.bar.statusSlot
     fontSize: Style.font.caption
-    tooltipText: "Pending HeliOS Updates"
+    tooltipText: "Pending Kestrel Updates"
     onPressed: root.runUpdate()
   }
 }

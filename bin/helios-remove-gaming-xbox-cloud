@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Remove the Xbox Cloud Gaming web app.
-
-set -e
-
-helios-webapp-remove "Xbox Cloud Gaming"

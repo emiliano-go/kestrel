@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Name=Zoom
-Exec=helios-webapp-handler-zoom %u
+Exec=kestrel-webapp-handler-zoom %u
 Terminal=false
 Type=Application
 Icon=zoom

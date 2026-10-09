@@ -5,7 +5,7 @@ set -euo pipefail
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
 template="$ROOT/default/snapper/root"
-limine_defaults="$ROOT/etc/limine-entry-tool.d/helios-defaults.conf"
+limine_defaults="$ROOT/etc/limine-entry-tool.d/kestrel-defaults.conf"
 limine_notify_autostart="$ROOT/config/autostart/limine-snapper-notify.desktop"
 
 grep -Fx 'NUMBER_CLEANUP="yes"' "$template" >/dev/null
@@ -59,19 +59,19 @@ pass "Limine Snapper warning notifier migration disables existing user autostart
 
 TEST_LOG="$test_tmp/calls.log" \
 PATH="$fake_bin:$PATH" \
-HELIOS_SNAPPER_CONFIGURE_TEST=1 \
-HELIOS_PATH="$ROOT" \
-HELIOS_SNAPPER_CONFIG_PATH="$test_tmp/etc/snapper/configs/root" \
-HELIOS_SNAPPER_CONF_PATH="$test_tmp/etc/conf.d/snapper" \
+KESTREL_SNAPPER_CONFIGURE_TEST=1 \
+KESTREL_PATH="$ROOT" \
+KESTREL_SNAPPER_CONFIG_PATH="$test_tmp/etc/snapper/configs/root" \
+KESTREL_SNAPPER_CONF_PATH="$test_tmp/etc/conf.d/snapper" \
   bash -euo pipefail "$ROOT/install/config/snapper.sh" >/dev/null
 
-cmp -s "$template" "$test_tmp/etc/snapper/configs/root" || fail "snapshot configure installs the HeliOS Snapper template"
+cmp -s "$template" "$test_tmp/etc/snapper/configs/root" || fail "snapshot configure installs the Kestrel Snapper template"
 grep -Fx 'SNAPPER_CONFIGS="root"' "$test_tmp/etc/conf.d/snapper" >/dev/null || fail "snapshot configure writes /etc/conf.d/snapper"
 grep -Fx 'systemctl disable --now snapper-timeline.timer' "$test_tmp/calls.log" >/dev/null || fail "snapshot configure disables timeline snapshots"
 grep -Fx 'systemctl enable --now snapper-cleanup.timer limine-snapper-sync.service' "$test_tmp/calls.log" >/dev/null || fail "snapshot configure enables cleanup and Limine snapshot sync"
 pass "snapshot configure normalizes Snapper policy and services"
 
-setup_system="$ROOT/bin/helios-apply-system"
+setup_system="$ROOT/bin/kestrel-apply-system"
 grep -F 'config/all.sh' "$setup_system" >/dev/null ||
   fail "system setup runs the config phase"
 grep -F 'config/snapper.sh' "$ROOT/install/config/all.sh" >/dev/null ||
@@ -83,19 +83,19 @@ migration=$(grep -rl 'Normalize Snapper snapshot services' "$ROOT/migrations" | 
 grep -F 'unit_active snapper-cleanup.timer' "$migration" >/dev/null
 grep -F 'unit_active limine-snapper-sync.service' "$migration" >/dev/null
 grep -F 'sudo "$@"' "$migration" >/dev/null
-grep -F 'as_root env HELIOS_PATH="$HELIOS_PATH" bash -euo pipefail "$snapper_config_script"' "$migration" >/dev/null
+grep -F 'as_root env KESTREL_PATH="$KESTREL_PATH" bash -euo pipefail "$snapper_config_script"' "$migration" >/dev/null
 ! grep -F 'NUMBER_LIMIT="5"' "$migration" >/dev/null || fail "Snapper service migration does not overwrite working custom retention"
 pass "Snapper service migration only repairs broken services idempotently"
 
 # Checkouts differ per machine, so allow an explicit pointer at the sibling repo.
-# Accepts either the helios-pkgs checkout or its pkgbuilds/ directory.
-find_helios_pks_root() {
+# Accepts either the kestrel-pkgs checkout or its pkgbuilds/ directory.
+find_kestrel_pks_root() {
   local candidate
   for candidate in \
-    ${HELIOS_PKGS_PATH:+"$HELIOS_PKGS_PATH/pkgbuilds" "$HELIOS_PKGS_PATH"} \
-    "$ROOT/../helios-pkgs/pkgbuilds" \
-    "$ROOT/../helios/helios-pkgs/pkgbuilds" \
-    "$ROOT/../../helios-pkgs/pkgbuilds" \
+    ${KESTREL_PKGS_PATH:+"$KESTREL_PKGS_PATH/pkgbuilds" "$KESTREL_PKGS_PATH"} \
+    "$ROOT/../kestrel-pkgs/pkgbuilds" \
+    "$ROOT/../kestrel/kestrel-pkgs/pkgbuilds" \
+    "$ROOT/../../kestrel-pkgs/pkgbuilds" \
     "$ROOT/../omacom/omarchy-pkgs/pkgbuilds" \
     "$ROOT/../../omacom/omarchy-pkgs/pkgbuilds" \
     "$HOME/Work/omacom/omarchy-pkgs/pkgbuilds"; do
@@ -107,27 +107,27 @@ find_helios_pks_root() {
   return 1
 }
 
-pkgs_root=$(find_helios_pks_root) || fail "helios-pkgs checkout is available for packaging coverage"
-settings_pkgbuild="$pkgs_root/helios-settings-dev/PKGBUILD"
-helios_pkgbuild="$pkgs_root/helios-dev/PKGBUILD"
+pkgs_root=$(find_kestrel_pks_root) || fail "kestrel-pkgs checkout is available for packaging coverage"
+settings_pkgbuild="$pkgs_root/kestrel-settings-dev/PKGBUILD"
+kestrel_pkgbuild="$pkgs_root/kestrel-dev/PKGBUILD"
 
-grep -F 'cp -a default/. "$pkgdir/usr/share/helios/default/"' "$settings_pkgbuild" >/dev/null || fail "helios-settings package bundles default/"
-grep -F 'install -Dm644 default/snapper/root \' "$settings_pkgbuild" >/dev/null || fail "helios-settings package installs Snapper template source"
-grep -F '"$pkgdir/etc/snapper/config-templates/helios"' "$settings_pkgbuild" >/dev/null || fail "helios-settings package installs Snapper template destination"
-grep -F "'snapper'" "$helios_pkgbuild" >/dev/null || fail "helios package depends on snapper"
-grep -F "'limine-snapper-sync'" "$helios_pkgbuild" >/dev/null || fail "helios package depends on limine-snapper-sync"
-grep -F 'cp -a install "$pkgdir/usr/share/helios/"' "$helios_pkgbuild" >/dev/null || fail "helios package bundles install scripts"
-grep -F 'cp -a migrations "$pkgdir/usr/share/helios/"' "$helios_pkgbuild" >/dev/null || fail "helios package bundles migrations"
-pass "helios-pkgs packages Snapper template, setup, and migration coverage"
+grep -F 'cp -a default/. "$pkgdir/usr/share/kestrel/default/"' "$settings_pkgbuild" >/dev/null || fail "kestrel-settings package bundles default/"
+grep -F 'install -Dm644 default/snapper/root \' "$settings_pkgbuild" >/dev/null || fail "kestrel-settings package installs Snapper template source"
+grep -F '"$pkgdir/etc/snapper/config-templates/kestrel"' "$settings_pkgbuild" >/dev/null || fail "kestrel-settings package installs Snapper template destination"
+grep -F "'snapper'" "$kestrel_pkgbuild" >/dev/null || fail "kestrel package depends on snapper"
+grep -F "'limine-snapper-sync'" "$kestrel_pkgbuild" >/dev/null || fail "kestrel package depends on limine-snapper-sync"
+grep -F 'cp -a install "$pkgdir/usr/share/kestrel/"' "$kestrel_pkgbuild" >/dev/null || fail "kestrel package bundles install scripts"
+grep -F 'cp -a migrations "$pkgdir/usr/share/kestrel/"' "$kestrel_pkgbuild" >/dev/null || fail "kestrel package bundles migrations"
+pass "kestrel-pkgs packages Snapper template, setup, and migration coverage"
 
-# Same per-machine checkout problem as helios-pkgs; HELIOS_ISO_PATH points at it.
-find_helios_iso_root() {
+# Same per-machine checkout problem as kestrel-pkgs; KESTREL_ISO_PATH points at it.
+find_kestrel_iso_root() {
   local candidate
   for candidate in \
-    ${HELIOS_ISO_PATH:+"$HELIOS_ISO_PATH"} \
-    "$ROOT/../helios-iso" \
-    "$ROOT/../helios/helios-iso" \
-    "$ROOT/../../helios-iso" \
+    ${KESTREL_ISO_PATH:+"$KESTREL_ISO_PATH"} \
+    "$ROOT/../kestrel-iso" \
+    "$ROOT/../kestrel/kestrel-iso" \
+    "$ROOT/../../kestrel-iso" \
     "$ROOT/../omacom/omarchy-iso" \
     "$ROOT/../../omacom/omarchy-iso" \
     "$HOME/Work/omacom/omarchy-iso"; do
@@ -139,9 +139,9 @@ find_helios_iso_root() {
   return 1
 }
 
-iso_root=$(find_helios_iso_root) || fail "helios-iso checkout is available for installer coverage"
+iso_root=$(find_kestrel_iso_root) || fail "kestrel-iso checkout is available for installer coverage"
 configurator="$iso_root/configs/airootfs/root/configurator"
-phases="$iso_root/configs/airootfs/usr/share/helios-iso/orchestrator/phases_impl.py"
+phases="$iso_root/configs/airootfs/usr/share/kestrel-iso/orchestrator/phases_impl.py"
 manifest="$iso_root/manifests/fresh-4-semantic.json"
 
 ! grep -F 'snapshot_config' "$configurator" >/dev/null || fail "ISO does not ask archinstall to create Snapper timeline config"
@@ -149,9 +149,9 @@ manifest="$iso_root/manifests/fresh-4-semantic.json"
 # The phases/manifest assertions cover the newer ISO orchestrator structure.
 # Skip them when the checkout predates that layout.
 if [[ -f $phases && -f $manifest ]]; then
-  ! grep -F '_configure_snapper_root' "$phases" >/dev/null || fail "ISO does not duplicate HeliOS Snapper setup"
+  ! grep -F '_configure_snapper_root' "$phases" >/dev/null || fail "ISO does not duplicate Kestrel Snapper setup"
   grep -F 'run_system_finalizer' "$phases" >/dev/null || fail "ISO runs packaged system setup"
   grep -F '/etc/systemd/system/timers.target.wants/snapper-cleanup.timer' "$manifest" >/dev/null || fail "fresh ISO manifest has snapper-cleanup timer enabled"
   ! grep -F '/etc/systemd/system/timers.target.wants/snapper-timeline.timer' "$manifest" >/dev/null || fail "fresh ISO manifest does not enable snapper timeline timer"
 fi
-pass "helios-iso delegates Snapper setup to packaged system setup"
+pass "kestrel-iso delegates Snapper setup to packaged system setup"

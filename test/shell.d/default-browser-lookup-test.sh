@@ -16,12 +16,12 @@ export XDG_CONFIG_DIRS="$test_tmp/etc"
 export XDG_DATA_HOME="$test_tmp/data"
 export XDG_DATA_DIRS="$test_tmp/system"
 export XDG_CURRENT_DESKTOP=Hyprland
-export BROWSER=helios-launch-browser
-export HELIOS_TEST_XDG_SETTINGS_LOG="$test_tmp/xdg-settings"
+export BROWSER=kestrel-launch-browser
+export KESTREL_TEST_XDG_SETTINGS_LOG="$test_tmp/xdg-settings"
 
 cat >"$mock_bin/xdg-settings" <<'SH'
 #!/bin/bash
-printf '%s\n' "${BROWSER:-unset}" >"$HELIOS_TEST_XDG_SETTINGS_LOG"
+printf '%s\n' "${BROWSER:-unset}" >"$KESTREL_TEST_XDG_SETTINGS_LOG"
 echo fallback.desktop
 SH
 export PATH="$mock_bin:$ROOT/bin:$PATH"
@@ -34,7 +34,7 @@ chmod +x "$mock_bin"/*
 echo "Exec=chromium %U" >"$XDG_DATA_HOME/applications/chromium.desktop"
 echo "Exec=firefox %u" >"$XDG_DATA_HOME/applications/firefox.desktop"
 echo "Exec=brave %U" >"$XDG_DATA_DIRS/applications/brave-browser.desktop"
-# An entry of HeliOS's own left behind by a browser since removed, shadowing
+# An entry of Kestrel's own left behind by a browser since removed, shadowing
 # a system copy that the launchers would never read.
 echo "Exec=removed-browser %U" >"$XDG_DATA_HOME/applications/removed.desktop"
 echo "Exec=brave %U" >"$XDG_DATA_DIRS/applications/removed.desktop"
@@ -48,9 +48,9 @@ text/html=firefox.desktop
 x-scheme-handler/http=missing.desktop;removed.desktop;chromium.desktop;
 EOF
 
-[[ $(helios-cmd-default-browser) == "chromium.desktop" ]] ||
+[[ $(kestrel-cmd-default-browser) == "chromium.desktop" ]] ||
   fail "default browser is the first installed http handler in mimeapps.list"
-[[ ! -e $HELIOS_TEST_XDG_SETTINGS_LOG ]] ||
+[[ ! -e $KESTREL_TEST_XDG_SETTINGS_LOG ]] ||
   fail "default browser skips xdg-settings when mimeapps.list names one"
 
 cat >"$XDG_CONFIG_HOME/hyprland-mimeapps.list" <<'EOF'
@@ -58,15 +58,15 @@ cat >"$XDG_CONFIG_HOME/hyprland-mimeapps.list" <<'EOF'
 x-scheme-handler/http=brave-browser.desktop
 EOF
 
-[[ $(helios-cmd-default-browser) == "brave-browser.desktop" ]] ||
+[[ $(kestrel-cmd-default-browser) == "brave-browser.desktop" ]] ||
   fail "default browser prefers the desktop-specific mimeapps.list"
 
 rm "$XDG_CONFIG_HOME/hyprland-mimeapps.list"
 printf '[Default Applications]\nx-scheme-handler/http=missing.desktop\n' >"$XDG_CONFIG_HOME/mimeapps.list"
 
-[[ $(helios-cmd-default-browser) == "fallback.desktop" ]] ||
+[[ $(kestrel-cmd-default-browser) == "fallback.desktop" ]] ||
   fail "default browser falls back to xdg-settings when no listed handler is installed"
-[[ $(<"$HELIOS_TEST_XDG_SETTINGS_LOG") == "unset" ]] ||
+[[ $(<"$KESTREL_TEST_XDG_SETTINGS_LOG") == "unset" ]] ||
   fail "default browser unsets BROWSER before asking xdg-settings"
 
 pass "default browser reads mimeapps.list and falls back to xdg-settings"

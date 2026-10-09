@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# helios:summary=List available monospace fonts
-# helios:examples=helios font list | helios font set "CaskaydiaMono Nerd Font"
-
-fc-list :spacing=100 -f "%{family[0]}\n" | grep -v -i -E 'emoji|signwriting|helios' | sort -u

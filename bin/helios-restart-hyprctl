@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Reload hyprland configuration (used by the HeliOS theme switching).
-
-hyprctl reload >/dev/null

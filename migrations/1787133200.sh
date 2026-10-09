@@ -1,3 +1,3 @@
 echo "Add webp decoding to the shell"
 
-helios-pkg-add qt6-imageformats
+kestrel-pkg-add qt6-imageformats

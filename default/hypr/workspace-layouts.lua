@@ -1,8 +1,8 @@
--- Restore workspace layouts saved by helios-hyprland-workspace-layout-toggle.
+-- Restore workspace layouts saved by kestrel-hyprland-workspace-layout-toggle.
 
 local paths = require("default.hypr.paths")
 local require_all = require("default.hypr.require_all")
 
-local layouts_dir = paths.state_home .. "/helios/workspace-layouts"
+local layouts_dir = paths.state_home .. "/kestrel/workspace-layouts"
 
-require_all.files(layouts_dir, "helios.workspace-layouts", { reload = true })
+require_all.files(layouts_dir, "kestrel.workspace-layouts", { reload = true })

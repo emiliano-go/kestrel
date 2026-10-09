@@ -1,13 +1,13 @@
-# HeliOS Icon Font
+# Kestrel Icon Font
 
-Read this before adding a branded glyph to `default/fonts/helios/helios.ttf`.
+Read this before adding a branded glyph to `default/fonts/kestrel/kestrel.ttf`.
 
-The HeliOS icon font is a small private-use font carrying the marks Nerd
-Fonts does not have: the HeliOS logo and the agent and app brand marks. The
+The Kestrel icon font is a small private-use font carrying the marks Nerd
+Fonts does not have: the Kestrel logo and the agent and app brand marks. The
 menu draws one by naming the font on an entry:
 
 ```jsonc
-"setup.default.agent.grok": {"icon":"","iconFont":"helios","label":"Grok", ...}
+"setup.default.agent.grok": {"icon":"","iconFont":"kestrel","label":"Grok", ...}
 ```
 
 Without `iconFont`, an entry's `icon` is drawn in the menu font, so reach for
@@ -15,16 +15,16 @@ this font only when a Nerd Font glyph would misrepresent the thing. A generic
 robot for four different AI apps is the case that justifies a real mark; a
 folder or a microphone is not.
 
-`default/fonts/helios/README.md` lists every glyph with the URL its artwork
+`default/fonts/kestrel/README.md` lists every glyph with the URL its artwork
 came from. Keep that list accurate — it is the only record of provenance.
 
 ## Adding a glyph
 
-`helios dev font` does the work:
+`kestrel dev font` does the work:
 
 ```bash
-helios dev font list
-helios dev font add ollama https://simpleicons.org/icons/ollama.svg
+kestrel dev font list
+kestrel dev font add ollama https://simpleicons.org/icons/ollama.svg
 ```
 
 `add` fetches the SVG, scales it into the same 64..960 box the existing marks
@@ -48,15 +48,15 @@ Pick a source whose silhouette alone reads.
 
 The command prints these, and all of them matter:
 
-- Point the menu entry at the new codepoint with `"iconFont":"helios"`.
+- Point the menu entry at the new codepoint with `"iconFont":"kestrel"`.
 - Bump the charset range asserted in `test/shell.d/menu-test.sh`; that test
   pins the font's coverage and fails until it matches.
 - Check the README line the command added, and give it a proper display name
   with `--label` if the glyph name is not the brand's name.
 
-The font is package-owned: `helios-settings` installs it to
-`/usr/share/fonts/helios/helios.ttf`, so a new glyph reaches the desktop
-through a settings release, not through `helios update`. Between the merge and
+The font is package-owned: `kestrel-settings` installs it to
+`/usr/share/fonts/kestrel/kestrel.ttf`, so a new glyph reaches the desktop
+through a settings release, not through `kestrel update`. Between the merge and
 that release, a pulled checkout renders the new entry with no icon.
 
 ## Verifying
@@ -66,10 +66,10 @@ filled counters that a glyph list cannot show:
 
 ```bash
 python3 -c "open('/tmp/row.txt','w').write(' '.join(chr(c) for c in range(0xE900, 0xE910)))"
-magick -background white -fill black -font default/fonts/helios/helios.ttf \
+magick -background white -fill black -font default/fonts/kestrel/kestrel.ttf \
   -pointsize 110 label:@/tmp/row.txt /tmp/font-row.png
 ```
 
-Then confirm it in the running menu per [`visual-verification.md`](visual-verification.md). Avoid leaving two fonts with the `helios` family registered: Qt can use an old copy in `~/.local/share/fonts` even when `fc-match helios` reports the packaged font. For a preview, either replace the packaged file in the disposable VM or temporarily exclude it with a `<rejectfont>` rule in `~/.config/fontconfig/conf.d/` before loading the candidate.
+Then confirm it in the running menu per [`visual-verification.md`](visual-verification.md). Avoid leaving two fonts with the `kestrel` family registered: Qt can use an old copy in `~/.local/share/fonts` even when `fc-match kestrel` reports the packaged font. For a preview, either replace the packaged file in the disposable VM or temporarily exclude it with a `<rejectfont>` rule in `~/.config/fontconfig/conf.d/` before loading the candidate.
 
-Refresh the font cache and restart the shell afterwards — Qt reads the font database at startup, so `helios menu refresh` alone will not pick up a changed font. Remove temporary fonts and rules after verification.
+Refresh the font cache and restart the shell afterwards — Qt reads the font database at startup, so `kestrel menu refresh` alone will not pick up a changed font. Remove temporary fonts and rules after verification.

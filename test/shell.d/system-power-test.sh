@@ -8,7 +8,7 @@ trap 'rm -rf "$test_tmp"' EXIT
 mock_bin="$test_tmp/bin"
 call_log="$test_tmp/calls.log"
 mkdir -p "$mock_bin"
-export PATH="$mock_bin:$PATH" CALL_LOG="$call_log" HELIOS_PATH="$ROOT"
+export PATH="$mock_bin:$PATH" CALL_LOG="$call_log" KESTREL_PATH="$ROOT"
 
 cat >"$mock_bin/systemd-run" <<'SH'
 #!/bin/bash
@@ -32,14 +32,14 @@ trap 'rm -f "$CALL_LOG.inhibited"' EXIT
 "$@"
 SH
 
-for command in helios-state helios-hyprland-window-close-all helios-osd helios-notification-send sleep systemctl; do
+for command in kestrel-state kestrel-hyprland-window-close-all kestrel-osd kestrel-notification-send sleep systemctl; do
   cat >"$mock_bin/$command" <<'SH'
 #!/bin/bash
 
 command=${0##*/}
 printf '%s %s\n' "$command" "$*" >>"$CALL_LOG"
 case $command in
-  helios-hyprland-window-close-all)
+  kestrel-hyprland-window-close-all)
     if [[ ${BLOCK_WINDOW_CLOSE:-false} == "true" ]]; then
       for (( attempt = 0; attempt < 200; attempt++ )); do
         if [[ -f $CALL_LOG.poweroff ]]; then
@@ -52,14 +52,14 @@ case $command in
       exit 1
     fi
     ;;
-  helios-notification-send)
+  kestrel-notification-send)
     [[ ${FAIL_NOTIFICATION:-false} != "true" ]] || exit 42
     ;;
   sleep)
     if [[ $1 == "2" ]]; then
       # Synchronize with background preparation without a fixed test-time sleep.
       for (( attempt = 0; attempt < 200; attempt++ )); do
-        grep -q '^helios-hyprland-window-close-all ' "$CALL_LOG" && break
+        grep -q '^kestrel-hyprland-window-close-all ' "$CALL_LOG" && break
         /usr/bin/sleep 0.01
       done
       touch "$CALL_LOG.grace"
@@ -80,15 +80,15 @@ run_power_command() {
 
   : >"$call_log"
   rm -f "$CALL_LOG.grace"
-  "$ROOT/bin/helios-system-$action"
+  "$ROOT/bin/kestrel-system-$action"
 }
 
 run_power_command reboot
 printf '%s\n' \
   'systemd-run --user --collect --quiet --on-active=2s --timer-property=AccuracySec=100ms systemctl reboot --no-wall' \
-  'helios-osd -i reboot -m Rebooting -d 5000' \
-  'helios-state clear re*-required' \
-  'helios-hyprland-window-close-all ' \
+  'kestrel-osd -i reboot -m Rebooting -d 5000' \
+  'kestrel-state clear re*-required' \
+  'kestrel-hyprland-window-close-all ' \
   'sleep 1' >"$test_tmp/reboot-expected.log"
 diff -u "$test_tmp/reboot-expected.log" "$call_log" || fail "reboot runs after being scheduled outside the terminal scope"
 pass "reboot runs after being scheduled outside the terminal scope"
@@ -98,22 +98,22 @@ grep -q '^systemd-run --user --collect --quiet --property=Type=exec --property=R
 bash "$CALL_LOG.worker" || fail "protected shutdown succeeds"
 grep -q '^systemd-inhibit --what=sleep:idle:handle-lid-switch .* --mode=block .* --inhibited$' "$CALL_LOG" || fail "shutdown blocks sleep and lid handling"
 inhibit_line=$(grep -n '^systemd-inhibit ' "$CALL_LOG" | cut -d: -f1)
-osd_line=$(grep -n '^helios-osd ' "$CALL_LOG" | cut -d: -f1)
+osd_line=$(grep -n '^kestrel-osd ' "$CALL_LOG" | cut -d: -f1)
 (( inhibit_line < osd_line )) || fail "inhibition precedes preparation"
-grep -q '^helios-state clear re\*-required$' "$CALL_LOG" || fail "shutdown clears restart state"
-grep -q '^helios-hyprland-window-close-all ' "$CALL_LOG" || fail "shutdown closes windows"
+grep -q '^kestrel-state clear re\*-required$' "$CALL_LOG" || fail "shutdown clears restart state"
+grep -q '^kestrel-hyprland-window-close-all ' "$CALL_LOG" || fail "shutdown closes windows"
 grep -q '^systemctl poweroff --no-wall$' "$CALL_LOG" || fail "poweroff runs after the grace period while inhibited"
 [[ ! -f $CALL_LOG.inhibited ]] || fail "accepted poweroff releases inhibition"
-! grep -q '^helios-notification-send ' "$CALL_LOG" || fail "successful shutdown sends no failure notification"
+! grep -q '^kestrel-notification-send ' "$CALL_LOG" || fail "successful shutdown sends no failure notification"
 pass "shutdown stays inhibited through preparation and the poweroff request"
 
 : >"$call_log"
 rm -f "$CALL_LOG.grace" "$CALL_LOG.poweroff"
 # Dev link/unlink can leave the user manager pointing at a removed checkout.
-HELIOS_PATH="$test_tmp/removed-checkout" bash "$CALL_LOG.worker" || fail "shutdown uses its own script when the service environment is stale"
+KESTREL_PATH="$test_tmp/removed-checkout" bash "$CALL_LOG.worker" || fail "shutdown uses its own script when the service environment is stale"
 [[ -f $CALL_LOG.poweroff ]] || fail "shutdown reaches poweroff with a stale service environment"
 [[ ! -f $CALL_LOG.inhibited ]] || fail "shutdown releases inhibition with a stale service environment"
-! grep -q '^helios-notification-send ' "$CALL_LOG" || fail "stale service environment sends no failure notification"
+! grep -q '^kestrel-notification-send ' "$CALL_LOG" || fail "stale service environment sends no failure notification"
 pass "shutdown uses its own script when the service environment is stale"
 
 : >"$call_log"
@@ -128,7 +128,7 @@ pass "blocked window closing cannot delay poweroff"
 
 for action in reboot shutdown; do
   : >"$call_log"
-  if FAIL_SYSTEMD_RUN=true "$ROOT/bin/helios-system-$action"; then
+  if FAIL_SYSTEMD_RUN=true "$ROOT/bin/kestrel-system-$action"; then
     fail "$action aborts when scheduling fails"
   fi
 
@@ -148,7 +148,7 @@ for failure in FAIL_INHIBIT FAIL_POWEROFF; do
   if (( status != expected_status )); then
     fail "$failure propagates to the service"
   fi
-  grep -q '^helios-notification-send -u critical Shutdown failed Could not complete shutdown. Please try again.$' "$CALL_LOG" || fail "$failure notifies the user"
+  grep -q '^kestrel-notification-send -u critical Shutdown failed Could not complete shutdown. Please try again.$' "$CALL_LOG" || fail "$failure notifies the user"
   [[ ! -f $CALL_LOG.inhibited ]] || fail "$failure releases inhibition"
   if [[ $failure == "FAIL_INHIBIT" ]]; then
     (( $(wc -l <"$call_log") == 2 )) || fail "inhibitor failure leaves applications alone"

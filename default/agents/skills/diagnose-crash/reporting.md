@@ -1,31 +1,31 @@
-# Reporting a Crash Upstream to HeliOS
+# Reporting a Crash Upstream to Kestrel
 
-Read this only after concluding that a crash is genuinely HeliOS's to fix.
+Read this only after concluding that a crash is genuinely Kestrel's to fix.
 
-## Is it even HeliOS's bug?
+## Is it even Kestrel's bug?
 
-Be strict here. HeliOS is a configuration layer over Arch Linux, so a crash
+Be strict here. Kestrel is a configuration layer over Arch Linux, so a crash
 inside a third-party application — a file manager, a browser, a GNOME or Qt
-library — is almost always an upstream bug in **that** project, not in HeliOS.
+library — is almost always an upstream bug in **that** project, not in Kestrel.
 
-HeliOS's sphere of control is roughly:
+Kestrel's sphere of control is roughly:
 
-- the `helios-*` commands
+- the `kestrel-*` commands
 - the Quickshell shell and its plugins
 - the Hyprland and terminal configuration it ships
 - its themes
 - its install and migration scripts
 - how it packages and configures what it installs
 
-A crash in a program HeliOS merely installs is **not** an HeliOS bug unless
-HeliOS's own packaging or configuration is implicated.
+A crash in a program Kestrel merely installs is **not** an Kestrel bug unless
+Kestrel's own packaging or configuration is implicated.
 
-If it is not HeliOS's, say so and stop. Suggesting the right upstream project is
+If it is not Kestrel's, say so and stop. Suggesting the right upstream project is
 useful; filing there yourself is not part of this.
 
 ## Three conditions, all required
 
-1. **It is a verified bug in HeliOS's sphere**, established on evidence. Issues
+1. **It is a verified bug in Kestrel's sphere**, established on evidence. Issues
    are for verified bugs only. An "is this even a bug?" belongs on the Discord at
    <https://omarchy.org/discord>; a feature idea belongs in GitHub Discussions
    under Suggestions.
@@ -86,8 +86,8 @@ gh issue create --repo omacom/omarchy --title "..." --body "..."
 ```
 
 Include what happened, what was expected, steps to reproduce, system details from
-`helios version`, and diagnostics from `helios debug --no-sudo --print` (which
-also writes `/tmp/helios-debug.log`; the interactive `helios debug` can upload
+`kestrel version`, and diagnostics from `kestrel debug --no-sudo --print` (which
+also writes `/tmp/kestrel-debug.log`; the interactive `kestrel debug` can upload
 it and print a shareable URL worth including).
 
 `gh` cannot attach media. If a screenshot would help, save one and give the user

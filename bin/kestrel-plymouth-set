@@ -1,0 +1,434 @@
+#!/bin/bash
+
+# kestrel:summary=Set the Plymouth boot theme colors, logo and optional LUKS background
+# kestrel:args=<background-hex> <text-hex> <path-to-logo.png> [path-to-background.png]
+# kestrel:examples=kestrel plymouth set '#1d2021' '#ebdbb2' ~/.local/state/kestrel/current/theme/plymouth/logo.png
+# kestrel:examples=kestrel plymouth set '#1d2021' '#ebdbb2' unlock.png ~/Pictures/luks-background.png
+# kestrel:requires-sudo=true
+
+set -euo pipefail
+
+# Build the authoritative theme in a root-owned directory, then publish each
+# fixed destination atomically. The caller opens the selected logo before sudo,
+# so the privileged process never resolves a user-controlled input path.
+
+usage() {
+  echo "Usage: kestrel-plymouth-set <background-hex> <text-hex> <path-to-logo.png>" >&2
+  exit 1
+}
+
+if (( $# == 3 || $# == 4 )); then
+  mode=set
+elif (( $# == 1 )); then
+  case "$1" in
+  --refresh-default)
+    mode=refresh-plymouth
+    ;;
+  --refresh-sddm-default)
+    mode=refresh-sddm
+    ;;
+  *)
+    usage
+    ;;
+  esac
+else
+  usage
+fi
+
+if (( EUID == 0 )); then
+  echo "Error: run kestrel-plymouth-set as your user, not under sudo." >&2
+  exit 1
+fi
+
+background_path=
+if [[ $mode != "set" ]]; then
+  bg_hex=
+  text_hex=
+else
+  bg_hex="${1#\#}"
+  text_hex="${2#\#}"
+  logo_path="$3"
+  background_path="${4:-}"
+
+  if ! [[ $bg_hex =~ ^[0-9a-fA-F]{6}$ ]]; then
+    echo "Invalid background color: $1 (expected #RRGGBB)" >&2
+    exit 1
+  fi
+
+  if ! [[ $text_hex =~ ^[0-9a-fA-F]{6}$ ]]; then
+    echo "Invalid text color: $2 (expected #RRGGBB)" >&2
+    exit 1
+  fi
+
+  if [[ ! -f $logo_path ]]; then
+    echo "Logo file not found: $logo_path" >&2
+    exit 1
+  fi
+
+  if [[ -L $logo_path ]]; then
+    echo "Logo file is a symlink, which is not accepted: $logo_path" >&2
+    exit 1
+  fi
+
+  # The selected images are streamed by this unprivileged process, so a symlink
+  # swapped in after validation is read as the user and can never publish a
+  # root-only file. The privileged side reads only from that stream.
+  if [[ -n $background_path ]]; then
+    if [[ ! -f $background_path ]]; then
+      echo "Background file not found: $background_path" >&2
+      exit 1
+    fi
+    if [[ -L $background_path ]]; then
+      echo "Background file is a symlink, which is not accepted: $background_path" >&2
+      exit 1
+    fi
+  fi
+fi
+
+run_root_transaction() {
+  sudo /bin/bash -c '
+    set -eEuo pipefail
+    PATH=/usr/bin:/bin
+    export PATH
+    umask 077
+
+    # Every check below is a bare assertion that aborts under set -e. Name the
+    # subject of each one so a refusal reaches the user instead of exiting mute.
+    failure_context="the privileged Plymouth transaction"
+    failure_reported=
+    report_failure() {
+      [[ -z $failure_reported ]] || return 0
+      failure_reported=1
+      printf "kestrel-plymouth-set: refusing to publish: %s failed validation\n" "$failure_context" >&2
+      if [[ -n ${failure_hint:-} ]]; then
+        printf "kestrel-plymouth-set: %s\n" "$failure_hint" >&2
+      fi
+    }
+    trap report_failure ERR
+
+    mode=$1
+    source_root=$2
+    bg_hex=$3
+    text_hex=$4
+    max_asset_size=$5
+
+    failure_context="the arguments of the privileged transaction"
+    [[ $mode == "set" || $mode == "refresh-plymouth" || $mode == "refresh-sddm" ]]
+    [[ $source_root == /* ]]
+    [[ $max_asset_size =~ ^[0-9]+$ ]]
+    (( max_asset_size > 0 ))
+
+    failure_context="the Kestrel source tree $source_root"
+    canonical_source_root=$(realpath -e -- "$source_root")
+    [[ $canonical_source_root == "$source_root" ]]
+
+    validate_trusted_directory() {
+      local directory=$1 canonical uid directory_mode
+
+      failure_context="directory $directory"
+      canonical=$(realpath -e -- "$directory")
+      [[ $canonical == "$directory" && -d $directory && ! -L $directory ]]
+
+      while :; do
+        failure_context="directory $directory (must be root-owned and not group- or world-writable)"
+        uid=$(stat -c %u -- "$directory")
+        directory_mode=$(stat -c %a -- "$directory")
+        (( uid == 0 ))
+        (( (8#$directory_mode & 0022) == 0 ))
+        [[ $directory == "/" ]] && break
+        directory=${directory%/*}
+        [[ -n $directory ]] || directory=/
+      done
+    }
+
+    validate_trusted_configuration_file() {
+      local configuration=$1 canonical uid configuration_mode size
+
+      failure_context="root configuration $configuration"
+      [[ -f $configuration && ! -L $configuration ]]
+      canonical=$(realpath -e -- "$configuration")
+      [[ $canonical == "$configuration" ]]
+      validate_trusted_directory "${configuration%/*}"
+      uid=$(stat -c %u -- "$configuration")
+      configuration_mode=$(stat -c %a -- "$configuration")
+      size=$(stat -c %s -- "$configuration")
+      (( uid == 0 ))
+      (( (8#$configuration_mode & 0022) == 0 ))
+      (( size > 0 && size <= 4096 ))
+    }
+
+    # A packaged tree must be root-owned. A development checkout is the one
+    # deliberate exception: kestrel dev link records its canonical path in a
+    # root-owned /etc/kestrel.conf. That is already an explicit decision to run
+    # privileged Kestrel commands from user-editable code in the checkout, so
+    # reading its packaged assets does not widen the development trust boundary.
+    development_source=false
+    source_root_uid=$(stat -c %u -- "$source_root")
+    if (( source_root_uid != 0 )); then
+      kestrel_conf=/etc/kestrel.conf
+      failure_context="$source_root is user-owned and $kestrel_conf must contain its trusted dev-link authorization; run kestrel dev link to authorize it"
+      failure_hint="$source_root is user-owned; run kestrel dev link to authorize this development checkout, or kestrel dev unlink to use the packaged tree"
+      validate_trusted_configuration_file "$kestrel_conf"
+
+      # validate_trusted_configuration_file walks /etc up to / and leaves its own
+      # subject behind in failure_context. Without restoring ours, a checkout
+      # that simply is not the authorized one refuses with "directory / must be
+      # root-owned and not group- or world-writable" -- naming a directory that
+      # passed, and sending the reader after a filesystem problem that is not
+      # there.
+      failure_context="the dev-link authorization in $kestrel_conf, which must name $source_root"
+
+      quoted_source_root=$source_root
+      quoted_source_root=${quoted_source_root//\\/\\\\}
+      quoted_source_root=${quoted_source_root//\"/\\\"}
+      quoted_source_root=${quoted_source_root//\$/\\\$}
+      quoted_source_root=${quoted_source_root//\`/\\\`}
+      expected_config_line="export KESTREL_PATH=\"$quoted_source_root\""
+      mapfile -t kestrel_config_lines <"$kestrel_conf"
+      (( ${#kestrel_config_lines[@]} == 1 ))
+      [[ ${kestrel_config_lines[0]} == "$expected_config_line" ]]
+      development_source=true
+      failure_hint=
+    fi
+
+    if [[ $mode == "set" ]]; then
+      [[ $bg_hex =~ ^[0-9a-fA-F]{6}$ ]]
+      [[ $text_hex =~ ^[0-9a-fA-F]{6}$ ]]
+    fi
+
+    theme_dir=/usr/share/plymouth/themes/kestrel
+    sddm_dir=/usr/share/sddm/themes/kestrel
+    plymouth_theme_assets=(
+      bullet.png
+      entry.png
+      lock.png
+      logo.png
+      kestrel.plymouth
+      kestrel.script
+      preview-unlock.png
+      progress_bar.png
+      progress_box.png
+    )
+    plymouth_default_assets=("${plymouth_theme_assets[@]}" logos/oma.png)
+    sddm_theme_assets=(Main.qml bullet.png entry-failed.png entry.png lock-failed.png lock.png logo.png)
+    sddm_default_assets=("${sddm_theme_assets[@]}" metadata.desktop theme.conf)
+
+    plymouth_assets=()
+    sddm_assets=()
+    case "$mode" in
+    set)
+      plymouth_assets=("${plymouth_theme_assets[@]}")
+      sddm_assets=("${sddm_theme_assets[@]}")
+      ;;
+    refresh-plymouth)
+      plymouth_assets=("${plymouth_default_assets[@]}")
+      ;;
+    refresh-sddm)
+      sddm_assets=("${sddm_default_assets[@]}")
+      ;;
+    esac
+
+    validate_trusted_file() {
+      local source=$1 canonical uid file_mode size
+
+      failure_context="packaged source file $source"
+      [[ -f $source && ! -L $source ]]
+      canonical=$(realpath -e -- "$source")
+      [[ $canonical == "$source" ]]
+      file_mode=$(stat -c %a -- "$source")
+      size=$(stat -c %s -- "$source")
+      (( size > 0 && size <= max_asset_size ))
+
+      if ! $development_source; then
+        validate_trusted_directory "${source%/*}"
+        uid=$(stat -c %u -- "$source")
+        (( uid == 0 ))
+        (( (8#$file_mode & 0022) == 0 ))
+      fi
+    }
+
+    copy_trusted_file() {
+      local source=$1 destination=$2
+
+      validate_trusted_file "$source"
+      install -o 0 -g 0 -m 0600 -- "$source" "$destination"
+    }
+
+    staging_dir=$(mktemp -d /tmp/kestrel-plymouth.XXXXXXXX)
+    temporary=
+    cleanup() {
+      [[ -z $temporary ]] || rm -f -- "$temporary"
+      rm -rf -- "$staging_dir"
+    }
+    trap cleanup EXIT HUP INT TERM
+    chown 0:0 -- "$staging_dir"
+    chmod 0700 -- "$staging_dir"
+
+    plymouth_stage=$staging_dir/plymouth
+    sddm_stage=$staging_dir/sddm
+    mkdir -m 0700 -p -- "$plymouth_stage/logos" "$sddm_stage"
+
+    for asset in "${plymouth_assets[@]}"; do
+      copy_trusted_file "$source_root/default/plymouth/$asset" "$plymouth_stage/$asset"
+    done
+
+    background_size=0
+    if [[ $mode == "set" ]]; then
+      # stdin is a framed stream built by the unprivileged caller: a 16-byte
+      # magic, a 10-byte logo size, a 10-byte background size, then the logo
+      # and optional background bytes. Buffer it under the documented limit
+      # before doing other work, then split it.
+      failure_context="the framed image payload from the calling user"
+      head -c "$((36 + 2 * max_asset_size))" >"$staging_dir/payload.bin"
+      plymouth_frame_magic=$(head -c 16 -- "$staging_dir/payload.bin")
+      [[ $plymouth_frame_magic == "KESTRELPLY-FRAME1" ]]
+      logo_size_text=$(dd if="$staging_dir/payload.bin" bs=1 skip=16 count=10 status=none)
+      background_size_text=$(dd if="$staging_dir/payload.bin" bs=1 skip=26 count=10 status=none)
+      [[ $logo_size_text =~ ^[0-9]{10}$ ]]
+      [[ $background_size_text =~ ^[0-9]{10}$ ]]
+      logo_size=$((10#$logo_size_text))
+      background_size=$((10#$background_size_text))
+      (( logo_size > 0 && logo_size <= max_asset_size ))
+      (( background_size >= 0 && background_size <= max_asset_size ))
+      (( $(stat -c %s -- "$staging_dir/payload.bin") >= 36 + logo_size + background_size ))
+
+      failure_context="the selected logo (expected 1 to $max_asset_size bytes)"
+      tail -c +37 -- "$staging_dir/payload.bin" | head -c "$logo_size" >"$plymouth_stage/logo.png"
+      (( $(stat -c %s -- "$plymouth_stage/logo.png") == logo_size ))
+      chown 0:0 -- "$plymouth_stage/logo.png"
+      chmod 0600 -- "$plymouth_stage/logo.png"
+      cp --reflink=never -- "$plymouth_stage/logo.png" "$sddm_stage/logo.png"
+
+      if (( background_size > 0 )); then
+        failure_context="the selected LUKS background (expected 1 to $max_asset_size bytes)"
+        tail -c +$((37 + logo_size)) -- "$staging_dir/payload.bin" >"$plymouth_stage/background.png"
+        (( $(stat -c %s -- "$plymouth_stage/background.png") == background_size ))
+        chown 0:0 -- "$plymouth_stage/background.png"
+        chmod 0600 -- "$plymouth_stage/background.png"
+      fi
+
+      bg_r=$(awk -v n=$((16#${bg_hex:0:2})) "BEGIN{printf \"%.3f\", n/255}")
+      bg_g=$(awk -v n=$((16#${bg_hex:2:2})) "BEGIN{printf \"%.3f\", n/255}")
+      bg_b=$(awk -v n=$((16#${bg_hex:4:2})) "BEGIN{printf \"%.3f\", n/255}")
+
+      sed -i \
+        -e "s/^Window.SetBackgroundTopColor.*/Window.SetBackgroundTopColor($bg_r, $bg_g, $bg_b);/" \
+        -e "s/^Window.SetBackgroundBottomColor.*/Window.SetBackgroundBottomColor($bg_r, $bg_g, $bg_b);/" \
+        "$plymouth_stage/kestrel.script"
+
+      for asset in bullet.png entry.png lock.png progress_bar.png; do
+        magick "$plymouth_stage/$asset" -channel RGB +level-colors "#$text_hex","#$text_hex" "$plymouth_stage/$asset"
+      done
+
+      copy_trusted_file "$source_root/default/sddm/kestrel/Main.qml" "$sddm_stage/Main.qml"
+      sed -i \
+        -e "s/#1a1b26/#__KESTREL_SDDM_BG__/g" \
+        -e "s/#ffffff/#__KESTREL_SDDM_TEXT__/g" \
+        -e "s/#__KESTREL_SDDM_BG__/#$bg_hex/g" \
+        -e "s/#__KESTREL_SDDM_TEXT__/#$text_hex/g" \
+        "$sddm_stage/Main.qml"
+
+      for asset in bullet.png entry.png lock.png; do
+        cp --reflink=never -- "$plymouth_stage/$asset" "$sddm_stage/$asset"
+      done
+      for asset in entry lock; do
+        magick "$plymouth_stage/$asset.png" -channel RGB +level-colors "#f7768e","#f7768e" "$sddm_stage/$asset-failed.png"
+      done
+      chown -R 0:0 -- "$staging_dir"
+      find "$staging_dir" -type f -exec chmod 0600 -- {} +
+    elif (( ${#sddm_assets[@]} )); then
+      for asset in "${sddm_assets[@]}"; do
+        copy_trusted_file "$source_root/default/sddm/kestrel/$asset" "$sddm_stage/$asset"
+      done
+    fi
+
+    if (( ${#plymouth_assets[@]} )); then
+      validate_trusted_directory "$theme_dir"
+      if [[ $mode == "refresh-plymouth" ]]; then
+        validate_trusted_directory "$theme_dir/logos"
+      fi
+    fi
+    if (( ${#sddm_assets[@]} )); then
+      validate_trusted_directory "$sddm_dir"
+    fi
+
+    publish_asset() {
+      local source=$1 destination=$2 parent filename source_size copied_size
+
+      failure_context="destination $destination"
+      [[ -f $source && ! -L $source ]]
+      (( $(stat -c %u -- "$source") == 0 ))
+      source_size=$(stat -c %s -- "$source")
+      (( source_size > 0 && source_size <= max_asset_size ))
+
+      [[ $destination == /* && $destination != */ && $destination != *"/../"* ]]
+      parent=${destination%/*}
+      filename=${destination##*/}
+      [[ -n $parent && -n $filename && $filename != "." && $filename != ".." ]]
+      validate_trusted_directory "$parent"
+
+      temporary=$(mktemp --tmpdir="$parent" ".$filename.kestrel-new.XXXXXXXX")
+      install -o 0 -g 0 -m 0644 -- "$source" "$temporary"
+      copied_size=$(stat -c %s -- "$temporary")
+      (( copied_size == source_size ))
+      cmp -s -- "$source" "$temporary"
+      sync -f -- "$temporary"
+      mv --no-copy -fT -- "$temporary" "$destination"
+      temporary=
+    }
+
+    if (( ${#plymouth_assets[@]} )); then
+      for asset in "${plymouth_assets[@]}"; do
+        publish_asset "$plymouth_stage/$asset" "$theme_dir/$asset"
+      done
+
+      # The background is optional and never part of the packaged asset list:
+      # publish it when supplied, otherwise remove any stale one so the solid
+      # color fallback shows.
+      if (( background_size > 0 )); then
+        publish_asset "$plymouth_stage/background.png" "$theme_dir/background.png"
+      else
+        rm -f -- "$theme_dir/background.png"
+      fi
+    fi
+
+    if (( ${#sddm_assets[@]} )); then
+      for asset in "${sddm_assets[@]}"; do
+        publish_asset "$sddm_stage/$asset" "$sddm_dir/$asset"
+      done
+      validate_trusted_directory "$sddm_dir"
+      rm -f -- "$sddm_dir/logo.svg"
+    fi
+  ' bash "$mode" "$KESTREL_PATH" "$bg_hex" "$text_hex" "$((64 * 1024 * 1024))"
+}
+
+if [[ $mode == "set" ]]; then
+  logo_size=$(stat -c %s -- "$logo_path")
+  if [[ -n $background_path ]]; then
+    background_size=$(stat -c %s -- "$background_path")
+  else
+    background_size=0
+  fi
+
+  {
+    printf 'KESTRELPLY-FRAME1'
+    printf '%010d' "$logo_size"
+    printf '%010d' "$background_size"
+    cat -- "$logo_path"
+    if (( background_size > 0 )); then
+      cat -- "$background_path"
+    fi
+  } | run_root_transaction
+else
+  run_root_transaction </dev/null
+fi
+
+if [[ $mode != "refresh-sddm" ]]; then
+  sudo plymouth-set-default-theme kestrel
+
+  if kestrel-cmd-present limine-mkinitcpio; then
+    sudo limine-mkinitcpio
+  else
+    sudo mkinitcpio -P
+  fi
+fi

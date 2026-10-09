@@ -4,13 +4,13 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
-remove="${REMOVE_SECURITY_SSHD_UNDER_TEST:-$ROOT/bin/helios-remove-security-sshd}"
+remove="${REMOVE_SECURITY_SSHD_UNDER_TEST:-$ROOT/bin/kestrel-remove-security-sshd}"
 test_dir=$(mktemp -d)
 stub_bin="$test_dir/bin"
 mkdir -p "$stub_bin"
 trap 'rm -rf "$test_dir"' EXIT
 
-cat >"$stub_bin/helios-cmd-present" <<'STUB'
+cat >"$stub_bin/kestrel-cmd-present" <<'STUB'
 #!/bin/bash
 [[ $1 == "ufw" && ${UFW_PRESENT:-1} == 1 ]]
 STUB

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kestrel:summary=Check whether a webcam is available
+
+[[ -n $(kestrel-capture-webcam-list) ]]

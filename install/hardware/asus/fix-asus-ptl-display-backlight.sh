@@ -7,7 +7,7 @@
 # Without xe.enable_dpcd_backlight=1, intel_backlight sysfs writes succeed
 # but produce no visible change; brightness is effectively binary.
 
-if helios-hw-asus-expertbook-b9406 || helios-hw-asus-zenbook-ux5406aa; then
+if kestrel-hw-asus-expertbook-b9406 || kestrel-hw-asus-zenbook-ux5406aa; then
   sudo mkdir -p /etc/limine-entry-tool.d
   sudo tee /etc/limine-entry-tool.d/asus-ptl-display-backlight.conf >/dev/null <<'EOF'
 # ASUS Panther Lake display backlight fix

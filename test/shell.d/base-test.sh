@@ -27,13 +27,13 @@ fail() {
   exit 1
 }
 
-# The IPC socket a shell running an HELIOS_PATH's config on this display
-# serves, derived as helios-shell derives it. A test that starts the real
+# The IPC socket a shell running an KESTREL_PATH's config on this display
+# serves, derived as kestrel-shell derives it. A test that starts the real
 # shell removes it afterwards: killing the shell leaves the file behind.
 shell_ipc_socket() {
   local id
   id=$(printf '%s\n%s' "$1/shell" "${WAYLAND_DISPLAY:-}" | md5sum)
-  printf '%s/helios-shell-%s.sock\n' "${XDG_RUNTIME_DIR:-/run/user/$UID}" "${id:0:16}"
+  printf '%s/kestrel-shell-%s.sock\n' "${XDG_RUNTIME_DIR:-/run/user/$UID}" "${id:0:16}"
 }
 
 require_command() {
@@ -62,7 +62,7 @@ compositor_reachable() {
   [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || return 0
 
   # Hyprland can miss a query while it reconfigures outputs, and one miss is not
-  # a dead compositor; retry the way helios-launch-shell does rather than
+  # a dead compositor; retry the way kestrel-launch-shell does rather than
   # discard a whole file's runtime coverage. Only a leftover socket gets this
   # far, so the waiting is rare.
   local attempt

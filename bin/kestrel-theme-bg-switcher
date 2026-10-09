@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# kestrel:summary=Open the Kestrel background switcher
+# kestrel:group=theme
+# kestrel:name=bg-switcher
+# kestrel:aliases=kestrel background
+
+theme_name=$(cat "$HOME/.local/state/kestrel/current/theme.name" 2>/dev/null)
+current_background=$(readlink -f "$HOME/.local/state/kestrel/current/background" 2>/dev/null)
+
+kestrel-menu-images \
+  --selected "$current_background" \
+  "$HOME/.local/state/kestrel/current/theme/backgrounds" \
+  "$HOME/.config/kestrel/backgrounds/$theme_name"

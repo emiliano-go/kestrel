@@ -6,9 +6,9 @@ import qs.Commons as Commons
 
 BarWidget {
   id: root
-  moduleName: "helios.media"
+  moduleName: "kestrel.media"
 
-  readonly property var mediaService: bar?.shell?.firstPartyServiceFor("helios.media")
+  readonly property var mediaService: bar?.shell?.firstPartyServiceFor("kestrel.media")
   readonly property var activePlayer: mediaService ? mediaService.activePlayer : null
   readonly property var sourcePlayers: mediaService ? mediaService.sourcePlayers : []
 

@@ -14,8 +14,8 @@ set -euo pipefail
 systemctl --user daemon-reload
 systemctl --user enable --now \
   bt-agent.service \
-  helios-recover-internal-monitor.service \
-  helios-sleep-lock.service \
-  helios-migrate-notify.service \
-  helios-fcitx5.service \
-  helios-crash-watch.service
+  kestrel-recover-internal-monitor.service \
+  kestrel-sleep-lock.service \
+  kestrel-migrate-notify.service \
+  kestrel-fcitx5.service \
+  kestrel-crash-watch.service

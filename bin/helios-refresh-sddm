@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Refresh the SDDM theme from default
-# helios:requires-sudo=true
-
-# Reuse the fixed-file publisher so root never resolves an untrusted source or
-# follows a destination symlink while restoring the packaged SDDM theme.
-exec "$HELIOS_PATH/bin/helios-plymouth-set" --refresh-sddm-default

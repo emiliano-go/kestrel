@@ -59,10 +59,10 @@ else
 fi
 
 # Touch .plymouth-sync-needed to signal rebuild on shutdown / reboot
-touch "$HOME/.config/helios/.plymouth-sync-needed"
+touch "$HOME/.config/kestrel/.plymouth-sync-needed"
 
 # Create the systemd service
-sudo tee /etc/systemd/system/helios-plymouth-shutdown.service >/dev/null <<EOF
+sudo tee /etc/systemd/system/kestrel-plymouth-shutdown.service >/dev/null <<EOF
 [Unit]
 Description=Sync Plymouth Theme on Shutdown
 DefaultDependencies=yes
@@ -72,7 +72,7 @@ After=network-online.target
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/bin/true
-ExecStop=$HOME/.local/share/helios/bin/helios-plymouth-shutdown-sync
+ExecStop=$HOME/.local/share/kestrel/bin/kestrel-plymouth-shutdown-sync
 
 [Install]
 WantedBy=multi-user.target
@@ -80,5 +80,5 @@ EOF
 
 # Reload systemd and enable the service
 sudo systemctl daemon-reload
-sudo systemctl enable helios-plymouth-shutdown.service
-sudo systemctl start helios-plymouth-shutdown.service
+sudo systemctl enable kestrel-plymouth-shutdown.service
+sudo systemctl start kestrel-plymouth-shutdown.service

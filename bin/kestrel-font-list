@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kestrel:summary=List available monospace fonts
+# kestrel:examples=kestrel font list | kestrel font set "CaskaydiaMono Nerd Font"
+
+fc-list :spacing=100 -f "%{family[0]}\n" | grep -v -i -E 'emoji|signwriting|kestrel' | sort -u

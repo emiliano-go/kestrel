@@ -34,8 +34,8 @@ class StatusNotifierItem(dbus.service.Object):
 
     return dbus.Dictionary({
       "Category": "ApplicationStatus",
-      "Id": "helios-test-tray",
-      "Title": "helios-test-tray",
+      "Id": "kestrel-test-tray",
+      "Title": "kestrel-test-tray",
       "Status": "Active",
       "WindowId": dbus.Int32(0),
       "IconName": "dialog-information",
@@ -45,7 +45,7 @@ class StatusNotifierItem(dbus.service.Object):
       "ToolTip": dbus.Struct((
         "",
         dbus.Array([], signature="(iiay)"),
-        "helios-test-tray",
+        "kestrel-test-tray",
         "",
       ), signature=None),
     }, signature="sv")
@@ -157,12 +157,12 @@ def main():
 
 
 def run():
-  event_path = os.environ["HELIOS_TRAY_MENU_EVENT_RESULT"]
-  ready_path = os.environ["HELIOS_TRAY_MENU_READY"]
+  event_path = os.environ["KESTREL_TRAY_MENU_EVENT_RESULT"]
+  ready_path = os.environ["KESTREL_TRAY_MENU_READY"]
 
   DBusGMainLoop(set_as_default=True)
   bus = dbus.SessionBus()
-  dbus.service.BusName("org.helios.TestStatusNotifier", bus)
+  dbus.service.BusName("org.kestrel.TestStatusNotifier", bus)
 
   StatusNotifierItem(bus)
   DBusMenu(bus, event_path)

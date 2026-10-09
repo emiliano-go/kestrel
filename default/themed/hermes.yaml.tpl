@@ -1,5 +1,5 @@
-name: helios
-description: HeliOS system theme
+name: kestrel
+description: Kestrel system theme
 colors:
   background: "{{ background }}"
   ui_text: "{{ foreground }}"

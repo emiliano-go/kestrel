@@ -1,8 +1,8 @@
 # Fix audio volume on Asus ROG laptops by using a soft mixer.
 
-if helios-hw-asus-rog; then
+if kestrel-hw-asus-rog; then
   mkdir -p ~/.config/wireplumber/wireplumber.conf.d/
-  cp "$HELIOS_PATH/default/wireplumber/wireplumber.conf.d/alsa-soft-mixer.conf" ~/.config/wireplumber/wireplumber.conf.d/
+  cp "$KESTREL_PATH/default/wireplumber/wireplumber.conf.d/alsa-soft-mixer.conf" ~/.config/wireplumber/wireplumber.conf.d/
   rm -rf ~/.local/state/wireplumber/default-routes
 
   # Unmute the Master control on the ALC285 card (often muted by default)

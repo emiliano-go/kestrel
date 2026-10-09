@@ -2,6 +2,6 @@
 # driver family requires this firmware; without it PipeWire exposes only a
 # Dummy Output sink.
 
-if helios-hw-intel-sof; then
-  helios-pkg-add sof-firmware
+if kestrel-hw-intel-sof; then
+  kestrel-pkg-add sof-firmware
 fi

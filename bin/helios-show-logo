@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Display the HeliOS logo in the terminal using green color.
-
-clear
-echo -e "\033[32m"
-cat <$HELIOS_PATH/logo.txt
-echo -e "\033[0m"
-echo

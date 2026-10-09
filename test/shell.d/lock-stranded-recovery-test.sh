@@ -15,7 +15,7 @@ assert(
 )
 
 assert(
-  /id: strandedLockCheckProc[\s\S]*helios-hyprland-session-locked/.test(serviceQml),
+  /id: strandedLockCheckProc[\s\S]*kestrel-hyprland-session-locked/.test(serviceQml),
   'the startup check goes through the shared session lock helper'
 )
 
@@ -30,7 +30,7 @@ assert(
   'only a compositor that reports a lock counts as a stranded lock'
 )
 
-// helios-restart-shell re-locks a fresh shell, possibly mid-question.
+// kestrel-restart-shell re-locks a fresh shell, possibly mid-question.
 assert(
   /root\.strandedLock = exitCode === 0 && !root\.locked && !root\.lockRequested/.test(serviceQml),
   'a lock this shell took while the check was in flight is not stranded'

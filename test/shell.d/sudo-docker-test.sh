@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# helios-sudo-docker is the single answer to "does Docker need sudo", and it
+# kestrel-sudo-docker is the single answer to "does Docker need sudo", and it
 # answers two different questions on purpose. The default asks whether this
 # session can reach the socket, which is what decides if a command must elevate.
 # --configured asks whether the account is set up for sudoless Docker, which is
@@ -14,7 +14,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
-command="$ROOT/bin/helios-sudo-docker"
+command="$ROOT/bin/kestrel-sudo-docker"
 
 # Stub id so the configured groups are controllable.
 mkdir -p "$TMPDIR/bin"
@@ -33,7 +33,7 @@ chmod 600 "$reachable_socket"
 chmod 400 "$blocked_socket"
 
 run() { # SOCKET GROUPS [--configured]
-  env PATH="$TMPDIR/bin:$PATH" HELIOS_DOCKER_SOCKET="$1" STUB_GROUPS="$2" USER=tester \
+  env PATH="$TMPDIR/bin:$PATH" KESTREL_DOCKER_SOCKET="$1" STUB_GROUPS="$2" USER=tester \
     bash "$command" ${3:+"$3"}
 }
 

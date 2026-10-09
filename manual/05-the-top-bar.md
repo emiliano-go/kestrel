@@ -1,14 +1,14 @@
 # The Top Bar
 
-The strip along the top of your screen is the HeliOS bar. It's not a bolted-on status bar but part of the HeliOS shell, the single long-running Quickshell process that also draws the menu, the notifications, the OSD popups, and the lock screen. That's why it themes perfectly with everything else and why a panel opens instantly instead of spawning a new app.
+The strip along the top of your screen is the Kestrel bar. It's not a bolted-on status bar but part of the Kestrel shell, the single long-running Quickshell process that also draws the menu, the notifications, the OSD popups, and the lock screen. That's why it themes perfectly with everything else and why a panel opens instantly instead of spawning a new app.
 
 It's also the one piece of the desktop that's always on screen, so it's worth knowing what all those little glyphs do.
 
 ## What's on it by default
 
-The bar has three sections. On the left sits the HeliOS logo (the menu launcher) and the workspace indicators. In the center you get the status indicators, the clock, the keyboard layout, the weather, and an HeliOS update badge. On the right: the system tray, agents, bluetooth, network, audio, display, and power.
+The bar has three sections. On the left sits the Kestrel logo (the menu launcher) and the workspace indicators. In the center you get the status indicators, the clock, the keyboard layout, the weather, and an Kestrel update badge. On the right: the system tray, agents, bluetooth, network, audio, display, and power.
 
-A few of those only show up when they have something to say. The keyboard layout appears only if you've configured more than one layout. The update badge appears only when there's an HeliOS update waiting. And the agents icon appears the first time HeliOS finds AI coding usage on the machine (see [AI](17-ai.md)).
+A few of those only show up when they have something to say. The keyboard layout appears only if you've configured more than one layout. The update badge appears only when there's an Kestrel update waiting. And the agents icon appears the first time Kestrel finds AI coding usage on the machine (see [AI](17-ai.md)).
 
 ## Clicking around
 
@@ -16,7 +16,7 @@ Nearly every widget does something on left, right, and middle click, and several
 
 | Widget | Left | Right | Middle / scroll |
 | --- | --- | --- | --- |
-| Menu | HeliOS menu | New terminal | — |
+| Menu | Kestrel menu | New terminal | — |
 | Workspaces | Focus that workspace | — | — |
 | Clock | Calendar popup | Cycle the label format | Middle: timezone picker |
 | Weather | Forecast popup | Full weather as a notification | Middle: refresh |
@@ -29,7 +29,7 @@ Nearly every widget does something on left, right, and middle click, and several
 | Media | Play/pause | Cover-art popup | Middle: next · scroll: prev/next |
 | Agents | Agents panel | Launch your agent | Middle: next subscription |
 | Tray | Hover to reveal the drawer | Right on the chevron to manage | — |
-| HeliOS update | Run the update | — | — |
+| Kestrel update | Run the update | — | — |
 
 Not everything in that table is on your bar out of the box. The media widget (MPRIS now-playing, with a scrolling track and artist) and the microphone widget are both built in but off by default — add them if you want them, as described below.
 
@@ -65,7 +65,7 @@ Every panel takes the keyboard as well as the mouse: arrows move, Return activat
 
 Two more widgets appear on the bar only once you install the matching service from **Install → Service**, and both are worth knowing about because they do more than report status.
 
-The **Tailscale** panel connects and disconnects the tailnet, switches between accounts, and picks an exit node (your own machines and Mullvad regions both show up in that list). It also browses your machines — and with one selected, `s` sends files to it over Taildrop, which is the fastest way to move a file to your phone or another laptop. `c` copies the machine's IP, `n` its name, and `d` its full DNS name. There's a send button on each machine row too, if you'd rather click. The same thing from the terminal is `helios tailscale send <machine> [file...]`.
+The **Tailscale** panel connects and disconnects the tailnet, switches between accounts, and picks an exit node (your own machines and Mullvad regions both show up in that list). It also browses your machines — and with one selected, `s` sends files to it over Taildrop, which is the fastest way to move a file to your phone or another laptop. `c` copies the machine's IP, `n` its name, and `d` its full DNS name. There's a send button on each machine row too, if you'd rather click. The same thing from the terminal is `kestrel tailscale send <machine> [file...]`.
 
 The **Dropbox** panel handles login, shows how much storage you've used, and lists recently synced files.
 
@@ -88,18 +88,18 @@ If you'd rather pick from a menu, **Style → Menu Bar** has both position and t
 The same things have commands, which is what you want for a [dotfiles](31-dotfiles.md) setup:
 
 ```bash
-helios bar position bottom
-helios bar transparent toggle
-helios bar move helios.clock --section center --index 0
-helios bar set helios.clock format "HH:mm"
-helios bar defaults          # back to the shipped layout
+kestrel bar position bottom
+kestrel bar transparent toggle
+kestrel bar move kestrel.clock --section center --index 0
+kestrel bar set kestrel.clock format "HH:mm"
+kestrel bar defaults          # back to the shipped layout
 ```
 
-To add or remove a widget entirely, use the plugin commands. `helios plugin list` prints every widget the shell knows about with its id, and then:
+To add or remove a widget entirely, use the plugin commands. `kestrel plugin list` prints every widget the shell knows about with its id, and then:
 
 ```bash
-helios plugin enable helios.media --section center
-helios plugin disable helios.weather
+kestrel plugin enable kestrel.media --section center
+kestrel plugin disable kestrel.weather
 ```
 
 ## Hiding the bar
@@ -108,7 +108,7 @@ helios plugin disable helios.weather
 
 ## The config file
 
-All of it is stored in `~/.config/helios/shell.json`, under the `bar` key. Here's a trimmed version:
+All of it is stored in `~/.config/kestrel/shell.json`, under the `bar` key. Here's a trimmed version:
 
 ```json
 {
@@ -116,20 +116,20 @@ All of it is stored in `~/.config/helios/shell.json`, under the `bar` key. Here'
   "bar": {
     "position": "top",
     "transparent": false,
-    "centerAnchor": "helios.clock",
+    "centerAnchor": "kestrel.clock",
     "layout": {
-      "left": [{ "id": "helios.menu" }, { "id": "helios.workspaces" }],
-      "center": [{ "id": "helios.clock", "format": "HH:mm" }],
-      "right": [{ "id": "helios.audio" }, { "id": "helios.power" }]
+      "left": [{ "id": "kestrel.menu" }, { "id": "kestrel.workspaces" }],
+      "center": [{ "id": "kestrel.clock", "format": "HH:mm" }],
+      "right": [{ "id": "kestrel.audio" }, { "id": "kestrel.power" }]
     }
   }
 }
 ```
 
-Every widget is one entry in one of the three layout arrays, and its settings sit inline on that entry — there's no separate settings file and no `config` sub-object. The clock's `format`, `formatAlt` (what right-click cycles to), and `verticalFormat` all live right there on `{ "id": "helios.clock" }`.
+Every widget is one entry in one of the three layout arrays, and its settings sit inline on that entry — there's no separate settings file and no `config` sub-object. The clock's `format`, `formatAlt` (what right-click cycles to), and `verticalFormat` all live right there on `{ "id": "kestrel.clock" }`.
 
 `centerAnchor` names the one center widget that gets pinned to the exact center of the screen, with the others flanking it. That's how the clock stays dead center even as the weather and update badge come and go. Set it to an empty string and the center list is just centered as a group instead.
 
-One rule worth internalizing: **once you have your own `shell.json`, it's canonical**. Until you customize anything, the shell reads HeliOS's default file. The moment you drag a widget, run `helios bar`, or edit the file yourself, you own it — there's no deep merge, so new default widgets in future HeliOS releases won't appear on your bar automatically. `helios bar defaults` puts the shipped layout back whenever you want a clean slate.
+One rule worth internalizing: **once you have your own `shell.json`, it's canonical**. Until you customize anything, the shell reads Kestrel's default file. The moment you drag a widget, run `kestrel bar`, or edit the file yourself, you own it — there's no deep merge, so new default widgets in future Kestrel releases won't appear on your bar automatically. `kestrel bar defaults` puts the shipped layout back whenever you want a clean slate.
 
 The same file also holds your idle timings at the top level, outside the `bar` key: `idle.screensaver` and `idle.lock`, both in seconds since you went idle. So the default screensaver kicks in at 150 seconds and the lock at 300.

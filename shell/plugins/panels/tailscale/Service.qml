@@ -142,7 +142,7 @@ Item {
     if (!canSendFiles(peer)) return
     var target = peerAddress(peer)
     if (target === "") return
-    Quickshell.execDetached(["helios-tailscale-send", target])
+    Quickshell.execDetached(["kestrel-tailscale-send", target])
   }
 
   function refresh(forceAccounts) {
@@ -373,7 +373,7 @@ Item {
       _loginUrlOpened = true
       _loginInProgress = false
       loginTimeoutTimer.stop()
-      Quickshell.execDetached(["helios-launch-browser", url])
+      Quickshell.execDetached(["kestrel-launch-browser", url])
       return true
     }
     return false

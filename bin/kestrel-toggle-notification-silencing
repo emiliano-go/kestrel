@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kestrel:summary=Toggle notification do-not-disturb mode
+
+state=$(kestrel-shell notifications toggleDnd 2>/dev/null || echo "")
+kestrel-shell -q kestrel.indicators refresh

@@ -9,7 +9,7 @@ require_command python3
 # exercised on its own: the collector loads as a module, and a recorded payload
 # stands in for the response.
 read_limits() {
-  COLLECTOR="$ROOT/bin/helios-agent-usage-claude" PAYLOAD="$1" python3 - <<'PY'
+  COLLECTOR="$ROOT/bin/kestrel-agent-usage-claude" PAYLOAD="$1" python3 - <<'PY'
 import importlib.machinery, importlib.util, io, json, os
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -76,7 +76,7 @@ pass "Claude collector adds no limit when the payload scopes none"
 # tier it runs under. Read the label off a planted credential store so the
 # whole path is exercised, not just the formatter.
 plan_label() {
-  COLLECTOR="$ROOT/bin/helios-agent-usage-claude" TIER="$1" SUBSCRIPTION="$2" python3 - <<'PY'
+  COLLECTOR="$ROOT/bin/kestrel-agent-usage-claude" TIER="$1" SUBSCRIPTION="$2" python3 - <<'PY'
 import importlib.machinery, importlib.util, json, os, pathlib, tempfile
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])
@@ -115,7 +115,7 @@ CACHE_HOME=$(mktemp -d)
 trap 'rm -rf "$CACHE_HOME"' EXIT
 
 collect_limits() {
-  COLLECTOR="$ROOT/bin/helios-agent-usage-claude" TOKEN="$1" EXPIRES_AT="$2" \
+  COLLECTOR="$ROOT/bin/kestrel-agent-usage-claude" TOKEN="$1" EXPIRES_AT="$2" \
     REFRESH_EXPIRES_AT="$3" CACHED="$4" CACHE_MTIME_OFFSET="${5:-0}" \
     XDG_CACHE_HOME="$CACHE_HOME" python3 - <<'PY'
 import importlib.machinery, importlib.util, json, os, pathlib, time
@@ -228,7 +228,7 @@ pass "Claude collector falls back to cache when the probe cannot connect"
 # Reuse and --force are decided against a cache that is fresh by the clock, so
 # the probe is answered rather than refused: what matters is whether it ran.
 probe_with_cache() {
-  COLLECTOR="$ROOT/bin/helios-agent-usage-claude" FORCE="$1" CACHED="$2" PAYLOAD="$3" CACHE_MTIME_OFFSET="${4:-0}" \
+  COLLECTOR="$ROOT/bin/kestrel-agent-usage-claude" FORCE="$1" CACHED="$2" PAYLOAD="$3" CACHE_MTIME_OFFSET="${4:-0}" \
     XDG_CACHE_HOME="$CACHE_HOME" python3 - <<'PY'
 import importlib.machinery, importlib.util, io, json, os, time
 
@@ -384,7 +384,7 @@ JS
 # numbers measured minutes ago still describes the account; only older numbers
 # count as stale, and either way the record says when they were measured.
 rate_limited() {
-  COLLECTOR="$ROOT/bin/helios-agent-usage-claude" FETCHED_AGO="$1" XDG_CACHE_HOME="$CACHE_HOME" python3 - <<'PY'
+  COLLECTOR="$ROOT/bin/kestrel-agent-usage-claude" FETCHED_AGO="$1" XDG_CACHE_HOME="$CACHE_HOME" python3 - <<'PY'
 import datetime as dt, importlib.machinery, importlib.util, json, os, time, urllib.error
 
 loader = importlib.machinery.SourceFileLoader("collector", os.environ["COLLECTOR"])

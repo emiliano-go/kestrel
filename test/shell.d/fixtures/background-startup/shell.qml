@@ -19,7 +19,7 @@ ShellRoot {
 
   QtObject {
     id: registry
-    property var installedPlugins: ({ "helios.background": {} })
+    property var installedPlugins: ({ "kestrel.background": {} })
     signal pluginsChanged()
     function resolveEnabledId(id) { return id }
     function isEnabled(id) { return false }
@@ -43,7 +43,7 @@ ShellRoot {
       cursorLog.reload()
       cursorLog.waitForJob()
       test.check(!cursorLog.text().trim(), "startup does not restore the cursor while media is loading")
-      test.services = ({ "helios.background": background })
+      test.services = ({ "kestrel.background": background })
     }
   }
   Timer {
@@ -73,7 +73,7 @@ ShellRoot {
       test.check(!intro.startupPending && intro.startupOpacity === 0, "the desktop fades in after both the media and bar are ready")
       cursorLog.reload()
       cursorLog.waitForJob()
-      test.check(cursorLog.text().includes("helios_startup_cursor_restore()"), "the opening fade restores the cursor")
+      test.check(cursorLog.text().includes("kestrel_startup_cursor_restore()"), "the opening fade restores the cursor")
       test.services = ({})
       intro.cover = true
       test.pluginRegistry = registry

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# kestrel:summary=Edit, set, or reset About branding
+# kestrel:group=branding
+# kestrel:name=about
+# kestrel:args=<image|text|reset>
+# kestrel:examples=kestrel branding about image | kestrel branding about text | kestrel branding about reset
+
+set -euo pipefail
+
+case "${1:-}" in
+image)
+  image=$(kestrel-file-select --title "Pick PNG or SVG for About" --extensions "png svg")
+  if kestrel-transcode-ascii "$image" ~/.config/kestrel/branding/about.txt --width 54 --height 26; then
+    kestrel-launch-about >/dev/null 2>&1
+  fi
+  ;;
+text)
+  kestrel-launch-editor ~/.config/kestrel/branding/about.txt >/dev/null 2>&1 && kestrel-launch-about >/dev/null 2>&1
+  ;;
+reset)
+  cp "$KESTREL_PATH/icon.txt" ~/.config/kestrel/branding/about.txt && kestrel-launch-about >/dev/null 2>&1
+  ;;
+*)
+  echo "Usage: kestrel-branding-about <image|text|reset>" >&2
+  exit 1
+  ;;
+esac

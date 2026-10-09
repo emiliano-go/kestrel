@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Restore the default HeliOS Plymouth boot theme and SDDM login screen
-# helios:requires-sudo=true
-
-set -euo pipefail
-
-"$HELIOS_PATH/bin/helios-refresh-plymouth"
-"$HELIOS_PATH/bin/helios-refresh-sddm"

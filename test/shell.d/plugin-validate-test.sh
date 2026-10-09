@@ -39,7 +39,7 @@ JSON
 }
 
 validate() {
-  HELIOS_PATH="$ROOT" "$ROOT/bin/helios-plugin-validate" "$1" 2>&1
+  KESTREL_PATH="$ROOT" "$ROOT/bin/kestrel-plugin-validate" "$1" 2>&1
 }
 
 # Every kind the shell knows how to load names the entry point it loads from.

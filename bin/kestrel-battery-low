@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# kestrel:summary=Send the low battery warning notification and run battery-low hooks.
+# kestrel:args=<percentage>
+# kestrel:hidden=true
+
+set -euo pipefail
+
+if (($# != 1)); then
+  echo "Usage: kestrel-battery-low <percentage>" >&2
+  exit 1
+fi
+
+level=$1
+
+kestrel-notification-send -g 󱐋 -u critical "Time to recharge!" "Battery is down to ${level}%" -i battery-caution -t 30000
+kestrel-hook battery-low "$level"

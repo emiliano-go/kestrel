@@ -1,4 +1,4 @@
 echo "Register the Chromium extension native messaging hosts for Brave Origin"
 
-helios-install-chromium-copy-url
-helios-install-chromium-ytdlp
+kestrel-install-chromium-copy-url
+kestrel-install-chromium-ytdlp

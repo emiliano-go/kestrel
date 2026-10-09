@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# kestrel:summary=Open a config file in the user's editor and surface a toast
+# kestrel:args=<path>
+# kestrel:examples=kestrel launch config-editor ~/.config/hypr/hyprland.lua
+
+path="${1-}"
+
+if [[ -z $path ]]; then
+  echo "Usage: kestrel-launch-config-editor <path>" >&2
+  exit 1
+fi
+
+kestrel-notification-send -u low "Editing config file" "$path"
+exec kestrel-launch-editor "$path"

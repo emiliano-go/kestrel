@@ -1,7 +1,7 @@
-echo "Link HeliOS agent skills into Hermes skill directories"
+echo "Link Kestrel agent skills into Hermes skill directories"
 
-HELIOS_PATH="${HELIOS_PATH:-/usr/share/helios}"
-skills_source="$HELIOS_PATH/default/agents/skills"
+KESTREL_PATH="${KESTREL_PATH:-/usr/share/kestrel}"
+skills_source="$KESTREL_PATH/default/agents/skills"
 
 [[ -d $skills_source ]] || exit 0
 

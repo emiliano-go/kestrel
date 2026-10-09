@@ -20,27 +20,27 @@ QtObject {
   property var _selectPlayer: null
 
   function setIdleEnabled(value) {
-    if (serviceId === "helios.idle" && _setIdleEnabled) _setIdleEnabled(!!value)
+    if (serviceId === "kestrel.idle" && _setIdleEnabled) _setIdleEnabled(!!value)
   }
 
   function setNightlight(value) {
-    if (serviceId === "helios.nightlight" && _setNightlight) _setNightlight(!!value)
+    if (serviceId === "kestrel.nightlight" && _setNightlight) _setNightlight(!!value)
   }
 
   function setDoNotDisturb(value) {
-    if (serviceId === "helios.notifications" && _setDoNotDisturb) _setDoNotDisturb(!!value)
+    if (serviceId === "kestrel.notifications" && _setDoNotDisturb) _setDoNotDisturb(!!value)
   }
 
   function runAction(action, showFeedback, playerId) {
-    if (serviceId === "helios.media" && _runAction)
+    if (serviceId === "kestrel.media" && _runAction)
       _runAction(String(action || ""), !!showFeedback, String(playerId || ""))
   }
 
   function playerKey(player) {
-    return serviceId === "helios.media" && _playerKey ? _playerKey(player) : ""
+    return serviceId === "kestrel.media" && _playerKey ? _playerKey(player) : ""
   }
 
   function selectPlayer(playerId) {
-    if (serviceId === "helios.media" && _selectPlayer) _selectPlayer(String(playerId || ""))
+    if (serviceId === "kestrel.media" && _selectPlayer) _selectPlayer(String(playerId || ""))
   }
 }

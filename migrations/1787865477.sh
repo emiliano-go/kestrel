@@ -13,6 +13,6 @@ if id -nG "$USER" | grep -qw input; then
   else
     sudo gpasswd -d "$USER" input >/dev/null
     echo "Removed $USER from the input group. Log out and back in to apply."
-    helios-state set reboot-required
+    kestrel-state set reboot-required
   fi
 fi

@@ -8,7 +8,7 @@ Item {
   id: root
 
   property var shell: null
-  property string heliosPath: Quickshell.env("HELIOS_PATH")
+  property string kestrelPath: Quickshell.env("KESTREL_PATH")
 
   readonly property int batteryThreshold: 10
   property string pendingPowerSource: ""
@@ -17,7 +17,7 @@ Item {
 
   PersistentProperties {
     id: persisted
-    reloadableId: "helios-battery"
+    reloadableId: "kestrel-battery"
     property bool notifiedLowBattery: false
   }
 
@@ -38,7 +38,7 @@ Item {
   function sendLowBatteryWarning(level) {
     if (warningProcess.running) return
     warningProcess.command = [
-      "helios-battery-low",
+      "kestrel-battery-low",
       String(level)
     ]
     warningProcess.running = true
@@ -50,7 +50,7 @@ Item {
   }
 
   function runPendingPowerProfile() {
-    powerProfileProcess.command = ["helios-powerprofiles-set", pendingPowerSource]
+    powerProfileProcess.command = ["kestrel-powerprofiles-set", pendingPowerSource]
     pendingPowerSource = ""
     powerProfileProcess.running = true
   }

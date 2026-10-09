@@ -20,15 +20,15 @@ awk '
   /^[a-z_]+\(\) \{/ { copying = 1 }
   copying { print }
   /^}/ { copying = 0 }
-' "$ROOT/bin/helios-system-factory-reset" >"$test_tmp/functions"
+' "$ROOT/bin/kestrel-system-factory-reset" >"$test_tmp/functions"
 
 cat >"$test_tmp/reset" <<'SH'
 #!/bin/bash
 set -euo pipefail
 source "$1/functions"
 TOP_MNT="$2"
-NEXT_NAME=@helios-reset-next
-PROVISIONING_DIR=/var/lib/helios/provisioning
+NEXT_NAME=@kestrel-reset-next
+PROVISIONING_DIR=/var/lib/kestrel/provisioning
 LOG_FILE="$TOP_MNT/reset.log"
 
 log() { printf '%s\n' "$1" >>"$LOG_FILE"; }
@@ -72,13 +72,13 @@ make_fixture() {
   local top="$1" root_hash="${2:-original-root-hash}"
   local factory="$top/@factory"
   mkdir -p "$top/@" "$factory/etc" "$factory/home/seller" \
-    "$factory/usr/bin" "$factory/usr/share/helios/install/provisioning" \
-    "$factory/var/lib/helios/provisioning/packages"
+    "$factory/usr/bin" "$factory/usr/share/kestrel/install/provisioning" \
+    "$factory/var/lib/kestrel/provisioning/packages"
   touch "$top/@/old-system" "$factory/home/seller/private-file" \
-    "$factory/usr/share/helios/install/provisioning/helios-provision-owner.service" \
-    "$factory/var/lib/helios/provisioning/packages/node-v0.tar.gz"
-  printf '#!/bin/bash\n' >"$factory/usr/bin/helios-provision-owner"
-  chmod +x "$factory/usr/bin/helios-provision-owner"
+    "$factory/usr/share/kestrel/install/provisioning/kestrel-provision-owner.service" \
+    "$factory/var/lib/kestrel/provisioning/packages/node-v0.tar.gz"
+  printf '#!/bin/bash\n' >"$factory/usr/bin/kestrel-provision-owner"
+  chmod +x "$factory/usr/bin/kestrel-provision-owner"
   printf 'true\n' >"$factory/read-only"
   cat >"$factory/etc/passwd" <<'EOF'
 root:x:0:0:root:/root:/bin/bash
@@ -123,7 +123,7 @@ for scenario in normal locked; do
   assert_scrubbed "$top/@factory"
   assert_scrubbed "$top/@"
   [[ $(cat "$top/@factory/read-only") == "true" ]] || fail "baseline returns to read-only"
-  [[ -f $top/@/var/lib/helios/provisioning/pending && -f $top/rebuilt ]] ||
+  [[ -f $top/@/var/lib/kestrel/provisioning/pending && -f $top/rebuilt ]] ||
     fail "reset reaches provisioning after cleanup"
 
   bash "$test_tmp/reset" "$test_tmp" "$top" || fail "$scenario reset can be repeated"
@@ -132,7 +132,7 @@ for scenario in normal locked; do
   pass "$scenario reset scrubs both roots, preserves service accounts, and can be repeated"
 done
 
-for target in @helios-reset-next @factory; do
+for target in @kestrel-reset-next @factory; do
   for command in userdel usermod rm; do
     top="$test_tmp/fail-$target-$command"
     make_fixture "$top"

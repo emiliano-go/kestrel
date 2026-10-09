@@ -4,10 +4,10 @@ if ! lspci -nn | grep "106b:180[12]" >/dev/null; then
   exit 0
 fi
 
-limine_conf="${HELIOS_T2_LIMINE_CONF:-/etc/limine-entry-tool.d/t2-mac.conf}"
-fan_conf="${HELIOS_T2_FAN_CONF:-/etc/t2fand.conf}"
-running_cmdline="${HELIOS_T2_RUNNING_CMDLINE:-/proc/cmdline}"
-repair_marker="${HELIOS_T2_REPAIR_MARKER:-/var/lib/helios/migrations/1785944594}"
+limine_conf="${KESTREL_T2_LIMINE_CONF:-/etc/limine-entry-tool.d/t2-mac.conf}"
+fan_conf="${KESTREL_T2_FAN_CONF:-/etc/t2fand.conf}"
+running_cmdline="${KESTREL_T2_RUNNING_CMDLINE:-/proc/cmdline}"
+repair_marker="${KESTREL_T2_REPAIR_MARKER:-/var/lib/kestrel/migrations/1785944594}"
 needs_limine_rebuild=0
 
 if [[ -f $limine_conf ]] && grep -q 'pcie_ports=compat' "$limine_conf"; then
@@ -33,9 +33,9 @@ fi
 
 # The kernel's built-in Boot Camp-style Touch Bar works without tiny-dfr. The
 # optional daemon holds stale device descriptors across suspend with t2bce.
-if helios-pkg-present tiny-dfr; then
+if kestrel-pkg-present tiny-dfr; then
   sudo systemctl disable --now tiny-dfr.service || true
-  helios-pkg-drop tiny-dfr
+  kestrel-pkg-drop tiny-dfr
 fi
 
 # The current kernel keeps its old command line until reboot. Record a

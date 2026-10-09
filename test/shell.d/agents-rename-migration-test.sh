@@ -12,7 +12,7 @@ trap 'rm -rf "$test_dir"' EXIT
 
 mkdir -p "$test_dir/bin"
 
-cat >"$test_dir/bin/helios-agent-usage-update" <<'STUB'
+cat >"$test_dir/bin/kestrel-agent-usage-update" <<'STUB'
 #!/bin/bash
 
 echo run >>"$USAGE_UPDATES"
@@ -23,44 +23,44 @@ chmod +x "$test_dir/bin/"*
 export USAGE_UPDATES="$test_dir/usage-updates"
 
 home="$test_dir/home"
-config="$home/.config/helios/shell.json"
+config="$home/.config/kestrel/shell.json"
 
 run_migration() {
   : >"$USAGE_UPDATES"
   HOME="$home" PATH="$test_dir/bin:$PATH" bash -euo pipefail "$migration" >/dev/null
 }
 
-mkdir -p "$home/.config/helios" "$home/.cache/helios/model-usage"
+mkdir -p "$home/.config/kestrel" "$home/.cache/kestrel/model-usage"
 cat >"$config" <<'JSON'
 {
   "bar": {
     "layout": {
-      "center": ["helios.model-usage"],
+      "center": ["kestrel.model-usage"],
       "right": [
-        { "id": "helios.tray" },
-        { "id": "helios.model-usage", "syncMode": "On", "syncDir": "~/Sync/agent-usage" }
+        { "id": "kestrel.tray" },
+        { "id": "kestrel.model-usage", "syncMode": "On", "syncDir": "~/Sync/agent-usage" }
       ]
     }
   },
-  "disabledPlugins": ["helios.model-usage", "helios.weather"]
+  "disabledPlugins": ["kestrel.model-usage", "kestrel.weather"]
 }
 JSON
 
 run_migration
 
-[[ $(jq -c '.bar.layout.right[1]' "$config") == '{"id":"helios.agents","syncMode":"On","syncDir":"~/Sync/agent-usage"}' ]] ||
+[[ $(jq -c '.bar.layout.right[1]' "$config") == '{"id":"kestrel.agents","syncMode":"On","syncDir":"~/Sync/agent-usage"}' ]] ||
   fail "migration renames the widget and keeps its settings" "$(cat "$config")"
 pass "migration renames the widget and keeps its settings"
 
-[[ $(jq -c '.bar.layout.center' "$config") == '["helios.agents"]' ]] ||
+[[ $(jq -c '.bar.layout.center' "$config") == '["kestrel.agents"]' ]] ||
   fail "migration renames string-form entries" "$(cat "$config")"
 pass "migration renames string-form entries"
 
-[[ $(jq -c '.disabledPlugins' "$config") == '["helios.agents","helios.weather"]' ]] ||
+[[ $(jq -c '.disabledPlugins' "$config") == '["kestrel.agents","kestrel.weather"]' ]] ||
   fail "migration keeps a disabled widget disabled" "$(cat "$config")"
 pass "migration keeps a disabled widget disabled"
 
-[[ ! -e $home/.cache/helios/model-usage ]] ||
+[[ ! -e $home/.cache/kestrel/model-usage ]] ||
   fail "migration drops the old scanner cache"
 pass "migration drops the old scanner cache"
 

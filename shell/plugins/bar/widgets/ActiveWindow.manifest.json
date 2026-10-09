@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.active-window",
+  "id": "kestrel.active-window",
   "name": "Active window",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Title of the focused window",
   "kinds": [
     "bar-widget"

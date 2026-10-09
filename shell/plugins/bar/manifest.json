@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.bar",
+  "id": "kestrel.bar",
   "name": "Bar",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Status bar with widgets",
   "kinds": [
     "bar"

@@ -4,8 +4,8 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
-CONFIG_FILE="$HOME/.config/helios/shell.json"
-DEFAULTS_FILE="$HELIOS_PATH/config/helios/shell.json"
+CONFIG_FILE="$HOME/.config/kestrel/shell.json"
+DEFAULTS_FILE="$KESTREL_PATH/config/kestrel/shell.json"
 config_backup=$(mktemp)
 config_existed=0
 
@@ -15,7 +15,7 @@ if [[ -f $CONFIG_FILE ]]; then
 fi
 
 restore_bar_config() {
-  helios-shell shell hide helios.menu >/dev/null 2>&1 || true
+  kestrel-shell shell hide kestrel.menu >/dev/null 2>&1 || true
 
   if ((config_existed)); then
     mkdir -p "$(dirname "$CONFIG_FILE")"
@@ -24,7 +24,7 @@ restore_bar_config() {
     rm -f "$CONFIG_FILE"
   fi
 
-  helios-shell shell reloadConfig >/dev/null 2>&1 || true
+  kestrel-shell shell reloadConfig >/dev/null 2>&1 || true
   rm -f "$config_backup"
 }
 
@@ -34,7 +34,7 @@ bar_is_vertical() {
   local width height
 
   read -r width height < <(hyprctl -j layers | jq -r '
-    [.. | objects | select(.namespace? == "helios-bar")][0]
+    [.. | objects | select(.namespace? == "kestrel-bar")][0]
     | [.w, .h] | @tsv
   ')
 
@@ -45,7 +45,7 @@ bar_is_horizontal() {
   local width height
 
   read -r width height < <(hyprctl -j layers | jq -r '
-    [.. | objects | select(.namespace? == "helios-bar")][0]
+    [.. | objects | select(.namespace? == "kestrel-bar")][0]
     | [.w, .h] | @tsv
   ')
 
@@ -62,8 +62,8 @@ source_file=$DEFAULTS_FILE
 ((config_existed)) && source_file=$CONFIG_FILE
 original_position=$(jq -r '.bar.position // "top"' "$source_file")
 
-helios-shell shell summon helios.menu '{"menu":"root"}' >/dev/null
-wait_until "root menu opens" 15 layer_on_overlay "helios-menu"
+kestrel-shell shell summon kestrel.menu '{"menu":"root"}' >/dev/null
+wait_until "root menu opens" 15 layer_on_overlay "kestrel-menu"
 wait_until "root menu content is visible" 15 screen_contains "Apps"
 screenshot "success-menu-01-root"
 
@@ -86,7 +86,7 @@ screenshot "success-menu-05-position-submenu"
 wtype -k Down -k Down -k Return
 wait_until "menu bar position changes to left" 20 bar_position_is "left"
 wait_until "menu bar becomes vertical" 20 bar_is_vertical
-wait_until "menu closes after selecting a position" 15 layer_absent "helios-menu"
+wait_until "menu closes after selecting a position" 15 layer_absent "kestrel-menu"
 screenshot "success-menu-06-bar-left"
 
 if ((config_existed)); then
@@ -94,7 +94,7 @@ if ((config_existed)); then
 else
   rm -f "$CONFIG_FILE"
 fi
-helios-shell shell reloadConfig >/dev/null
+kestrel-shell shell reloadConfig >/dev/null
 
 if [[ $original_position == "left" || $original_position == "right" ]]; then
   wait_until "menu bar restores its original vertical position" 20 bar_is_vertical

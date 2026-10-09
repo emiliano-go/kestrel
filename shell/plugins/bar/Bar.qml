@@ -12,8 +12,8 @@ import "BarModel.js" as BarModel
 Item {
   id: root
 
-  // The helios-shell host injects heliosPath from HELIOS_PATH.
-  property string heliosPath: Quickshell.env("HELIOS_PATH")
+  // The kestrel-shell host injects kestrelPath from KESTREL_PATH.
+  property string kestrelPath: Quickshell.env("KESTREL_PATH")
   // Injected by the host shell so bar slots can resolve enabled widgets.
   property var barWidgetRegistry: fallbackBarWidgetRegistry
   // Read-only registry view for third-party full bars; the built-in bar does
@@ -42,11 +42,11 @@ Item {
   property bool barHidden: false
   property string home: Quickshell.env("HOME")
   property string stateHome: home + "/.local/state"
-  property string heliosConfigDir: home + "/.config/helios"
+  property string kestrelConfigDir: home + "/.config/kestrel"
   property var fallbackBarConfig: ({
     position: "top",
     transparent: false,
-    centerAnchor: "helios.clock",
+    centerAnchor: "kestrel.clock",
     layout: { left: [], center: [], right: [] }
   })
   property var layoutConfig: fallbackBarConfig.layout
@@ -67,7 +67,7 @@ Item {
   property int barConfigSerial: 0
   property string position: "top"
   // Resolves through fontconfig at paint time (Style.font.family defaults
-  // to "monospace"), so changing the system font (via `helios-font-set`)
+  // to "monospace"), so changing the system font (via `kestrel-font-set`)
   // updates the bar without a reload.
   property string fontFamily: Style.font.family
   // Bound to the central Color singleton so the bar tracks shell.toml's
@@ -732,7 +732,7 @@ Item {
     return monitor ? String(monitor.name || "") : ""
   }
 
-  // Resolve the live bar-widget instance for a plugin id (e.g. "helios.bluetooth").
+  // Resolve the live bar-widget instance for a plugin id (e.g. "kestrel.bluetooth").
   // Only widgets that expose popup open/close methods count; plain indicators
   // (clock, workspaces, tray) return null. Used by shell.summon/toggle so
   // panel hotkeys route through the bar instead of a per-target IPC handler
@@ -815,7 +815,7 @@ Item {
   }
 
   function customModuleSource(entry) {
-    var source = BarModel.customModulePath(entry, home, heliosConfigDir)
+    var source = BarModel.customModulePath(entry, home, kestrelConfigDir)
     return source ? Util.fileUrl(source) : ""
   }
 
@@ -1075,7 +1075,7 @@ Item {
     if (!requestedTransparent || transparentForegroundProc.running) return
 
     transparentForegroundProc.command = [
-      "helios-bar-text-color",
+      "kestrel-bar-text-color",
       root.position,
       String(root.barSize),
       colorHex(root.themeForeground),
@@ -1115,7 +1115,7 @@ Item {
   }
 
   FileView {
-    path: root.stateHome + "/helios/current"
+    path: root.stateHome + "/kestrel/current"
     watchChanges: true
     printErrors: false
     onFileChanged: root.scheduleTransparentForegroundRefresh()
@@ -1178,15 +1178,15 @@ Item {
 
   // Presence of the `bar-off` flag = bar hidden. Watching the parent toggles
   // directory because FileView can't observe a file that doesn't exist yet,
-  // and the flag is created/removed by `helios-toggle-bar`.
+  // and the flag is created/removed by `kestrel-toggle-bar`.
   Process {
     id: barHiddenProbe
     running: true
-    command: ["bash", "-c", "[[ -f $HOME/.local/state/helios/toggles/bar-off ]] && echo yes || echo no"]
+    command: ["bash", "-c", "[[ -f $HOME/.local/state/kestrel/toggles/bar-off ]] && echo yes || echo no"]
     stdout: SplitParser { onRead: function(line) { root.barHidden = String(line).trim() === "yes" } }
   }
   FileView {
-    path: root.home + "/.local/state/helios/toggles"
+    path: root.home + "/.local/state/kestrel/toggles"
     watchChanges: true
     printErrors: false
     onFileChanged: barHiddenProbe.running = true
@@ -1194,10 +1194,10 @@ Item {
 
   // The directory watch can permanently stop delivering events after flag
   // changes land in quick succession, stranding the bar off screen until the
-  // shell restarts. `helios-toggle-bar` nudges this after flipping the flag
+  // shell restarts. `kestrel-toggle-bar` nudges this after flipping the flag
   // so the probe re-reads it even when the watch has gone quiet.
   ShellIpc {
-    target: "helios.bar"
+    target: "kestrel.bar"
 
     // Start rather than restart: a probe already in flight was launched by the
     // directory watch after the flag flipped, so its answer is current, and
@@ -1279,7 +1279,7 @@ Item {
     implicitHeight: root.vertical ? 0 : root.barSize
     color: root.transparent ? "transparent" : root.background
     surfaceFormat.opaque: false
-    WlrLayershell.namespace: "helios-bar"
+    WlrLayershell.namespace: "kestrel-bar"
     WlrLayershell.layer: WlrLayer.Top
 
     Loader {
@@ -1423,7 +1423,7 @@ Item {
     visible: active && sourceItem !== null
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "helios-bar-drag-ghost"
+    WlrLayershell.namespace: "kestrel-bar-drag-ghost"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
@@ -1485,7 +1485,7 @@ Item {
     visible: root.barMoveActive && screenMatches
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "helios-bar-move-ghost"
+    WlrLayershell.namespace: "kestrel-bar-move-ghost"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 

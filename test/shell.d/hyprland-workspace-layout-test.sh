@@ -25,16 +25,16 @@ fi
 EOF
 chmod +x "$stub_dir/hyprctl"
 
-cat >"$stub_dir/helios-notification-send" <<'EOF'
+cat >"$stub_dir/kestrel-notification-send" <<'EOF'
 #!/bin/bash
 :
 EOF
-chmod +x "$stub_dir/helios-notification-send"
+chmod +x "$stub_dir/kestrel-notification-send"
 
 HOME="$home_dir" HYPRCTL_LOG="$log_file" PATH="$stub_dir:$PATH" \
-  "$ROOT/bin/helios-hyprland-workspace-layout-toggle"
+  "$ROOT/bin/kestrel-hyprland-workspace-layout-toggle"
 
-layout_file="$home_dir/.local/state/helios/workspace-layouts/3.lua"
+layout_file="$home_dir/.local/state/kestrel/workspace-layouts/3.lua"
 [[ -f $layout_file ]] || fail "workspace layout toggle saves a workspace rule"
 grep -Fx 'hl.workspace_rule({ workspace = "3", layout = "scrolling" })' "$layout_file" >/dev/null ||
   fail "workspace layout toggle saves the selected layout"
@@ -43,14 +43,14 @@ grep -Fx 'eval hl.workspace_rule({ workspace = "3", layout = "scrolling" })' "$l
 pass "workspace layout toggle persists and applies the selected layout"
 
 if HOME="$home_dir" HYPRCTL_LOG="$log_file" HYPRCTL_BROKEN=1 PATH="$stub_dir:$PATH" \
-  "$ROOT/bin/helios-hyprland-workspace-layout-toggle" 2>/dev/null; then
+  "$ROOT/bin/kestrel-hyprland-workspace-layout-toggle" 2>/dev/null; then
   fail "workspace layout toggle exits nonzero without a workspace id"
 fi
-[[ -f "$home_dir/.local/state/helios/workspace-layouts/null.lua" ]] &&
+[[ -f "$home_dir/.local/state/kestrel/workspace-layouts/null.lua" ]] &&
   fail "workspace layout toggle does not persist a rule without a workspace id"
 pass "workspace layout toggle ignores broken hyprctl output"
 
-HOME="$home_dir" HELIOS_PATH="$ROOT" lua <<'LUA'
+HOME="$home_dir" KESTREL_PATH="$ROOT" lua <<'LUA'
 local rules = {}
 
 hl = {
@@ -59,7 +59,7 @@ hl = {
   end,
 }
 
-dofile(os.getenv("HELIOS_PATH") .. "/default/hypr/bootstrap.lua")
+dofile(os.getenv("KESTREL_PATH") .. "/default/hypr/bootstrap.lua")
 require("default.hypr.workspace-layouts")
 
 assert(#rules == 1)

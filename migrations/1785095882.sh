@@ -1,8 +1,8 @@
 echo "Only check for pending migrations at login, not on every package update"
 
-# helios-update-user-notify.path watched /usr/share/helios/migrations, but
+# kestrel-update-user-notify.path watched /usr/share/kestrel/migrations, but
 # pacman writes that directory during every update -- including the blessed
-# `helios update`, which runs helios-migrate a step later. The watcher fired a
+# `kestrel update`, which runs kestrel-migrate a step later. The watcher fired a
 # critical notification for migrations that were already being applied in the
 # visible update terminal. Retire the watcher and keep only the once-per-login
 # check, now named after the command it runs.
@@ -13,27 +13,27 @@ systemctl --user daemon-reload >/dev/null 2>&1 || true
 
 # The watcher's unit file is already gone, but it stays loaded in a session that
 # started before this update, so stop it before it can fire again.
-systemctl --user stop helios-update-user-notify.path >/dev/null 2>&1 || true
+systemctl --user stop kestrel-update-user-notify.path >/dev/null 2>&1 || true
 
 # Enable the replacement before dropping the old enablement, so a failure here
 # can never leave a user with no notifier at all. Enable without --now: this
-# usually runs from inside `helios update`, and starting the notifier here would
+# usually runs from inside `kestrel update`, and starting the notifier here would
 # pop a toast for the migrations running right after it -- the exact behavior
 # being removed. `systemctl enable` also needs a live user manager, which
-# `helios update` over SSH does not have, so fall back to writing precisely the
+# `kestrel update` over SSH does not have, so fall back to writing precisely the
 # symlink it would have written rather than silently doing nothing.
-if ! systemctl --user enable helios-migrate-notify.service >/dev/null 2>&1; then
+if ! systemctl --user enable kestrel-migrate-notify.service >/dev/null 2>&1; then
   mkdir -p "$wants_dir"
-  ln -sfn /usr/lib/systemd/user/helios-migrate-notify.service \
-    "$wants_dir/helios-migrate-notify.service"
+  ln -sfn /usr/lib/systemd/user/kestrel-migrate-notify.service \
+    "$wants_dir/kestrel-migrate-notify.service"
 fi
 
 # Drop the retired enablement by hand instead of through `systemctl disable`.
-# The package ships helios-update-user-notify.service as a compatibility
+# The package ships kestrel-update-user-notify.service as a compatibility
 # symlink onto the new unit, for users who have not reached this migration yet,
 # so disabling that name here would disable the replacement along with it.
-rm -f "$wants_dir/helios-update-user-notify.path" \
-  "$wants_dir/helios-update-user-notify.service"
+rm -f "$wants_dir/kestrel-update-user-notify.path" \
+  "$wants_dir/kestrel-update-user-notify.service"
 
-systemctl --user reset-failed helios-update-user-notify.path >/dev/null 2>&1 || true
+systemctl --user reset-failed kestrel-update-user-notify.path >/dev/null 2>&1 || true
 systemctl --user daemon-reload >/dev/null 2>&1 || true

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# kestrel:summary=Wake displays and restore brightness after idle
+# kestrel:group=system
+# kestrel:name=wake
+# kestrel:examples=kestrel system wake
+
+kestrel-brightness-display on
+kestrel-brightness-keyboard restore
+kestrel-hyprland-monitor-clamshell >/dev/null 2>&1 || true

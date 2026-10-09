@@ -1,0 +1,6 @@
+#!/bin/bash
+# kestrel:summary=Launch the clipboard manager
+# kestrel:group=menu
+# kestrel:examples=kestrel menu clipboard
+
+kestrel-shell shell toggle kestrel.clipboard

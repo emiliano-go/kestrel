@@ -75,9 +75,9 @@ cp "$SHELL_TEST_DIR/fixtures/manifest-entrypoints/shell.qml" "$config_dir/shell.
 ln -s "$ROOT/shell/Ui" "$config_dir/Ui"
 ln -s "$ROOT/shell/Commons" "$config_dir/Commons"
 
-HELIOS_PATH="$ROOT" \
-HELIOS_QML_TEST_RESULT="$result" \
-HELIOS_QML_MANIFESTS="$manifest_entries" \
+KESTREL_PATH="$ROOT" \
+KESTREL_QML_TEST_RESULT="$result" \
+KESTREL_QML_MANIFESTS="$manifest_entries" \
 HOME="$TMPDIR/home" \
 XDG_CONFIG_HOME="$TMPDIR/home/.config" \
 XDG_CACHE_HOME="$TMPDIR/home/.cache" \

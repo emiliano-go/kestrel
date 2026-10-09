@@ -5,6 +5,6 @@
 # appears, so the package is a hard requirement wherever a tuning applies. It is
 # only pulled in on machines that have one.
 
-if helios-audio-tuning match >/dev/null; then
-  helios-pkg-add lsp-plugins-lv2
+if kestrel-audio-tuning match >/dev/null; then
+  kestrel-pkg-add lsp-plugins-lv2
 fi

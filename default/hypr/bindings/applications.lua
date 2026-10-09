@@ -1,22 +1,22 @@
 -- Essential application bindings.
 o.bind("SUPER + RETURN", "Terminal", o.launch_terminal())
-o.bind("SUPER + SHIFT + RETURN", "Browser", { helios = "browser" })
-o.bind("SUPER + SHIFT + F", "File manager", { helios = "nautilus" })
-o.bind("SUPER + ALT + SHIFT + F", "File manager (cwd)", { helios = "nautilus-cwd" })
-o.bind("SUPER + SHIFT + B", "Browser", { helios = "browser" })
-o.bind("SUPER + SHIFT + ALT + B", "Browser (private)", { helios = "browser --private" })
-o.bind("SUPER + SHIFT + N", "Editor", { helios = "editor" })
+o.bind("SUPER + SHIFT + RETURN", "Browser", { kestrel = "browser" })
+o.bind("SUPER + SHIFT + F", "File manager", { kestrel = "nautilus" })
+o.bind("SUPER + ALT + SHIFT + F", "File manager (cwd)", { kestrel = "nautilus-cwd" })
+o.bind("SUPER + SHIFT + B", "Browser", { kestrel = "browser" })
+o.bind("SUPER + SHIFT + ALT + B", "Browser (private)", { kestrel = "browser --private" })
+o.bind("SUPER + SHIFT + N", "Editor", { kestrel = "editor" })
 
 if o.preinstalled_bindings_enabled() then
-  -- Bindings for preinstalled HeliOS applications, TUIs, and web apps.
-  o.bind("SUPER + ALT + RETURN", "Tmux", { helios = "terminal-tmux" })
+  -- Bindings for preinstalled Kestrel applications, TUIs, and web apps.
+  o.bind("SUPER + ALT + RETURN", "Tmux", { kestrel = "terminal-tmux" })
   o.bind("SUPER + SHIFT + M", "Music", { launch = "zuno", focus = "^[Zz]uno$" })
   if o.cmd_present("lazydocker") then
-    o.bind("SUPER + SHIFT + D", "Docker", { tui = "helios-launch-docker-tui" })
+    o.bind("SUPER + SHIFT + D", "Docker", { tui = "kestrel-launch-docker-tui" })
   end
-  o.bind("SUPER + SHIFT + G", "Signal", { helios = "signal" })
+  o.bind("SUPER + SHIFT + G", "Signal", { kestrel = "signal" })
   o.bind("SUPER + SHIFT + O", "Obsidian", { launch = "obsidian", focus = "^obsidian$" })
-  o.bind("SUPER + SHIFT + SLASH", "Passwords", { helios = "1password" })
+  o.bind("SUPER + SHIFT + SLASH", "Passwords", { kestrel = "1password" })
 
   o.bind("SUPER + SHIFT + A", "ChatGPT", { webapp = "https://chatgpt.com" })
   o.bind("SUPER + SHIFT + ALT + A", "Grok", { webapp = "https://grok.com" })

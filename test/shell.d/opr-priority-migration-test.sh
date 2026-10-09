@@ -18,7 +18,7 @@ else
   "$@"
 fi
 SH
-cat >"$test_dir/bin/helios-update-system-pkgs" <<'SH'
+cat >"$test_dir/bin/kestrel-update-system-pkgs" <<'SH'
 #!/bin/bash
 # Snapshot exactly the configuration visible to the package updater.
 cat "$PACMAN_CONFIG" >"$CALL_LOG"
@@ -40,7 +40,7 @@ IgnorePkg = custom-package
 Server = https://custom.example/\$arch
 [core]
 Include = /etc/pacman.d/mirrorlist
-[helios]
+[kestrel]
 Server = https://pkgs.omarchy.org/$channel/\$arch
 SigLevel = Required
 [extra]
@@ -48,7 +48,7 @@ Include = /etc/pacman.d/mirrorlist
 CONF
   cp "$PACMAN_CONFIG" "$test_dir/original"
   run || fail "$channel migration succeeds"
-  [[ $(awk '/^\[/ && $0 != "[options]" { print; exit }' "$CALL_LOG") == "[helios]" ]] || fail "packages update after OPR is prioritized"
+  [[ $(awk '/^\[/ && $0 != "[options]" { print; exit }' "$CALL_LOG") == "[kestrel]" ]] || fail "packages update after OPR is prioritized"
   cmp -s "$PACMAN_CONFIG.bak" "$test_dir/original" || fail "original configuration is backed up"
   for setting in 'IgnorePkg = custom-package' '[custom]' 'Server = https://custom.example/$arch' 'SigLevel = Required' "Server = https://pkgs.omarchy.org/$channel/\$arch"; do
     grep -qxF "$setting" "$CALL_LOG" || fail "repository settings survive"

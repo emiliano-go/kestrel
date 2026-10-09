@@ -1,20 +1,20 @@
-echo "Require signed packages from the HeliOS repository"
+echo "Require signed packages from the Kestrel repository"
 
-# The [helios] repo predates the HeliOS packaging key, so existing installs
+# The [kestrel] repo predates the Kestrel packaging key, so existing installs
 # carry a SigLevel override that also accepts unsigned packages. Packages are
 # signed now, so drop the override and let the repo inherit the global
 # SigLevel = Required DatabaseOptional like every other repo. Machine-wide and
 # self-detecting, so another user's rerun no-ops.
-helios_sig_override='SigLevel = Optional TrustAll'
+kestrel_sig_override='SigLevel = Optional TrustAll'
 
 if [[ -f /etc/pacman.conf ]] &&
-  sed -n '/^\[helios\]/,/^\[/p' /etc/pacman.conf | grep -qxF "$helios_sig_override"; then
+  sed -n '/^\[kestrel\]/,/^\[/p' /etc/pacman.conf | grep -qxF "$kestrel_sig_override"; then
   # Requiring signatures with an untrusted packaging key would fail every
-  # helios transaction, including the one that could repair it.
-  if helios-pkg-missing helios-keyring ||
+  # kestrel transaction, including the one that could repair it.
+  if kestrel-pkg-missing kestrel-keyring ||
     ! sudo pacman-key --list-keys 40DFB630FF42BCFFB047046CF0134EE680CAC571 &>/dev/null; then
-    helios-update-keyring
+    kestrel-update-keyring
   fi
 
-  sudo sed -i "/^\[helios\]/,/^\[/{/^$helios_sig_override$/d}" /etc/pacman.conf
+  sudo sed -i "/^\[kestrel\]/,/^\[/{/^$kestrel_sig_override$/d}" /etc/pacman.conf
 fi

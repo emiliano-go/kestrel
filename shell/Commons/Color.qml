@@ -14,7 +14,7 @@ QtObject {
 
   readonly property string home: Quickshell.env("HOME")
   readonly property string stateHome: home + "/.local/state"
-  readonly property string currentThemePath: stateHome + "/helios/current/theme"
+  readonly property string currentThemePath: stateHome + "/kestrel/current/theme"
 
   property color foreground: "#cacccc"
   property color background: "#101315"
@@ -205,7 +205,7 @@ QtObject {
   }
 
   // Re-derive `shellValues` from theme base + user override and push it to
-  // Style. User keys win, so a machine-level `~/.config/helios/shell.toml`
+  // Style. User keys win, so a machine-level `~/.config/kestrel/shell.toml`
   // survives theme switches (which replace only themeShellValues).
   function mergeShell() {
     var merged = {}
@@ -243,11 +243,11 @@ QtObject {
     onLoadFailed: root.loadShell("")
   }
   // Machine-level override, layered on top of whatever theme is active. This
-  // is where `helios display text size` writes `[font] base-size`. Watched so the
+  // is where `kestrel display text size` writes `[font] base-size`. Watched so the
   // CLI takes effect live without restarting the shell; absent by default.
   property FileView userShellFile: FileView {
     id: userShellFile
-    path: root.home + "/.config/helios/shell.toml"
+    path: root.home + "/.config/kestrel/shell.toml"
     watchChanges: true
     printErrors: false
     onLoaded: root.loadUserShell(text())

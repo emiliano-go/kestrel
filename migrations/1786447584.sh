@@ -1,3 +1,3 @@
 echo "Install QR code scanning support"
 
-helios-pkg-add zbar
+kestrel-pkg-add zbar

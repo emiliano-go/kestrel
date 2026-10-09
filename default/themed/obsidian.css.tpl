@@ -1,4 +1,4 @@
-/* HeliOS Theme for Obsidian */
+/* Kestrel Theme for Obsidian */
 
 .theme-dark, .theme-light {
   /* Core colors */

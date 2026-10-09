@@ -1,11 +1,11 @@
 echo "Replace the Gemini coding agent with Antigravity"
 
-HELIOS_PATH="${HELIOS_PATH:-/usr/share/helios}"
+KESTREL_PATH="${KESTREL_PATH:-/usr/share/kestrel}"
 
-agent_file="$HOME/.config/helios/defaults/agent"
-skills_source="$HELIOS_PATH/default/agents/skills"
+agent_file="$HOME/.config/kestrel/defaults/agent"
+skills_source="$KESTREL_PATH/default/agents/skills"
 
-# Read the default the way helios-default-agent reads it, so this migration and
+# Read the default the way kestrel-default-agent reads it, so this migration and
 # the launcher always agree on which agent is selected.
 selected_agent=""
 if [[ -f $agent_file ]]; then
@@ -15,16 +15,16 @@ fi
 # Choosing Gemini was opting into an agent, so its replacement follows even for
 # someone who removed the preinstalls. Otherwise the default rewritten below
 # would name a command that is not there.
-if helios-cmd-missing agy &&
-  { [[ $selected_agent == "gemini" ]] || [[ ! -f $HOME/.local/state/helios/preinstalls-removed ]]; }; then
-  helios-mise-install antigravity-cli agy
+if kestrel-cmd-missing agy &&
+  { [[ $selected_agent == "gemini" ]] || [[ ! -f $HOME/.local/state/kestrel/preinstalls-removed ]]; }; then
+  kestrel-mise-install antigravity-cli agy
 fi
 
 if [[ $selected_agent == "gemini" ]]; then
   printf '%s\n' agy >"$agent_file"
 fi
 
-# Remove Preinstalls no longer lists gemini, so HeliOS's own wrapper would
+# Remove Preinstalls no longer lists gemini, so Kestrel's own wrapper would
 # linger with nothing left to clean it up. Anchored to the line the installer
 # writes, so a hand-written wrapper that merely mentions it is left alone.
 if [[ -f $HOME/.local/bin/gemini ]] && grep -Eq '^mise use -g .*"gemini"' "$HOME/.local/bin/gemini"; then

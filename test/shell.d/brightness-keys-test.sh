@@ -8,7 +8,7 @@ run_node_test <<'JS'
 const fs = require('fs')
 const model = requireFromRoot('shell/services/BrightnessModel.js')
 
-// The in-shell brightness keys follow helios-brightness-display's steps.
+// The in-shell brightness keys follow kestrel-brightness-display's steps.
 const steps = [
   ['raise', 60, 65], ['lower', 60, 55],
   ['raise', 4, 5], ['raise', 5, 10], ['lower', 5, 4], ['lower', 6, 1],
@@ -39,7 +39,7 @@ assert(
 
 const shellQml = fs.readFileSync(path.join(root, 'shell/shell.qml'), 'utf8')
 assert(
-  /if \(!shell\.brightnessKeys\.handle\(entry\.target\)\)\s*Util\.execArgv\(\["helios-brightness-display", entry\.target === "raise" \? "\+5%" : "5%-"\]\)/.test(shellQml),
-  'a brightness key the shell declines runs helios-brightness-display'
+  /if \(!shell\.brightnessKeys\.handle\(entry\.target\)\)\s*Util\.execArgv\(\["kestrel-brightness-display", entry\.target === "raise" \? "\+5%" : "5%-"\]\)/.test(shellQml),
+  'a brightness key the shell declines runs kestrel-brightness-display'
 )
 JS

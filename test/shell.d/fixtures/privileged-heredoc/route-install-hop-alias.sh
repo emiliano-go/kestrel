@@ -1,6 +1,6 @@
-tmp=/tmp/helios-generated
+tmp=/tmp/kestrel-generated
 copy=$tmp
 cat >"$tmp" <<EOF
-command=$HOME/.local/share/helios/bin/example
+command=$HOME/.local/share/kestrel/bin/example
 EOF
-sudo install -m644 "$copy" /etc/helios/example.conf
+sudo install -m644 "$copy" /etc/kestrel/example.conf

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# kestrel:summary=Remove Dropbox and its bar plugin.
+# kestrel:requires-sudo=true
+
+dropbox-cli stop 2>/dev/null || true
+kestrel-plugin-disable kestrel.dropbox
+kestrel-pkg-drop dropbox dropbox-cli libappindicator-gtk3 python-gpgme nautilus-dropbox
+
+echo ""
+echo "Dropbox has been removed."

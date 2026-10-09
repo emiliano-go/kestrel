@@ -5,7 +5,7 @@ import "background" as BackgroundPlugin
 
 ShellRoot {
   id: test
-  property var services: ({ "helios.background": background })
+  property var services: ({ "kestrel.background": background })
   property var bar: ({})
   property bool failed: false
   function firstPartyServiceFor(id) { return services[id] || null }

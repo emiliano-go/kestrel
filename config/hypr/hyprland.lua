@@ -1,19 +1,19 @@
 -- Learn how to configure Hyprland: https://wiki.hypr.land/Configuring/Start/
 
--- HeliOS's bootstrap keeps path setup out of this user config.
-dofile((os.getenv("HELIOS_PATH") or "/usr/share/helios") .. "/default/hypr/bootstrap.lua")
+-- Kestrel's bootstrap keeps path setup out of this user config.
+dofile((os.getenv("KESTREL_PATH") or "/usr/share/kestrel") .. "/default/hypr/bootstrap.lua")
 
--- Disable all HeliOS default bindings. Add your own in hypr/bindings.lua.
--- helios_default_bindings = false
+-- Disable all Kestrel default bindings. Add your own in hypr/bindings.lua.
+-- kestrel_default_bindings = false
 --
--- Or disable only bindings for HeliOS's preinstalled apps/web apps while
+-- Or disable only bindings for Kestrel's preinstalled apps/web apps while
 -- keeping core window-manager bindings:
--- helios_preinstalled_bindings = false
+-- kestrel_preinstalled_bindings = false
 
--- Load HeliOS defaults.
-require("default.hypr.helios")
+-- Load Kestrel defaults.
+require("default.hypr.kestrel")
 
--- Put your personal overrides in these files. They're loaded after HeliOS's
+-- Put your personal overrides in these files. They're loaded after Kestrel's
 -- defaults so package updates can improve the defaults without rewriting your
 -- ~/.config/hypr files.
 require("hypr.monitors")

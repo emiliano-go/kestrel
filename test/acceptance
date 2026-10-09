@@ -1,32 +1,32 @@
 #!/bin/bash
 #
-# In-guest acceptance suite. Runs inside a live HeliOS session (typically a
-# VM installed by helios-iso-test, reached over SSH) and verifies that the
+# In-guest acceptance suite. Runs inside a live Kestrel session (typically a
+# VM installed by kestrel-iso-test, reached over SSH) and verifies that the
 # desktop actually works: session health, application launches, and shell
 # surfaces (launcher, emoji picker, menu).
 #
-# Artifacts (screenshots, logs) land in $HELIOS_ACCEPTANCE_DIR.
+# Artifacts (screenshots, logs) land in $KESTREL_ACCEPTANCE_DIR.
 
 set -euo pipefail
 
 ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 TEST_DIR="$ROOT/test/acceptance.d"
 
-export HELIOS_ACCEPTANCE_DIR="${HELIOS_ACCEPTANCE_DIR:-/tmp/helios-acceptance}"
-mkdir -p "$HELIOS_ACCEPTANCE_DIR"
+export KESTREL_ACCEPTANCE_DIR="${KESTREL_ACCEPTANCE_DIR:-/tmp/kestrel-acceptance}"
+mkdir -p "$KESTREL_ACCEPTANCE_DIR"
 
 # Discover the graphical session so the suite works over SSH, where none of
 # the session environment is inherited.
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
 # The suite verifies the installed product the session is running, so default
-# HELIOS_PATH to the installed tree — never this checkout, which may hold
-# only test/ (helios-iso-test's --sync-helios). qs matches shell instances
+# KESTREL_PATH to the installed tree — never this checkout, which may hold
+# only test/ (kestrel-iso-test's --sync-kestrel). qs matches shell instances
 # by config path, so a suite pointed at any other tree reads the session
 # shell as "not running". Callers testing a different tree pass it explicitly.
-export HELIOS_PATH="${HELIOS_PATH:-/usr/share/helios}"
+export KESTREL_PATH="${KESTREL_PATH:-/usr/share/kestrel}"
 
-export PATH="$HELIOS_PATH/bin:$PATH"
+export PATH="$KESTREL_PATH/bin:$PATH"
 
 if [[ -z ${DISPLAY:-} ]]; then
   display=$(systemctl --user show-environment | sed -n 's/^DISPLAY=//p' | head -1)
@@ -39,7 +39,7 @@ if [[ -z ${LANG:-} ]]; then
 fi
 
 # First boot may still be settling; wait for Hyprland to come up.
-boot_deadline=$((SECONDS + ${HELIOS_ACCEPTANCE_BOOT_TIMEOUT:-300}))
+boot_deadline=$((SECONDS + ${KESTREL_ACCEPTANCE_BOOT_TIMEOUT:-300}))
 
 wait_for_session() {
   local signature
@@ -87,15 +87,15 @@ suite_started=$SECONDS
 for test in "${tests[@]}"; do
   test_started=$SECONDS
   printf '==> %s\n' "${test#$ROOT/}"
-  if ! timeout "${HELIOS_ACCEPTANCE_TEST_TIMEOUT:-420}" bash "$test"; then
+  if ! timeout "${KESTREL_ACCEPTANCE_TEST_TIMEOUT:-420}" bash "$test"; then
     status=1
   fi
   printf '    completed in %ss\n' "$((SECONDS - test_started))"
 done
 
 if ((status != 0)); then
-  printf 'not ok - acceptance suite failed in %ss (artifacts in %s)\n' "$((SECONDS - suite_started))" "$HELIOS_ACCEPTANCE_DIR" >&2
+  printf 'not ok - acceptance suite failed in %ss (artifacts in %s)\n' "$((SECONDS - suite_started))" "$KESTREL_ACCEPTANCE_DIR" >&2
   exit $status
 fi
 
-printf 'ok - acceptance suite passed in %ss (artifacts in %s)\n' "$((SECONDS - suite_started))" "$HELIOS_ACCEPTANCE_DIR"
+printf 'ok - acceptance suite passed in %ss (artifacts in %s)\n' "$((SECONDS - suite_started))" "$KESTREL_ACCEPTANCE_DIR"

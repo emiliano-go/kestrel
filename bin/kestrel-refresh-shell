@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# kestrel:summary=Reset shell.json to Kestrel defaults
+# kestrel:examples=kestrel refresh shell
+
+set -euo pipefail
+
+kestrel-refresh-config kestrel/shell.json
+kestrel-bar defaults
+
+kestrel-restart-shell

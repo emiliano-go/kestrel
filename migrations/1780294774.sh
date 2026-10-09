@@ -1,12 +1,12 @@
 echo "Remove leading zero from bar clock date"
 
-config_file="$HOME/.config/helios/shell.json"
+config_file="$HOME/.config/kestrel/shell.json"
 
-if [[ -f $config_file ]] && helios-cmd-present jq; then
+if [[ -f $config_file ]] && kestrel-cmd-present jq; then
   tmp=$(mktemp)
   jq '
     def update_clock_format:
-      if type == "object" and (.id // "") == "helios.clock" and (.formatAlt // "") == "dd MMMM \u0027W\u0027ww yyyy" then
+      if type == "object" and (.id // "") == "kestrel.clock" and (.formatAlt // "") == "dd MMMM \u0027W\u0027ww yyyy" then
         .formatAlt = "d MMMM \u0027W\u0027ww yyyy"
       else
         .

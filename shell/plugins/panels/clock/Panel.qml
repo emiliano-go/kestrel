@@ -17,8 +17,8 @@ import "Model.js" as Model
 // anchor against.
 Panel {
   id: root
-  moduleName: "helios.clock"
-  ipcTarget: "helios.clock"
+  moduleName: "kestrel.clock"
+  ipcTarget: "kestrel.clock"
   manageIpc: false
 
   property var anchorItem: null

@@ -1,4 +1,4 @@
-echo "Backfill hardware support and tmux settings added before HeliOS quattro"
+echo "Backfill hardware support and tmux settings added before Kestrel quattro"
 
 tmux_config="$HOME/.config/tmux/tmux.conf"
 if [[ -f $tmux_config ]]; then
@@ -8,28 +8,28 @@ if [[ -f $tmux_config ]]; then
     sed -i '/^# Pane Controls$/a\bind -n M-Enter split-window -v -c "#{pane_current_path}"\nbind -n M-S-Enter split-window -h -c "#{pane_current_path}"\nbind -n M-Escape kill-pane\n' "$tmux_config"
   fi
 
-  helios-restart-tmux
+  kestrel-restart-tmux
 fi
 
 hardware_packages=()
-if lspci | grep -iE '(Multimedia audio controller|Audio device).*Intel' >/dev/null && helios-pkg-missing sof-firmware; then
+if lspci | grep -iE '(Multimedia audio controller|Audio device).*Intel' >/dev/null && kestrel-pkg-missing sof-firmware; then
   hardware_packages+=(sof-firmware)
 fi
-if lspci | grep -iE '(VGA|Display).*Intel' >/dev/null && helios-pkg-missing vulkan-intel; then
+if lspci | grep -iE '(VGA|Display).*Intel' >/dev/null && kestrel-pkg-missing vulkan-intel; then
   hardware_packages+=(vulkan-intel)
 fi
-if lspci | grep -iE '(VGA|Display).*AMD' >/dev/null && helios-pkg-missing vulkan-radeon; then
+if lspci | grep -iE '(VGA|Display).*AMD' >/dev/null && kestrel-pkg-missing vulkan-radeon; then
   hardware_packages+=(vulkan-radeon)
 fi
-if lspci | grep -iE '(VGA|Display).*Apple' >/dev/null && helios-pkg-missing vulkan-asahi; then
+if lspci | grep -iE '(VGA|Display).*Apple' >/dev/null && kestrel-pkg-missing vulkan-asahi; then
   hardware_packages+=(vulkan-asahi)
 fi
 
 if (( ${#hardware_packages[@]} > 0 )); then
-  helios-pkg-add "${hardware_packages[@]}"
-  helios-state set reboot-required
+  kestrel-pkg-add "${hardware_packages[@]}"
+  kestrel-state set reboot-required
 fi
 
-if helios-hw-match "DX13260"; then
+if kestrel-hw-match "DX13260"; then
   gsettings set org.gnome.desktop.interface text-scaling-factor 0.95
 fi

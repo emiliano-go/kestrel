@@ -1,50 +1,50 @@
-# Single source of truth for HELIOS_PATH + PATH adjustments. Sourced by:
-#   /etc/profile.d/helios.sh                 (system login shells)
+# Single source of truth for KESTREL_PATH + PATH adjustments. Sourced by:
+#   /etc/profile.d/kestrel.sh                 (system login shells)
 #   /etc/skel/.bashrc                         (interactive shells)
-#   /usr/share/uwsm/env.d/10-helios          (Hyprland session via uwsm)
-#   /usr/share/helios/default/bash/envs      (bash rc chain; SSH/non-login)
+#   /usr/share/uwsm/env.d/10-kestrel          (Hyprland session via uwsm)
+#   /usr/share/kestrel/default/bash/envs      (bash rc chain; SSH/non-login)
 
-# /etc/helios.conf is written by helios-dev-link and reset by
-# helios-dev-unlink. When absent, force the packaged default instead of
+# /etc/kestrel.conf is written by kestrel-dev-link and reset by
+# kestrel-dev-unlink. When absent, force the packaged default instead of
 # preserving a stale inherited value.
-if [ -f /etc/helios.conf ]; then
-  . /etc/helios.conf
-  : "${HELIOS_PATH:=/usr/share/helios}"
+if [ -f /etc/kestrel.conf ]; then
+  . /etc/kestrel.conf
+  : "${KESTREL_PATH:=/usr/share/kestrel}"
 else
-  HELIOS_PATH=/usr/share/helios
+  KESTREL_PATH=/usr/share/kestrel
 fi
-export HELIOS_PATH
+export KESTREL_PATH
 
 # Only prepend in dev-link mode. On a production install, the binaries are
-# already on PATH as /usr/bin/helios-* via the helios package — prepending
-# /usr/share/helios/bin would just be noise.
-if [ "$HELIOS_PATH" != /usr/share/helios ]; then
+# already on PATH as /usr/bin/kestrel-* via the kestrel package — prepending
+# /usr/share/kestrel/bin would just be noise.
+if [ "$KESTREL_PATH" != /usr/share/kestrel ]; then
   case ":$PATH:" in
-    *":${HELIOS_PATH%/}/bin:"*) ;;
-    *) PATH="${HELIOS_PATH%/}/bin${PATH:+:$PATH}" ;;
+    *":${KESTREL_PATH%/}/bin:"*) ;;
+    *) PATH="${KESTREL_PATH%/}/bin${PATH:+:$PATH}" ;;
   esac
 fi
 
 # mise's command wrappers must precede real tool directories inherited from a
 # parent shell, so scripts follow account switches without Bash functions.
 # mise activate also keeps this directory ahead of its managed tool binaries.
-helios_wrapper_dir="${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/command-wrappers/bin"
-helios_wrapper_path=$helios_wrapper_dir
+kestrel_wrapper_dir="${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/command-wrappers/bin"
+kestrel_wrapper_path=$kestrel_wrapper_dir
 if [ -n "${PATH:-}" ]; then
-  helios_remaining_path=$PATH
+  kestrel_remaining_path=$PATH
   while :; do
-    helios_path_entry=${helios_remaining_path%%:*}
-    if [ "$helios_path_entry" != "$helios_wrapper_dir" ]; then
-      helios_wrapper_path="$helios_wrapper_path:$helios_path_entry"
+    kestrel_path_entry=${kestrel_remaining_path%%:*}
+    if [ "$kestrel_path_entry" != "$kestrel_wrapper_dir" ]; then
+      kestrel_wrapper_path="$kestrel_wrapper_path:$kestrel_path_entry"
     fi
-    case "$helios_remaining_path" in
-      *:*) helios_remaining_path=${helios_remaining_path#*:} ;;
+    case "$kestrel_remaining_path" in
+      *:*) kestrel_remaining_path=${kestrel_remaining_path#*:} ;;
       *) break ;;
     esac
   done
 fi
-PATH=$helios_wrapper_path
-unset helios_wrapper_dir helios_wrapper_path helios_remaining_path helios_path_entry
+PATH=$kestrel_wrapper_path
+unset kestrel_wrapper_dir kestrel_wrapper_path kestrel_remaining_path kestrel_path_entry
 
 # User-level tool paths, appended so system binaries keep precedence. This is
 # what lets login shells (ssh, bash -lc) and the uwsm session find mise-managed

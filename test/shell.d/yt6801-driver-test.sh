@@ -138,15 +138,15 @@ case "$command" in
       *) exit 90 ;;
     esac
     ;;
-  helios-notification-dismiss) ;;
+  kestrel-notification-dismiss) ;;
   *) exit 90 ;;
 esac
 SH
 chmod +x "$stub_bin/stub"
-for command in lspci pacman lsmod readlink modinfo modprobe rmmod tee sudo helios-notification-dismiss; do
+for command in lspci pacman lsmod readlink modinfo modprobe rmmod tee sudo kestrel-notification-dismiss; do
   ln -s stub "$stub_bin/$command"
 done
-ln -s "$ROOT/bin/helios-pkg-drop" "$stub_bin/helios-pkg-drop"
+ln -s "$ROOT/bin/kestrel-pkg-drop" "$stub_bin/kestrel-pkg-drop"
 
 reset_state() {
   rm -rf "$TEST_STATE"
@@ -333,25 +333,25 @@ pass "manual hardware setup leaves the vendor fallback for the proven migration 
 # Exercise the real runner's completion markers and queue, without using the
 # current user's state directory or running any other repository migrations.
 reset_state
-mkdir -p "$test_tmp/helios/migrations"
-ln -s "$ROOT/migrations/1788279117.sh" "$test_tmp/helios/migrations/1788279117.sh"
-printf '%s\n' 'touch "$TEST_STATE/later-migration"' >"$test_tmp/helios/migrations/1788279118.sh"
-export HELIOS_PATH="$test_tmp/helios"
-export HELIOS_MIGRATION_STATE="$test_tmp/migration-state"
+mkdir -p "$test_tmp/kestrel/migrations"
+ln -s "$ROOT/migrations/1788279117.sh" "$test_tmp/kestrel/migrations/1788279117.sh"
+printf '%s\n' 'touch "$TEST_STATE/later-migration"' >"$test_tmp/kestrel/migrations/1788279118.sh"
+export KESTREL_PATH="$test_tmp/kestrel"
+export KESTREL_MIGRATION_STATE="$test_tmp/migration-state"
 TEST_FAULT=probe-noop
-if "$ROOT/bin/helios-migrate" >"$test_tmp/output" 2>&1; then
+if "$ROOT/bin/kestrel-migrate" >"$test_tmp/output" 2>&1; then
   fail "migration runner must fail when cutover is incomplete"
 fi
-[[ ! -e $HELIOS_MIGRATION_STATE/1788279117.sh && ! -e $TEST_STATE/later-migration ]] ||
+[[ ! -e $KESTREL_MIGRATION_STATE/1788279117.sh && ! -e $TEST_STATE/later-migration ]] ||
   fail "failed cutover must not write a completion marker or run later migrations"
 TEST_FAULT=""
-"$ROOT/bin/helios-migrate" >"$test_tmp/output" 2>&1
+"$ROOT/bin/kestrel-migrate" >"$test_tmp/output" 2>&1
 assert_complete
-[[ -f $HELIOS_MIGRATION_STATE/1788279117.sh && -f $TEST_STATE/later-migration ]] ||
+[[ -f $KESTREL_MIGRATION_STATE/1788279117.sh && -f $TEST_STATE/later-migration ]] ||
   fail "successful retry must mark completion and continue the queue"
 pass "the real migration runner keeps failures pending and completes successful retries"
 
-if grep -Fxq 'yt6801-dkms' "$ROOT/install/helios-other.packages"; then
+if grep -Fxq 'yt6801-dkms' "$ROOT/install/kestrel-other.packages"; then
   fail "default package list still installs yt6801-dkms"
 fi
 pass "the default package list no longer installs the vendor driver"

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.spacer",
+  "id": "kestrel.spacer",
   "name": "Spacer",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Configurable blank space",
   "kinds": [
     "bar-widget"

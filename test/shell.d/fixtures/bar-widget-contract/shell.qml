@@ -5,8 +5,8 @@ import qs.Commons
 ShellRoot {
   id: root
 
-  readonly property string resultPath: Quickshell.env("HELIOS_QML_TEST_RESULT")
-  readonly property string rootPath: Quickshell.env("HELIOS_PATH")
+  readonly property string resultPath: Quickshell.env("KESTREL_QML_TEST_RESULT")
+  readonly property string rootPath: Quickshell.env("KESTREL_PATH")
   property var failures: []
   property var createdIds: []
   property var createdObjects: []
@@ -41,7 +41,7 @@ ShellRoot {
 
   function widgets() {
     try {
-      return JSON.parse(Qt.atob(Quickshell.env("HELIOS_QML_BAR_WIDGETS") || "W10="))
+      return JSON.parse(Qt.atob(Quickshell.env("KESTREL_QML_BAR_WIDGETS") || "W10="))
     } catch (error) {
       fail("bar widget list failed to parse: " + error)
       return []
@@ -94,7 +94,7 @@ ShellRoot {
     if (typeof item.setting === "function") {
       root.assertEqual(item.setting("missing", "fallback"), "fallback", entry.id + " exposes setting fallback")
     }
-    if (entry.id === "helios.agents") {
+    if (entry.id === "kestrel.agents") {
       root.assertTrue(typeof item.iconCandidatesForProvider === "function", entry.id + " resolves provider marks by convention")
       var darkIcons = item.iconCandidatesForProvider({ providerId: "codex" }, Qt.color("#1a1b26")).join(" ")
       var lightIcons = item.iconCandidatesForProvider({ providerId: "codex" }, Qt.color("#ffffff")).join(" ")
@@ -128,7 +128,7 @@ ShellRoot {
     id: fakeBar
     property bool vertical: false
     property int barSize: 26
-    property string heliosPath: root.rootPath
+    property string kestrelPath: root.rootPath
     property string fontFamily: "monospace"
     property color foreground: "white"
     property color background: "black"
@@ -167,9 +167,9 @@ ShellRoot {
           for (var k = 0; k < root.createdObjects.length; k++) {
             var verticalItem = root.createdObjects[k]
             var verticalId = root.createdIds[k]
-            if (verticalId === "helios.clock")
+            if (verticalId === "kestrel.clock")
               root.assertEqual(verticalItem.implicitHeight, Style.bar.iconSlot * 3, verticalId + " uses one slot per line")
-            else if (verticalId === "helios.weather" || verticalId === "helios.system-update")
+            else if (verticalId === "kestrel.weather" || verticalId === "kestrel.system-update")
               root.assertEqual(verticalItem.implicitHeight, Style.bar.statusSlot, verticalId + " uses one compact status slot")
             if (verticalItem && typeof verticalItem.destroy === "function") verticalItem.destroy()
           }

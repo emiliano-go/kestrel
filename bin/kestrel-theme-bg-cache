@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# kestrel:summary=Cache background switcher thumbnails for the current theme
+
+theme_name=$(cat "$HOME/.local/state/kestrel/current/theme.name" 2>/dev/null)
+
+kestrel-menu-images \
+  --cache-only \
+  "$HOME/.local/state/kestrel/current/theme/backgrounds" \
+  "$HOME/.config/kestrel/backgrounds/$theme_name"

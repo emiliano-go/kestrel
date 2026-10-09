@@ -11,19 +11,19 @@ trap 'rm -rf "$test_tmp"' EXIT
 mock_bin="$test_tmp/bin"
 test_home="$test_tmp/home"
 hermes="$test_home/.local/bin/hermes"
-marker="# Written by helios-install-hermes-cli."
+marker="# Written by kestrel-install-hermes-cli."
 tool='pipx:hermes-agent[extras=all]'
 mise_log="$test_tmp/mise-log"
 mkdir -p "$mock_bin" "$test_home/.local/bin"
 
-cat >"$mock_bin/helios-pkg-present" <<'SH'
+cat >"$mock_bin/kestrel-pkg-present" <<'SH'
 #!/bin/bash
-[[ ${HELIOS_TEST_DESKTOP_INSTALLED:-0} == 1 ]]
+[[ ${KESTREL_TEST_DESKTOP_INSTALLED:-0} == 1 ]]
 SH
 
-cat >"$mock_bin/helios-default-agent" <<'SH'
+cat >"$mock_bin/kestrel-default-agent" <<'SH'
 #!/bin/bash
-printf '%s\n' "${HELIOS_TEST_DEFAULT_AGENT:-}"
+printf '%s\n' "${KESTREL_TEST_DEFAULT_AGENT:-}"
 SH
 
 # `where` finds the environment mise built when a test says it did, and `ls -g`
@@ -32,25 +32,25 @@ SH
 # being asked from being told to remove.
 cat >"$mock_bin/mise" <<'SH'
 #!/bin/bash
-printf '%s\n' "$*" >>"$HELIOS_TEST_MISE_LOG"
+printf '%s\n' "$*" >>"$KESTREL_TEST_MISE_LOG"
 case "$1" in
   where)
-    [[ ${HELIOS_TEST_MISE_STUCK:-0} == 1 ]] && exit 0
-    [[ ${HELIOS_TEST_MISE_BUILT:-0} == 1 && ! -e $HELIOS_TEST_MISE_LOG.removed ]]
+    [[ ${KESTREL_TEST_MISE_STUCK:-0} == 1 ]] && exit 0
+    [[ ${KESTREL_TEST_MISE_BUILT:-0} == 1 && ! -e $KESTREL_TEST_MISE_LOG.removed ]]
     ;;
   ls)
-    [[ ${HELIOS_TEST_MISE_LS_FAIL:-0} == 1 ]] && exit 1
-    if [[ ${HELIOS_TEST_MISE_BUILT:-0} == 1 && ! -e $HELIOS_TEST_MISE_LOG.unrequested ]]; then
+    [[ ${KESTREL_TEST_MISE_LS_FAIL:-0} == 1 ]] && exit 1
+    if [[ ${KESTREL_TEST_MISE_BUILT:-0} == 1 && ! -e $KESTREL_TEST_MISE_LOG.unrequested ]]; then
       echo '{"pipx:hermes-agent[extras=all]": [{"version": "latest"}]}'
     else
       echo '{}'
     fi
     ;;
   rm)
-    [[ ${HELIOS_TEST_MISE_RM_STUCK:-0} == 1 ]] || touch "$HELIOS_TEST_MISE_LOG.unrequested"
+    [[ ${KESTREL_TEST_MISE_RM_STUCK:-0} == 1 ]] || touch "$KESTREL_TEST_MISE_LOG.unrequested"
     ;;
   uninstall)
-    touch "$HELIOS_TEST_MISE_LOG.removed"
+    touch "$KESTREL_TEST_MISE_LOG.removed"
     ;;
 esac
 SH
@@ -74,13 +74,13 @@ rm -f "$test_tmp/usr-bin-without-mise/mise"
 
 # The real installer is on PATH: the migration asks it what to retire and
 # whether a Hermes still answers before telling the user how to get one back.
-# ~/.local/bin is on PATH the way HeliOS puts it there, after the mocks.
+# ~/.local/bin is on PATH the way Kestrel puts it there, after the mocks.
 run_migration() {
   : >"$mise_log"
   rm -f "$mise_log.removed" "$mise_log.unrequested"
-  HELIOS_TEST_MISE_LOG="$mise_log" \
+  KESTREL_TEST_MISE_LOG="$mise_log" \
     HOME="$test_home" \
-    PATH="${HELIOS_TEST_PATH:-$mock_bin:$test_home/.local/bin:$ROOT/bin:$PATH}" \
+    PATH="${KESTREL_TEST_PATH:-$mock_bin:$test_home/.local/bin:$ROOT/bin:$PATH}" \
     bash -euo pipefail "$migration" >"$test_tmp/output" 2>&1
 }
 
@@ -90,8 +90,8 @@ write_stub() {
 }
 
 write_stub
-HELIOS_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds over the HeliOS wrapper" "$(cat "$test_tmp/output")"
-[[ ! -e $hermes ]] || fail "the migration removes the wrapper HeliOS wrote"
+KESTREL_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds over the Kestrel wrapper" "$(cat "$test_tmp/output")"
+[[ ! -e $hermes ]] || fail "the migration removes the wrapper Kestrel wrote"
 grep -qxF "rm -g $tool" "$mise_log" || fail "the migration removes the global mise Hermes" "$(cat "$mise_log")"
 grep -qxF "uninstall --all $tool" "$mise_log" || fail "the migration uninstalls the mise Hermes" "$(cat "$mise_log")"
 pass "the migration retires the wrapper and the Hermes mise built"
@@ -103,24 +103,24 @@ run_migration || fail "the migration succeeds over a wrapper nobody ran"
 pass "a wrapper nobody ran goes without an uninstall"
 
 run_migration || fail "the migration succeeds with nothing to do"
-[[ ! -s $mise_log ]] || fail "with nothing of HeliOS's left, mise is not asked" "$(cat "$mise_log")"
+[[ ! -s $mise_log ]] || fail "with nothing of Kestrel's left, mise is not asked" "$(cat "$mise_log")"
 pass "the migration is a no-op once the wrapper is gone"
 
 # Anyone else's hermes stays exactly where it is, is not run, and does not vouch
-# for a mise environment being HeliOS's.
+# for a mise environment being Kestrel's.
 foreign_ran="$test_tmp/foreign-ran"
 foreign_body="#!/bin/bash
 touch $foreign_ran
 exec $test_home/.hermes/hermes-agent/venv/bin/hermes \"\$@\""
 printf '%s\n' "$foreign_body" >"$hermes"
 chmod +x "$hermes"
-HELIOS_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds over a foreign hermes"
+KESTREL_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds over a foreign hermes"
 [[ -x $hermes && $(cat "$hermes") == "$foreign_body" ]] || fail "a hermes the user set up stays as it is"
 [[ ! -e $foreign_ran ]] || fail "the migration runs a foreign hermes"
 ! grep -q '^rm -g' "$mise_log" || fail "a user's mise environment is removed on the strength of their wrapper"
 pass "the migration leaves a hermes the user set up alone"
 
-printf '%s\n' "#!/bin/bash" "# Replaces the stub helios-install-hermes-cli used to write." >"$hermes"
+printf '%s\n' "#!/bin/bash" "# Replaces the stub kestrel-install-hermes-cli used to write." >"$hermes"
 chmod +x "$hermes"
 run_migration || fail "the migration succeeds over a wrapper that mentions the installer"
 [[ -x $hermes ]] || fail "a wrapper that merely mentions the installer is removed"
@@ -144,10 +144,10 @@ run_migration || fail "the migration succeeds over a directory at the command's 
 rmdir "$hermes"
 pass "the migration leaves links and directories at the command's path alone"
 
-# Without the wrapper nothing proves a mise environment is HeliOS's, the app
+# Without the wrapper nothing proves a mise environment is Kestrel's, the app
 # being installed included: a user who built the same spec keeps it.
 rm -f "$hermes"
-HELIOS_TEST_DESKTOP_INSTALLED=1 HELIOS_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds with the app installed and no wrapper"
+KESTREL_TEST_DESKTOP_INSTALLED=1 KESTREL_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds with the app installed and no wrapper"
 ! grep -q '^rm -g' "$mise_log" || fail "a mise environment without the wrapper is removed" "$(cat "$mise_log")"
 pass "a mise environment without the wrapper is nobody's to remove"
 
@@ -156,10 +156,10 @@ pass "a mise environment without the wrapper is nobody's to remove"
 # keeps the wrapper, says how to finish by hand, and leaves the migration
 # pending; once it can finish, it does.
 write_stub
-HELIOS_TEST_MISE_BUILT=1 HELIOS_TEST_MISE_STUCK=1 run_migration && fail "a removal that left the environment behind counts as done"
+KESTREL_TEST_MISE_BUILT=1 KESTREL_TEST_MISE_STUCK=1 run_migration && fail "a removal that left the environment behind counts as done"
 [[ -x $hermes ]] || fail "a failed removal takes the wrapper anyway"
 grep -qF "mise uninstall --all '$tool'" "$test_tmp/output" || fail "a failed removal says how to finish by hand" "$(cat "$test_tmp/output")"
-HELIOS_TEST_MISE_BUILT=1 run_migration || fail "the migration finishes once the environment can go" "$(cat "$test_tmp/output")"
+KESTREL_TEST_MISE_BUILT=1 run_migration || fail "the migration finishes once the environment can go" "$(cat "$test_tmp/output")"
 [[ ! -e $hermes ]] || fail "the retry takes the wrapper once the environment is gone"
 pass "a removal that cannot finish leaves the wrapper and the migration pending"
 
@@ -167,7 +167,7 @@ pass "a removal that cannot finish leaves the wrapper and the migration pending"
 # uninstalled but still requested in the global config -- where `mise up` would
 # build it again -- is judged by the listing, not the exit code.
 write_stub
-HELIOS_TEST_MISE_BUILT=1 HELIOS_TEST_MISE_RM_STUCK=1 run_migration && fail "an environment still requested counts as removed"
+KESTREL_TEST_MISE_BUILT=1 KESTREL_TEST_MISE_RM_STUCK=1 run_migration && fail "an environment still requested counts as removed"
 [[ -x $hermes ]] || fail "a still-requested environment takes the wrapper anyway"
 grep -qF "mise rm -g '$tool'" "$test_tmp/output" || fail "a still-requested environment says how to finish by hand" "$(cat "$test_tmp/output")"
 pass "an environment mise still requests is not counted as gone"
@@ -175,9 +175,9 @@ pass "an environment mise still requests is not counted as gone"
 # A listing that cannot be read is not an answer: the wrapper stays and the
 # migration stays pending rather than deleting the proof on a guess.
 write_stub
-HELIOS_TEST_MISE_BUILT=1 HELIOS_TEST_MISE_LS_FAIL=1 run_migration && fail "an unreadable listing counts as retired"
+KESTREL_TEST_MISE_BUILT=1 KESTREL_TEST_MISE_LS_FAIL=1 run_migration && fail "an unreadable listing counts as retired"
 [[ -x $hermes ]] || fail "an unreadable listing takes the wrapper anyway"
-HELIOS_TEST_MISE_BUILT=1 run_migration || fail "the migration finishes once the listing can be read" "$(cat "$test_tmp/output")"
+KESTREL_TEST_MISE_BUILT=1 run_migration || fail "the migration finishes once the listing can be read" "$(cat "$test_tmp/output")"
 [[ ! -e $hermes ]] || fail "the retry takes the wrapper once the listing answers"
 pass "a mise listing that cannot be read leaves the migration pending"
 
@@ -185,9 +185,9 @@ pass "a mise listing that cannot be read leaves the migration pending"
 # hold would build Hermes again the day mise is back; the wrapper stays, the
 # migration stays pending, and the way out names mise first.
 write_stub
-HELIOS_TEST_PATH="$no_mise_path" run_migration && fail "a machine without mise counts the environment as retired"
+KESTREL_TEST_PATH="$no_mise_path" run_migration && fail "a machine without mise counts the environment as retired"
 [[ -x $hermes ]] || fail "without mise the wrapper is taken anyway"
-grep -qF "helios pkg add mise" "$test_tmp/output" || fail "without mise the way out names mise first" "$(cat "$test_tmp/output")"
+grep -qF "kestrel pkg add mise" "$test_tmp/output" || fail "without mise the way out names mise first" "$(cat "$test_tmp/output")"
 pass "without mise the migration stays pending rather than guessing"
 
 # The runtime installer saves whatever held the command aside before upstream's
@@ -202,8 +202,8 @@ mv "$hermes" "$saved_dir/hermes"
 printf '%s\n' "#!/bin/bash" "exec $test_home/.hermes/hermes-agent/venv/bin/python $test_home/.hermes/hermes-agent/hermes \"\$@\"" >"$hermes"
 chmod +x "$hermes"
 runtime_command=$(cat "$hermes")
-HELIOS_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds over a saved wrapper" "$(cat "$test_tmp/output")"
-grep -qxF "rm -g $tool" "$mise_log" || fail "a saved wrapper proves the environment HeliOS's" "$(cat "$mise_log")"
+KESTREL_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds over a saved wrapper" "$(cat "$test_tmp/output")"
+grep -qxF "rm -g $tool" "$mise_log" || fail "a saved wrapper proves the environment Kestrel's" "$(cat "$mise_log")"
 [[ ! -e $saved_dir/hermes && ! -d $saved_dir ]] || fail "the saved copy and its empty directory go once the environment is gone"
 [[ $(cat "$hermes") == "$runtime_command" ]] || fail "the runtime's command is left alone"
 pass "a wrapper saved aside by the runtime installer still retires the environment"
@@ -216,7 +216,7 @@ mkdir -p "$test_home/archive"
 write_stub
 mv "$hermes" "$test_home/archive/hermes"
 ln -s "$test_home/archive" "$test_home/.local/bin/.hermes-before-desktop.linked"
-HELIOS_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds over a linked backup directory"
+KESTREL_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds over a linked backup directory"
 ! grep -q '^rm -g' "$mise_log" || fail "a marked file behind a linked backup directory counts as proof"
 [[ -f $test_home/archive/hermes ]] || fail "a file behind a linked backup directory is removed"
 rm -f "$test_home/.local/bin/.hermes-before-desktop.linked"; rm -rf "$test_home/archive"
@@ -225,8 +225,8 @@ pass "a linked backup directory is neither proof nor touched"
 # Choosing Hermes again is what installs the runtime, so a default agent whose
 # command just went is told so; one that still answers, or another agent, is not.
 write_stub
-HELIOS_TEST_DEFAULT_AGENT=hermes HELIOS_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds for a Hermes default agent"
-grep -q 'helios default agent hermes' "$test_tmp/output" || fail "a default agent that just went is told how to come back" "$(cat "$test_tmp/output")"
+KESTREL_TEST_DEFAULT_AGENT=hermes KESTREL_TEST_MISE_BUILT=1 run_migration || fail "the migration succeeds for a Hermes default agent"
+grep -q 'kestrel default agent hermes' "$test_tmp/output" || fail "a default agent that just went is told how to come back" "$(cat "$test_tmp/output")"
 # A working Hermes is the app's: the package, its runtime finished and seeded,
 # and the command upstream's installer wrote for it.
 app_runtime="$test_home/.hermes/hermes-agent"
@@ -244,9 +244,9 @@ else
 fi
 SH
 chmod +x "$hermes"
-HELIOS_TEST_DESKTOP_INSTALLED=1 HELIOS_TEST_DEFAULT_AGENT=hermes run_migration || fail "the migration succeeds with the app's Hermes in place"
+KESTREL_TEST_DESKTOP_INSTALLED=1 KESTREL_TEST_DEFAULT_AGENT=hermes run_migration || fail "the migration succeeds with the app's Hermes in place"
 ! grep -q 'default agent' "$test_tmp/output" || fail "the app's own Hermes gets reinstall guidance" "$(cat "$test_tmp/output")"
 rm -rf "$hermes" "$test_home/.hermes"
-HELIOS_TEST_DEFAULT_AGENT=codex run_migration || fail "the migration succeeds for another default agent"
+KESTREL_TEST_DEFAULT_AGENT=codex run_migration || fail "the migration succeeds for another default agent"
 ! grep -q 'default agent' "$test_tmp/output" || fail "another default agent gets Hermes guidance"
 pass "the migration says how to reinstall a Hermes that was the default agent"

@@ -2,7 +2,7 @@ echo "Remove automatic project bin directories from PATH"
 
 work_dir="$HOME/Work"
 mise_config="$work_dir/.mise.toml"
-# install/user/mise-work.sh as shipped in HeliOS 4.0.3.
+# install/user/mise-work.sh as shipped in Kestrel 4.0.3.
 stock_sha="bd04f191d63bbde86920f44f76f0989fad980afc84e268e8474c201ec7149245"
 cwd_bin='\{\{[[:space:]]*cwd[[:space:]]*\}\}/bin'
 unsafe_path="^[[:space:]]*_[.]path[[:space:]]*=[[:space:]]*(\"$cwd_bin\"|'$cwd_bin')[[:space:]]*(#.*)?$"

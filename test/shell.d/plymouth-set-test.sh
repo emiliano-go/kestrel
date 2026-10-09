@@ -15,8 +15,8 @@ plymouth_theme_assets=(
   entry.png
   lock.png
   logo.png
-  helios.plymouth
-  helios.script
+  kestrel.plymouth
+  kestrel.script
   preview-unlock.png
   progress_bar.png
   progress_box.png
@@ -36,23 +36,23 @@ pass "Plymouth refresh allowlist covers every packaged asset"
 
 # SDDM reset is also a fixed-file publication contract. New packaged files
 # must fail this test until their trust and reset behavior are reviewed.
-packaged_sddm_assets=$(find "$ROOT/default/sddm/helios" -type f -printf '%P\n' | LC_ALL=C sort)
+packaged_sddm_assets=$(find "$ROOT/default/sddm/kestrel" -type f -printf '%P\n' | LC_ALL=C sort)
 allowlisted_sddm_assets=$(printf '%s\n' "${sddm_default_assets[@]}" | LC_ALL=C sort)
 [[ $packaged_sddm_assets == "$allowlisted_sddm_assets" ]] ||
   fail "SDDM refresh allowlist differs from the packaged asset set" "$packaged_sddm_assets"
 pass "SDDM refresh allowlist covers every packaged asset"
 
-# helios-plymouth-set-by-theme hands over a theme's unlock.png from
-# ~/.config/helios/themes. Both installed copies are world-readable, so a
+# kestrel-plymouth-set-by-theme hands over a theme's unlock.png from
+# ~/.config/kestrel/themes. Both installed copies are world-readable, so a
 # symlink there must not republish whatever it points at.
 printf 'not yours\n' >"$secret"
 ln -s "$secret" "$test_tmp/logo-link.png"
 
-output=$(HELIOS_PATH="$ROOT" /bin/bash "$ROOT/bin/helios-plymouth-set" '#1d2021' '#ebdbb2' "$test_tmp/logo-link.png" 2>&1)
+output=$(KESTREL_PATH="$ROOT" /bin/bash "$ROOT/bin/kestrel-plymouth-set" '#1d2021' '#ebdbb2' "$test_tmp/logo-link.png" 2>&1)
 status=$?
 
-(( status != 0 )) || fail "helios-plymouth-set refuses a symlinked logo"
-[[ $output == *"symlink"* ]] || fail "helios-plymouth-set says why it refused the logo" "$output"
+(( status != 0 )) || fail "kestrel-plymouth-set refuses a symlinked logo"
+[[ $output == *"symlink"* ]] || fail "kestrel-plymouth-set says why it refused the logo" "$output"
 
 pass "a themed logo cannot republish a file it merely points at"
 
@@ -62,22 +62,22 @@ pass "a themed logo cannot republish a file it merely points at"
 # without real privilege; retain a structural assertion on hosts that disable
 # them so the invariant never becomes an untested skip.
 if unshare --user --map-root-user true 2>/dev/null; then
-  output=$(unshare --user --map-root-user env HELIOS_PATH="$ROOT" /bin/bash "$ROOT/bin/helios-plymouth-set" '#1d2021' '#ebdbb2' "$secret" 2>&1)
+  output=$(unshare --user --map-root-user env KESTREL_PATH="$ROOT" /bin/bash "$ROOT/bin/kestrel-plymouth-set" '#1d2021' '#ebdbb2' "$secret" 2>&1)
   status=$?
-  (( status != 0 )) || fail "helios-plymouth-set refuses to run as root"
+  (( status != 0 )) || fail "kestrel-plymouth-set refuses to run as root"
   [[ $output == *"as your user"* && $output == *"not under sudo"* ]] ||
     fail "the root refusal explains how to invoke the publisher safely" "$output"
 else
-  grep -A2 -Eq '^if \(\( EUID == 0 \)\); then$' "$ROOT/bin/helios-plymouth-set" ||
-    fail "helios-plymouth-set retains its root-invocation guard"
+  grep -A2 -Eq '^if \(\( EUID == 0 \)\); then$' "$ROOT/bin/kestrel-plymouth-set" ||
+    fail "kestrel-plymouth-set retains its root-invocation guard"
 fi
 pass "the logo descriptor can only be opened by an unprivileged caller"
 
 # Style > Unlock picks a theme by name and hands the answer to
-# helios-launch-floating-terminal-with-presentation, which joins its arguments
+# kestrel-launch-floating-terminal-with-presentation, which joins its arguments
 # into a script and runs that with `bash -c`. So the name is shell source
 # unless the action quotes it -- and the name is a directory name under
-# ~/.config/helios/themes, which a theme installed from a git repo gets from
+# ~/.config/kestrel/themes, which a theme installed from a git repo gets from
 # the repo URL. `a';id;'b` is a legal directory name.
 require_command node
 
@@ -85,7 +85,7 @@ unlock_action=$(node -e '
   const fs = require("fs")
   const path = require("path")
   const menu = require(path.join(process.env.ROOT, "shell/plugins/menu/MenuModel.js"))
-  const items = menu.parseMenuJsonc(fs.readFileSync(path.join(process.env.ROOT, "default/helios/helios-menu.jsonc"), "utf8"))
+  const items = menu.parseMenuJsonc(fs.readFileSync(path.join(process.env.ROOT, "default/kestrel/kestrel-menu.jsonc"), "utf8"))
   process.stdout.write(items.find(item => item.id === "style.unlock").action)
 ')
 
@@ -100,22 +100,22 @@ reset_marker="$test_tmp/reset-ran"
 
 # What a name that got reparsed would reach. It is a command rather than a
 # `touch` so that no quoting of the test's own paths is involved.
-cat >"$stub_dir/helios-test-canary" <<STUB
+cat >"$stub_dir/kestrel-test-canary" <<STUB
 #!/bin/bash
 printf 'ran\n' >"$canary"
 STUB
 
-cat >"$stub_dir/helios-plymouth-switcher" <<'STUB'
+cat >"$stub_dir/kestrel-plymouth-switcher" <<'STUB'
 #!/bin/bash
-printf '%s\n' "$HELIOS_TEST_UNLOCK_NAME"
+printf '%s\n' "$KESTREL_TEST_UNLOCK_NAME"
 STUB
 
 # Run the real presentation wrapper while replacing only its terminal launcher.
 # The launcher stub executes the final `bash -c` locally instead of opening a
 # terminal window.
-ln -s "$ROOT/bin/helios-launch-floating-terminal-with-presentation" "$stub_dir/helios-launch-floating-terminal-with-presentation"
+ln -s "$ROOT/bin/kestrel-launch-floating-terminal-with-presentation" "$stub_dir/kestrel-launch-floating-terminal-with-presentation"
 
-cat >"$stub_dir/helios-restart-gum" <<'STUB'
+cat >"$stub_dir/kestrel-restart-gum" <<'STUB'
 #!/bin/bash
 :
 STUB
@@ -133,17 +133,17 @@ STUB
 
 # Records what actually arrived, so a name that survived as data is told apart
 # from one that arrived split or partly eaten.
-cat >"$stub_dir/helios-plymouth-set-by-theme" <<'STUB'
+cat >"$stub_dir/kestrel-plymouth-set-by-theme" <<'STUB'
 #!/bin/bash
-printf '%s\n' "$#" "$@" >"$HELIOS_TEST_SET_ARGS"
+printf '%s\n' "$#" "$@" >"$KESTREL_TEST_SET_ARGS"
 STUB
 
-cat >"$stub_dir/helios-plymouth-reset" <<'STUB'
+cat >"$stub_dir/kestrel-plymouth-reset" <<'STUB'
 #!/bin/bash
-printf 'ran\n' >"$HELIOS_TEST_RESET_MARKER"
+printf 'ran\n' >"$KESTREL_TEST_RESET_MARKER"
 STUB
 
-for command in helios-show-logo helios-show-done; do
+for command in kestrel-show-logo kestrel-show-done; do
   printf '#!/bin/bash\nexit 0\n' >"$stub_dir/$command"
 done
 
@@ -153,15 +153,15 @@ run_unlock_action() {
   rm -f "$canary" "$set_args" "$reset_marker"
 
   PATH="$stub_dir:$PATH" \
-    HELIOS_TEST_UNLOCK_NAME="$1" \
-    HELIOS_TEST_SET_ARGS="$set_args" \
-    HELIOS_TEST_RESET_MARKER="$reset_marker" \
+    KESTREL_TEST_UNLOCK_NAME="$1" \
+    KESTREL_TEST_SET_ARGS="$set_args" \
+    KESTREL_TEST_RESET_MARKER="$reset_marker" \
     bash -c "$unlock_action" >/dev/null 2>&1
 }
 
 # A directory name cannot hold a slash or a NUL, and everything else is fair
 # game -- these are the shapes that would run on the way to the picker.
-for name in "a';helios-test-canary;'b" 'a$(helios-test-canary)b' 'a`helios-test-canary`b' 'a b' '-a'; do
+for name in "a';kestrel-test-canary;'b" 'a$(kestrel-test-canary)b' 'a`kestrel-test-canary`b' 'a b' '-a'; do
   run_unlock_action "$name"
 
   [[ ! -e $canary ]] || fail "a theme name reaches the unlock screen as data, not as shell" "ran for: $name"
@@ -175,7 +175,7 @@ pass "a theme name cannot carry a command into the unlock screen"
 # resets rather than being looked up as a theme.
 run_unlock_action "tokyo-night"
 [[ $(cat "$set_args" 2>/dev/null) == $'1\ntokyo-night' ]] ||
-  fail "an ordinary theme name still reaches helios-plymouth-set-by-theme" "$(cat "$set_args" 2>/dev/null)"
+  fail "an ordinary theme name still reaches kestrel-plymouth-set-by-theme" "$(cat "$set_args" 2>/dev/null)"
 
 run_unlock_action "default"
 [[ -e $reset_marker ]] || fail "picking default still resets the unlock screen"
@@ -210,16 +210,16 @@ case "$1" in
   # simulation only, substitute trusted tools and map fixed system destinations
   # under the disposable fake root.
   code=${code/PATH=\/usr\/bin:\/bin/PATH=$TEST_ROOT_TOOLS:\/usr\/bin:\/bin}
-  code=${code/helios_conf=\/etc\/helios.conf/helios_conf=$TEST_HELIOS_CONF}
-  code=${code/theme_dir=\/usr\/share\/plymouth\/themes\/helios/theme_dir=$TEST_FAKE_ROOT\/usr\/share\/plymouth\/themes\/helios}
-  code=${code/sddm_dir=\/usr\/share\/sddm\/themes\/helios/sddm_dir=$TEST_FAKE_ROOT\/usr\/share\/sddm\/themes\/helios}
+  code=${code/kestrel_conf=\/etc\/kestrel.conf/kestrel_conf=$TEST_KESTREL_CONF}
+  code=${code/theme_dir=\/usr\/share\/plymouth\/themes\/kestrel/theme_dir=$TEST_FAKE_ROOT\/usr\/share\/plymouth\/themes\/kestrel}
+  code=${code/sddm_dir=\/usr\/share\/sddm\/themes\/kestrel/sddm_dir=$TEST_FAKE_ROOT\/usr\/share\/sddm\/themes\/kestrel}
 
   # Each rewrite above silently no-ops if the production text drifts, which
   # would point this simulation at the real /usr/share. Refuse instead.
   [[ $code == *"PATH=$TEST_ROOT_TOOLS:/usr/bin:/bin"* ]] || exit 94
-  [[ $code == *"helios_conf=$TEST_HELIOS_CONF"* ]] || exit 94
-  [[ $code == *"theme_dir=$TEST_FAKE_ROOT/usr/share/plymouth/themes/helios"* ]] || exit 94
-  [[ $code == *"sddm_dir=$TEST_FAKE_ROOT/usr/share/sddm/themes/helios"* ]] || exit 94
+  [[ $code == *"kestrel_conf=$TEST_KESTREL_CONF"* ]] || exit 94
+  [[ $code == *"theme_dir=$TEST_FAKE_ROOT/usr/share/plymouth/themes/kestrel"* ]] || exit 94
+  [[ $code == *"sddm_dir=$TEST_FAKE_ROOT/usr/share/sddm/themes/kestrel"* ]] || exit 94
 
   PATH="$TEST_ROOT_TOOLS:/usr/bin:/bin" \
     /bin/bash -c "$code" "$shell_name" "$@"
@@ -257,7 +257,7 @@ SH
 cat >"$root_tools/chown" <<'SH'
 #!/bin/bash
 last=${!#}
-[[ $last == "$TEST_FAKE_ROOT"* || $last == /tmp/helios-plymouth.* ]] || exit 93
+[[ $last == "$TEST_FAKE_ROOT"* || $last == /tmp/kestrel-plymouth.* ]] || exit 93
 exit 0
 SH
 
@@ -286,7 +286,7 @@ done
 (( $# == 2 )) || exit 96
 [[ $mode == "0600" || $mode == "0644" ]] || exit 96
 destination=$2
-[[ $destination == "$TEST_FAKE_ROOT"* || $destination == /tmp/helios-plymouth.* ]] || exit 93
+[[ $destination == "$TEST_FAKE_ROOT"* || $destination == /tmp/kestrel-plymouth.* ]] || exit 93
 exec /usr/bin/install -m "$mode" -- "$1" "$destination"
 SH
 
@@ -297,7 +297,7 @@ destination=${@: -1}
 [[ $source == "$destination" ]] || /usr/bin/cp -- "$source" "$destination"
 SH
 
-cat >"$fake_bin/helios-cmd-present" <<'SH'
+cat >"$fake_bin/kestrel-cmd-present" <<'SH'
 #!/bin/bash
 exit 1
 SH
@@ -311,9 +311,9 @@ setup_run() {
   fake_root="$run_dir/root"
   sudo_log="$run_dir/sudo.log"
   leak_log="$run_dir/leaked-stage-path.log"
-  helios_conf="$run_dir/helios.conf"
-  theme="$fake_root/usr/share/plymouth/themes/helios"
-  sddm="$fake_root/usr/share/sddm/themes/helios"
+  kestrel_conf="$run_dir/kestrel.conf"
+  theme="$fake_root/usr/share/plymouth/themes/kestrel"
+  sddm="$fake_root/usr/share/sddm/themes/kestrel"
 
   mkdir -p "$theme/logos" "$sddm"
   chmod 0755 \
@@ -347,8 +347,8 @@ setup_run() {
   printf 'LEGACY VICTIM\n' >"$legacy_victim"
   chmod 0600 "$plymouth_victim" "$sddm_victim" "$legacy_victim"
 
-  rm -f "$theme/helios.script" "$sddm/Main.qml"
-  ln -s "$plymouth_victim" "$theme/helios.script"
+  rm -f "$theme/kestrel.script" "$sddm/Main.qml"
+  ln -s "$plymouth_victim" "$theme/kestrel.script"
   ln -s "$sddm_victim" "$sddm/Main.qml"
   ln -s "$legacy_victim" "$sddm/logo.svg"
 }
@@ -365,7 +365,7 @@ setup_fresh_run() {
   for asset in "${sddm_default_assets[@]}"; do
     destination="$sddm/$asset"
     rm -f -- "$destination"
-    /usr/bin/install -m 0644 -- "$ROOT/default/sddm/helios/$asset" "$destination"
+    /usr/bin/install -m 0644 -- "$ROOT/default/sddm/kestrel/$asset" "$destination"
   done
   rm -f -- "$sddm/logo.svg"
 }
@@ -377,11 +377,11 @@ run_in_fake_root() {
     umask "$requested_umask"
     PATH="$fake_bin:$ROOT/bin:$PATH" \
       TMPDIR="$stages" \
-      HELIOS_PATH="$ROOT" \
+      KESTREL_PATH="$ROOT" \
       TEST_FAKE_ROOT="$fake_root" \
       TEST_STAGES="$stages" \
       TEST_ROOT_TOOLS="$root_tools" \
-      TEST_HELIOS_CONF="$helios_conf" \
+      TEST_KESTREL_CONF="$kestrel_conf" \
       TEST_SUDO_LOG="$sudo_log" \
       TEST_LEAK_LOG="$leak_log" \
       "$@"
@@ -392,7 +392,7 @@ run_set_colors() {
   local requested_umask="$1" background="$2" text="$3"
   shift 3
   run_in_fake_root "$requested_umask" "$@" \
-    /bin/bash "$ROOT/bin/helios-plymouth-set" "$background" "$text" "$test_tmp/logo.png"
+    /bin/bash "$ROOT/bin/kestrel-plymouth-set" "$background" "$text" "$test_tmp/logo.png"
 }
 
 run_set() {
@@ -402,20 +402,20 @@ run_set() {
 }
 
 run_refresh_plymouth() {
-  run_in_fake_root 022 "$@" /bin/bash "$ROOT/bin/helios-refresh-plymouth"
+  run_in_fake_root 022 "$@" /bin/bash "$ROOT/bin/kestrel-refresh-plymouth"
 }
 
 run_refresh_sddm() {
-  run_in_fake_root 022 "$@" /bin/bash "$ROOT/bin/helios-refresh-sddm"
+  run_in_fake_root 022 "$@" /bin/bash "$ROOT/bin/kestrel-refresh-sddm"
 }
 
 run_reset() {
-  run_in_fake_root 022 "$@" /bin/bash "$ROOT/bin/helios-plymouth-reset"
+  run_in_fake_root 022 "$@" /bin/bash "$ROOT/bin/kestrel-plymouth-reset"
 }
 
 assert_no_temporary_files() {
   local directory="$1" leftovers
-  leftovers=$(find "$directory" -name '.*.helios-new.*' -print)
+  leftovers=$(find "$directory" -name '.*.kestrel-new.*' -print)
   [[ -z $leftovers ]] || fail "failed publication cleans up its root-side temporary file" "$leftovers"
 }
 
@@ -454,14 +454,14 @@ for requested_umask in 022 027 077; do
   cmp -s "$test_tmp/logo.png" "$theme/logo.png" || fail "Plymouth receives the selected logo under umask $requested_umask"
   cmp -s "$test_tmp/logo.png" "$sddm/logo.png" || fail "SDDM receives the selected logo under umask $requested_umask"
   grep -Fq '#1d2021' "$sddm/Main.qml" || fail "SDDM Main.qml receives the selected background under umask $requested_umask"
-  grep -Fq 'Window.SetBackgroundTopColor(0.114, 0.125, 0.129);' "$theme/helios.script" || fail "Plymouth script receives the selected background under umask $requested_umask"
+  grep -Fq 'Window.SetBackgroundTopColor(0.114, 0.125, 0.129);' "$theme/kestrel.script" || fail "Plymouth script receives the selected background under umask $requested_umask"
 
   cmp -s "$ROOT/default/plymouth/logos/oma.png" "$theme/logos/oma.png" || fail "theme set leaves the packaged nested logo unchanged"
-  cmp -s "$ROOT/default/sddm/helios/metadata.desktop" "$sddm/metadata.desktop" || fail "theme set leaves packaged SDDM metadata unchanged"
-  cmp -s "$ROOT/default/sddm/helios/theme.conf" "$sddm/theme.conf" || fail "theme set leaves packaged SDDM configuration unchanged"
+  cmp -s "$ROOT/default/sddm/kestrel/metadata.desktop" "$sddm/metadata.desktop" || fail "theme set leaves packaged SDDM metadata unchanged"
+  cmp -s "$ROOT/default/sddm/kestrel/theme.conf" "$sddm/theme.conf" || fail "theme set leaves packaged SDDM configuration unchanged"
   [[ ! -s $leak_log ]] || fail "no privileged command receives a user-writable staged pathname" "$(cat "$leak_log")"
   [[ $(stat -c %a "$theme") == 755 && $(stat -c %a "$sddm") == 755 && $(stat -c %a "$theme/logos") == 755 ]] || fail "publication preserves destination directory modes under umask $requested_umask"
-  grep -Fq 'command plymouth-set-default-theme helios' "$sudo_log" || fail "theme set activates the published Plymouth theme"
+  grep -Fq 'command plymouth-set-default-theme kestrel' "$sudo_log" || fail "theme set activates the published Plymouth theme"
   grep -Fq 'command mkinitcpio -P' "$sudo_log" || fail "theme set rebuilds the initramfs"
   assert_no_temporary_files "$fake_root"
 done
@@ -476,7 +476,7 @@ output=$(run_set 022 env 2>&1)
 status=$?
 
 (( status == 0 )) || fail "theme set repairs migrated Plymouth and SDDM destinations" "$output"
-[[ -f $theme/helios.script && ! -L $theme/helios.script ]] || fail "theme set replaces a migrated Plymouth destination symlink"
+[[ -f $theme/kestrel.script && ! -L $theme/kestrel.script ]] || fail "theme set replaces a migrated Plymouth destination symlink"
 [[ -f $sddm/Main.qml && ! -L $sddm/Main.qml ]] || fail "theme set replaces a migrated SDDM destination symlink"
 [[ $(cat "$plymouth_victim") == 'PLYMOUTH VICTIM' && $(stat -c %a "$plymouth_victim") == 600 ]] || fail "theme set never changes a Plymouth symlink victim"
 [[ $(cat "$sddm_victim") == 'SDDM VICTIM' && $(stat -c %a "$sddm_victim") == 600 ]] || fail "theme set never changes an SDDM symlink victim"
@@ -494,7 +494,7 @@ output=$(run_set_colors 022 '#ffffff' '#000000' env 2>&1)
 status=$?
 (( status == 0 )) || fail "White theme publishes through the safe asset pipeline" "$output"
 grep -Fq 'color: "#ffffff"' "$sddm/Main.qml" || fail "White theme preserves its SDDM background color"
-if grep -Fq '__HELIOS_SDDM_' "$sddm/Main.qml"; then
+if grep -Fq '__KESTREL_SDDM_' "$sddm/Main.qml"; then
   fail "SDDM color substitution left an intermediate token behind"
 fi
 pass "White theme keeps a white SDDM background instead of becoming black-on-black"
@@ -508,7 +508,7 @@ preopen_marker="$run_dir/preopen-marker"
 printf 'ROOT ONLY\n' >"$secret"
 chmod 000 "$secret"
 cat >"$preopen_hook" <<'SH'
-if [[ $0 == */bin/helios-plymouth-set ]]; then
+if [[ $0 == */bin/kestrel-plymouth-set ]]; then
   set -T
   trap '
     if [[ $BASH_COMMAND == exec* && $BASH_COMMAND == *logo_fd* &&
@@ -546,7 +546,7 @@ setup_run
 nonregular_hook="$run_dir/nonregular-hook"
 nonregular_marker="$run_dir/nonregular-marker"
 cat >"$nonregular_hook" <<'SH'
-if [[ $0 == */bin/helios-plymouth-set ]]; then
+if [[ $0 == */bin/kestrel-plymouth-set ]]; then
   set -T
   trap '
     if [[ $BASH_COMMAND == exec* && $BASH_COMMAND == *logo_fd* &&
@@ -582,7 +582,7 @@ pass "the caller refuses an opened descriptor that is not a regular file"
 setup_run
 attacker_stage="$stages/tmp.attacker"
 mkdir -p "$attacker_stage/plymouth"
-printf 'MALICIOUS BOOT SCRIPT\n' >"$attacker_stage/plymouth/helios.script"
+printf 'MALICIOUS BOOT SCRIPT\n' >"$attacker_stage/plymouth/kestrel.script"
 ln -s "$secret" "$attacker_stage/plymouth/logo.png"
 
 output=$(run_set 022 env 2>&1)
@@ -590,8 +590,8 @@ status=$?
 
 (( status == 0 )) || fail "a planted caller-owned stage cannot disrupt publication" "$output"
 ! grep -Rqs 'MALICIOUS BOOT SCRIPT' "$fake_root" || fail "caller-owned staged content reached the boot theme"
-[[ -f $theme/helios.script && ! -L $theme/helios.script ]] || fail "the trusted Plymouth script replaces the planted destination symlink"
-grep -Fq 'Window.SetBackgroundTopColor(0.114, 0.125, 0.129);' "$theme/helios.script" || fail "the installed script was derived from the trusted packaged source"
+[[ -f $theme/kestrel.script && ! -L $theme/kestrel.script ]] || fail "the trusted Plymouth script replaces the planted destination symlink"
+grep -Fq 'Window.SetBackgroundTopColor(0.114, 0.125, 0.129);' "$theme/kestrel.script" || fail "the installed script was derived from the trusted packaged source"
 unexpected_stages=$(find "$stages" -mindepth 1 -maxdepth 1 ! -name tmp.attacker -print)
 [[ -z $unexpected_stages ]] || fail "the caller created an authoritative staging directory" "$unexpected_stages"
 assert_no_temporary_files "$fake_root"
@@ -606,7 +606,7 @@ status=$?
 
 (( status != 0 )) || fail "a user-owned packaged source tree is rejected"
 [[ $(cat "$theme/bullet.png") == 'old plymouth bullet.png' ]] || fail "an untrusted packaged source leaves the live theme unchanged"
-[[ -L $theme/helios.script && $(cat "$plymouth_victim") == 'PLYMOUTH VICTIM' ]] || fail "an untrusted source cannot replace executable Plymouth content"
+[[ -L $theme/kestrel.script && $(cat "$plymouth_victim") == 'PLYMOUTH VICTIM' ]] || fail "an untrusted source cannot replace executable Plymouth content"
 [[ $output == *"refusing to publish"* ]] || fail "a rejected packaged source says why it refused" "$output"
 assert_no_temporary_files "$fake_root"
 
@@ -623,9 +623,9 @@ mkdir -p "$symlink_source_root/default"
 cp -a "$ROOT/default/plymouth" "$ROOT/default/sddm" "$symlink_source_root/default/"
 rm -f "$symlink_source_root/default/plymouth/bullet.png"
 ln -s "$secret" "$symlink_source_root/default/plymouth/bullet.png"
-printf 'export HELIOS_PATH="%s"\n' "$symlink_source_root" >"$helios_conf"
-chmod 0644 "$helios_conf"
-output=$(run_set 022 env HELIOS_PATH="$symlink_source_root" TEST_UNTRUSTED_SOURCE="$symlink_source_root" 2>&1)
+printf 'export KESTREL_PATH="%s"\n' "$symlink_source_root" >"$kestrel_conf"
+chmod 0644 "$kestrel_conf"
+output=$(run_set 022 env KESTREL_PATH="$symlink_source_root" TEST_UNTRUSTED_SOURCE="$symlink_source_root" 2>&1)
 status=$?
 
 (( status != 0 )) || fail "a symlinked packaged asset is rejected" "$output"
@@ -635,39 +635,39 @@ assert_no_temporary_files "$fake_root"
 
 pass "root never follows a packaged asset symlink"
 
-# A random user-owned HELIOS_PATH remains untrusted. Only the exact canonical
-# checkout recorded by root in /etc/helios.conf is the supported dev-link
+# A random user-owned KESTREL_PATH remains untrusted. Only the exact canonical
+# checkout recorded by root in /etc/kestrel.conf is the supported dev-link
 # exception; an unrelated or stale authorization must not weaken the check.
 setup_run
 output=$(run_set 022 env TEST_UNTRUSTED_SOURCE="$ROOT" 2>&1)
 status=$?
 
-(( status != 0 )) || fail "a user-owned HELIOS_PATH is rejected"
+(( status != 0 )) || fail "a user-owned KESTREL_PATH is rejected"
 [[ $output == *"user-owned"* ]] || fail "the refusal names the untrusted source tree" "$output"
-[[ $output == *"helios dev link"* ]] || fail "the refusal names how to authorize a development checkout" "$output"
-[[ $(cat "$theme/bullet.png") == 'old plymouth bullet.png' ]] || fail "a user-owned HELIOS_PATH leaves the live theme unchanged"
+[[ $output == *"kestrel dev link"* ]] || fail "the refusal names how to authorize a development checkout" "$output"
+[[ $(cat "$theme/bullet.png") == 'old plymouth bullet.png' ]] || fail "a user-owned KESTREL_PATH leaves the live theme unchanged"
 assert_no_temporary_files "$fake_root"
 
 setup_run
-printf 'export HELIOS_PATH="/some/other/checkout"\n' >"$helios_conf"
-chmod 0644 "$helios_conf"
+printf 'export KESTREL_PATH="/some/other/checkout"\n' >"$kestrel_conf"
+chmod 0644 "$kestrel_conf"
 output=$(run_set 022 env TEST_UNTRUSTED_SOURCE="$ROOT" 2>&1)
 status=$?
 
 (( status != 0 )) || fail "a stale dev-link authorization is rejected"
 [[ $(cat "$theme/bullet.png") == 'old plymouth bullet.png' ]] || fail "a stale dev-link authorization leaves the live theme unchanged"
-# The refusal has to name the authorization. Validating /etc/helios.conf walks
+# The refusal has to name the authorization. Validating /etc/kestrel.conf walks
 # its parents and leaves that walk's subject in failure_context, so without
 # restoring ours this refuses with "directory / must be root-owned and not
 # group- or world-writable" -- accusing a directory that passed and pointing the
 # reader at a filesystem problem that does not exist.
-[[ $output == *"$helios_conf"* ]] || fail "a stale dev-link refusal names the authorization it rejected" "$output"
+[[ $output == *"$kestrel_conf"* ]] || fail "a stale dev-link refusal names the authorization it rejected" "$output"
 [[ $output != *"directory / "* ]] || fail "a stale dev-link refusal does not blame the root directory" "$output"
 assert_no_temporary_files "$fake_root"
 
 setup_run
-printf 'export HELIOS_PATH="%s"\n' "$ROOT" >"$helios_conf"
-chmod 0666 "$helios_conf"
+printf 'export KESTREL_PATH="%s"\n' "$ROOT" >"$kestrel_conf"
+chmod 0666 "$kestrel_conf"
 output=$(run_set 022 env TEST_UNTRUSTED_SOURCE="$ROOT" 2>&1)
 status=$?
 
@@ -677,9 +677,9 @@ assert_no_temporary_files "$fake_root"
 
 setup_run
 authorization_target="$run_dir/authorization-target"
-printf 'export HELIOS_PATH="%s"\n' "$ROOT" >"$authorization_target"
+printf 'export KESTREL_PATH="%s"\n' "$ROOT" >"$authorization_target"
 chmod 0644 "$authorization_target"
-ln -s "$authorization_target" "$helios_conf"
+ln -s "$authorization_target" "$kestrel_conf"
 output=$(run_set 022 env TEST_UNTRUSTED_SOURCE="$ROOT" 2>&1)
 status=$?
 
@@ -688,9 +688,9 @@ status=$?
 assert_no_temporary_files "$fake_root"
 
 setup_run
-printf 'export HELIOS_PATH="%s"\n' "$ROOT" >"$helios_conf"
-chmod 0644 "$helios_conf"
-output=$(run_set 022 env TEST_UNTRUSTED_SOURCE="$ROOT" TEST_UNTRUSTED_CONFIGURATION="$helios_conf" 2>&1)
+printf 'export KESTREL_PATH="%s"\n' "$ROOT" >"$kestrel_conf"
+chmod 0644 "$kestrel_conf"
+output=$(run_set 022 env TEST_UNTRUSTED_SOURCE="$ROOT" TEST_UNTRUSTED_CONFIGURATION="$kestrel_conf" 2>&1)
 status=$?
 
 (( status != 0 )) || fail "a user-owned dev-link authorization is rejected"
@@ -698,8 +698,8 @@ status=$?
 assert_no_temporary_files "$fake_root"
 
 setup_run
-printf 'export HELIOS_PATH="%s"\n' "$ROOT" >"$helios_conf"
-chmod 0644 "$helios_conf"
+printf 'export KESTREL_PATH="%s"\n' "$ROOT" >"$kestrel_conf"
+chmod 0644 "$kestrel_conf"
 output=$(run_set 022 env TEST_UNTRUSTED_SOURCE="$ROOT" 2>&1)
 status=$?
 
@@ -786,7 +786,7 @@ writable_directory_root=$(realpath -e -- "$writable_directory_root")
 mkdir -p "$writable_directory_root/default"
 cp -a "$ROOT/default/plymouth" "$ROOT/default/sddm" "$writable_directory_root/default/"
 chmod 0777 "$writable_directory_root/default/plymouth"
-output=$(run_set 022 env HELIOS_PATH="$writable_directory_root" 2>&1)
+output=$(run_set 022 env KESTREL_PATH="$writable_directory_root" 2>&1)
 status=$?
 
 (( status != 0 )) || fail "a writable packaged source directory is rejected" "$output"
@@ -805,7 +805,7 @@ writable_root=$(realpath -e -- "$writable_root")
 mkdir -p "$writable_root/default"
 cp -a "$ROOT/default/plymouth" "$ROOT/default/sddm" "$writable_root/default/"
 chmod 0666 "$writable_root/default/plymouth/bullet.png"
-output=$(run_set 022 env HELIOS_PATH="$writable_root" 2>&1)
+output=$(run_set 022 env KESTREL_PATH="$writable_root" 2>&1)
 status=$?
 
 (( status != 0 )) || fail "a world-writable packaged asset is rejected" "$output"
@@ -858,7 +858,7 @@ assert_packaged_assets "Plymouth refresh" "$ROOT/default/plymouth" "$theme" "${p
 [[ -L $sddm/Main.qml && $(cat "$sddm_victim") == 'SDDM VICTIM' ]] || fail "Plymouth refresh leaves SDDM unchanged"
 ! grep -Fq 'transaction /usr/share/sddm/' "$sudo_log" || fail "Plymouth refresh does not publish SDDM assets"
 [[ ! -s $leak_log ]] || fail "refresh never gives root a user-writable source pathname" "$(cat "$leak_log")"
-grep -Fq 'command plymouth-set-default-theme helios' "$sudo_log" || fail "Plymouth refresh activates the restored theme"
+grep -Fq 'command plymouth-set-default-theme kestrel' "$sudo_log" || fail "Plymouth refresh activates the restored theme"
 grep -Fq 'command mkinitcpio -P' "$sudo_log" || fail "Plymouth refresh rebuilds the initramfs"
 
 pass "refresh safely publishes its complete fixed asset set, including logos/oma.png"
@@ -871,8 +871,8 @@ output=$(run_refresh_sddm 2>&1)
 status=$?
 (( status == 0 )) || fail "SDDM refresh succeeds through the safe publisher" "$output"
 
-assert_packaged_assets "SDDM refresh" "$ROOT/default/sddm/helios" "$sddm" "${sddm_default_assets[@]}"
-[[ -L $theme/helios.script && $(cat "$plymouth_victim") == 'PLYMOUTH VICTIM' ]] || fail "SDDM refresh leaves Plymouth unchanged"
+assert_packaged_assets "SDDM refresh" "$ROOT/default/sddm/kestrel" "$sddm" "${sddm_default_assets[@]}"
+[[ -L $theme/kestrel.script && $(cat "$plymouth_victim") == 'PLYMOUTH VICTIM' ]] || fail "SDDM refresh leaves Plymouth unchanged"
 [[ $(cat "$sddm_victim") == 'SDDM VICTIM' && $(stat -c %a "$sddm_victim") == 600 ]] || fail "SDDM refresh never changes a destination symlink victim"
 [[ $(cat "$legacy_victim") == 'LEGACY VICTIM' && $(stat -c %a "$legacy_victim") == 600 ]] || fail "SDDM refresh never changes the legacy logo victim"
 [[ ! -e $sddm/logo.svg && ! -L $sddm/logo.svg ]] || fail "SDDM refresh removes the legacy logo.svg"
@@ -890,8 +890,8 @@ status=$?
 (( status == 0 )) || fail "reset succeeds on a fresh installation" "$output"
 
 assert_packaged_assets "fresh reset Plymouth" "$ROOT/default/plymouth" "$theme" "${plymouth_default_assets[@]}"
-assert_packaged_assets "fresh reset SDDM" "$ROOT/default/sddm/helios" "$sddm" "${sddm_default_assets[@]}"
-grep -Fq 'command plymouth-set-default-theme helios' "$sudo_log" || fail "fresh reset activates the packaged Plymouth theme"
+assert_packaged_assets "fresh reset SDDM" "$ROOT/default/sddm/kestrel" "$sddm" "${sddm_default_assets[@]}"
+grep -Fq 'command plymouth-set-default-theme kestrel' "$sudo_log" || fail "fresh reset activates the packaged Plymouth theme"
 grep -Fq 'command mkinitcpio -P' "$sudo_log" || fail "fresh reset rebuilds the initramfs"
 assert_no_temporary_files "$fake_root"
 
@@ -906,12 +906,12 @@ status=$?
 (( status == 0 )) || fail "combined Plymouth and SDDM reset succeeds" "$output"
 
 assert_packaged_assets "migrated reset Plymouth" "$ROOT/default/plymouth" "$theme" "${plymouth_default_assets[@]}"
-assert_packaged_assets "migrated reset SDDM" "$ROOT/default/sddm/helios" "$sddm" "${sddm_default_assets[@]}"
+assert_packaged_assets "migrated reset SDDM" "$ROOT/default/sddm/kestrel" "$sddm" "${sddm_default_assets[@]}"
 [[ $(cat "$plymouth_victim") == 'PLYMOUTH VICTIM' && $(stat -c %a "$plymouth_victim") == 600 ]] || fail "reset never changes a Plymouth destination symlink victim"
 [[ $(cat "$sddm_victim") == 'SDDM VICTIM' && $(stat -c %a "$sddm_victim") == 600 ]] || fail "reset never changes an SDDM destination symlink victim"
 [[ $(cat "$legacy_victim") == 'LEGACY VICTIM' && $(stat -c %a "$legacy_victim") == 600 ]] || fail "reset never changes the legacy logo victim"
 [[ ! -e $sddm/logo.svg && ! -L $sddm/logo.svg ]] || fail "reset removes the legacy logo.svg"
-grep -Fq 'command plymouth-set-default-theme helios' "$sudo_log" || fail "reset activates the restored Plymouth theme"
+grep -Fq 'command plymouth-set-default-theme kestrel' "$sudo_log" || fail "reset activates the restored Plymouth theme"
 grep -Fq 'command mkinitcpio -P' "$sudo_log" || fail "reset rebuilds the initramfs"
 [[ ! -s $leak_log ]] || fail "reset never gives root a user-writable source pathname" "$(cat "$leak_log")"
 
@@ -931,7 +931,7 @@ output=$(run_reset 2>&1)
 status=$?
 (( status == 0 )) || fail "reset repairs missing Plymouth and SDDM destinations" "$output"
 assert_packaged_assets "missing-file reset Plymouth" "$ROOT/default/plymouth" "$theme" "${plymouth_default_assets[@]}"
-assert_packaged_assets "missing-file reset SDDM" "$ROOT/default/sddm/helios" "$sddm" "${sddm_default_assets[@]}"
+assert_packaged_assets "missing-file reset SDDM" "$ROOT/default/sddm/kestrel" "$sddm" "${sddm_default_assets[@]}"
 
 pass "reset recreates missing files in package-owned destination trees"
 

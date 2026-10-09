@@ -21,8 +21,8 @@ EOF
 
 cat >"$mock_bin/xdg-settings" <<'SH'
 #!/bin/bash
-[[ -z ${BROWSER:-} ]] || printf '%s\n' "$BROWSER" >"$HELIOS_TEST_XDG_SETTINGS_BROWSER"
-[[ ${HELIOS_TEST_XDG_SETTINGS_EMPTY:-0} == "1" ]] || echo chromium.desktop
+[[ -z ${BROWSER:-} ]] || printf '%s\n' "$BROWSER" >"$KESTREL_TEST_XDG_SETTINGS_BROWSER"
+[[ ${KESTREL_TEST_XDG_SETTINGS_EMPTY:-0} == "1" ]] || echo chromium.desktop
 SH
 cat >"$mock_bin/xdg-mime" <<'SH'
 #!/bin/bash
@@ -36,11 +36,11 @@ exit 0
 SH
 cat >"$mock_bin/systemd-run" <<'SH'
 #!/bin/bash
-printf '%s\n' "$*" >"$HELIOS_TEST_BROWSER_LAUNCH"
+printf '%s\n' "$*" >"$KESTREL_TEST_BROWSER_LAUNCH"
 SH
-cat >"$mock_bin/helios-hyprland-focus-app" <<'SH'
+cat >"$mock_bin/kestrel-hyprland-focus-app" <<'SH'
 #!/bin/bash
-printf '%s\n' "$1" >"$HELIOS_TEST_BROWSER_FOCUS"
+printf '%s\n' "$1" >"$KESTREL_TEST_BROWSER_FOCUS"
 SH
 chmod +x "$mock_bin"/*
 
@@ -48,20 +48,20 @@ launch_log="$test_tmp/launch"
 focus_log="$test_tmp/focus"
 xdg_settings_browser="$test_tmp/xdg-settings-browser"
 HOME="$test_home" PATH="$mock_bin:$PATH" HYPRLAND_INSTANCE_SIGNATURE=test \
-  HELIOS_TEST_BROWSER_LAUNCH="$launch_log" HELIOS_TEST_BROWSER_FOCUS="$focus_log" \
-  bash "$ROOT/bin/helios-launch-browser"
+  KESTREL_TEST_BROWSER_LAUNCH="$launch_log" KESTREL_TEST_BROWSER_FOCUS="$focus_log" \
+  bash "$ROOT/bin/kestrel-launch-browser"
 
 [[ ! -e $focus_log ]] || fail "browser launcher leaves a new window on the current workspace"
 
 HOME="$test_home" PATH="$mock_bin:$PATH" HYPRLAND_INSTANCE_SIGNATURE=test \
-  HELIOS_TEST_BROWSER_LAUNCH="$launch_log" HELIOS_TEST_BROWSER_FOCUS="$focus_log" \
-  bash "$ROOT/bin/helios-launch-browser" --private
+  KESTREL_TEST_BROWSER_LAUNCH="$launch_log" KESTREL_TEST_BROWSER_FOCUS="$focus_log" \
+  bash "$ROOT/bin/kestrel-launch-browser" --private
 
 [[ ! -e $focus_log ]] || fail "private browser launcher leaves a new window on the current workspace"
 
 HOME="$test_home" PATH="$mock_bin:$PATH" HYPRLAND_INSTANCE_SIGNATURE=test \
-  HELIOS_TEST_BROWSER_LAUNCH="$launch_log" HELIOS_TEST_BROWSER_FOCUS="$focus_log" \
-  bash "$ROOT/bin/helios-launch-browser" "https://example.test/authorize"
+  KESTREL_TEST_BROWSER_LAUNCH="$launch_log" KESTREL_TEST_BROWSER_FOCUS="$focus_log" \
+  bash "$ROOT/bin/kestrel-launch-browser" "https://example.test/authorize"
 
 grep -F 'https://example.test/authorize' "$launch_log" >/dev/null || fail "browser launcher passes through the URL"
 grep -Fx '^chromium.*$' "$focus_log" >/dev/null || fail "browser launcher focuses the default browser window"
@@ -69,10 +69,10 @@ grep -Fx '^chromium.*$' "$focus_log" >/dev/null || fail "browser launcher focuse
 rm -f "$focus_log" "$xdg_settings_browser"
 
 HOME="$test_home" PATH="$mock_bin:$PATH" HYPRLAND_INSTANCE_SIGNATURE=test \
-  BROWSER=helios-launch-browser HELIOS_TEST_XDG_SETTINGS_EMPTY=1 \
-  HELIOS_TEST_BROWSER_LAUNCH="$launch_log" HELIOS_TEST_BROWSER_FOCUS="$focus_log" \
-  HELIOS_TEST_XDG_SETTINGS_BROWSER="$xdg_settings_browser" \
-  bash "$ROOT/bin/helios-launch-browser" "https://example.test/fallback"
+  BROWSER=kestrel-launch-browser KESTREL_TEST_XDG_SETTINGS_EMPTY=1 \
+  KESTREL_TEST_BROWSER_LAUNCH="$launch_log" KESTREL_TEST_BROWSER_FOCUS="$focus_log" \
+  KESTREL_TEST_XDG_SETTINGS_BROWSER="$xdg_settings_browser" \
+  bash "$ROOT/bin/kestrel-launch-browser" "https://example.test/fallback"
 
 grep -F 'https://example.test/fallback' "$launch_log" >/dev/null ||
   fail "browser launcher falls back to the HTTPS handler when xdg-settings is empty"
@@ -84,14 +84,14 @@ grep -Fx '^chromium.*$' "$focus_log" >/dev/null ||
 pass "browser launcher follows opened links to the browser workspace"
 
 rm -f "$launch_log"
-cat >"$mock_bin/helios-cmd-browser-handoff" <<'SH'
+cat >"$mock_bin/kestrel-cmd-browser-handoff" <<'SH'
 #!/bin/bash
 [[ $1 == "chromium" && $2 == "https://example.test/running" ]]
 SH
-chmod +x "$mock_bin/helios-cmd-browser-handoff"
+chmod +x "$mock_bin/kestrel-cmd-browser-handoff"
 
-HOME="$test_home" PATH="$mock_bin:$PATH" HELIOS_TEST_BROWSER_LAUNCH="$launch_log" \
-  HELIOS_TEST_BROWSER_FOCUS="$focus_log" bash "$ROOT/bin/helios-launch-browser" "https://example.test/running"
+HOME="$test_home" PATH="$mock_bin:$PATH" KESTREL_TEST_BROWSER_LAUNCH="$launch_log" \
+  KESTREL_TEST_BROWSER_FOCUS="$focus_log" bash "$ROOT/bin/kestrel-launch-browser" "https://example.test/running"
 
 [[ ! -e $launch_log ]] || fail "browser launcher starts no browser when the running one takes the URL"
 pass "browser launcher hands a URL to the running browser"

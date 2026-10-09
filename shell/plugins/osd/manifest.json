@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "helios.osd",
+  "id": "kestrel.osd",
   "name": "On-screen display",
   "version": "1.0.0",
   "description": "Quickshell volume, brightness, and status overlays.",

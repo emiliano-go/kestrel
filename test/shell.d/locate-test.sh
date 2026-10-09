@@ -22,7 +22,7 @@ def check(condition, description):
     raise SystemExit("not ok - " + description)
   print("ok - " + description, flush=True)
 
-drop_in = root / "default/systemd/system/plocate-updatedb.service.d/10-helios.conf"
+drop_in = root / "default/systemd/system/plocate-updatedb.service.d/10-kestrel.conf"
 directives = [line.strip() for line in drop_in.read_text().splitlines() if line.strip() and not line.startswith("#")]
 check(len(directives) == 3 and directives[:2] == ["[Service]", "ExecStart="] and directives[2].startswith("ExecStart="),
       "locate drop-in replaces the command and preserves upstream service restrictions")
@@ -33,7 +33,7 @@ check(command == ["/usr/bin/updatedb", *options],
 check("ConditionACPower=true" in (root / "etc/systemd/system/plocate-updatedb.service.d/ac-only.conf").read_text(),
       "scheduled locate indexing keeps its AC-power condition")
 
-with tempfile.TemporaryDirectory(prefix="helios-locate-") as scratch:
+with tempfile.TemporaryDirectory(prefix="kestrel-locate-") as scratch:
   scratch = Path(scratch)
   fake_bin = scratch / "bin"
   fake_bin.mkdir()
@@ -42,8 +42,8 @@ with tempfile.TemporaryDirectory(prefix="helios-locate-") as scratch:
     "sudo": 'exec "$@"',
     "fzf": 'cat >/dev/null\nprintf "%s\\n" test-package',
     "yay": 'if [[ ${1:-} == "-Slqa" ]]; then printf "%s\\n" test-package; fi',
-    "helios-sudo-keepalive": ':',
-    "helios-show-done": ':',
+    "kestrel-sudo-keepalive": ':',
+    "kestrel-show-done": ':',
   }
   for name, body in stubs.items():
     path = fake_bin / name
@@ -51,7 +51,7 @@ with tempfile.TemporaryDirectory(prefix="helios-locate-") as scratch:
     path.chmod(0o755)
   calls = scratch / "updatedb-arguments"
   env = dict(os.environ, PATH=str(fake_bin) + ":" + os.environ["PATH"], TEST_CALLS=str(calls))
-  for relative in ("install/post-install/localdb.sh", "bin/helios-pkg-aur-install"):
+  for relative in ("install/post-install/localdb.sh", "bin/kestrel-pkg-aur-install"):
     subprocess.run(["bash", "-euo", "pipefail", str(root / relative)], env=env, check=True)
     check(calls.read_text().splitlines() == options,
           relative + " passes the scheduled service options directly")

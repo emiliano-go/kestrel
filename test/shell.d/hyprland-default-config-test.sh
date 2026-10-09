@@ -8,10 +8,10 @@ run_application_bindings() {
   local home="$1"
   local prelude="${2:-}"
 
-  HOME="$home" XDG_CONFIG_HOME="$home/.config" XDG_STATE_HOME="$home/.local/state" HELIOS_PATH="$ROOT" HELIOS_BINDING_PRELUDE="$prelude" lua <<'LUA'
-package.path = os.getenv("HOME") .. "/.config/?.lua;" .. os.getenv("HELIOS_PATH") .. "/?.lua;" .. package.path
+  HOME="$home" XDG_CONFIG_HOME="$home/.config" XDG_STATE_HOME="$home/.local/state" KESTREL_PATH="$ROOT" KESTREL_BINDING_PRELUDE="$prelude" lua <<'LUA'
+package.path = os.getenv("HOME") .. "/.config/?.lua;" .. os.getenv("KESTREL_PATH") .. "/?.lua;" .. package.path
 
-local prelude = os.getenv("HELIOS_BINDING_PRELUDE") or ""
+local prelude = os.getenv("KESTREL_BINDING_PRELUDE") or ""
 if prelude ~= "" then
   assert(load(prelude))()
 end
@@ -35,12 +35,12 @@ require("default.hypr.bindings.applications")
 LUA
 }
 
-run_helios_bindings() {
+run_kestrel_bindings() {
   local home="$1"
   local prelude="${2:-}"
 
-  HOME="$home" XDG_CONFIG_HOME="$home/.config" XDG_STATE_HOME="$home/.local/state" HELIOS_PATH="$ROOT" HELIOS_BINDING_PRELUDE="$prelude" lua <<'LUA'
-package.path = os.getenv("HOME") .. "/.config/?.lua;" .. os.getenv("HELIOS_PATH") .. "/?.lua;" .. package.path
+  HOME="$home" XDG_CONFIG_HOME="$home/.config" XDG_STATE_HOME="$home/.local/state" KESTREL_PATH="$ROOT" KESTREL_BINDING_PRELUDE="$prelude" lua <<'LUA'
+package.path = os.getenv("HOME") .. "/.config/?.lua;" .. os.getenv("KESTREL_PATH") .. "/?.lua;" .. package.path
 
 local function proxy()
   return setmetatable({}, {
@@ -55,7 +55,7 @@ local function proxy()
   })
 end
 
-local prelude = os.getenv("HELIOS_BINDING_PRELUDE") or ""
+local prelude = os.getenv("KESTREL_BINDING_PRELUDE") or ""
 if prelude ~= "" then
   assert(load(prelude))()
 end
@@ -91,7 +91,7 @@ hl = setmetatable({
   end,
 })
 
-require("default.hypr.helios")
+require("default.hypr.kestrel")
 LUA
 }
 
@@ -120,8 +120,8 @@ fi
 pass "universal clipboard shortcuts avoid virtual keyboard modifier merging"
 
 removed_home="$tmpdir/removed-home"
-mkdir -p "$removed_home/.local/state/helios"
-touch "$removed_home/.local/state/helios/preinstalls-removed"
+mkdir -p "$removed_home/.local/state/kestrel"
+touch "$removed_home/.local/state/kestrel/preinstalls-removed"
 removed_output=$(run_application_bindings "$removed_home")
 grep -Fq $'SUPER + RETURN	Terminal' <<<"$removed_output" || fail "preinstall removal keeps essential bindings"
 if grep -Fq $'SUPER + SHIFT + A	ChatGPT' <<<"$removed_output"; then
@@ -131,7 +131,7 @@ pass "preinstall removal flag skips optional application bindings"
 
 variable_home="$tmpdir/variable-home"
 mkdir -p "$variable_home"
-variable_output=$(run_application_bindings "$variable_home" 'helios_preinstalled_bindings = false')
+variable_output=$(run_application_bindings "$variable_home" 'kestrel_preinstalled_bindings = false')
 grep -Fq $'SUPER + RETURN	Terminal' <<<"$variable_output" || fail "preinstalled binding variable keeps essential bindings"
 if grep -Fq $'SUPER + SHIFT + A	ChatGPT' <<<"$variable_output"; then
   fail "preinstalled binding variable skips optional application bindings"
@@ -140,9 +140,9 @@ pass "preinstalled binding variable skips optional application bindings"
 
 no_bindings_home="$tmpdir/no-bindings-home"
 mkdir -p "$no_bindings_home"
-no_bindings_output=$(run_helios_bindings "$no_bindings_home" 'helios_default_bindings = false')
-[[ -z $no_bindings_output ]] || fail "default binding variable disables all HeliOS bindings" "$no_bindings_output"
-pass "default binding variable disables all HeliOS bindings"
+no_bindings_output=$(run_kestrel_bindings "$no_bindings_home" 'kestrel_default_bindings = false')
+[[ -z $no_bindings_output ]] || fail "default binding variable disables all Kestrel bindings" "$no_bindings_output"
+pass "default binding variable disables all Kestrel bindings"
 
 dictation_home="$tmpdir/dictation-home"
 missing_bin="$tmpdir/missing-bin"
@@ -150,14 +150,14 @@ mkdir -p "$dictation_home" "$missing_bin"
 ln -s "$(command -v lua)" "$missing_bin/lua"
 ln -s "$(command -v lspci)" "$missing_bin/lspci"
 ln -s "$(command -v sort)" "$missing_bin/sort"
-dictation_output=$(PATH="$missing_bin" run_helios_bindings "$dictation_home")
+dictation_output=$(PATH="$missing_bin" run_kestrel_bindings "$dictation_home")
 if grep -Fq 'dictation' <<<"$dictation_output"; then fail "unconfigured dictation leaves application shortcuts available"; fi
-cat > "$missing_bin/helios-default-dictation" <<'SH'
+cat > "$missing_bin/kestrel-default-dictation" <<'SH'
 #!/bin/bash
 echo future-backend
 SH
-chmod +x "$missing_bin/helios-default-dictation"
-dictation_output=$(PATH="$missing_bin" run_helios_bindings "$dictation_home")
+chmod +x "$missing_bin/kestrel-default-dictation"
+dictation_output=$(PATH="$missing_bin" run_kestrel_bindings "$dictation_home")
 for binding in \
   $'SUPER + CTRL + X\tToggle dictation' \
   $'F9\tStart dictation (push-to-talk)' \
@@ -188,7 +188,7 @@ pass "missing Lazydocker skips its Docker shortcut"
 # working alongside them.
 scratchpad_home="$tmpdir/scratchpad-home"
 mkdir -p "$scratchpad_home"
-scratchpad_output=$(run_helios_bindings "$scratchpad_home")
+scratchpad_output=$(run_kestrel_bindings "$scratchpad_home")
 grep -Fqx $'SUPER + S	Toggle scratchpad' <<<"$scratchpad_output" ||
   fail "scratchpad keeps its existing toggle binding"
 grep -Fqx $'SUPER + grave	Toggle scratchpad' <<<"$scratchpad_output" ||
@@ -204,7 +204,7 @@ pass "scratchpad retains existing bindings and adds Grave shortcuts"
 # claim on SUPER + CTRL + a number is a collision with one of these.
 panels_home="$tmpdir/panels-home"
 mkdir -p "$panels_home"
-panels_output=$(run_helios_bindings "$panels_home")
+panels_output=$(run_kestrel_bindings "$panels_home")
 for panel in 1 2 3 4 5 6 7 8 9; do
   grep -Fqx "SUPER + CTRL + code:$((panel + 9))"$'\t'"Bar panel $panel" <<<"$panels_output" ||
     fail "bar panel hotkeys count the right section" "$panel"
@@ -225,23 +225,23 @@ require("default.hypr.bindings.clipboard")
 require("default.hypr.bindings.tiling")
 require("default.hypr.bindings.utilities")
 
--- Application bindings without HeliOS's preinstalled web apps, TUIs, or desktop apps.
-o.bind("SUPER + RETURN", "Terminal", { helios = "terminal" })
-o.bind("SUPER + SHIFT + RETURN", "Browser", { helios = "browser" })
-o.bind("SUPER + SHIFT + F", "File manager", { helios = "nautilus" })
-o.bind("SUPER + ALT + SHIFT + F", "File manager (cwd)", { helios = "nautilus-cwd" })
-o.bind("SUPER + SHIFT + B", "Browser", { helios = "browser" })
-o.bind("SUPER + SHIFT + ALT + B", "Browser (private)", { helios = "browser --private" })
-o.bind("SUPER + SHIFT + N", "Editor", { helios = "editor" })
+-- Application bindings without Kestrel's preinstalled web apps, TUIs, or desktop apps.
+o.bind("SUPER + RETURN", "Terminal", { kestrel = "terminal" })
+o.bind("SUPER + SHIFT + RETURN", "Browser", { kestrel = "browser" })
+o.bind("SUPER + SHIFT + F", "File manager", { kestrel = "nautilus" })
+o.bind("SUPER + ALT + SHIFT + F", "File manager (cwd)", { kestrel = "nautilus-cwd" })
+o.bind("SUPER + SHIFT + B", "Browser", { kestrel = "browser" })
+o.bind("SUPER + SHIFT + ALT + B", "Browser (private)", { kestrel = "browser --private" })
+o.bind("SUPER + SHIFT + N", "Editor", { kestrel = "editor" })
 LUA
-HOME="$migration_home" HELIOS_PATH="$ROOT" bash -euo pipefail "$migration" >/dev/null
+HOME="$migration_home" KESTREL_PATH="$ROOT" bash -euo pipefail "$migration" >/dev/null
 cmp -s "$ROOT/config/hypr/bindings.lua" "$migration_home/.config/hypr/bindings.lua" ||
   fail "plain legacy bindings migrate to the user override stub"
-[[ -f $migration_home/.local/state/helios/preinstalls-removed ]] ||
+[[ -f $migration_home/.local/state/kestrel/preinstalls-removed ]] ||
   fail "plain legacy bindings preserve preinstall removal state"
 pass "migration converts plain legacy bindings to package-owned defaults"
 
-upgrade_script="$ROOT/bin/helios-upgrade-to-quattro"
+upgrade_script="$ROOT/bin/kestrel-upgrade-to-quattro"
 grep -Fq 'touch "$state_dir/preinstalls-removed"' "$upgrade_script" ||
   fail "upgrade-to-quattro preserves preinstall removal state"
 

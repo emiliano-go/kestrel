@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# kestrel:summary=Launch or focus on a given web app identified by the window-pattern.
+# kestrel:args=<window-pattern> <url-and-flags...>
+
+if (($# == 0)); then
+  echo "Usage: kestrel-launch-or-focus-webapp [window-pattern] [url-and-flags...]"
+  exit 1
+fi
+
+WINDOW_PATTERN="$1"
+shift
+LAUNCH_COMMAND="kestrel-launch-webapp $@"
+
+exec kestrel-launch-or-focus "$WINDOW_PATTERN" "$LAUNCH_COMMAND"

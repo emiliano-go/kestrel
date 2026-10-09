@@ -4,7 +4,7 @@ set -euo pipefail
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 source "$SHELL_TEST_DIR/fixtures/passwordless-sudo-test.sh"
 
-quarantine="$test_tmp/var/lib/helios/sudoers-quarantine"
+quarantine="$test_tmp/var/lib/kestrel/sudoers-quarantine"
 quarantined_policy() {
   local entry
   for entry in "$quarantine"/*/; do
@@ -20,55 +20,55 @@ long_suffix=$(printf 'l%.0s' {1..223})
 (
   source "$library"
   printf 'deleteduser ALL=(ALL) NOPASSWD: ALL\n' >"$(rule_file 1000)"
-  printf 'buildbot$ ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-helios-nopasswd-buildbot$"
+  printf 'buildbot$ ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-buildbot$"
   # The legacy command never validated the account name, so a manual or NSS
   # account outside the current policy still has its exact old grant removed.
-  printf 'Alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-helios-nopasswd-Alice"
+  printf 'Alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-Alice"
   # The legacy writer produced the body with echo. Under BASH_ENV with
   # xpg_echo, USER='ali\0143e' yields this filename with an 'alice' rule, so
   # a suffix/body mismatch does not prove administrator authorship.
-  printf 'alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-helios-nopasswd-ali\\0143e"
-  printf 'alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-helios-nopasswd-$long_suffix"
-  printf 'admin ALL=(ALL) NOPASSWD: /usr/bin/true\n' >"$test_tmp/etc/sudoers.d/99-helios-nopasswd-custom"
+  printf 'alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-ali\\0143e"
+  printf 'alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-$long_suffix"
+  printf 'admin ALL=(ALL) NOPASSWD: /usr/bin/true\n' >"$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-custom"
   TEST_DELETE_FAIL=1 assert_status 1 cleanup_all_locked
   [[ -e $(rule_file 1000) ]]
   cleanup_all_locked
-  ! compgen -G "$test_tmp/etc/sudoers.d/99-helios-nopasswd-*"
+  ! compgen -G "$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-*"
   [[ $(stat -c '%a' "$quarantine") == 700 ]]
-  [[ $(quarantined_policy '99-helios-nopasswd-ali\0143e') == 'alice ALL=(ALL) NOPASSWD: ALL' ]]
-  [[ $(quarantined_policy "99-helios-nopasswd-$long_suffix") == 'alice ALL=(ALL) NOPASSWD: ALL' ]]
-  [[ $(quarantined_policy 99-helios-nopasswd-custom) == 'admin ALL=(ALL) NOPASSWD: /usr/bin/true' ]]
+  [[ $(quarantined_policy '99-kestrel-nopasswd-ali\0143e') == 'alice ALL=(ALL) NOPASSWD: ALL' ]]
+  [[ $(quarantined_policy "99-kestrel-nopasswd-$long_suffix") == 'alice ALL=(ALL) NOPASSWD: ALL' ]]
+  [[ $(quarantined_policy 99-kestrel-nopasswd-custom) == 'admin ALL=(ALL) NOPASSWD: /usr/bin/true' ]]
   (( $(ls -A "$quarantine" | wc -l) == 3 ))
 )
 pass "legacy cleanup removes generated rules for any account and quarantines everything else in the prefix"
 
 # Run the actual migration queue for separate temporary homes. Sudo only calls
 # the mapped helper and can be refused without requesting host authorization.
-# The migration reaches the helper through $HELIOS_PATH, as the package's bin
+# The migration reaches the helper through $KESTREL_PATH, as the package's bin
 # links and a dev checkout provide it, so the mapped copy stands in there.
 mkdir -p "$test_tmp/source/migrations" "$test_tmp/source/bin"
 cp "$ROOT/migrations/1788163635.sh" "$test_tmp/source/migrations/"
-ln -s "$test_tmp/helios-sudo-passwordless" "$test_tmp/source/bin/helios-sudo-passwordless"
+ln -s "$test_tmp/kestrel-sudo-passwordless" "$test_tmp/source/bin/kestrel-sudo-passwordless"
 printf 'echo "later migration ran"\n' >"$test_tmp/source/migrations/1788163636.sh"
 run_migrations() {
-  TEST_MIGRATION=1 HELIOS_PATH="$test_tmp/source" HELIOS_MIGRATION_STATE="$test_tmp/$1" \
-    PATH="$test_tmp/bin:$PATH" /usr/bin/bash "$ROOT/bin/helios-migrate" >"$test_tmp/migrations.log" 2>&1
+  TEST_MIGRATION=1 KESTREL_PATH="$test_tmp/source" KESTREL_MIGRATION_STATE="$test_tmp/$1" \
+    PATH="$test_tmp/bin:$PATH" /usr/bin/bash "$ROOT/bin/kestrel-migrate" >"$test_tmp/migrations.log" 2>&1
 }
-marker="$test_tmp/var/lib/helios/migrations/1788163635"
+marker="$test_tmp/var/lib/kestrel/migrations/1788163635"
 (
   source "$library"
   # A quarantine that cannot be trusted keeps the migration pending.
-  printf 'alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-helios-nopasswd-mismatch"
-  TEST_BAD_PATH="$test_tmp/var/lib/helios" assert_status 1 run_migrations first
-  [[ ! -e $marker && -e $test_tmp/etc/sudoers.d/99-helios-nopasswd-mismatch ]]
+  printf 'alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-mismatch"
+  TEST_BAD_PATH="$test_tmp/var/lib/kestrel" assert_status 1 run_migrations first
+  [[ ! -e $marker && -e $test_tmp/etc/sudoers.d/99-kestrel-nopasswd-mismatch ]]
   printf 'audituser ALL=(ALL) NOPASSWD: ALL\n' >"$(rule_file 1000)"
-  printf 'Alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-helios-nopasswd-Alice"
+  printf 'Alice ALL=(ALL) NOPASSWD: ALL\n' >"$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-Alice"
   TEST_DELETE_FAIL=1 assert_status 1 run_migrations first
   [[ ! -e $marker && ! -e $test_tmp/first/1788163636.sh ]]
   run_migrations first
   [[ -f $marker && -f $test_tmp/first/1788163636.sh ]]
-  ! compgen -G "$test_tmp/etc/sudoers.d/99-helios-nopasswd-*"
-  [[ $(quarantined_policy 99-helios-nopasswd-mismatch) == 'alice ALL=(ALL) NOPASSWD: ALL' ]]
+  ! compgen -G "$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-*"
+  [[ $(quarantined_policy 99-kestrel-nopasswd-mismatch) == 'alice ALL=(ALL) NOPASSWD: ALL' ]]
   enable_locked 1000 15
   cp "$(rule_file 1000)" "$test_tmp/renewed"
   : >"$test_tmp/commands"
@@ -93,11 +93,11 @@ pass "migration checks marker ownership and rejects symlinks"
 
 # Keep real package scripts in the contract: source and packaging share the
 # same lock and blocker, including the legacy scriptlet fallback.
-pkgs_path=${HELIOS_PKGS_PATH:-$ROOT/../helios-pkgs}
+pkgs_path=${KESTREL_PKGS_PATH:-$ROOT/../kestrel-pkgs}
 [[ ! -d $pkgs_path/pkgbuilds ]] || pkgs_path=$pkgs_path/pkgbuilds
-for name in helios-settings helios-settings-dev; do
+for name in kestrel-settings kestrel-settings-dev; do
   script="$pkgs_path/$name/$name.install"
-  [[ -f $script ]] || fail "set HELIOS_PKGS_PATH to the companion package checkout"
+  [[ -f $script ]] || fail "set KESTREL_PKGS_PATH to the companion package checkout"
   sed -e "s|/etc/|$test_tmp/etc/|g" -e "s|/run|$test_tmp/run|g" \
     -e "s|/usr/bin/stat|$test_tmp/bin/stat|g" -e "s|/usr/bin/rm|$test_tmp/bin/rm|g" \
     "$script" >"$test_tmp/$name.install"
@@ -187,32 +187,32 @@ for (( attempt=0; attempt<200; attempt++ )); do
   sleep 0.01
 done
 [[ -f $test_tmp/entered ]] || fail "publisher failed to acquire the lock"
-/usr/bin/bash -euo pipefail -c 'source "$1"; pre_remove; post_remove' bash "$test_tmp/helios-settings.install" >"$test_tmp/removal.log" 2>&1 &
+/usr/bin/bash -euo pipefail -c 'source "$1"; pre_remove; post_remove' bash "$test_tmp/kestrel-settings.install" >"$test_tmp/removal.log" 2>&1 &
 removal=$!
 children+=("$removal")
 # The removal announces itself before waiting for the lock, so a publisher
 # still holding it is refused rather than allowed to publish a rule that the
 # removal would delete a moment later.
 for (( attempt=0; attempt<200; attempt++ )); do
-  [[ ! -f $test_tmp/run/helios-sudo-passwordless-package-removing ]] || break
+  [[ ! -f $test_tmp/run/kestrel-sudo-passwordless-package-removing ]] || break
   sleep 0.01
 done
-[[ -f $test_tmp/run/helios-sudo-passwordless-package-removing ]] || fail "removal did not announce itself before waiting for the lock"
+[[ -f $test_tmp/run/kestrel-sudo-passwordless-package-removing ]] || fail "removal did not announce itself before waiting for the lock"
 touch "$test_tmp/release"
 if wait "$publisher"; then fail "publisher was allowed to publish after removal announced itself" "$(cat "$test_tmp/publisher.log")"; fi
 wait "$removal" || fail "removal failed" "$(cat "$test_tmp/removal.log")"
 children=()
-[[ ! -e $test_tmp/etc/sudoers.d/99-helios-nopasswd-1000 ]]
-[[ -f $test_tmp/run/helios-sudo-passwordless-package-removing ]]
+[[ ! -e $test_tmp/etc/sudoers.d/99-kestrel-nopasswd-1000 ]]
+[[ -f $test_tmp/run/kestrel-sudo-passwordless-package-removing ]]
 pass "an announced package removal refuses a waiting publisher and clears the namespace"
 
 # systemd-tmpfiles operates on an explicit disposable root, never the host.
 reset_grant
-: >"$test_tmp/etc/sudoers.d/99-helios-nopasswd-1000"
+: >"$test_tmp/etc/sudoers.d/99-kestrel-nopasswd-1000"
 : >"$test_tmp/etc/sudoers.d/unrelated"
-rule='r! /etc/sudoers.d/99-helios-nopasswd-*'
+rule='r! /etc/sudoers.d/99-kestrel-nopasswd-*'
 /usr/bin/systemd-tmpfiles --root="$test_tmp" --remove --inline "$rule"
-[[ -f $test_tmp/etc/sudoers.d/99-helios-nopasswd-1000 ]] || fail "routine tmpfiles shortened a live grant"
+[[ -f $test_tmp/etc/sudoers.d/99-kestrel-nopasswd-1000 ]] || fail "routine tmpfiles shortened a live grant"
 /usr/bin/systemd-tmpfiles --root="$test_tmp" --remove --boot --inline "$rule"
-[[ ! -e $test_tmp/etc/sudoers.d/99-helios-nopasswd-1000 && -f $test_tmp/etc/sudoers.d/unrelated ]] || fail "boot cleanup boundary"
+[[ ! -e $test_tmp/etc/sudoers.d/99-kestrel-nopasswd-1000 && -f $test_tmp/etc/sudoers.d/unrelated ]] || fail "boot cleanup boundary"
 pass "native boot cleanup removes grants while routine tmpfiles preserves them"

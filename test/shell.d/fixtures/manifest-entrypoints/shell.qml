@@ -4,18 +4,18 @@ import Quickshell
 ShellRoot {
   id: root
 
-  readonly property string resultPath: Quickshell.env("HELIOS_QML_TEST_RESULT")
-  readonly property string rootPath: Quickshell.env("HELIOS_PATH")
+  readonly property string resultPath: Quickshell.env("KESTREL_QML_TEST_RESULT")
+  readonly property string rootPath: Quickshell.env("KESTREL_PATH")
   property var failures: []
   property var createdIds: []
   property var createdObjects: []
   property var panelBarIds: [
-    "helios.audio",
-    "helios.bluetooth",
-    "helios.monitor",
-    "helios.network",
-    "helios.power",
-    "helios.weather"
+    "kestrel.audio",
+    "kestrel.bluetooth",
+    "kestrel.monitor",
+    "kestrel.network",
+    "kestrel.power",
+    "kestrel.weather"
   ]
 
   function fail(message) {
@@ -44,7 +44,7 @@ ShellRoot {
 
   function manifests() {
     try {
-      return JSON.parse(Qt.atob(Quickshell.env("HELIOS_QML_MANIFESTS") || "W10="))
+      return JSON.parse(Qt.atob(Quickshell.env("KESTREL_QML_MANIFESTS") || "W10="))
     } catch (error) {
       fail("manifest list failed to parse: " + error)
       return []
@@ -54,7 +54,7 @@ ShellRoot {
   function initialProperties(entry) {
     var props = {}
     if (entry.kind === "bar") {
-      props.heliosPath = rootPath
+      props.kestrelPath = rootPath
       props.barWidgetRegistry = fakeBarWidgetRegistry
       props.barConfig = {
         position: "top",
@@ -73,7 +73,7 @@ ShellRoot {
 
   function injectProperties(item, entry) {
     if (!item) return
-    if ("heliosPath" in item) item.heliosPath = rootPath
+    if ("kestrelPath" in item) item.kestrelPath = rootPath
     if ("shell" in item) item.shell = mockShell
     if ("manifest" in item) item.manifest = entry.manifest
     if ("pluginRegistry" in item) item.pluginRegistry = mockPluginRegistry
@@ -156,7 +156,7 @@ ShellRoot {
     id: fakeBar
     property bool vertical: false
     property int barSize: 26
-    property string heliosPath: root.rootPath
+    property string kestrelPath: root.rootPath
     property string fontFamily: "monospace"
     property color foreground: "white"
     property color background: "black"

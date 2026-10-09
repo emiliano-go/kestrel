@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Detect ASUS Zenbook UX5406AA series laptops on Intel Panther Lake.
-
-helios-hw-match "ux5406aa" && helios-hw-intel-ptl

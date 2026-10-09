@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# kestrel:summary=Apply the current theme keyboard color to supported keyboards
+# kestrel:hidden=true
+
+kestrel-theme-set-keyboard-asus-rog
+kestrel-theme-set-keyboard-f16

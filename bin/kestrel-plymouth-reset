@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# kestrel:summary=Restore the default Kestrel Plymouth boot theme and SDDM login screen
+# kestrel:requires-sudo=true
+
+set -euo pipefail
+
+"$KESTREL_PATH/bin/kestrel-refresh-plymouth"
+"$KESTREL_PATH/bin/kestrel-refresh-sddm"

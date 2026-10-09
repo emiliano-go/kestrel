@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json",
-  "name": "helios-system",
+  "name": "kestrel-system",
   "vars": {
     "background": "{{ background }}",
     "foreground": "{{ foreground }}",

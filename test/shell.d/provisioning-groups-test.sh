@@ -11,7 +11,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
-export HELIOS_PROVISIONING_DIR="$TMPDIR/provisioning"
+export KESTREL_PROVISIONING_DIR="$TMPDIR/provisioning"
 
 mkdir -p "$TMPDIR/bin"
 cat >"$TMPDIR/bin/usermod" <<STUB
@@ -37,25 +37,25 @@ exec "\$@"
 STUB
 chmod +x "$TMPDIR/bin"/{usermod,groupadd,install,find,sudo}
 export PATH="$TMPDIR/bin:$PATH"
-export HELIOS_PATH="$ROOT"
+export KESTREL_PATH="$ROOT"
 
 # A deferred-provisioning install records neither privileged group.
-HELIOS_INSTALL_USER="" bash -eE "$ROOT/install/config/docker.sh"
-HELIOS_INSTALL_USER="" bash -eE "$ROOT/install/config/browser-policy.sh"
+KESTREL_INSTALL_USER="" bash -eE "$ROOT/install/config/docker.sh"
+KESTREL_INSTALL_USER="" bash -eE "$ROOT/install/config/browser-policy.sh"
 
-[[ ! -f $HELIOS_PROVISIONING_DIR/groups ]] ||
-  ! grep -Eq '^(docker|input)$' "$HELIOS_PROVISIONING_DIR/groups" ||
+[[ ! -f $KESTREL_PROVISIONING_DIR/groups ]] ||
+  ! grep -Eq '^(docker|input)$' "$KESTREL_PROVISIONING_DIR/groups" ||
   fail "default install must not record docker or input groups"
 [[ ! -f $TMPDIR/usermod.calls ]] || fail "usermod not called without an install user"
-[[ ! -f $TMPDIR/groupadd.calls ]] || ! grep -F helios-browser-policy "$TMPDIR/groupadd.calls" >/dev/null ||
+[[ ! -f $TMPDIR/groupadd.calls ]] || ! grep -F kestrel-browser-policy "$TMPDIR/groupadd.calls" >/dev/null ||
   fail "browser-policy group is not created"
 grep -F -- '-d -m 0755 -o root -g root /etc/chromium/policies/managed' "$TMPDIR/install.calls" >/dev/null ||
   fail "browser-policy directory is created root-owned"
 pass "deferred provisioning records no privileged groups"
 
 # The same remains true when an install user already exists.
-HELIOS_INSTALL_USER=existing bash -eE "$ROOT/install/config/docker.sh"
-HELIOS_INSTALL_USER=existing bash -eE "$ROOT/install/config/browser-policy.sh"
+KESTREL_INSTALL_USER=existing bash -eE "$ROOT/install/config/docker.sh"
+KESTREL_INSTALL_USER=existing bash -eE "$ROOT/install/config/browser-policy.sh"
 [[ ! -f $TMPDIR/usermod.calls ]] || fail "default install must not grant privileged groups"
 pass "existing install user gets neither docker nor input access"
 

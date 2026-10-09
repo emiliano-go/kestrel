@@ -17,22 +17,22 @@ cleanup_test() {
 trap cleanup_test EXIT
 
 stub_bin="$test_tmp/bin"
-mapped_root="$test_tmp/helios"
+mapped_root="$test_tmp/kestrel"
 test_home="$test_tmp/home"
 runtime_dir=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 if [[ ! -d $runtime_dir || -L $runtime_dir || $(stat -Lc '%u %a' "$runtime_dir" 2>/dev/null || true) != "$(id -u) 700" ]]; then
   if (( EUID != 0 )); then
     fail "test needs a private XDG runtime directory or root namespace"
   fi
-  runtime_dir=$(mktemp -d -p /run helios-stay-awake-runtime.XXXXXXXX)
+  runtime_dir=$(mktemp -d -p /run kestrel-stay-awake-runtime.XXXXXXXX)
   chmod 0700 "$runtime_dir"
   test_runtime_created="$runtime_dir"
 fi
 test_run_id="test-$BASHPID-$RANDOM"
-state_dir="$runtime_dir/helios-update-stay-awake-$test_run_id"
-state_hardlink="$runtime_dir/.helios-update-stay-awake-hardlink-$test_run_id"
+state_dir="$runtime_dir/kestrel-update-stay-awake-$test_run_id"
+state_hardlink="$runtime_dir/.kestrel-update-stay-awake-hardlink-$test_run_id"
 inhibitor_log="$test_tmp/inhibitors"
-mkdir -p "$stub_bin" "$test_home" "$mapped_root/bin" "$mapped_root/default/helios/sudo-no-update"
+mkdir -p "$stub_bin" "$test_home" "$mapped_root/bin" "$mapped_root/default/kestrel/sudo-no-update"
 : >"$inhibitor_log"
 
 cat >"$stub_bin/pkexec" <<'SH'
@@ -91,9 +91,9 @@ while [[ ${1:-} == --* ]]; do shift; done
 exec "$@"
 SH
 
-cat >"$stub_bin/helios-toggle-idle" <<'SH'
+cat >"$stub_bin/kestrel-toggle-idle" <<'SH'
 #!/bin/bash
-state_file="$HOME/.local/state/helios/indicators/stay-awake"
+state_file="$HOME/.local/state/kestrel/indicators/stay-awake"
 case "$1" in
   stay-awake)
     mkdir -p "$(dirname "$state_file")"
@@ -105,33 +105,33 @@ case "$1" in
 esac
 SH
 chmod +x "$stub_bin"/*
-ln -s "$stub_bin/helios-toggle-idle" "$mapped_root/bin/helios-toggle-idle"
+ln -s "$stub_bin/kestrel-toggle-idle" "$mapped_root/bin/kestrel-toggle-idle"
 
-mapped_helper="$mapped_root/bin/helios-update-stay-awake"
-cp "$ROOT/bin/helios-update-stay-awake" "$mapped_helper"
-cp "$ROOT/bin/helios-security-functions" "$mapped_root/bin/helios-security-functions"
-cp "$ROOT/default/helios/sudo-no-update/sudo" "$mapped_root/default/helios/sudo-no-update/sudo"
+mapped_helper="$mapped_root/bin/kestrel-update-stay-awake"
+cp "$ROOT/bin/kestrel-update-stay-awake" "$mapped_helper"
+cp "$ROOT/bin/kestrel-security-functions" "$mapped_root/bin/kestrel-security-functions"
+cp "$ROOT/default/kestrel/sudo-no-update/sudo" "$mapped_root/default/kestrel/sudo-no-update/sudo"
 for mapped_file in \
   "$mapped_helper" \
-  "$mapped_root/bin/helios-security-functions" \
-  "$mapped_root/default/helios/sudo-no-update/sudo"; do
+  "$mapped_root/bin/kestrel-security-functions" \
+  "$mapped_root/default/kestrel/sudo-no-update/sudo"; do
   sed -i \
     -e "s#/usr/bin/sudo#$stub_bin/sudo#g" \
     -e "s#/usr/bin/pkexec#$stub_bin/pkexec#g" \
     -e "s#/usr/bin/systemd-inhibit#$stub_bin/systemd-inhibit#g" \
     -e "s#/usr/bin/setpriv#$stub_bin/setpriv#g" \
-    -e 's#state_dir="$state_base/helios-update-stay-awake"#state_dir="$state_base/helios-update-stay-awake-${HELIOS_TEST_RUN_ID:?}"#' \
+    -e 's#state_dir="$state_base/kestrel-update-stay-awake"#state_dir="$state_base/kestrel-update-stay-awake-${KESTREL_TEST_RUN_ID:?}"#' \
     "$mapped_file"
 done
-chmod +x "$mapped_helper" "$mapped_root/default/helios/sudo-no-update/sudo"
+chmod +x "$mapped_helper" "$mapped_root/default/kestrel/sudo-no-update/sudo"
 
 run_helper() {
   HOME="$test_home" \
   XDG_RUNTIME_DIR="$runtime_dir" \
   INHIBITOR_LOG="$inhibitor_log" \
   TEST_STATE_DIR="$state_dir" \
-  HELIOS_TEST_RUN_ID="$test_run_id" \
-  HELIOS_PATH="$mapped_root" \
+  KESTREL_TEST_RUN_ID="$test_run_id" \
+  KESTREL_PATH="$mapped_root" \
   PATH="$stub_bin:$ROOT/bin:/usr/bin:/bin" \
     "$mapped_helper" "$@"
 }
@@ -163,7 +163,7 @@ start_identity_process() {
   local token="$1"
 
   /usr/bin/bash -c 'trap "exit 0" TERM; while :; do sleep 0.05; done' \
-    helios-test "--why=HeliOS update in progress [$token]" &
+    kestrel-test "--why=Kestrel update in progress [$token]" &
   identity_pid=$!
   test_processes+=("$identity_pid")
   identity_start=$(awk '{ print $22 }' "/proc/$identity_pid/stat")
@@ -182,12 +182,12 @@ wait_dead "$valid_pid" || fail "valid inhibitor identity is stopped"
 [[ ! -e $state_dir ]] || fail "valid state is cleaned after stop"
 pass "valid XDG runtime uses private atomic inhibitor state"
 
-# helios update owns its one authorization; the helper must not revoke it.
+# kestrel update owns its one authorization; the helper must not revoke it.
 # Run on its own, the helper still starts and ends cold.
 sudo_events="$test_tmp/sudo-events"
 : >"$sudo_events"
-HELIOS_UPDATE_SUDO_SESSION=1 SUDO_EVENT_LOG="$sudo_events" run_helper start
-HELIOS_UPDATE_SUDO_SESSION=1 SUDO_EVENT_LOG="$sudo_events" run_helper stop
+KESTREL_UPDATE_SUDO_SESSION=1 SUDO_EVENT_LOG="$sudo_events" run_helper start
+KESTREL_UPDATE_SUDO_SESSION=1 SUDO_EVENT_LOG="$sudo_events" run_helper stop
 ! grep -qx 'sudo -k' "$sudo_events" || fail "helper revoked the update's authorization" "$(<"$sudo_events")"
 SUDO_EVENT_LOG="$sudo_events" run_helper start
 SUDO_EVENT_LOG="$sudo_events" run_helper stop
@@ -197,8 +197,8 @@ pass "helper leaves the update's authorization alone and revokes when standalone
 # Without a terminal, an update's inhibitor reuses the update's authorization
 # non-interactively instead of asking again through polkit.
 : >"$sudo_events"
-HELIOS_UPDATE_SUDO_SESSION=1 SUDO_EVENT_LOG="$sudo_events" run_helper start </dev/null
-HELIOS_UPDATE_SUDO_SESSION=1 SUDO_EVENT_LOG="$sudo_events" run_helper stop </dev/null
+KESTREL_UPDATE_SUDO_SESSION=1 SUDO_EVENT_LOG="$sudo_events" run_helper start </dev/null
+KESTREL_UPDATE_SUDO_SESSION=1 SUDO_EVENT_LOG="$sudo_events" run_helper stop </dev/null
 grep -q -- '^sudo -n -N -b -- ' "$sudo_events" || fail "update inhibitor without a terminal did not reuse sudo" "$(<"$sudo_events")"
 ! grep -qx pkexec "$sudo_events" || fail "update inhibitor without a terminal asked polkit" "$(<"$sudo_events")"
 pass "update inhibitor without a terminal reuses the update's authorization instead of polkit"
@@ -206,17 +206,17 @@ pass "update inhibitor without a terminal reuses the update's authorization inst
 permissive_runtime="$test_tmp/permissive-runtime"
 mkdir -m 755 "$permissive_runtime"
 if HOME="$test_home" XDG_RUNTIME_DIR="$permissive_runtime" PATH="$stub_bin:$ROOT/bin:/usr/bin:/bin" \
-  HELIOS_TEST_RUN_ID="$test_run_id" "$mapped_helper" stop 2>/dev/null; then
+  KESTREL_TEST_RUN_ID="$test_run_id" "$mapped_helper" stop 2>/dev/null; then
   fail "permissive XDG runtime is rejected"
 fi
 symlink_runtime="$test_tmp/runtime-link"
 ln -s "$runtime_dir" "$symlink_runtime"
 if HOME="$test_home" XDG_RUNTIME_DIR="$symlink_runtime" PATH="$stub_bin:$ROOT/bin:/usr/bin:/bin" \
-  HELIOS_TEST_RUN_ID="$test_run_id" "$mapped_helper" stop 2>/dev/null; then
+  KESTREL_TEST_RUN_ID="$test_run_id" "$mapped_helper" stop 2>/dev/null; then
   fail "symlink XDG runtime is rejected"
 fi
 if HOME="$test_home" XDG_RUNTIME_DIR="$test_tmp/../${test_tmp##*/}/runtime" PATH="$stub_bin:$ROOT/bin:/usr/bin:/bin" \
-  HELIOS_TEST_RUN_ID="$test_run_id" "$mapped_helper" stop 2>/dev/null; then
+  KESTREL_TEST_RUN_ID="$test_run_id" "$mapped_helper" stop 2>/dev/null; then
   fail "non-canonical XDG runtime is rejected"
 fi
 pass "unsafe XDG runtime directories are rejected"
@@ -237,7 +237,7 @@ pass "unsafe inhibitor state directories are rejected"
 
 # Package replacement leaves the preceding helper's PID/start pair and its
 # umask-derived modes for the newly installed stop command to consume.
-idle_marker="$test_home/.local/state/helios/indicators/stay-awake"
+idle_marker="$test_home/.local/state/kestrel/indicators/stay-awake"
 for modes in '755 644' '750 640' '700 600'; do
   read -r directory_mode file_mode <<<"$modes"
   for idle_choice in update user; do
@@ -329,7 +329,7 @@ token=44444444444444444444444444444444
   while [[ ! -e $1 ]]; do sleep 0.05; done
   trap "exit 0" TERM
   while :; do sleep 0.05; done
-' helios-retry "$retry_flag" "--why=HeliOS update in progress [$token]" &
+' kestrel-retry "$retry_flag" "--why=Kestrel update in progress [$token]" &
 retry_pid=$!
 test_processes+=("$retry_pid")
 retry_start=$(awk '{ print $22 }' "/proc/$retry_pid/stat")
@@ -430,7 +430,7 @@ pass "state publication failures roll back a launched inhibitor"
 # Hold each cancellation window open, including publication before child exec,
 # readiness before idle setup, and publication of the update-owned idle marker.
 cp "$mapped_helper" "$test_tmp/helper-before-pause"
-idle_marker="$test_home/.local/state/helios/indicators/stay-awake"
+idle_marker="$test_home/.local/state/kestrel/indicators/stay-awake"
 for cancel_phase in published ready idle-temporary idle user-idle; do
   rm -f "$test_tmp/cancel-ready" "$test_tmp/release-child"
   if [[ $cancel_phase == "user-idle" ]]; then
@@ -463,8 +463,8 @@ for old, new in edits:
 p.write_text(s)
 PY
   (
-    export HOME="$test_home" XDG_RUNTIME_DIR="$runtime_dir" HELIOS_PATH="$mapped_root"
-    export INHIBITOR_LOG="$inhibitor_log" HELIOS_TEST_RUN_ID="$test_run_id"
+    export HOME="$test_home" XDG_RUNTIME_DIR="$runtime_dir" KESTREL_PATH="$mapped_root"
+    export INHIBITOR_LOG="$inhibitor_log" KESTREL_TEST_RUN_ID="$test_run_id"
     export TEST_CANCEL_READY="$test_tmp/cancel-ready" TEST_RELEASE_CHILD="$test_tmp/release-child"
     export PATH="$stub_bin:$ROOT/bin:/usr/bin:/bin"
     exec "$mapped_helper" start
@@ -533,7 +533,7 @@ if (( namespace_capable == 0 )); then
 else
   # Keep the protected entrypoint, shared helper and harmless command stubs
   # together, even when tmpfs hides a checkout or fixture under /tmp.
-  tar -C "$test_tmp" -cf "$test_tmp/namespace-fixture.tar" bin helios
+  tar -C "$test_tmp" -cf "$test_tmp/namespace-fixture.tar" bin kestrel
   if ! "${namespace_args[@]}" /usr/bin/bash -s -- "$test_tmp" "$test_run_id" \
     9<"$test_tmp/namespace-fixture.tar" <<'SH'
 set -euo pipefail
@@ -550,19 +550,19 @@ setpriv --reuid=1000 --regid=1000 --clear-groups sleep 30 &
 victim_pid=$!
 trap 'kill "$victim_pid" "${legacy_sudo_pid:-$victim_pid}" 2>/dev/null || true; wait "$victim_pid" 2>/dev/null || true' EXIT
 victim_start=$(awk '{ print $22 }' "/proc/$victim_pid/stat")
-state=/tmp/helios-1000/helios-update-stay-awake-$run_id
+state=/tmp/kestrel-1000/kestrel-update-stay-awake-$run_id
 
 run_fallback() {
   local uid=$1 home=$2
   shift 2
   setpriv --reuid="$uid" --regid="$uid" --clear-groups /usr/bin/env -i \
-    HOME="$home" HELIOS_PATH="$fixture/helios" HELIOS_TEST_RUN_ID="$run_id" \
+    HOME="$home" KESTREL_PATH="$fixture/kestrel" KESTREL_TEST_RUN_ID="$run_id" \
     INHIBITOR_LOG="$home/inhibitors" PATH="$fixture/bin:/usr/bin:/bin" \
-    "$fixture/helios/bin/helios-update-stay-awake" "$@"
+    "$fixture/kestrel/bin/kestrel-update-stay-awake" "$@"
 }
 
 setpriv --reuid=1001 --regid=1001 --clear-groups /usr/bin/bash -c '
-  mkdir -m 755 /tmp/helios-1000 "$3"
+  mkdir -m 755 /tmp/kestrel-1000 "$3"
   printf "%s %s\n" "$1" "$2" >"$3/inhibit-pid"
   chmod 644 "$3/inhibit-pid"
 ' attacker "$victim_pid" "$victim_start" "$state"
@@ -571,14 +571,14 @@ if run_fallback 1000 /tmp/victim-home stop 2>/tmp/refusal; then
   echo "foreign fallback state was accepted" >&2
   exit 1
 fi
-grep -q 'unsafe HeliOS update inhibitor state path' /tmp/refusal
+grep -q 'unsafe Kestrel update inhibitor state path' /tmp/refusal
 kill -0 "$victim_pid"
 
-rm -rf /tmp/helios-1000
+rm -rf /tmp/kestrel-1000
 # The old helper also left a readable fallback parent after a successful stop.
-setpriv --reuid=1000 --regid=1000 --clear-groups mkdir -m 755 /tmp/helios-1000
+setpriv --reuid=1000 --regid=1000 --clear-groups mkdir -m 755 /tmp/kestrel-1000
 run_fallback 1000 /tmp/victim-home start
-[[ $(stat -Lc '%u %a' /tmp/helios-1000) == "1000 700" ]]
+[[ $(stat -Lc '%u %a' /tmp/kestrel-1000) == "1000 700" ]]
 run_fallback 1000 /tmp/victim-home stop
 [[ ! -e $state ]]
 
@@ -592,7 +592,7 @@ if run_fallback 1000 /tmp/victim-home stop 2>/tmp/refusal; then
   echo "foreign state file was accepted" >&2
   exit 1
 fi
-grep -q 'unsafe HeliOS update sleep inhibitor state' /tmp/refusal
+grep -q 'unsafe Kestrel update sleep inhibitor state' /tmp/refusal
 kill -0 "$victim_pid"
 
 # A legacy-looking record owned by another account is still untrusted.
@@ -628,7 +628,7 @@ wait "$legacy_sudo_pid" 2>/dev/null || true
 # Root may read the record, but must not signal a live legacy target whose
 # real UID differs. Preserve the retry handle instead of treating it as dead.
 mkdir -m 700 /tmp/root-home
-root_state=/tmp/helios-0/helios-update-stay-awake-$run_id
+root_state=/tmp/kestrel-0/kestrel-update-stay-awake-$run_id
 mkdir -p "$root_state"
 printf '%s %s\n' "$victim_pid" "$victim_start" >"$root_state/inhibit-pid"
 chmod 644 "$root_state/inhibit-pid"
@@ -642,9 +642,9 @@ kill -0 "$victim_pid"
 rm "$root_state/inhibit-pid"
 
 run_fallback 0 /tmp/root-home start
-[[ $(stat -Lc '%u %a' /tmp/helios-0) == "0 700" ]]
+[[ $(stat -Lc '%u %a' /tmp/kestrel-0) == "0 700" ]]
 run_fallback 0 /tmp/root-home stop
-[[ ! -e /tmp/helios-0/helios-update-stay-awake-$run_id ]]
+[[ ! -e /tmp/kestrel-0/kestrel-update-stay-awake-$run_id ]]
 SH
   then
     fail "two-UID fallback probe failed after its capability check" "$(<"$namespace_probe_error")"

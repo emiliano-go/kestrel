@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# kestrel:summary=Overwrite the user config for the Plymouth drive decryption and boot sequence with the Kestrel default and rebuild it.
+# kestrel:requires-sudo=true
+
+# Reuse the fixed-file publisher so root never resolves the source checkout or
+# follows a destination symlink while restoring the packaged assets.
+exec "$KESTREL_PATH/bin/kestrel-plymouth-set" --refresh-default

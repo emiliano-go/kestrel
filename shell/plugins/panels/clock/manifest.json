@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.clock",
+  "id": "kestrel.clock",
   "name": "Clock",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Date/time label with a calendar popup",
   "kinds": [
     "bar-widget"

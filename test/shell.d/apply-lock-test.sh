@@ -4,14 +4,14 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
-apply_lock="$ROOT/bin/helios-apply-lock"
+apply_lock="$ROOT/bin/kestrel-apply-lock"
 
 root_path_guard=$(awk '
   /^if \(\( EUID == 0 \)\); then$/ { inside = 1 }
   inside { print }
   inside && /^fi$/ { exit }
 ' "$apply_lock")
-grep -Fx '  export PATH=/usr/share/helios/bin:/usr/local/bin:/usr/bin:/bin' <<<"$root_path_guard" >/dev/null ||
+grep -Fx '  export PATH=/usr/share/kestrel/bin:/usr/local/bin:/usr/bin:/bin' <<<"$root_path_guard" >/dev/null ||
   fail "the root lock helper replaces its inherited command path"
 if grep -E '(\.local/bin|target_user|target_home)' <<<"$root_path_guard" >/dev/null; then
   fail "the root lock helper does not retain a user-controlled command directory"
@@ -22,7 +22,7 @@ grep -F '[[ -x /usr/bin/fprintd-list ]]' "$apply_lock" >/dev/null ||
   fail "the lock helper checks the trusted fprintd-list executable"
 grep -F '/usr/bin/fprintd-list "$target_user"' "$apply_lock" >/dev/null ||
   fail "the lock helper invokes fprintd-list by its trusted absolute path"
-if grep -F 'helios-cmd-present fprintd-list' "$apply_lock" >/dev/null ||
+if grep -F 'kestrel-cmd-present fprintd-list' "$apply_lock" >/dev/null ||
   grep -E '(^|[[:space:];&|])fprintd-list([[:space:]]|$)' "$apply_lock" >/dev/null ||
   grep -E 'command[[:space:]]+-v[[:space:]]+fprintd-list' "$apply_lock" >/dev/null; then
   fail "the lock helper does not resolve fprintd-list through PATH"
@@ -56,21 +56,21 @@ trap 'rm -rf "$test_tmp"' EXIT
 poison_bin="$test_tmp/poison-bin"
 trusted_root_bin="$test_tmp/trusted-root-bin"
 trusted_fprintd="$test_tmp/trusted-fprintd-list"
-password_pam="$test_tmp/helios-lock-password"
-fingerprint_pam="$test_tmp/helios-lock-fingerprint"
+password_pam="$test_tmp/kestrel-lock-password"
+fingerprint_pam="$test_tmp/kestrel-lock-fingerprint"
 attack_marker="$test_tmp/user-fprintd-list-ran"
 trusted_uid="$test_tmp/trusted-fprintd-list.uid"
 trusted_args="$test_tmp/trusted-fprintd-list.args"
 attack_args="$test_tmp/user-fprintd-list.args"
-patched_helper="$test_tmp/helios-apply-lock-patched"
-absolute_only_helper="$test_tmp/helios-apply-lock-absolute-only"
-root_path_only_helper="$test_tmp/helios-apply-lock-root-path-only"
-unprotected_helper="$test_tmp/helios-apply-lock-unprotected"
+patched_helper="$test_tmp/kestrel-apply-lock-patched"
+absolute_only_helper="$test_tmp/kestrel-apply-lock-absolute-only"
+root_path_only_helper="$test_tmp/kestrel-apply-lock-root-path-only"
+unprotected_helper="$test_tmp/kestrel-apply-lock-unprotected"
 hook_source="$test_tmp/fprintd-resume-source"
 cp "$ROOT/default/systemd/system-sleep/fprintd-resume" "$hook_source"
 timeout_source="$test_tmp/fprintd-stop-timeout-source"
 cp "$ROOT/default/systemd/system/fprintd.service.d/10-stop-timeout.conf" "$timeout_source"
-target_user=helios-regression-user
+target_user=kestrel-regression-user
 mkdir -p "$poison_bin" "$trusted_root_bin"
 
 # The runtime copy pins to this isolated root path. It contains every bare
@@ -120,14 +120,14 @@ prepare_helper() {
     -v timeout_dst="$test_tmp/fprintd.service.d/10-stop-timeout.conf" '
     {
       line = $0
-      gsub("/etc/pam\\.d/helios-lock-password", "\"" password_pam "\"", line)
-      gsub("/etc/pam\\.d/helios-lock-fingerprint", "\"" fingerprint_pam "\"", line)
+      gsub("/etc/pam\\.d/kestrel-lock-password", "\"" password_pam "\"", line)
+      gsub("/etc/pam\\.d/kestrel-lock-fingerprint", "\"" fingerprint_pam "\"", line)
 
       if (line == "if (( EUID == 0 )); then" && keep_root_path == 0) {
         print "if (( 0 )); then"
         next
       }
-      if (line == "  export PATH=/usr/share/helios/bin:/usr/local/bin:/usr/bin:/bin") {
+      if (line == "  export PATH=/usr/share/kestrel/bin:/usr/local/bin:/usr/bin:/bin") {
         print "  export PATH=\"" trusted_root_bin "\""
         next
       }
@@ -147,7 +147,7 @@ prepare_helper() {
         }
         next
       }
-      if (line == "resume_hook_src=\"$HELIOS_PATH/default/systemd/system-sleep/fprintd-resume\"") {
+      if (line == "resume_hook_src=\"$KESTREL_PATH/default/systemd/system-sleep/fprintd-resume\"") {
         print "resume_hook_src=\"" hook_src "\""
         next
       }
@@ -155,7 +155,7 @@ prepare_helper() {
         print "resume_hook_dst=\"" hook_dst "\""
         next
       }
-      if (line == "stop_timeout_src=\"$HELIOS_PATH/default/systemd/system/fprintd.service.d/10-stop-timeout.conf\"") {
+      if (line == "stop_timeout_src=\"$KESTREL_PATH/default/systemd/system/fprintd.service.d/10-stop-timeout.conf\"") {
         print "stop_timeout_src=\"" timeout_src "\""
         next
       }
@@ -167,7 +167,7 @@ prepare_helper() {
         print "  :"
         next
       }
-      if (line == "if helios-shell lock status >/dev/null 2>&1; then") {
+      if (line == "if kestrel-shell lock status >/dev/null 2>&1; then") {
         print "if false; then"
         next
       }
@@ -189,7 +189,7 @@ for helper in "$patched_helper" "$absolute_only_helper" "$root_path_only_helper"
     grep -F '/usr/lib/systemd/system-sleep' "$helper" >/dev/null ||
     grep -F '/etc/systemd/system/' "$helper" >/dev/null ||
     grep -F 'systemctl daemon-reload' "$helper" >/dev/null ||
-    grep -F 'helios-shell lock status' "$helper" >/dev/null; then
+    grep -F 'kestrel-shell lock status' "$helper" >/dev/null; then
     fail "the isolated root fixture redirects every live-system lock-helper target"
   fi
 done
@@ -201,7 +201,7 @@ reset_runtime_files() {
 run_as_root() {
   local helper="$1" description="$2" output
 
-  if ! output=$(PATH="$poison_bin:/usr/bin:/bin" HELIOS_INSTALL_USER="$target_user" \
+  if ! output=$(PATH="$poison_bin:/usr/bin:/bin" KESTREL_INSTALL_USER="$target_user" \
     "${root_runner[@]}" /bin/bash "$helper" 2>&1); then
     fail "$description" "$output"
   fi
@@ -266,7 +266,7 @@ pass "empty enrollment removes fingerprint authentication and its resume recover
 for source in "$hook_source" "$timeout_source"; do
   reset_runtime_files
   mv "$source" "$source.saved"
-  if PATH="$poison_bin:/usr/bin:/bin" HELIOS_INSTALL_USER="$target_user" \
+  if PATH="$poison_bin:/usr/bin:/bin" KESTREL_INSTALL_USER="$target_user" \
     "${root_runner[@]}" /bin/bash "$patched_helper" >"$test_tmp/failed-install" 2>&1; then
     fail "missing recovery source must fail installation"
   fi

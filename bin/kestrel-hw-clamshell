@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# kestrel:summary=Returns true when clamshell mode is active
+# kestrel:hidden=true
+
+# Clamshell = lid closed while driving one or more external monitors.
+kestrel-hw-laptop-closed && kestrel-hw-external-monitors

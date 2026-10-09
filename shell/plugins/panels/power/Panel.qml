@@ -9,8 +9,8 @@ import "Model.js" as Model
 
 Panel {
   id: root
-  moduleName: "helios.power"
-  ipcTarget: "helios.power"
+  moduleName: "kestrel.power"
+  ipcTarget: "kestrel.power"
   // manageIpc: false so this panel can own the single IpcHandler the target
   // permits — needed for the togglePercentage method below.
   manageIpc: false
@@ -166,7 +166,7 @@ Panel {
 
   function setProfile(profile) {
     if (!profile || actionProc.running) return
-    actionProc.command = ["helios-powerprofiles-set", root.discharging ? "battery" : "ac", profile]
+    actionProc.command = ["kestrel-powerprofiles-set", root.discharging ? "battery" : "ac", profile]
     actionProc.running = true
   }
 
@@ -176,7 +176,7 @@ Panel {
   }
 
   ShellIpc {
-    target: "helios.power"
+    target: "kestrel.power"
 
     function open() { root.open() }
     function close() { root.close() }
@@ -208,19 +208,19 @@ Panel {
 
   Process {
     id: batteryProc
-    command: ["helios-battery-status", "--shell"]
+    command: ["kestrel-battery-status", "--shell"]
     stdout: StdioCollector { waitForEnd: true; onStreamFinished: root.updateKeyValue(text, "battery") }
   }
 
   Process {
     id: profilesProc
-    command: ["helios-powerprofiles-list", "--active-state"]
+    command: ["kestrel-powerprofiles-list", "--active-state"]
     stdout: StdioCollector { waitForEnd: true; onStreamFinished: root.updateProfiles(text) }
   }
 
   Process {
     id: systemProc
-    command: ["helios-system-stats"]
+    command: ["kestrel-system-stats"]
     stdout: StdioCollector { waitForEnd: true; onStreamFinished: root.updateKeyValue(text, "system") }
   }
 

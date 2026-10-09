@@ -36,11 +36,11 @@ exit 0
 SH
 chmod +x "$stub_bin/hyprctl"
 
-cwd=$(ACTIVE_PID="$terminal_pid" PATH="$stub_bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" "$ROOT/bin/helios-cmd-terminal-cwd")
+cwd=$(ACTIVE_PID="$terminal_pid" PATH="$stub_bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" "$ROOT/bin/kestrel-cmd-terminal-cwd")
 [[ $cwd == "$work_dir" ]] || fail "a new terminal opens in the focused terminal's shell directory" "got: $cwd"
 pass "a new terminal opens in the focused terminal's shell directory"
 
-output=$(PATH="$stub_bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" HOME="$test_tmp" "$ROOT/bin/helios-cmd-terminal-cwd" 2>&1)
+output=$(PATH="$stub_bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" HOME="$test_tmp" "$ROOT/bin/kestrel-cmd-terminal-cwd" 2>&1)
 [[ $output == "$test_tmp" ]] || fail "with no focused terminal the new one opens in HOME" "got: $output"
 pass "with no focused terminal the new one opens in HOME, quietly"
 
@@ -52,6 +52,6 @@ echo "hyprctl was asked for the active window" >&2
 exit 1
 SH
 
-cwd=$(PATH="$stub_bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" "$ROOT/bin/helios-cmd-terminal-cwd" "$terminal_pid" 2>&1)
+cwd=$(PATH="$stub_bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" "$ROOT/bin/kestrel-cmd-terminal-cwd" "$terminal_pid" 2>&1)
 [[ $cwd == "$work_dir" ]] || fail "a terminal pid passed in finds its shell directory without hyprctl" "got: $cwd"
 pass "a terminal pid passed in finds its shell directory without hyprctl"

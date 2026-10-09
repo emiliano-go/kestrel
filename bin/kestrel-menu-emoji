@@ -1,0 +1,6 @@
+#!/bin/bash
+# kestrel:summary=Launch emojis
+# kestrel:group=menu
+# kestrel:examples=kestrel menu emoji
+
+kestrel-shell shell toggle kestrel.emojis

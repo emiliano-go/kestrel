@@ -26,7 +26,7 @@ mkdir -p "$PROVISIONING_DIR"
 printf 'wheel\ninput\ndocker\n' >"$PROVISIONING_DIR/groups"
 
 # Load the real user_groups() from the provisioning command and run it.
-eval "$(sed -n '/^user_groups() {/,/^}/p' "$ROOT/bin/helios-provision-owner")"
+eval "$(sed -n '/^user_groups() {/,/^}/p' "$ROOT/bin/kestrel-provision-owner")"
 groups=$(user_groups)
 
 [[ ",$groups," == *",wheel,"* ]] || fail "user_groups always includes wheel"
@@ -41,7 +41,7 @@ groups=$(STUB_PACKAGES=ydotool user_groups)
 pass "first-boot user_groups keeps deliberate input-group opt-ins"
 
 # The Quattro upgrade must not re-add the user to docker.
-if rg -q 'usermod -aG docker' "$ROOT/bin/helios-upgrade-to-quattro"; then
-  fail "helios-upgrade-to-quattro must not add the user to the docker group"
+if rg -q 'usermod -aG docker' "$ROOT/bin/kestrel-upgrade-to-quattro"; then
+  fail "kestrel-upgrade-to-quattro must not add the user to the docker group"
 fi
 pass "the Quattro upgrade does not grant the docker group"

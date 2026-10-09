@@ -13,8 +13,8 @@ import "GlobeModel.js" as Solar
 // minutes to catch DST.
 Panel {
   id: root
-  moduleName: "helios.elsewhen"
-  ipcTarget: "helios.elsewhen"
+  moduleName: "kestrel.elsewhen"
+  ipcTarget: "kestrel.elsewhen"
   manageIpc: false
 
 

@@ -86,13 +86,13 @@ trap 'rm -rf "$test_tmp"' EXIT
 test_home="$test_tmp/home"
 mkdir -p "$test_home"
 
-HOME="$test_home" "$ROOT/bin/helios-toggle-idle" stay-awake >/dev/null
-[[ -f $test_home/.local/state/helios/indicators/stay-awake ]] || fail "Stay Awake toggle persists enabled state"
+HOME="$test_home" "$ROOT/bin/kestrel-toggle-idle" stay-awake >/dev/null
+[[ -f $test_home/.local/state/kestrel/indicators/stay-awake ]] || fail "Stay Awake toggle persists enabled state"
 
-HOME="$test_home" "$ROOT/bin/helios-toggle-idle" allow-idle >/dev/null
-[[ ! -f $test_home/.local/state/helios/indicators/stay-awake ]] || fail "Stay Awake toggle persists disabled state"
+HOME="$test_home" "$ROOT/bin/kestrel-toggle-idle" allow-idle >/dev/null
+[[ ! -f $test_home/.local/state/kestrel/indicators/stay-awake ]] || fail "Stay Awake toggle persists disabled state"
 
-if rg -q 'helios-shell' "$ROOT/bin/helios-toggle-idle"; then
+if rg -q 'kestrel-shell' "$ROOT/bin/kestrel-toggle-idle"; then
   fail "Stay Awake toggle avoids reentrant shell IPC"
 fi
 

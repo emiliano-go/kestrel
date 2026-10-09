@@ -4,7 +4,7 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
-remove="$ROOT/bin/helios-remove-security-fido2"
+remove="$ROOT/bin/kestrel-remove-security-fido2"
 
 test_tmp=$(mktemp -d)
 stub_bin="$test_tmp/bin"
@@ -71,11 +71,11 @@ case "${1:-}" in
 esac
 SH
 
-cat >"$stub_bin/helios-pkg-drop" <<'SH'
+cat >"$stub_bin/kestrel-pkg-drop" <<'SH'
 #!/bin/bash
 SH
 
-chmod +x "$stub_bin/sudo" "$stub_bin/helios-pkg-drop"
+chmod +x "$stub_bin/sudo" "$stub_bin/kestrel-pkg-drop"
 
 invoke_remove() {
   : >"$calls"

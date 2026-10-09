@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Returns true when Hyprland has an active external monitor
-# helios:hidden=true
-
-hyprctl monitors all -j | jq -e '.[] | select(.name | test("^(eDP|LVDS|DSI)-") | not) | select(.disabled == false)' >/dev/null 2>&1

@@ -1,13 +1,13 @@
-_helios_complete() {
+_kestrel_complete() {
   COMPREPLY=()
   local cur="${COMP_WORDS[COMP_CWORD]}"
 
-  local helios_path bin_dir
-  helios_path=$(command -v helios 2>/dev/null) || return 0
-  bin_dir=$(dirname -- "$(readlink -f -- "$helios_path" 2>/dev/null || printf '%s' "$helios_path")")
+  local kestrel_path bin_dir
+  kestrel_path=$(command -v kestrel 2>/dev/null) || return 0
+  bin_dir=$(dirname -- "$(readlink -f -- "$kestrel_path" 2>/dev/null || printf '%s' "$kestrel_path")")
   [[ -d $bin_dir ]] || return 0
 
-  local prefix="helios"
+  local prefix="kestrel"
   local i part
   for ((i = 1; i < COMP_CWORD; i++)); do
     part="${COMP_WORDS[i]}"
@@ -43,7 +43,7 @@ _helios_complete() {
   if (( ${#candidates[@]} == 0 )); then
     local command_prefix command_path first_arg_index n j
     for ((n = COMP_CWORD - 1; n >= 0; n--)); do
-      command_prefix="helios"
+      command_prefix="kestrel"
       for ((j = 1; j <= n; j++)); do
         part="${COMP_WORDS[j]}"
         [[ -z $part || $part == -* ]] && continue
@@ -59,8 +59,8 @@ _helios_complete() {
 
     if [[ -n ${command_path:-} && -x $command_path ]]; then
       local args spec alt token actual alts value match current_arg_index
-      args=$(grep -m 1 '^# helios:args=' "$command_path" 2>/dev/null)
-      args="${args#*helios:args=}"
+      args=$(grep -m 1 '^# kestrel:args=' "$command_path" 2>/dev/null)
+      args="${args#*kestrel:args=}"
       current_arg_index=$((COMP_CWORD - first_arg_index))
 
       alts="${args// | /$'\n'}"
@@ -122,8 +122,8 @@ _helios_complete() {
   fi
 }
 
-complete -o default -F _helios_complete helios
+complete -o default -F _kestrel_complete kestrel
 
-# Hide individual helios-* binaries from initial-word command completion;
-# the unified `helios` dispatcher is the user-facing entry point.
-complete -I -A command -X 'helios-*'
+# Hide individual kestrel-* binaries from initial-word command completion;
+# the unified `kestrel` dispatcher is the user-facing entry point.
+complete -I -A command -X 'kestrel-*'

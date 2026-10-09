@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Check if a Hyprland toggle is currently disabled (missing).
-# helios:args=<flag-name>
-
-[[ ! -f "$HOME/.local/state/helios/toggles/hypr/$1.lua" ]]

@@ -8,53 +8,53 @@ status=0
 
 verify_core_packages() {
   local package
-  local manifest="$HELIOS_PATH/install/helios-base.packages"
+  local manifest="$KESTREL_PATH/install/kestrel-base.packages"
   local -a missing=()
 
   # Without this, a missing manifest reads as an empty package list and the
   # audit passes having checked nothing.
-  [[ -f $manifest ]] || fail "all HeliOS core packages are installed" "package manifest not found: $manifest"
+  [[ -f $manifest ]] || fail "all Kestrel core packages are installed" "package manifest not found: $manifest"
 
   while IFS= read -r package; do
     [[ -z $package || $package == \#* ]] && continue
     pacman -Q "$package" >/dev/null 2>&1 || missing+=("$package")
   done <"$manifest"
 
-  (( ${#missing[@]} == 0 )) || fail "all HeliOS core packages are installed" "missing packages: ${missing[*]}"
-  pass "all HeliOS core packages are installed (${#missing[@]} missing)"
+  (( ${#missing[@]} == 0 )) || fail "all Kestrel core packages are installed" "missing packages: ${missing[*]}"
+  pass "all Kestrel core packages are installed (${#missing[@]} missing)"
 }
 
 verify_kernel_headers() {
-  local kernel=linux-helios
+  local kernel=linux-kestrel
   local release
   release=$(uname -r)
-  helios-pkg-present linux-t2 && kernel=linux-t2
+  kestrel-pkg-present linux-t2 && kernel=linux-t2
 
   [[ $(cat "/usr/lib/modules/$release/pkgbase") == "$kernel" ]] ||
     fail "the installed system boots the supported kernel" "$release is not $kernel"
-  helios-pkg-present "$kernel-headers" || fail "kernel headers are installed" "$kernel-headers is missing"
+  kestrel-pkg-present "$kernel-headers" || fail "kernel headers are installed" "$kernel-headers is missing"
   [[ $(cat "/usr/lib/modules/$release/build/include/config/kernel.release") == "$release" ]] ||
     fail "headers match the running kernel" "$release has missing or mismatched headers"
   pass "the running $kernel kernel has matching headers ($release)"
 }
 
 verify_defaults() {
-  [[ $(helios-default-browser) == "chromium" ]] || fail "Chromium is the default browser"
+  [[ $(kestrel-default-browser) == "chromium" ]] || fail "Chromium is the default browser"
   pass "Chromium is the default browser"
 
-  [[ $(helios-default-terminal) == "foot" ]] || fail "Foot is the default terminal"
+  [[ $(kestrel-default-terminal) == "foot" ]] || fail "Foot is the default terminal"
   pass "Foot is the default terminal"
 
-  [[ $(helios-default-editor) == "nvim" ]] || fail "Neovim is the default editor"
+  [[ $(kestrel-default-editor) == "nvim" ]] || fail "Neovim is the default editor"
   pass "Neovim is the default editor"
 
-  [[ $(helios-theme-current) != "Unknown" ]] || fail "a current theme is configured"
+  [[ $(kestrel-theme-current) != "Unknown" ]] || fail "a current theme is configured"
   pass "a current theme is configured"
 
-  [[ $(helios-theme-bg-current) != "Unknown" ]] || fail "a current background is configured"
+  [[ $(kestrel-theme-bg-current) != "Unknown" ]] || fail "a current background is configured"
   pass "a current background is configured"
 
-  [[ -n $(helios-font-current) ]] || fail "a monospace font is configured"
+  [[ -n $(kestrel-font-current) ]] || fail "a monospace font is configured"
   pass "a monospace font is configured"
 
   [[ $(xdg-mime query default x-scheme-handler/http) == "chromium.desktop" ]] || fail "HTTP MIME handling uses Chromium"
@@ -119,11 +119,11 @@ verify_user_setup() {
   done
   pass "XDG user directories exist"
 
-  [[ -e $HOME/.local/state/helios/current/theme ]] || fail "current theme state exists"
-  [[ -e $HOME/.local/state/helios/current/background ]] || fail "current background state exists"
-  [[ -s $HOME/.config/helios/shell.json ]] || fail "shell configuration exists"
-  jq empty "$HOME/.config/helios/shell.json" || fail "shell configuration is valid JSON"
-  pass "HeliOS user state and shell configuration exist"
+  [[ -e $HOME/.local/state/kestrel/current/theme ]] || fail "current theme state exists"
+  [[ -e $HOME/.local/state/kestrel/current/background ]] || fail "current background state exists"
+  [[ -s $HOME/.config/kestrel/shell.json ]] || fail "shell configuration exists"
+  jq empty "$HOME/.config/kestrel/shell.json" || fail "shell configuration is valid JSON"
+  pass "Kestrel user state and shell configuration exist"
 }
 
 for check in verify_core_packages verify_kernel_headers verify_defaults verify_services verify_runtime_tools verify_user_setup; do

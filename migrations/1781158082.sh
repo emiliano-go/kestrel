@@ -1,10 +1,10 @@
-echo "Relink Neovim theme to HeliOS current state"
+echo "Relink Neovim theme to Kestrel current state"
 
 theme_link="$HOME/.config/nvim/lua/plugins/theme.lua"
-legacy_absolute_target="$HOME/.config/helios/current/theme/neovim.lua"
-legacy_relative_target="../../../helios/current/theme/neovim.lua"
-legacy_home_target="~/.config/helios/current/theme/neovim.lua"
-current_relative_target="../../../../.local/state/helios/current/theme/neovim.lua"
+legacy_absolute_target="$HOME/.config/kestrel/current/theme/neovim.lua"
+legacy_relative_target="../../../kestrel/current/theme/neovim.lua"
+legacy_home_target="~/.config/kestrel/current/theme/neovim.lua"
+current_relative_target="../../../../.local/state/kestrel/current/theme/neovim.lua"
 
 [[ -L $theme_link ]] || exit 0
 

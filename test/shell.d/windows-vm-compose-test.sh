@@ -6,9 +6,9 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
 # Bind mounts need CAP_SYS_ADMIN in a private mount namespace. Keep the
 # caller's uid so the non-root development path is exercised.
-if [[ ${HELIOS_WINDOWS_TEST_NAMESPACE:-0} != 1 ]]; then
+if [[ ${KESTREL_WINDOWS_TEST_NAMESPACE:-0} != 1 ]]; then
   if unshare --user --map-current-user --keep-caps --mount true 2>/dev/null; then
-    exec env HELIOS_WINDOWS_TEST_NAMESPACE=1 \
+    exec env KESTREL_WINDOWS_TEST_NAMESPACE=1 \
       unshare --user --map-current-user --keep-caps --mount --propagation private bash "$0"
   fi
   skip "unprivileged mount namespaces unavailable; skipping Windows VM mount runtime tests"
@@ -16,13 +16,13 @@ if [[ ${HELIOS_WINDOWS_TEST_NAMESPACE:-0} != 1 ]]; then
 fi
 
 TMPDIR=$(mktemp -d)
-export HELIOS_WINDOWS_DIR="$TMPDIR/win"
+export KESTREL_WINDOWS_DIR="$TMPDIR/win"
 export HOME="$TMPDIR/home"
 mkdir -p "$HOME"
 
 set -- help
-source "$ROOT/bin/helios-windows-vm" >/dev/null 2>&1
-COMPOSE="$HELIOS_WINDOWS_DIR/docker-compose.yml"
+source "$ROOT/bin/kestrel-windows-vm" >/dev/null 2>&1
+COMPOSE="$KESTREL_WINDOWS_DIR/docker-compose.yml"
 
 unmount_all() {
   local path
@@ -48,7 +48,7 @@ fd_count() { find "/proc/$$/fd" -mindepth 1 -maxdepth 1 -printf x | wc -c; }
 
 reset_case() {
   unmount_all
-  rm -rf "$HELIOS_WINDOWS_DIR" "$HOME/.windows" "$HOME/Windows"
+  rm -rf "$KESTREL_WINDOWS_DIR" "$HOME/.windows" "$HOME/Windows"
   mkdir -p "$HOME"
 }
 
@@ -97,10 +97,10 @@ pass "privileged action dispatch is allowlisted"
 # file from priv_target's stat checks to exercise the historical fallback.
 attack_bin="$TMPDIR/attack-bin"
 mkdir -p "$attack_bin"
-ln -s /bin/bash "$attack_bin/helios-windows-vm"
+ln -s /bin/bash "$attack_bin/kestrel-windows-vm"
 printf 'printf exploited >"$TMPDIR/exploited"\n' >"$TMPDIR/__priv"
 stat() {
-  [[ ${!#} == /usr/bin/helios-windows-vm ]] && return 1
+  [[ ${!#} == /usr/bin/kestrel-windows-vm ]] && return 1
   command stat "$@"
 }
 PATH="$attack_bin:$PATH" priv_target >/dev/null 2>&1 && fail "PATH symlink became a privileged target"

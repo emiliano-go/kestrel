@@ -8,18 +8,18 @@ require_command quickshell
 
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
-mkdir -p "$stage/bin" "$stage/home/.local/state/helios/current"
-ln -s "$stage/deleted.png" "$stage/home/.local/state/helios/current/background"
+mkdir -p "$stage/bin" "$stage/home/.local/state/kestrel/current"
+ln -s "$stage/deleted.png" "$stage/home/.local/state/kestrel/current/background"
 for component in Commons Ui services; do
   ln -s "$ROOT/shell/$component" "$stage/$component"
 done
 ln -s "$ROOT/shell/plugins/background" "$stage/background"
 cp "$SHELL_TEST_DIR/fixtures/background-startup-failure/shell.qml" "$stage/shell.qml"
-cat >"$stage/bin/helios-theme-bg-boot-intro" <<'SH'
+cat >"$stage/bin/kestrel-theme-bg-boot-intro" <<'SH'
 #!/bin/bash
 exit 0
 SH
-chmod +x "$stage/bin/helios-theme-bg-boot-intro"
+chmod +x "$stage/bin/kestrel-theme-bg-boot-intro"
 
 output=$(HOME="$stage/home" PATH="$stage/bin:$PATH" timeout 13 quickshell -p "$stage" --no-color 2>&1) || fail "failed background startup exits cleanly" "$output"
 [[ $output == *"RESULT pass"* ]] || fail "a missing wallpaper reveals the desktop within the startup deadline" "$output"

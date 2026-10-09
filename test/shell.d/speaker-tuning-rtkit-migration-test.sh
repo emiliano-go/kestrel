@@ -6,7 +6,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 mkdir -p "$tmp_dir/bin"
-export XDG_CONFIG_HOME="$tmp_dir/config" HELIOS_PATH="$ROOT" CALL_LOG="$tmp_dir/calls"
+export XDG_CONFIG_HOME="$tmp_dir/config" KESTREL_PATH="$ROOT" CALL_LOG="$tmp_dir/calls"
 export PATH="$tmp_dir/bin:$PATH"
 
 cat > "$tmp_dir/bin/systemctl" <<'SH'
@@ -17,21 +17,21 @@ chmod +x "$tmp_dir/bin/systemctl"
 
 migration="$ROOT/migrations/1790114905.sh"
 host_source="$ROOT/default/audio/filter-chain-host.conf"
-host_config="$XDG_CONFIG_HOME/pipewire/helios-speaker-tuning.conf"
+host_config="$XDG_CONFIG_HOME/pipewire/kestrel-speaker-tuning.conf"
 mkdir -p "${host_config%/*}"
 
 grep -q 'args = { rtportal.enabled = false }' "$host_source" ||
   fail "the shipped tuning host asks RTKit directly"
 pass "the shipped tuning host asks RTKit directly"
 
-# The copy an earlier HeliOS installed: the same file with the old setting.
+# The copy an earlier Kestrel installed: the same file with the old setting.
 sed 's/args = { rtportal.enabled = false }/args = { }/' "$host_source" > "$host_config"
 : > "$CALL_LOG"
 bash -euo pipefail "$migration" >/dev/null
-cmp -s "$host_source" "$host_config" || fail "an installed HeliOS host is replaced"
-grep -Fxq -- "--user try-restart helios-speaker-tuning.service" "$CALL_LOG" ||
+cmp -s "$host_source" "$host_config" || fail "an installed Kestrel host is replaced"
+grep -Fxq -- "--user try-restart kestrel-speaker-tuning.service" "$CALL_LOG" ||
   fail "a replaced host is restarted if it runs"
-pass "an installed HeliOS host is replaced and restarted"
+pass "an installed Kestrel host is replaced and restarted"
 
 : > "$CALL_LOG"
 bash -euo pipefail "$migration" >/dev/null

@@ -1,4 +1,4 @@
-# HeliOS snapshots root only for pre-update recovery — kept to 5, no timeline
+# Kestrel snapshots root only for pre-update recovery — kept to 5, no timeline
 SUBVOLUME="/"
 FSTYPE="btrfs"
 

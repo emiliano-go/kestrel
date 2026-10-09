@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# kestrel:summary=Print the active package mirror
+
+# Kestrel ships upstream Arch mirrors and no package channel of its own. Report
+# "arch" when the Arch mirror is configured, a legacy channel name if an older
+# omarchy-style mirror is still present, otherwise "custom".
+if grep -q "geo.mirror.pkgbuild.com" /etc/pacman.d/mirrorlist; then
+  echo "arch"
+elif grep -q "https://stable-mirror.omarchy.org/" /etc/pacman.d/mirrorlist; then
+  echo "stable"
+elif grep -q "https://rc-mirror.omarchy.org/" /etc/pacman.d/mirrorlist; then
+  echo "rc"
+elif grep -q "https://mirror.omarchy.org/" /etc/pacman.d/mirrorlist; then
+  echo "edge"
+else
+  echo "custom"
+fi

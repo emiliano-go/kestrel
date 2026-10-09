@@ -9,13 +9,13 @@ trap 'rm -rf "$test_tmp"' EXIT
 
 test_home="$test_tmp/home"
 runtime_dir="$test_tmp/runtime"
-current_state="$test_home/.local/state/helios/current"
-background_state="$test_home/.local/state/helios/theme-backgrounds"
+current_state="$test_home/.local/state/kestrel/current"
+background_state="$test_home/.local/state/kestrel/theme-backgrounds"
 mkdir -p "$test_home" "$runtime_dir"
 
 set_theme() {
-  HOME="$test_home" XDG_RUNTIME_DIR="$runtime_dir" HELIOS_PATH="$ROOT" PATH="$ROOT/bin:$PATH" \
-    HELIOS_THEME_HEADLESS=1 "$ROOT/bin/helios-theme-set" "$1" >/dev/null
+  HOME="$test_home" XDG_RUNTIME_DIR="$runtime_dir" KESTREL_PATH="$ROOT" PATH="$ROOT/bin:$PATH" \
+    KESTREL_THEME_HEADLESS=1 "$ROOT/bin/kestrel-theme-set" "$1" >/dev/null
 }
 
 current_background_name() {
@@ -69,7 +69,7 @@ set_theme "$theme_b"
 pass "reapplying a theme with an external background falls back to the first image"
 
 set_theme "$theme_a"
-user_background_dir="$test_home/.config/helios/backgrounds/$theme_a"
+user_background_dir="$test_home/.config/kestrel/backgrounds/$theme_a"
 user_background="$user_background_dir/$theme_a_first"
 mkdir -p "$user_background_dir"
 cp "${theme_a_backgrounds[0]}" "$user_background"
@@ -92,7 +92,7 @@ pass "reapplying the active theme still cycles backgrounds"
 
 printf '%s\n' "../escaped" >"$current_state/theme.name"
 set_theme "$theme_b"
-[[ ! -e $test_home/.local/state/helios/escaped ]] || fail "invalid theme names cannot escape the background state directory"
+[[ ! -e $test_home/.local/state/kestrel/escaped ]] || fail "invalid theme names cannot escape the background state directory"
 pass "invalid theme names cannot escape the background state directory"
 
 # Interactive switches choose before swapping the staged theme into place.
@@ -100,7 +100,7 @@ source <(awk '
   /^(theme_background_state_file|choose_theme_background|choose_staged_theme_background)\(\) \{/ { copying=1 }
   copying { print }
   copying && /^}$/ { copying=0 }
-' "$ROOT/bin/helios-theme-set")
+' "$ROOT/bin/kestrel-theme-set")
 
 HOME="$test_home"
 CURRENT_THEME_PATH="$current_state/theme"

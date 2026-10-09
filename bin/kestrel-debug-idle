@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# kestrel:summary=Show idle, screensaver, and lock diagnostics
+# kestrel:group=debug
+# kestrel:args=[log-lines]
+# kestrel:examples=kestrel debug idle | kestrel-debug-idle 400
+
+lines=${1:-200}
+if [[ ! $lines =~ ^[0-9]+$ ]]; then
+  lines=200
+fi
+
+section() {
+  printf '\n== %s ==\n' "$1"
+}
+
+section "Time"
+date -Is
+
+section "Idle IPC status"
+kestrel-shell idle status 2>&1 | jq . 2>/dev/null || kestrel-shell idle status 2>&1 || true
+
+section "Quickshell instances"
+quickshell list -p "$KESTREL_PATH/shell" --any-display 2>&1 || true
+
+section "Recent idle logs"
+quickshell --no-color log -p "$KESTREL_PATH/shell" --any-display --tail "$lines" --log-times -r 'quickshell.wayland.idle_notify=true' 2>&1 \
+  | grep -Ei 'kestrel idle|idle_notify|screensaver|lock|error|warn|failed' || true
+
+section "Persisted shell log"
+journalctl -t kestrel-shell -n "$lines" --no-pager --quiet 2>/dev/null || true
+
+section "Relevant processes"
+ps -eo pid=,args= \
+  | grep -E 'quickshell -n -p|kestrel-system-sleep-monitor|systemd-inhibit.*Lock screen before suspend|org\.kestrel\.screensaver|kestrel-screensaver|(^|/| )ttfx( |$)' \
+  | grep -v grep || true
+
+section "Sleep lock service"
+systemctl --user status kestrel-sleep-lock.service --no-pager 2>/dev/null || true
+
+section "Hyprland screensaver clients"
+hyprctl clients -j 2>/dev/null \
+  | jq -r '.[] | select(.class == "org.kestrel.screensaver" or .initialClass == "org.kestrel.screensaver") | [.pid,.class,.initialClass,.title,.focusHistoryID] | @tsv' || true
+
+section "Idle inhibitors"
+hyprctl clients -j 2>/dev/null \
+  | jq -r '.[] | select(.inhibitingIdle == true or ((.tags // []) | index("noidle"))) | [.pid,.class,.title,((.tags // []) | join(",")),.inhibitingIdle] | @tsv' || true
+
+section "Screensaver detector"
+if hyprctl clients -j 2>/dev/null | jq -e '.[] | select(.class == "org.kestrel.screensaver" or .initialClass == "org.kestrel.screensaver")' >/dev/null; then
+  echo "running-window"
+elif pgrep -f '[o]rg.kestrel.screensaver' >/dev/null; then
+  echo "running-process"
+elif kestrel-toggle-enabled screensaver-off; then
+  echo "disabled"
+else
+  echo "stopped"
+fi
+
+section "Lock detector"
+kestrel-shell lock status 2>&1 | jq . 2>/dev/null || kestrel-shell lock status 2>&1 || true

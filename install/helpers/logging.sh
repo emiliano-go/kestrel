@@ -1,26 +1,26 @@
-helios_log_to_stdout() {
-  [[ ${HELIOS_LOG_TO_STDOUT:-} == "1" || -z ${HELIOS_INSTALL_LOG_FILE:-} ]]
+kestrel_log_to_stdout() {
+  [[ ${KESTREL_LOG_TO_STDOUT:-} == "1" || -z ${KESTREL_INSTALL_LOG_FILE:-} ]]
 }
 
-helios_log_line() {
-  if helios_log_to_stdout; then
+kestrel_log_line() {
+  if kestrel_log_to_stdout; then
     echo "$1"
   else
-    echo "$1" >>"$HELIOS_INSTALL_LOG_FILE"
+    echo "$1" >>"$KESTREL_INSTALL_LOG_FILE"
   fi
 }
 
 start_install_log() {
-  if ! helios_log_to_stdout; then
-    mkdir -p "$(dirname "$HELIOS_INSTALL_LOG_FILE")"
-    touch "$HELIOS_INSTALL_LOG_FILE"
-    chmod 666 "$HELIOS_INSTALL_LOG_FILE" 2>/dev/null || true
+  if ! kestrel_log_to_stdout; then
+    mkdir -p "$(dirname "$KESTREL_INSTALL_LOG_FILE")"
+    touch "$KESTREL_INSTALL_LOG_FILE"
+    chmod 666 "$KESTREL_INSTALL_LOG_FILE" 2>/dev/null || true
   fi
 
-  export HELIOS_START_TIME="${HELIOS_START_TIME:-$(date '+%Y-%m-%d %H:%M:%S')}"
-  export HELIOS_START_EPOCH="${HELIOS_START_EPOCH:-$(date +%s)}"
+  export KESTREL_START_TIME="${KESTREL_START_TIME:-$(date '+%Y-%m-%d %H:%M:%S')}"
+  export KESTREL_START_EPOCH="${KESTREL_START_EPOCH:-$(date +%s)}"
 
-  helios_log_line "=== HeliOS Setup Started: $HELIOS_START_TIME ==="
+  kestrel_log_line "=== Kestrel Setup Started: $KESTREL_START_TIME ==="
 }
 
 stop_install_log() {
@@ -28,13 +28,13 @@ stop_install_log() {
   end_time=$(date '+%Y-%m-%d %H:%M:%S')
   end_epoch=$(date +%s)
 
-  helios_log_line "=== HeliOS Setup Completed: $end_time ==="
+  kestrel_log_line "=== Kestrel Setup Completed: $end_time ==="
 
-  if [[ -n ${HELIOS_START_EPOCH:-} ]]; then
-    duration=$((end_epoch - HELIOS_START_EPOCH))
+  if [[ -n ${KESTREL_START_EPOCH:-} ]]; then
+    duration=$((end_epoch - KESTREL_START_EPOCH))
     mins=$((duration / 60))
     secs=$((duration % 60))
-    helios_log_line "HeliOS setup: ${mins}m ${secs}s"
+    kestrel_log_line "Kestrel setup: ${mins}m ${secs}s"
   fi
 }
 
@@ -42,7 +42,7 @@ run_logged() {
   local script="$1"
   local exit_code errexit_was_set=0
 
-  helios_log_line "[$(date '+%Y-%m-%d %H:%M:%S')] Starting: $script"
+  kestrel_log_line "[$(date '+%Y-%m-%d %H:%M:%S')] Starting: $script"
 
   case $- in
     *e*)
@@ -52,25 +52,25 @@ run_logged() {
   esac
 
   local runner=(bash -eE)
-  if [[ ${HELIOS_INSTALL_DEBUG:-} == "1" ]]; then
+  if [[ ${KESTREL_INSTALL_DEBUG:-} == "1" ]]; then
     runner=(bash -x -eE)
   fi
 
-  if helios_log_to_stdout; then
+  if kestrel_log_to_stdout; then
     PS4='+ ${BASH_SOURCE[0]##*/}:${LINENO}:${FUNCNAME[0]:-main}: ' \
       "${runner[@]}" -c 'source "$1"' bash "$script" </dev/null 2>&1
   else
     PS4='+ ${BASH_SOURCE[0]##*/}:${LINENO}:${FUNCNAME[0]:-main}: ' \
-      "${runner[@]}" -c 'source "$1"' bash "$script" </dev/null >>"$HELIOS_INSTALL_LOG_FILE" 2>&1
+      "${runner[@]}" -c 'source "$1"' bash "$script" </dev/null >>"$KESTREL_INSTALL_LOG_FILE" 2>&1
   fi
 
   exit_code=$?
   (( errexit_was_set )) && set -e
 
   if (( exit_code == 0 )); then
-    helios_log_line "[$(date '+%Y-%m-%d %H:%M:%S')] Completed: $script"
+    kestrel_log_line "[$(date '+%Y-%m-%d %H:%M:%S')] Completed: $script"
   else
-    helios_log_line "[$(date '+%Y-%m-%d %H:%M:%S')] Failed: $script (exit code: $exit_code)"
+    kestrel_log_line "[$(date '+%Y-%m-%d %H:%M:%S')] Failed: $script (exit code: $exit_code)"
   fi
 
   return $exit_code

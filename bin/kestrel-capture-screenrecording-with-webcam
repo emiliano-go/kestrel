@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# kestrel:summary=Pick a webcam and start a screen recording with it
+# kestrel:examples=kestrel capture screenrecording-with-webcam
+
+mapfile -t devices < <(kestrel-capture-webcam-list)
+if (( ${#devices[@]} == 0 )); then
+  kestrel-notification-send "No webcam devices found" -u critical -t 3000
+  exit 1
+fi
+
+if (( ${#devices[@]} == 1 )); then
+  device="${devices[0]%%[[:space:]]*}"
+else
+  selection=$(kestrel-menu-select "Select Webcam" "${devices[@]}" -- --width 520 --maxheight 520) || exit 1
+  device="${selection%%[[:space:]]*}"
+fi
+
+exec kestrel-capture-screenrecording \
+  --with-desktop-audio --with-microphone-audio \
+  --with-webcam --webcam-device="$device"

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.idle",
+  "id": "kestrel.idle",
   "name": "Idle",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Quickshell-based idle detection for screensaver, lock, and display wake.",
   "kinds": [
     "service"

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.media",
+  "id": "kestrel.media",
   "name": "Media",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "MPRIS media control service",
   "kinds": [
     "service",

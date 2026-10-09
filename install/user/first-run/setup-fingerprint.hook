@@ -4,9 +4,9 @@ set -e
 
 # Only invite when there's a reader to use and it isn't set up yet (the lock
 # PAM file is the last thing the setup writes on success).
-if helios-hw-fingerprint && [[ ! -f /etc/pam.d/helios-lock-fingerprint ]] &&
-  helios-done ensure fingerprint-setup-invitation; then
-  helios-notification-send -u critical -g 󰈷 "Setup Fingerprint Reader" \
+if kestrel-hw-fingerprint && [[ ! -f /etc/pam.d/kestrel-lock-fingerprint ]] &&
+  kestrel-done ensure fingerprint-setup-invitation; then
+  kestrel-notification-send -u critical -g 󰈷 "Setup Fingerprint Reader" \
     "Enable sudo and unlocking with your fingerprint." \
-    --exec helios-launch-floating-terminal-with-presentation helios-setup-security-fingerprint
+    --exec kestrel-launch-floating-terminal-with-presentation kestrel-setup-security-fingerprint
 fi

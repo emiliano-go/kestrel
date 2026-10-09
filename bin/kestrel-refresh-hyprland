@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# kestrel:summary=Overwrite all the user Hyprland Lua configs in ~/.config/hypr with the Kestrel defaults.
+
+kestrel-refresh-config hypr/.luarc.json
+kestrel-refresh-config hypr/autostart.lua
+kestrel-refresh-config hypr/bindings.lua
+kestrel-refresh-config hypr/input.lua
+kestrel-refresh-config hypr/looknfeel.lua
+kestrel-refresh-config hypr/hyprland.lua
+kestrel-refresh-config hypr/monitors.lua
+
+mkdir -p ~/.local/state/kestrel/toggles/hypr
+cp "$KESTREL_PATH/default/hypr/toggles/flags.lua" ~/.local/state/kestrel/toggles/hypr/

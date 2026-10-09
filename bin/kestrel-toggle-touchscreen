@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kestrel:summary=Enable, disable, or toggle the touch functionality of the screen
+# kestrel:args=[on|off|toggle]
+
+exec kestrel-toggle-input-device touchscreen "${1:-toggle}"

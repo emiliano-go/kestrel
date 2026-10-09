@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Name=Discord
-Exec=helios-launch-webapp https://discord.com/channels/@me
+Exec=kestrel-launch-webapp https://discord.com/channels/@me
 Terminal=false
 Type=Application
-Icon=helios-discord
+Icon=kestrel-discord
 StartupNotify=true

@@ -5,19 +5,19 @@ echo "Gate sudo and polkit fingerprint auth behind the lid state (password when 
 # block on the unreachable reader for the full pam_fprintd timeout before
 # offering the password. Insert a pam_exec gate before pam_fprintd that skips
 # fingerprint while the lid is closed. New setups already get this from
-# helios-setup-security-fingerprint.
+# kestrel-setup-security-fingerprint.
 #
-# The gate points at the fixed /usr/bin path the helios package always
+# The gate points at the fixed /usr/bin path the kestrel package always
 # provides, so it keeps working across package installs and dev-link (which
-# overlays $HELIOS_PATH but leaves /usr/bin untouched). pam_exec needs a
+# overlays $KESTREL_PATH but leaves /usr/bin untouched). pam_exec needs a
 # literal absolute path — it does not expand env vars.
 
-gate="auth      [success=1 default=ignore] pam_exec.so quiet /usr/bin/helios-hw-laptop-closed"
+gate="auth      [success=1 default=ignore] pam_exec.so quiet /usr/bin/kestrel-hw-laptop-closed"
 
 for pam in /etc/pam.d/sudo /etc/pam.d/polkit-1; do
   if [[ -f $pam ]] &&
     grep -q 'pam_fprintd\.so' "$pam" &&
-    ! grep -q 'helios-hw-laptop-closed' "$pam"; then
+    ! grep -q 'kestrel-hw-laptop-closed' "$pam"; then
     sudo sed -i "/pam_fprintd\.so/i $gate" "$pam"
   fi
 done

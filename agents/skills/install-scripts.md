@@ -5,12 +5,12 @@ Read this before working under `install/` or on the system/user setup commands.
 The ISO owns installation orchestration. This repo ships target-side setup
 commands and reusable setup leaves:
 
-- `bin/helios-apply-system` runs root-owned system setup during ISO finalization.
-- `bin/helios-apply-hardware` runs idempotent hardware-specific setup and is called by `helios-apply-system`.
-- `bin/helios-finalize-user` runs the per-user runtime finalization (skill symlinks, xdg-user-dirs, mime defaults, `install/user/all.sh`). Shipped user defaults are seeded by `/etc/skel` from `helios-settings`, not by this command. `bin/helios-reinstall-configs` is the explicit destructive resync of those defaults into an existing user's `$HOME`.
-- leaf scripts under `install/` are sourced by `run_logged $HELIOS_INSTALL/path/to/script.sh` and intentionally do not have shebangs.
+- `bin/kestrel-apply-system` runs root-owned system setup during ISO finalization.
+- `bin/kestrel-apply-hardware` runs idempotent hardware-specific setup and is called by `kestrel-apply-system`.
+- `bin/kestrel-finalize-user` runs the per-user runtime finalization (skill symlinks, xdg-user-dirs, mime defaults, `install/user/all.sh`). Shipped user defaults are seeded by `/etc/skel` from `kestrel-settings`, not by this command. `bin/kestrel-reinstall-configs` is the explicit destructive resync of those defaults into an existing user's `$HOME`.
+- leaf scripts under `install/` are sourced by `run_logged $KESTREL_INSTALL/path/to/script.sh` and intentionally do not have shebangs.
 - avoid `exit` in sourced setup scripts unless intentionally aborting setup.
-- use `$HELIOS_INSTALL` and `$HELIOS_PATH` instead of hard-coded HeliOS paths.
+- use `$KESTREL_INSTALL` and `$KESTREL_PATH` instead of hard-coded Kestrel paths.
 - keep root-scoped hardware setup under `install/hardware/` and orchestrate it through `install/hardware/all.sh`.
 - keep every per-user setup leaf under `install/user/` (including `install/user/hardware/` and `install/user/first-run/`) so it is clear what must run for each user.
 - The base install supplies matching kernel headers before hardware setup. DKMS installers should install their driver packages and assume the headers exist.

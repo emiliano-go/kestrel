@@ -6,7 +6,7 @@ description: >
   why an application crashed or disappeared, or when a "Process crashed:" desktop
   notification is acted on. Triggers: crash, segfault, SIGSEGV, SIGABRT, core dump,
   coredumpctl, "why did X crash", "X keeps crashing", backtrace symbolization.
-  Covers reporting a confirmed HeliOS bug upstream — see reporting.md.
+  Covers reporting a confirmed Kestrel bug upstream — see reporting.md.
 ---
 
 # Diagnosing a Crash
@@ -97,14 +97,14 @@ silence notifications for **that one program**, and never run it unprompted. Say
 how to lift it in the same breath, so it is not a one-way door.
 
 ```bash
-helios-crash-mute '<program>'        # silence it
-helios-crash-mute '<program>' off    # let it speak again
-helios-crash-mute                    # list what is muted
+kestrel-crash-mute '<program>'        # silence it
+kestrel-crash-mute '<program>' off    # let it speak again
+kestrel-crash-mute                    # list what is muted
 ```
 
 Pass the `binary:` path from the crash facts, or the `process:` name where no
 binary was recorded; the command reduces either to the name the watcher keys on.
-A diagnosis run by hand from `helios agent crash <pid>` has neither, so take
+A diagnosis run by hand from `kestrel agent crash <pid>` has neither, so take
 them from `coredumpctl info`. Prefer the binary: a process name is truncated to
 15 characters and a basename is not, so muting the truncated form matches
 nothing, forever, while looking like it worked.
@@ -120,9 +120,9 @@ None of this fixes anything, and a mute offered in place of a fix that was withi
 reach is the wrong answer. For every program rather than one, the switch is
 _Trigger > Toggle > Crash Capture_.
 
-## If it is an HeliOS bug
+## If it is an Kestrel bug
 
-Most application crashes are upstream bugs in those applications, not HeliOS's
-doing. In the minority of cases where the cause really does sit within HeliOS's
+Most application crashes are upstream bugs in those applications, not Kestrel's
+doing. In the minority of cases where the cause really does sit within Kestrel's
 sphere of control, read [`reporting.md`](reporting.md) before offering to file
 anything.

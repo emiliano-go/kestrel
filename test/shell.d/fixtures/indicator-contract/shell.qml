@@ -4,7 +4,7 @@ import Quickshell
 ShellRoot {
   id: root
 
-  property string resultPath: Quickshell.env("HELIOS_QML_TEST_RESULT")
+  property string resultPath: Quickshell.env("KESTREL_QML_TEST_RESULT")
   property var failures: []
   property var commands: []
 
@@ -44,9 +44,9 @@ ShellRoot {
   QtObject {
     id: mockShell
     function firstPartyServiceFor(id) {
-      if (id === "helios.notifications") return notificationService
-      if (id === "helios.idle") return idleService
-      if (id === "helios.nightlight") return nightlightService
+      if (id === "kestrel.notifications") return notificationService
+      if (id === "kestrel.idle") return idleService
+      if (id === "kestrel.nightlight") return nightlightService
       return null
     }
   }
@@ -163,7 +163,7 @@ ShellRoot {
     return "'" + String(value).replace(/'/g, "'\\''") + "'"
   }
 
-  readonly property string rootPath: Quickshell.env("HELIOS_PATH")
+  readonly property string rootPath: Quickshell.env("KESTREL_PATH")
 
   Timer {
     interval: 1
@@ -192,10 +192,10 @@ ShellRoot {
         screenRecording.moduleName = "ScreenRecording"
         root.injectBar(screenRecording)
         screenRecording.triggerPress(Qt.LeftButton)
-        root.assertTrue(root.commandCount("helios-menu toggle trigger.capture.screenrecord") === 1, "Screen Recording left click opens capture menu when idle")
+        root.assertTrue(root.commandCount("kestrel-menu toggle trigger.capture.screenrecord") === 1, "Screen Recording left click opens capture menu when idle")
         screenRecording.recording = true
         screenRecording.triggerPress(Qt.LeftButton)
-        root.assertTrue(root.commandCount("helios-capture-screenrecording --stop-recording") === 1, "Screen Recording left click stops active recording")
+        root.assertTrue(root.commandCount("kestrel-capture-screenrecording --stop-recording") === 1, "Screen Recording left click stops active recording")
       }
 
       var stayAwake = root.createIndicator("StayAwake")

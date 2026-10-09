@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.audio",
+  "id": "kestrel.audio",
   "name": "Audio",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Volume slider, output picker, per-app mixer",
   "kinds": [
     "bar-widget"

@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = *
+
+[Action]
+Description = Checking Kestrel update entrypoint...
+When = PreTransaction
+Depends = kestrel
+Exec = /usr/bin/kestrel-update-pacman-guard
+AbortOnFail

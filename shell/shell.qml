@@ -26,14 +26,14 @@ ShellRoot {
 
   property string home: Quickshell.env("HOME")
 
-  // The helios-shell host is the long-running entry point. Plugins live in
-  // sibling directories under plugins/. HELIOS_PATH is provided by the uwsm
+  // The kestrel-shell host is the long-running entry point. Plugins live in
+  // sibling directories under plugins/. KESTREL_PATH is provided by the uwsm
   // session environment and is the single source of truth for this checkout.
-  property string heliosPath: Quickshell.env("HELIOS_PATH")
-  readonly property string shellPath: heliosPath + "/shell"
+  property string kestrelPath: Quickshell.env("KESTREL_PATH")
+  readonly property string shellPath: kestrelPath + "/shell"
   readonly property string firstPartyPluginsDir: shellPath + "/plugins"
-  readonly property string defaultsPath: heliosPath + "/config/helios/shell.json"
-  readonly property string userConfigPath: home + "/.config/helios/shell.json"
+  readonly property string defaultsPath: kestrelPath + "/config/kestrel/shell.json"
+  readonly property string userConfigPath: home + "/.config/kestrel/shell.json"
 
   // Bundled fallback so the shell can start even when the default shell.json is
   // missing or unreadable. The bar config here mirrors the on-disk defaults
@@ -47,11 +47,11 @@ ShellRoot {
     bar: {
       position: "top",
       transparent: false,
-      centerAnchor: "helios.clock",
+      centerAnchor: "kestrel.clock",
       layout: {
-        left: [{ id: "helios.menu" }, { id: "helios.workspaces" }],
-        center: [{ id: "helios.clock", format: "dddd HH:mm" }],
-        right: [{ id: "helios.audio" }]
+        left: [{ id: "kestrel.menu" }, { id: "kestrel.workspaces" }],
+        center: [{ id: "kestrel.clock", format: "dddd HH:mm" }],
+        right: [{ id: "kestrel.audio" }]
       }
     },
     plugins: []
@@ -147,8 +147,8 @@ ShellRoot {
   }
 
   Component.onCompleted: {
-    console.log("helios-shell paths",
-      "heliosPath=" + shell.heliosPath,
+    console.log("kestrel-shell paths",
+      "kestrelPath=" + shell.kestrelPath,
       "shellDir=" + Quickshell.shellDir,
       "firstPartyPluginsDir=" + shell.firstPartyPluginsDir,
       "defaultsPath=" + shell.defaultsPath,
@@ -171,7 +171,7 @@ ShellRoot {
 
   // Exposed as a property so child plugins (notifications, future panels)
   // can read barSize/barHidden/position to anchor relative to the active bar.
-  readonly property string defaultBarId: "helios.bar"
+  readonly property string defaultBarId: "kestrel.bar"
   readonly property string selectedBarId: {
     var config = shell.barConfig
     if (Util.isPlainObject(config)) {
@@ -221,7 +221,7 @@ ShellRoot {
 
   function configureBar(target, manifest) {
     if (!target) return
-    if ("heliosPath" in target) target.heliosPath = shell.heliosPath
+    if ("kestrelPath" in target) target.kestrelPath = shell.kestrelPath
     if ("shell" in target) target.shell = shell.pluginShellFor(manifest)
     if ("manifest" in target) target.manifest = shell.publicPluginManifest(manifest)
     if ("barWidgetRegistry" in target) target.barWidgetRegistry = shell.pluginBarWidgetRegistryFor(manifest)
@@ -234,7 +234,7 @@ ShellRoot {
     id: defaultBarComponent
 
     Bar {
-      heliosPath: shell.heliosPath
+      kestrelPath: shell.kestrelPath
       barWidgetRegistry: shell.barWidgetRegistry
       barConfig: shell.barConfig
       shell: shell
@@ -361,21 +361,21 @@ ShellRoot {
   }
 
   function publicIdleConfigFor(manifest) {
-    var metadata = manifest && Util.isPlainObject(manifest.helios) ? manifest.helios : null
-    if (!metadata || String(metadata.clonedFrom || "") !== "helios.idle") return ({})
+    var metadata = manifest && Util.isPlainObject(manifest.kestrel) ? manifest.kestrel : null
+    if (!metadata || String(metadata.clonedFrom || "") !== "kestrel.idle") return ({})
     var idle = shell.shellConfig && Util.isPlainObject(shell.shellConfig.idle)
       ? shell.shellConfig.idle : ({})
     return JSON.parse(JSON.stringify(idle))
   }
 
   function pluginCloneMaySummon(manifest, requestedId) {
-    var metadata = manifest && Util.isPlainObject(manifest.helios) ? manifest.helios : null
+    var metadata = manifest && Util.isPlainObject(manifest.kestrel) ? manifest.kestrel : null
     var sourceId = metadata ? String(metadata.clonedFrom || "") : ""
     var allowed = {
-      "helios.audio": ["helios.osd"],
-      "helios.media": ["helios.osd"],
-      "helios.monitor": ["helios.osd"],
-      "helios.network": ["helios.speedtest", "helios.wifiqr"]
+      "kestrel.audio": ["kestrel.osd"],
+      "kestrel.media": ["kestrel.osd"],
+      "kestrel.monitor": ["kestrel.osd"],
+      "kestrel.network": ["kestrel.speedtest", "kestrel.wifiqr"]
     }
     var targets = allowed[sourceId] || []
     return targets.indexOf(String(requestedId || "")) !== -1
@@ -456,7 +456,7 @@ ShellRoot {
 
   function pluginFirstPartyServiceFor(cacheKey, pluginId, requestedId) {
     var id = String(requestedId || "")
-    var allowed = ["helios.idle", "helios.media", "helios.nightlight", "helios.notifications"]
+    var allowed = ["kestrel.idle", "kestrel.media", "kestrel.nightlight", "kestrel.notifications"]
     if (allowed.indexOf(id) === -1) return null
     var proxyKey = cacheKey + "::" + id
     if (_pluginFirstPartyServiceApis[proxyKey]) return _pluginFirstPartyServiceApis[proxyKey]
@@ -588,7 +588,7 @@ ShellRoot {
     // property, even though the resulting proxy is otherwise acyclic.
     var firstPartyServices = ({})
     if (barCapabilities) {
-      var serviceIds = ["helios.idle", "helios.media", "helios.nightlight", "helios.notifications"]
+      var serviceIds = ["kestrel.idle", "kestrel.media", "kestrel.nightlight", "kestrel.notifications"]
       for (var i = 0; i < serviceIds.length; i++) {
         var serviceId = serviceIds[i]
         firstPartyServices[serviceId] = shell.pluginFirstPartyServiceFor(cacheKey, key, serviceId)
@@ -919,7 +919,7 @@ ShellRoot {
         console.warn("service plugin createObject returned null for", key)
         return
       }
-      if ("heliosPath" in inst) inst.heliosPath = shell.heliosPath
+      if ("kestrelPath" in inst) inst.kestrelPath = shell.kestrelPath
       if ("shell" in inst) inst.shell = shell.pluginShellFor(manifest)
       if ("manifest" in inst) inst.manifest = shell.publicPluginManifest(manifest)
       if ("barWidgetRegistry" in inst) inst.barWidgetRegistry = shell.pluginBarWidgetRegistryFor(manifest)
@@ -1022,7 +1022,7 @@ ShellRoot {
   }
 
   // keepLoaded services (lock, idle, polkit) must survive plugin hot-reload.
-  // Destroying helios.lock drops the ext-session-lock client while Hyprland
+  // Destroying kestrel.lock drops the ext-session-lock client while Hyprland
   // still holds the lock, which surfaces the crashed-lockscreen fallback.
   function unloadPluginServices() {
     var next = ({})
@@ -1135,7 +1135,7 @@ ShellRoot {
     if (!m || !Array.isArray(m.kinds)) return false
     if (m.kinds.indexOf("bar-widget") === -1) return false
     // Plugins that are also panel/overlay/menu kinds are owned by the
-    // panel loader (e.g. helios.menu); let that path handle them.
+    // panel loader (e.g. kestrel.menu); let that path handle them.
     var loaderKinds = ["panel", "overlay", "menu"]
     for (var i = 0; i < loaderKinds.length; i++) {
       if (m.kinds.indexOf(loaderKinds[i]) !== -1) return false
@@ -1368,7 +1368,7 @@ ShellRoot {
         asynchronous: true
         onLoaded: {
           if (!item) return
-          if ("heliosPath" in item) item.heliosPath = shell.heliosPath
+          if ("kestrelPath" in item) item.kestrelPath = shell.kestrelPath
           if ("shell" in item) item.shell = shell.pluginShellFor(panelEntry.manifest)
           if ("manifest" in item) item.manifest = shell.publicPluginManifest(panelEntry.manifest)
           if ("barWidgetRegistry" in item) item.barWidgetRegistry = shell.pluginBarWidgetRegistryFor(panelEntry.manifest)
@@ -1573,11 +1573,11 @@ ShellRoot {
   }
 
   // The IPC targets an ipc shortcut may name, and the service that owns each.
-  readonly property var ipcShortcutServices: ({ media: "helios.media", notifications: "helios.notifications" })
+  readonly property var ipcShortcutServices: ({ media: "kestrel.media", notifications: "kestrel.notifications" })
 
   function runShortcut(entry) {
     if (entry.kind === "menu") {
-      shell.toggle("helios.menu", JSON.stringify({ menu: entry.target }))
+      shell.toggle("kestrel.menu", JSON.stringify({ menu: entry.target }))
     } else if (entry.kind === "ipc") {
       // "media.next" runs the media service's own IPC handler for next.
       var dot = entry.target.indexOf(".")
@@ -1585,14 +1585,14 @@ ShellRoot {
       var method = entry.target.slice(dot + 1)
       var service = shell.serviceFor(shell.ipcShortcutServices[target] || "")
       if (!service || !service.runShortcut(method))
-        Util.execArgv(["helios-shell", target, method])
+        Util.execArgv(["kestrel-shell", target, method])
     } else if (entry.kind === "brightness") {
       if (!shell.brightnessKeys.handle(entry.target))
-        Util.execArgv(["helios-brightness-display", entry.target === "raise" ? "+5%" : "5%-"])
+        Util.execArgv(["kestrel-brightness-display", entry.target === "raise" ? "+5%" : "5%-"])
     } else if (entry.kind === "audio") {
-      var media = shell.serviceFor("helios.media")
+      var media = shell.serviceFor("kestrel.media")
       if (!media || !media.handleVolumeKey(entry.target))
-        Util.execArgv(["helios-audio-output-volume", entry.target])
+        Util.execArgv(["kestrel-audio-output-volume", entry.target])
     } else {
       shell.toggle(entry.target, "{}")
     }
@@ -1600,7 +1600,7 @@ ShellRoot {
 
   FileView {
     id: shortcutsFile
-    path: shell.heliosPath + "/default/helios/shortcuts"
+    path: shell.kestrelPath + "/default/kestrel/shortcuts"
     watchChanges: true
     onFileChanged: reload()
   }
@@ -1611,7 +1611,7 @@ ShellRoot {
     GlobalShortcut {
       required property var modelData
 
-      appid: "helios"
+      appid: "kestrel"
       name: modelData.name
       description: modelData.kind === "audio" || modelData.kind === "brightness" ? (modelData.kind === "audio" ? "Volume " : "Brightness ") + modelData.target : (modelData.kind === "ipc" ? "Run " + modelData.target : "Toggle the " + modelData.target + " " + modelData.kind)
       onPressed: shell.runShortcut(modelData)
@@ -1620,20 +1620,20 @@ ShellRoot {
 
   // ------------------------------------------------------------ IPC socket
   //
-  // helios-shell reaches the shell here first: a qs ipc client costs ~45ms
+  // kestrel-shell reaches the shell here first: a qs ipc client costs ~45ms
   // to start per call, socat ~5ms. A request is target, method and arguments
   // separated by unit separators and ended by a record separator. The reply is
   // "OK" and the output, or "SKIP" when nothing ran (no such target or
-  // function, or the wrong number of arguments), which helios-shell hands to
+  // function, or the wrong number of arguments), which kestrel-shell hands to
   // qs ipc for its exact answer. The socket sits in XDG_RUNTIME_DIR, private
   // to the user like qs ipc's own. Like qs ipc, it belongs to one shell: the
-  // one running this config on this display. helios-shell derives the same
+  // one running this config on this display. kestrel-shell derives the same
   // name from the same two values.
-  readonly property string ipcSocketPath: Quickshell.env("XDG_RUNTIME_DIR") + "/helios-shell-"
-    + Qt.md5(shell.heliosPath + "/shell\n" + Quickshell.env("WAYLAND_DISPLAY")).slice(0, 16) + ".sock"
+  readonly property string ipcSocketPath: Quickshell.env("XDG_RUNTIME_DIR") + "/kestrel-shell-"
+    + Qt.md5(shell.kestrelPath + "/shell\n" + Quickshell.env("WAYLAND_DISPLAY")).slice(0, 16) + ".sock"
 
   SocketServer {
-    active: shell.heliosPath !== ""
+    active: shell.kestrelPath !== ""
     path: shell.ipcSocketPath
 
     handler: Socket {
@@ -1655,7 +1655,7 @@ ShellRoot {
   // --------------------------------------------------- image selector IPC
 
   function imagePickerItem() {
-    var loader = panelLoaders["helios.image-picker"]
+    var loader = panelLoaders["kestrel.image-picker"]
     return loader && loader.item ? loader.item : null
   }
 
@@ -1678,7 +1678,7 @@ ShellRoot {
         showLabels: showLabels,
         filterable: filterable
       })
-      return shell.summon("helios.image-picker", payload) ? "ok" : "unknown"
+      return shell.summon("kestrel.image-picker", payload) ? "ok" : "unknown"
     }
 
     function preload(imageRowsB64: string,
@@ -1698,7 +1698,7 @@ ShellRoot {
       if (picker && typeof picker.closeSelector === "function") {
         picker.closeSelector(doneFile || "")
       } else {
-        shell.hide("helios.image-picker")
+        shell.hide("kestrel.image-picker")
       }
       return "ok"
     }
@@ -1736,7 +1736,7 @@ ShellRoot {
 
     function applyTheme(colorsB64: string, shellB64: string): string {
       if (shell.bootIntro) shell.bootIntro.cancelTheme()
-      var background = shell.firstPartyServiceFor("helios.background")
+      var background = shell.firstPartyServiceFor("kestrel.background")
       if (background && typeof background.setPendingTheme === "function" && typeof background.applyPendingTheme === "function") {
         background.setPendingTheme(colorsB64, shellB64)
         background.applyPendingTheme()
@@ -1822,13 +1822,13 @@ ShellRoot {
         var isBarOption = Array.isArray(kinds) && kinds.indexOf("bar") !== -1
         var isBarWidget = Array.isArray(kinds) && kinds.indexOf("bar-widget") !== -1
         var active = isBarOption && shell.isActiveBarOption(id)
-        var metadata = plugins[id].helios
+        var metadata = plugins[id].kestrel
         var clonedFrom = Util.isPlainObject(metadata) ? String(metadata.clonedFrom || "") : ""
         out.push({
           id: id,
           name: plugins[id].name,
           kinds: kinds,
-          // What `helios plugin enable/disable` toggles: for a widget that is
+          // What `kestrel plugin enable/disable` toggles: for a widget that is
           // its place in the bar, not whether its component is loadable.
           enabled: isBarOption ? active
             : (isBarWidget ? shell.pluginRegistry.inBar(id) : shell.pluginRegistry.isEnabled(id)),

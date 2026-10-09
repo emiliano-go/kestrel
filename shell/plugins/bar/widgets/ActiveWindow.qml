@@ -7,7 +7,7 @@ import qs.Ui
 
 BarWidget {
   id: root
-  moduleName: "helios.active-window"
+  moduleName: "kestrel.active-window"
 
 
   readonly property var toplevel: ToplevelManager.activeToplevel

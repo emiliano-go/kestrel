@@ -1,9 +1,9 @@
-mkdir -p ~/.config/helios
+mkdir -p ~/.config/kestrel
 
-cat >~/.config/helios/agent.conf <<EOF
-helper=$HOME/.local/share/helios/bin/helios-agent
+cat >~/.config/kestrel/agent.conf <<EOF
+helper=$HOME/.local/share/kestrel/bin/kestrel-agent
 EOF
 
-cat >"$HOME/.local/bin/helios-shim" <<EOF
-exec "$HELIOS_PATH/bin/helios-agent" "$@"
+cat >"$HOME/.local/bin/kestrel-shim" <<EOF
+exec "$KESTREL_PATH/bin/kestrel-agent" "$@"
 EOF

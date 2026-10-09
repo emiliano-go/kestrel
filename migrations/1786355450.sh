@@ -1,4 +1,4 @@
 echo "Replace terminaltexteffects with ttfx"
 
-helios-pkg-add ttfx
-helios-pkg-drop python-terminaltexteffects
+kestrel-pkg-add ttfx
+kestrel-pkg-drop python-terminaltexteffects

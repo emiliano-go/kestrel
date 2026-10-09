@@ -8,17 +8,17 @@ require_command quickshell
 
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
-mkdir -p "$stage/services" "$stage/bin" "$stage/home/.local/state/helios/current"
+mkdir -p "$stage/services" "$stage/bin" "$stage/home/.local/state/kestrel/current"
 printf 'P6\n1 1\n255\n\377\000\377' >"$stage/still.ppm"
-ln -s "$stage/still.ppm" "$stage/home/.local/state/helios/current/background"
+ln -s "$stage/still.ppm" "$stage/home/.local/state/kestrel/current/background"
 ln -s "$ROOT/shell/Commons" "$stage/Commons"
 cp "$ROOT/shell/services/BackgroundIntro.qml" "$stage/services/"
 cp "$SHELL_TEST_DIR/fixtures/background-startup/shell.qml" "$stage/shell.qml"
-cat >"$stage/bin/helios-theme-bg-boot-intro" <<'SH'
+cat >"$stage/bin/kestrel-theme-bg-boot-intro" <<'SH'
 #!/bin/bash
 exit 0
 SH
-chmod +x "$stage/bin/helios-theme-bg-boot-intro"
+chmod +x "$stage/bin/kestrel-theme-bg-boot-intro"
 cat >"$stage/bin/hyprctl" <<'SH'
 #!/bin/bash
 if [[ $1 == "eval" ]]; then

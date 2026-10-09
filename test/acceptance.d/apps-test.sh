@@ -36,7 +36,7 @@ launch_and_verify() {
 # name|command|window class regex|launch timeout
 apps='terminal|foot|^foot$
 browser|chromium --new-window|(?i)chromium
-neovim|xdg-terminal-exec --app-id=org.helios.nvim nvim|org.helios.nvim
+neovim|xdg-terminal-exec --app-id=org.kestrel.nvim nvim|org.kestrel.nvim
 writer|omawrite|(?i)omawrite'
 
 status=0

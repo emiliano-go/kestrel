@@ -5,7 +5,7 @@
 # the group change actually takes effect (group membership is fixed at login),
 # refresh the stale Docker launcher entry, and stay idempotent on reruns.
 #
-# The real helios-remove-security-sudoless-docker and helios-state run here
+# The real kestrel-remove-security-sudoless-docker and kestrel-state run here
 # (from the repo bin); only the privileged/system calls are stubbed, so the whole
 # chain — including the reboot flag — is exercised.
 
@@ -18,11 +18,11 @@ test_dir=$(mktemp -d)
 trap 'rm -rf "$test_dir"' EXIT
 
 home="$test_dir/home"
-helios_path="$test_dir/helios"
+kestrel_path="$test_dir/kestrel"
 stub_bin="$test_dir/bin"
-mkdir -p "$home/.local/share/applications" "$helios_path/default/applications" "$stub_bin"
+mkdir -p "$home/.local/share/applications" "$kestrel_path/default/applications" "$stub_bin"
 
-printf 'NEW-LAUNCHER\n' >"$helios_path/default/applications/Docker.desktop"
+printf 'NEW-LAUNCHER\n' >"$kestrel_path/default/applications/Docker.desktop"
 printf 'OLD-LAUNCHER\n' >"$home/.local/share/applications/Docker.desktop"
 
 # id reports a controllable group set; sudo just drops the prefix; gpasswd
@@ -40,27 +40,27 @@ cat >"$stub_bin/gpasswd" <<'STUB'
 echo "$@" >>"${GPASSWD_CALLS:?}"
 STUB
 # gum confirm always says yes, and reboot records that it fired: the migration
-# must still NOT reboot (it defers to helios-update-restart), so neither should
+# must still NOT reboot (it defers to kestrel-update-restart), so neither should
 # be reached.
 cat >"$stub_bin/gum" <<'STUB'
 #!/bin/bash
 [[ $1 == confirm ]] && exit 0
 exit 0
 STUB
-cat >"$stub_bin/helios-system-reboot" <<'STUB'
+cat >"$stub_bin/kestrel-system-reboot" <<'STUB'
 #!/bin/bash
 touch "${REBOOT_CALLED:?}"
 STUB
-chmod +x "$stub_bin/id" "$stub_bin/sudo" "$stub_bin/gpasswd" "$stub_bin/gum" "$stub_bin/helios-system-reboot"
+chmod +x "$stub_bin/id" "$stub_bin/sudo" "$stub_bin/gpasswd" "$stub_bin/gum" "$stub_bin/kestrel-system-reboot"
 
-reboot_flag="$home/.local/state/helios/reboot-required"
+reboot_flag="$home/.local/state/kestrel/reboot-required"
 gpasswd_calls="$test_dir/gpasswd-calls"
 reboot_called="$test_dir/reboot-called"
 launcher="$home/.local/share/applications/Docker.desktop"
 
 run_migration() {
   rm -f "$gpasswd_calls" "$reboot_flag" "$reboot_called"
-  HOME="$home" HELIOS_PATH="$helios_path" USER="tester" STUB_GROUPS="$1" \
+  HOME="$home" KESTREL_PATH="$kestrel_path" USER="tester" STUB_GROUPS="$1" \
     GPASSWD_CALLS="$gpasswd_calls" REBOOT_CALLED="$reboot_called" \
     PATH="$stub_bin:$ROOT/bin:$PATH" \
     bash -euo pipefail "$migration" >/dev/null 2>&1

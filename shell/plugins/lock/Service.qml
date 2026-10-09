@@ -11,12 +11,12 @@ Item {
   id: root
 
   property var shell: null
-  property string heliosPath: ""
+  property string kestrelPath: ""
 
   readonly property string home: Quickshell.env("HOME")
   readonly property string stateHome: home + "/.local/state"
   readonly property string userName: Quickshell.env("USER") || Quickshell.env("LOGNAME")
-  readonly property string currentBackgroundLink: stateHome + "/helios/current/background"
+  readonly property string currentBackgroundLink: stateHome + "/kestrel/current/background"
 
   property bool lockRequested: false
   property bool pendingSessionLock: false
@@ -58,7 +58,7 @@ Item {
 
   readonly property bool locked: lockRequested || sessionLock.locked || sessionLock.secure
   readonly property bool authenticating: authenticatingPassword || fingerprintAuthenticating
-  readonly property var batteryService: shell && shell.services ? shell.firstPartyServiceFor("helios.battery") : null
+  readonly property var batteryService: shell && shell.services ? shell.firstPartyServiceFor("kestrel.battery") : null
   readonly property bool powerSaverActive: batteryService ? batteryService.powerSaverOnBattery : false
   // A prompt clears the unavailable notice before the attempt finishes.
   readonly property bool fingerprintUnavailable: FingerprintModel.isUnavailable(fingerprintProbeStreak) || (fingerprintConfigured && (!fingerprintAttemptReachedDevice || fingerprintAttemptFastError) && FingerprintModel.isUnavailable(fingerprintUnreachedStreak))
@@ -173,7 +173,7 @@ Item {
   function logEvent(event) {
     lastEvent = event
     lastEventAt = new Date().toISOString()
-    console.log("helios lock " + lastEventAt + " " + event)
+    console.log("kestrel lock " + lastEventAt + " " + event)
   }
 
   function resetAuthenticationState() {
@@ -500,7 +500,7 @@ Item {
     visible: root.previewVisible
     anchors { top: true; bottom: true; left: true; right: true }
     color: "transparent"
-    WlrLayershell.namespace: "helios-lock-preview"
+    WlrLayershell.namespace: "kestrel-lock-preview"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
     exclusionMode: ExclusionMode.Ignore
@@ -530,7 +530,7 @@ Item {
 
   PamContext {
     id: passwordPam
-    config: "helios-lock-password"
+    config: "kestrel-lock-password"
     user: root.userName
 
     onResponseRequiredChanged: root.respondToPasswordPrompt()
@@ -552,7 +552,7 @@ Item {
 
   PamContext {
     id: fingerprintPam
-    config: "helios-lock-fingerprint"
+    config: "kestrel-lock-fingerprint"
     user: root.userName
 
     onPamMessage: {
@@ -650,7 +650,7 @@ Item {
   Process {
     id: posterProc
     property string sourcePath: ""
-    command: ["bash", Quickshell.env("HELIOS_PATH") + "/shell/plugins/lock/poster.sh", sourcePath]
+    command: ["bash", Quickshell.env("KESTREL_PATH") + "/shell/plugins/lock/poster.sh", sourcePath]
     stdout: StdioCollector { id: posterOutput; waitForEnd: true }
     onExited: function(exitCode) {
       if (sourcePath !== root.backgroundPath) {
@@ -664,7 +664,7 @@ Item {
   // Keep fprintd errors distinguishable from an explicit empty enrollment.
   Process {
     id: fingerprintCheckProc
-    command: ["bash", "-c", "if [[ -f /etc/pam.d/helios-lock-fingerprint ]] && command -v fprintd-list >/dev/null 2>&1; then LC_ALL=C fprintd-list \"$USER\" 2>&1; else echo no; fi"]
+    command: ["bash", "-c", "if [[ -f /etc/pam.d/kestrel-lock-fingerprint ]] && command -v fprintd-list >/dev/null 2>&1; then LC_ALL=C fprintd-list \"$USER\" 2>&1; else echo no; fi"]
     stdout: StdioCollector { id: fingerprintCheckStdout; waitForEnd: true }
     onExited: root.applyFingerprintProbe(fingerprintCheckStdout.text)
   }
@@ -680,7 +680,7 @@ Item {
 
   Process {
     id: strandedLockCheckProc
-    command: ["bash", "-c", "helios-hyprland-session-locked"]
+    command: ["bash", "-c", "kestrel-hyprland-session-locked"]
     onExited: function(exitCode) {
       // No output to read the lock off yet.
       if (exitCode === 2) return
@@ -695,12 +695,12 @@ Item {
 
   Process {
     id: wakeProcess
-    command: ["bash", "-c", "helios-system-wake"]
+    command: ["bash", "-c", "kestrel-system-wake"]
   }
 
   Process {
     id: blankProcess
-    command: ["bash", "-c", "helios-brightness-keyboard off; helios-brightness-display off"]
+    command: ["bash", "-c", "kestrel-brightness-keyboard off; kestrel-brightness-display off"]
   }
 
   // Quickshell exposes no DPMS signal, so the panel state is polled while a
@@ -803,7 +803,7 @@ Item {
   }
 
   FileView {
-    path: "/etc/pam.d/helios-lock-password"
+    path: "/etc/pam.d/kestrel-lock-password"
     watchChanges: true
     printErrors: false
     onLoaded: root.passwordPamConfigured = true

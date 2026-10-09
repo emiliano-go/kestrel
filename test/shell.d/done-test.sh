@@ -7,23 +7,23 @@ source "$(dirname "$0")/base-test.sh"
 test_home=$(mktemp -d)
 trap 'rm -rf "$test_home"' EXIT
 
-done_marker="$test_home/.local/state/helios/done/example"
+done_marker="$test_home/.local/state/kestrel/done/example"
 
-if HOME="$test_home" "$ROOT/bin/helios-done" check example; then
+if HOME="$test_home" "$ROOT/bin/kestrel-done" check example; then
   fail "done reports an unmarked task as complete"
 fi
 
-HOME="$test_home" "$ROOT/bin/helios-done" mark example
+HOME="$test_home" "$ROOT/bin/kestrel-done" mark example
 [[ -f $done_marker ]] || fail "done marks a task complete"
-HOME="$test_home" "$ROOT/bin/helios-done" check example || fail "done reports a marked task as complete"
+HOME="$test_home" "$ROOT/bin/kestrel-done" check example || fail "done reports a marked task as complete"
 
-HOME="$test_home" "$ROOT/bin/helios-done" ensure once || fail "done ensures an unmarked task"
-[[ -f $test_home/.local/state/helios/done/once ]] || fail "done ensure marks a task complete"
-if HOME="$test_home" "$ROOT/bin/helios-done" ensure once; then
+HOME="$test_home" "$ROOT/bin/kestrel-done" ensure once || fail "done ensures an unmarked task"
+[[ -f $test_home/.local/state/kestrel/done/once ]] || fail "done ensure marks a task complete"
+if HOME="$test_home" "$ROOT/bin/kestrel-done" ensure once; then
   fail "done ensures a completed task again"
 fi
 
-if HOME="$test_home" "$ROOT/bin/helios-done" check ../invalid >/dev/null 2>&1; then
+if HOME="$test_home" "$ROOT/bin/kestrel-done" check ../invalid >/dev/null 2>&1; then
   fail "done accepts marker path traversal"
 fi
 

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.indicators",
+  "id": "kestrel.indicators",
   "name": "Indicators",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Manual state indicators",
   "kinds": [
     "bar-widget"
@@ -67,7 +67,7 @@
       }
     ]
   },
-  "helios": {
+  "kestrel": {
     "clonePaths": [
       {
         "source": "../indicators",

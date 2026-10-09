@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "helios.dropbox",
+  "id": "kestrel.dropbox",
   "name": "Dropbox",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "license": "MIT",
-  "description": "Dropbox status, storage usage, login, and recent synced files in the HeliOS bar.",
+  "description": "Dropbox status, storage usage, login, and recent synced files in the Kestrel bar.",
   "kinds": [
     "bar-widget"
   ],

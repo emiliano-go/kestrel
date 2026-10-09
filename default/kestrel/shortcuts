@@ -1,0 +1,40 @@
+# Hyprland global shortcuts the Kestrel shell registers, one per line: a menu
+# route to toggle, a panel plugin to toggle, a volume or brightness key, or an
+# argument-free IPC call as target.method. A binding written as o.bind(keys,
+# description, { menu = "theme" }), { panel = "kestrel.emojis" },
+# { audio = "raise" }, { brightness = "raise" } or { ipc = "media.next" }
+# dispatches the matching shortcut straight to the shell, with no process to
+# spawn per keypress. Anything missing here still binds, through the
+# kestrel-menu, kestrel-shell, kestrel-audio-output-volume or
+# kestrel-brightness-display command instead.
+menu root
+menu apps
+menu capture
+menu toggle
+menu hardware
+menu system
+menu background
+menu theme
+menu share
+menu reminder-set
+panel kestrel.clipboard
+panel kestrel.emojis
+panel kestrel.audio
+panel kestrel.bluetooth
+panel kestrel.monitor
+panel kestrel.clock
+panel kestrel.elsewhen
+panel kestrel.network
+panel kestrel.power
+audio raise
+audio lower
+audio mute-toggle
+brightness raise
+brightness lower
+ipc media.playPause
+ipc media.next
+ipc media.previous
+ipc notifications.dismissOne
+ipc notifications.dismissAll
+ipc notifications.invokeLast
+ipc notifications.showHistory

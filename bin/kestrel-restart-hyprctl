@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kestrel:summary=Reload hyprland configuration (used by the Kestrel theme switching).
+
+hyprctl reload >/dev/null

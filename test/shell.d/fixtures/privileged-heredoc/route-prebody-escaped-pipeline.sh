@@ -1,6 +1,6 @@
 #!/bin/bash
 
 cat <<EOF | \
-  sudo tee /etc/helios/review.conf
+  sudo tee /etc/kestrel/review.conf
 ExecStart=$HOME/.local/bin/payload
 EOF

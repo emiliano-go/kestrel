@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.speedtest",
+  "id": "kestrel.speedtest",
   "name": "Speed Test",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Internet speed test with download and upload dials",
   "kinds": [
     "panel"

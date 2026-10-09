@@ -6,7 +6,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
 require_command python3
 
-python3 - "$ROOT/bin/helios-agent-usage-codex" <<'PY'
+python3 - "$ROOT/bin/kestrel-agent-usage-codex" <<'PY'
 import json
 import os
 import runpy

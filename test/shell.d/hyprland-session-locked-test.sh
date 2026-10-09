@@ -16,8 +16,8 @@ cat >"$fake_bin/hyprctl" <<'SH'
 #!/bin/bash
 
 [[ ${1:-} == "-j" && ${2:-} == "monitors" ]] || exit 1
-[[ ${HELIOS_TEST_HYPRCTL_FAILS:-0} == 1 ]] && exit 4
-printf '%s\n' "$HELIOS_TEST_MONITORS"
+[[ ${KESTREL_TEST_HYPRCTL_FAILS:-0} == 1 ]] && exit 4
+printf '%s\n' "$KESTREL_TEST_MONITORS"
 SH
 chmod +x "$fake_bin/hyprctl"
 
@@ -29,9 +29,9 @@ assert_status() {
   local expected="$1" monitors="$2" description="$3" hyprctl_fails="${4:-0}" actual=0
 
   PATH="$fake_bin:$PATH" \
-  HELIOS_TEST_MONITORS="$monitors" \
-  HELIOS_TEST_HYPRCTL_FAILS="$hyprctl_fails" \
-    "$ROOT/bin/helios-hyprland-session-locked" || actual=$?
+  KESTREL_TEST_MONITORS="$monitors" \
+  KESTREL_TEST_HYPRCTL_FAILS="$hyprctl_fails" \
+    "$ROOT/bin/kestrel-hyprland-session-locked" || actual=$?
 
   (( actual == expected )) || fail "$description" "expected exit $expected, got $actual"
   pass "$description"

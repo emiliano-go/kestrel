@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Check if a toggle is enabled (flag file exists)
-# helios:args=<flag-name>
-
-[[ -f "$HOME/.local/state/helios/toggles/$1" ]]

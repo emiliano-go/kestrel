@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# kestrel:summary=Toggle single-window square aspect ratio.
+
+case $(kestrel-hyprland-toggle single-window-aspect-ratio) in
+  on) kestrel-notification-send -g  "Enable single-window square aspect ratio" ;;
+  off) kestrel-notification-send -g  "Disable single-window square aspect ratio" ;;
+esac

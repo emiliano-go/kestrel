@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kestrel:summary=Check if a toggle is enabled (flag file exists)
+# kestrel:args=<flag-name>
+
+[[ -f "$HOME/.local/state/kestrel/toggles/$1" ]]

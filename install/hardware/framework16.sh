@@ -1,3 +1,3 @@
-if helios-hw-framework16; then
-  helios-pkg-add qmk-hid
+if kestrel-hw-framework16; then
+  kestrel-pkg-add qmk-hid
 fi

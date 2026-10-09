@@ -46,7 +46,7 @@ BarIndicator {
 
   Process {
     id: statusProc
-    command: ["helios-sudo-passwordless", "--active"]
+    command: ["kestrel-sudo-passwordless", "--active"]
     onExited: function(exitCode, exitStatus) {
       root.granted = exitCode === 0 && exitStatus === 0
       if (root.refreshPending) Qt.callLater(root.refresh)
@@ -55,10 +55,10 @@ BarIndicator {
 
   Process {
     id: disableProc
-    command: ["helios-sudo-passwordless", "--disable"]
+    command: ["kestrel-sudo-passwordless", "--disable"]
     onExited: function(exitCode, exitStatus) {
       if ((exitCode !== 0 || exitStatus !== 0) && root.bar)
-        root.bar.run('helios-notification-send "Could not disable passwordless sudo" "Check the sudo configuration and try again."')
+        root.bar.run('kestrel-notification-send "Could not disable passwordless sudo" "Check the sudo configuration and try again."')
       if (root.indicatorHost) root.indicatorHost.refresh()
       else root.refresh()
     }
@@ -67,6 +67,6 @@ BarIndicator {
   onPressed: function() {
     if (!root.bar || disableProc.running) return
     if (root.granted) disableProc.running = true
-    else root.bar.run("helios-launch-floating-terminal-with-presentation helios-sudo-passwordless")
+    else root.bar.run("kestrel-launch-floating-terminal-with-presentation kestrel-sudo-passwordless")
   }
 }

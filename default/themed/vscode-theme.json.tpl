@@ -1,5 +1,5 @@
 {
-    "name": "HeliOS",
+    "name": "Kestrel",
     "$schema": "vscode://schemas/color-theme",
     "type": "{{ theme_type }}",
     "semanticHighlighting": true,

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# kestrel:summary=Dismiss a notification by summary substring. Used by the first-run notifications to dismiss them after clicking for action.
+# kestrel:args=<summary>
+
+if (($# == 0)); then
+  echo "Usage: kestrel-notification-dismiss <summary>"
+  exit 1
+fi
+
+kestrel-shell -q notifications dismiss "$1"

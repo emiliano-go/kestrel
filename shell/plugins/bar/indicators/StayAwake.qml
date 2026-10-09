@@ -4,7 +4,7 @@ import qs.Ui
 BarIndicator {
   id: root
 
-  readonly property var idleService: bar?.shell?.firstPartyServiceFor("helios.idle")
+  readonly property var idleService: bar?.shell?.firstPartyServiceFor("kestrel.idle")
 
   active: idleService ? idleService.stayAwake : false
   activeText: "󰅶"

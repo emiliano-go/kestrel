@@ -1,16 +1,16 @@
-echo "Link the helios-app agent skill for building apps"
+echo "Link the kestrel-app agent skill for building apps"
 
-# helios-provision-user links every skill, but only once per user, so
+# kestrel-provision-user links every skill, but only once per user, so
 # existing installs get the new one here, in the same places. A skill of the
 # user's own by that name is left where it is.
-skill="$HELIOS_PATH/default/agents/skills/helios-app"
+skill="$KESTREL_PATH/default/agents/skills/kestrel-app"
 
 link_skill() {
   mkdir -p "$1"
-  if [[ -e $1/helios-app && ! -L $1/helios-app ]]; then
-    echo "Leaving your own $1/helios-app in place"
+  if [[ -e $1/kestrel-app && ! -L $1/kestrel-app ]]; then
+    echo "Leaving your own $1/kestrel-app in place"
   else
-    ln -sfn "$skill" "$1/helios-app"
+    ln -sfn "$skill" "$1/kestrel-app"
   fi
 }
 

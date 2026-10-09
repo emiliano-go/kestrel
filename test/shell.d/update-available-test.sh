@@ -15,7 +15,7 @@ cat >"$stub_bin/checkupdates" <<'SH'
 #!/bin/bash
 case "${TEST_CHECKUPDATES:-updates}" in
   updates)
-    printf 'linux 6.1-1 -> 6.1-2\nhelios 4.0.0-1 -> 4.0.1-1\nhelios-settings 4.0.0-1 -> 4.0.1-1\nhelios-dev 4.1.0-1 -> 4.1.1-1\nhelios-settings-dev 4.1.0-1 -> 4.1.1-1\n'
+    printf 'linux 6.1-1 -> 6.1-2\nkestrel 4.0.0-1 -> 4.0.1-1\nkestrel-settings 4.0.0-1 -> 4.0.1-1\nkestrel-dev 4.1.0-1 -> 4.1.1-1\nkestrel-settings-dev 4.1.0-1 -> 4.1.1-1\n'
     exit 0
     ;;
   none)
@@ -33,15 +33,15 @@ cat >"$stub_bin/pacman" <<'SH'
 #!/bin/bash
 case "$1" in
   -Qq)
-    case "${TEST_INSTALLED_PACKAGE:-helios}" in
-      helios)
-        [[ $2 == "helios" ]]; exit $?
+    case "${TEST_INSTALLED_PACKAGE:-kestrel}" in
+      kestrel)
+        [[ $2 == "kestrel" ]]; exit $?
         ;;
-      helios-dev)
-        [[ $2 == "helios-dev" ]]; exit $?
+      kestrel-dev)
+        [[ $2 == "kestrel-dev" ]]; exit $?
         ;;
       both)
-        [[ $2 == "helios" || $2 == "helios-dev" ]]; exit $?
+        [[ $2 == "kestrel" || $2 == "kestrel-dev" ]]; exit $?
         ;;
       none)
         exit 1
@@ -91,10 +91,10 @@ SH
 chmod +x "$stub_bin/git"
 
 run_checker() {
-  HELIOS_PATH="${TEST_HELIOS_PATH:-/usr/share/helios}" \
+  KESTREL_PATH="${TEST_KESTREL_PATH:-/usr/share/kestrel}" \
     TEST_GIT_LOG="$git_log" \
     PATH="$stub_bin:$PATH" \
-    "$ROOT/bin/helios-update-available"
+    "$ROOT/bin/kestrel-update-available"
 }
 
 capture_checker() {
@@ -115,69 +115,69 @@ capture_checker() {
 stdout="$test_tmp/stdout"
 stderr="$test_tmp/stderr"
 
-if capture_checker "$stdout" "$stderr" TEST_CHECKUPDATES=updates TEST_INSTALLED_PACKAGE=helios; then
+if capture_checker "$stdout" "$stderr" TEST_CHECKUPDATES=updates TEST_INSTALLED_PACKAGE=kestrel; then
   status=0
 else
   status=$?
 fi
-[[ $status -eq 0 ]] || fail "update checker exits successfully when helios update is available"
-grep -q '^helios ' "$stdout" || fail "update checker prints helios updates"
-! grep -q '^helios-settings ' "$stdout" || fail "update checker ignores helios-settings updates"
-! grep -q '^linux ' "$stdout" || fail "update checker ignores non-HeliOS package updates"
-! grep -q '^helios-dev ' "$stdout" || fail "update checker ignores helios-dev when helios is installed"
-pass "update checker detects installed helios package updates"
+[[ $status -eq 0 ]] || fail "update checker exits successfully when kestrel update is available"
+grep -q '^kestrel ' "$stdout" || fail "update checker prints kestrel updates"
+! grep -q '^kestrel-settings ' "$stdout" || fail "update checker ignores kestrel-settings updates"
+! grep -q '^linux ' "$stdout" || fail "update checker ignores non-Kestrel package updates"
+! grep -q '^kestrel-dev ' "$stdout" || fail "update checker ignores kestrel-dev when kestrel is installed"
+pass "update checker detects installed kestrel package updates"
 
-if capture_checker "$stdout" "$stderr" TEST_CHECKUPDATES=updates TEST_INSTALLED_PACKAGE=helios-dev; then
+if capture_checker "$stdout" "$stderr" TEST_CHECKUPDATES=updates TEST_INSTALLED_PACKAGE=kestrel-dev; then
   status=0
 else
   status=$?
 fi
-[[ $status -eq 0 ]] || fail "update checker exits successfully when helios-dev update is available"
-grep -q '^helios-dev ' "$stdout" || fail "update checker prints helios-dev updates"
-! grep -q '^helios-settings-dev ' "$stdout" || fail "update checker ignores helios-settings-dev updates"
-! grep -q '^helios ' "$stdout" || fail "update checker ignores helios when helios-dev is installed"
-pass "update checker detects installed helios-dev package updates"
+[[ $status -eq 0 ]] || fail "update checker exits successfully when kestrel-dev update is available"
+grep -q '^kestrel-dev ' "$stdout" || fail "update checker prints kestrel-dev updates"
+! grep -q '^kestrel-settings-dev ' "$stdout" || fail "update checker ignores kestrel-settings-dev updates"
+! grep -q '^kestrel ' "$stdout" || fail "update checker ignores kestrel when kestrel-dev is installed"
+pass "update checker detects installed kestrel-dev package updates"
 
 if capture_checker "$stdout" "$stderr" TEST_CHECKUPDATES=updates TEST_INSTALLED_PACKAGE=both; then
   status=0
 else
   status=$?
 fi
-[[ $status -eq 0 ]] || fail "update checker prefers helios-dev when both packages are installed"
-grep -q '^helios-dev ' "$stdout" || fail "update checker prints helios-dev when both packages are installed"
-! grep -q '^helios ' "$stdout" || fail "update checker ignores helios when helios-dev is installed"
-pass "update checker prefers helios-dev over helios"
+[[ $status -eq 0 ]] || fail "update checker prefers kestrel-dev when both packages are installed"
+grep -q '^kestrel-dev ' "$stdout" || fail "update checker prints kestrel-dev when both packages are installed"
+! grep -q '^kestrel ' "$stdout" || fail "update checker ignores kestrel when kestrel-dev is installed"
+pass "update checker prefers kestrel-dev over kestrel"
 
 if capture_checker "$stdout" "$stderr" TEST_CHECKUPDATES=updates TEST_INSTALLED_PACKAGE=none; then
   status=0
 else
   status=$?
 fi
-[[ $status -eq 1 ]] || fail "update checker exits non-zero when no HeliOS package is installed"
-[[ ! -s $stderr ]] || fail "update checker is quiet when no HeliOS package is installed"
-pass "update checker ignores systems without helios or helios-dev installed"
+[[ $status -eq 1 ]] || fail "update checker exits non-zero when no Kestrel package is installed"
+[[ ! -s $stderr ]] || fail "update checker is quiet when no Kestrel package is installed"
+pass "update checker ignores systems without kestrel or kestrel-dev installed"
 
-if capture_checker "$stdout" "$stderr" TEST_CHECKUPDATES=none TEST_INSTALLED_PACKAGE=helios; then
+if capture_checker "$stdout" "$stderr" TEST_CHECKUPDATES=none TEST_INSTALLED_PACKAGE=kestrel; then
   status=0
 else
   status=$?
 fi
 [[ $status -eq 1 ]] || fail "update checker exits non-zero when no updates are available"
-grep -q '^HeliOS is up to date$' "$stdout" || fail "update checker prints up-to-date message"
-pass "update checker reports up-to-date HeliOS packages"
+grep -q '^Kestrel is up to date$' "$stdout" || fail "update checker prints up-to-date message"
+pass "update checker reports up-to-date Kestrel packages"
 
 : >"$git_log"
 if capture_checker "$stdout" "$stderr" \
   TEST_CHECKUPDATES=none \
   TEST_INSTALLED_PACKAGE=none \
-  TEST_HELIOS_PATH="$test_tmp/checkout" \
+  TEST_KESTREL_PATH="$test_tmp/checkout" \
   TEST_GIT_BEHIND=2; then
   status=0
 else
   status=$?
 fi
 [[ $status -eq 0 ]] || fail "update checker exits successfully when dev commits are available"
-grep -Fx 'helios-dev-checkout 2 new commits on origin/quattro' "$stdout" >/dev/null ||
+grep -Fx 'kestrel-dev-checkout 2 new commits on origin/quattro' "$stdout" >/dev/null ||
   fail "update checker reports available dev commits" "$(cat "$stdout")"
 grep -Fx -- "-C $test_tmp/checkout fetch --quiet" "$git_log" >/dev/null ||
   fail "update checker fetches the dev checkout upstream" "$(cat "$git_log")"
@@ -186,20 +186,20 @@ pass "update checker detects new commits in the dev checkout"
 if capture_checker "$stdout" "$stderr" \
   TEST_CHECKUPDATES=none \
   TEST_INSTALLED_PACKAGE=none \
-  TEST_HELIOS_PATH="$test_tmp/checkout" \
+  TEST_KESTREL_PATH="$test_tmp/checkout" \
   TEST_GIT_BEHIND=0; then
   status=0
 else
   status=$?
 fi
 [[ $status -eq 1 ]] || fail "update checker exits non-zero when the dev checkout is current"
-grep -q '^HeliOS is up to date$' "$stdout" || fail "update checker reports a current dev checkout"
+grep -q '^Kestrel is up to date$' "$stdout" || fail "update checker reports a current dev checkout"
 pass "update checker ignores a current dev checkout"
 
 if capture_checker "$stdout" "$stderr" \
   TEST_CHECKUPDATES=none \
   TEST_INSTALLED_PACKAGE=none \
-  TEST_HELIOS_PATH="$test_tmp/checkout" \
+  TEST_KESTREL_PATH="$test_tmp/checkout" \
   TEST_GIT_BEHIND=1 \
   TEST_GIT_FETCH=fail; then
   status=0
@@ -207,7 +207,7 @@ else
   status=$?
 fi
 [[ $status -eq 0 ]] || fail "update checker uses cached upstream state when fetch fails"
-grep -Fx 'helios-dev-checkout 1 new commit on origin/quattro' "$stdout" >/dev/null ||
+grep -Fx 'kestrel-dev-checkout 1 new commit on origin/quattro' "$stdout" >/dev/null ||
   fail "update checker reports cached dev commits after a fetch failure" "$(cat "$stdout")"
 [[ ! -s $stderr ]] || fail "update checker keeps dev fetch failures quiet" "$(cat "$stderr")"
 pass "update checker uses cached dev state when fetching is unavailable"

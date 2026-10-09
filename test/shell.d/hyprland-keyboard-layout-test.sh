@@ -6,10 +6,10 @@ require_command lua
 
 resolved_input_for() {
   local module="$1"
-  HELIOS_PATH="$ROOT" HELIOS_MODULE="$module" HELIOS_VCONSOLE="${2-}" lua <<'LUA'
-package.path = os.getenv("HELIOS_PATH") .. "/?.lua;" .. package.path
+  KESTREL_PATH="$ROOT" KESTREL_MODULE="$module" KESTREL_VCONSOLE="${2-}" lua <<'LUA'
+package.path = os.getenv("KESTREL_PATH") .. "/?.lua;" .. package.path
 
-local vconsole = os.getenv("HELIOS_VCONSOLE")
+local vconsole = os.getenv("KESTREL_VCONSOLE")
 local real_open = io.open
 
 io.open = function(path, mode)
@@ -17,7 +17,7 @@ io.open = function(path, mode)
     return real_open(path, mode)
   end
 
-  -- An unset HELIOS_VCONSOLE reaches Lua as "", never nil, so the cases that
+  -- An unset KESTREL_VCONSOLE reaches Lua as "", never nil, so the cases that
   -- ask for a missing /etc/vconsole.conf need the empty string to fail the open.
   if not vconsole or vconsole == "" then
     return nil
@@ -38,7 +38,7 @@ hl = {
 
 o = { window = function() end }
 
-require(os.getenv("HELIOS_MODULE"))
+require(os.getenv("KESTREL_MODULE"))
 LUA
 }
 
@@ -110,13 +110,13 @@ assert_greeter_input "greeter keeps a latin layout in front" "[us,ru] [,phonetic
 XKBVARIANT=phonetic
 '
 
-hooks_conf="$ROOT/etc/mkinitcpio.conf.d/helios_hooks.conf"
+hooks_conf="$ROOT/etc/mkinitcpio.conf.d/kestrel_hooks.conf"
 input_lua="$ROOT/default/hypr/input.lua"
 
 hooks_layouts=$(awk -F')' '/\) ;;$/ { gsub(/[[:space:]|]+/, "\n", $1); print $1 }' "$hooks_conf" | grep '^[a-z]\+$' | sort)
 lua_layouts=$(sed -n '/^local non_latin_layouts =/,+1p' "$input_lua" | grep -o '"[^"]*"' | tr -d '"' | tr ' ' '\n' | grep '^[a-z]\+$' | sort)
 
-[[ -n $hooks_layouts ]] || fail "non-latin layout list is readable from helios_hooks.conf"
+[[ -n $hooks_layouts ]] || fail "non-latin layout list is readable from kestrel_hooks.conf"
 
 [[ $hooks_layouts == "$lua_layouts" ]] ||
   fail "non-latin layout lists stay in sync" "$(diff <(echo "$hooks_layouts") <(echo "$lua_layouts"))"

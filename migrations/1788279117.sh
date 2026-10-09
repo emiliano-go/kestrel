@@ -1,7 +1,7 @@
 echo "Replace the YT6801 vendor DKMS driver with the upstream kernel driver"
 
 if ! yt6801_pci=$(lspci -Dn -d 1f0a:6801); then
-  echo "Unable to discover YT6801 adapters; rerun helios-migrate." >&2
+  echo "Unable to discover YT6801 adapters; rerun kestrel-migrate." >&2
   exit 1
 fi
 
@@ -26,7 +26,7 @@ yt6801_check_binding() {
   for device in "${yt6801_devices[@]}"; do
     if ! yt6801_uses_upstream "$device"; then
       echo "YT6801 device $device did not bind to dwmac-motorcomm." >&2
-      echo "Reboot into the latest HeliOS kernel and rerun helios-migrate." >&2
+      echo "Reboot into the latest Kestrel kernel and rerun kestrel-migrate." >&2
       exit 1
     fi
   done
@@ -48,7 +48,7 @@ if (( ${#yt6801_pending[@]} > 0 )); then
   if ! aliases=$(modinfo -F alias dwmac-motorcomm) ||
     ! grep -Fxq 'pci:v00001F0Ad00006801sv*sd*bc*sc*i*' <<< "$aliases"; then
     echo "The running kernel does not provide YT6801 support in dwmac-motorcomm." >&2
-    echo "Reboot into the latest HeliOS kernel and rerun helios-migrate." >&2
+    echo "Reboot into the latest Kestrel kernel and rerun kestrel-migrate." >&2
     exit 1
   fi
 
@@ -73,14 +73,14 @@ yt6801_check_binding
 # Keep the package available until the live cutover succeeds. Package removal
 # invokes DKMS/depmod hooks, so unloading must happen before this transaction.
 if grep -Fxq 'yt6801-dkms' <<< "$installed_packages"; then
-  helios-pkg-drop yt6801-dkms
+  kestrel-pkg-drop yt6801-dkms
 fi
 
 installed_packages=$(pacman -Qq)
 loaded_modules=$(lsmod)
 if grep -Fxq 'yt6801-dkms' <<< "$installed_packages" ||
   grep -Eq '^yt6801[[:space:]]' <<< "$loaded_modules"; then
-  echo "The YT6801 vendor package or module is still present; rerun helios-migrate." >&2
+  echo "The YT6801 vendor package or module is still present; rerun kestrel-migrate." >&2
   exit 1
 fi
 yt6801_check_binding

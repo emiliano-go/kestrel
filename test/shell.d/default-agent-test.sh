@@ -9,7 +9,7 @@ trap 'rm -rf "$test_tmp"' EXIT
 
 mock_bin="$test_tmp/bin"
 test_home="$test_tmp/home"
-agent_file="$test_home/.config/helios/defaults/agent"
+agent_file="$test_home/.config/kestrel/defaults/agent"
 notification_history="$test_tmp/notification-history"
 agent_open_log="$test_tmp/agent-open"
 launch_log="$test_tmp/launch"
@@ -22,108 +22,108 @@ menu_log="$test_tmp/menu"
 muse_login_log="$test_tmp/muse-login"
 mkdir -p "$mock_bin" "$test_home"
 
-cat >"$mock_bin/helios-install-chromium-claude" <<'SH'
+cat >"$mock_bin/kestrel-install-chromium-claude" <<'SH'
 #!/bin/bash
-echo claude-extension >>"$HELIOS_TEST_STUB_LOG"
-if [[ ${HELIOS_TEST_EXTENSION_FAIL:-false} == "true" ]]; then
+echo claude-extension >>"$KESTREL_TEST_STUB_LOG"
+if [[ ${KESTREL_TEST_EXTENSION_FAIL:-false} == "true" ]]; then
   echo "Extension installation failed" >&2
   exit 1
 fi
 SH
 
-cat >"$mock_bin/helios-notification-send" <<'SH'
+cat >"$mock_bin/kestrel-notification-send" <<'SH'
 #!/bin/bash
-printf '%s\0' "$@" >>"$HELIOS_TEST_NOTIFICATION_HISTORY"
+printf '%s\0' "$@" >>"$KESTREL_TEST_NOTIFICATION_HISTORY"
 SH
 
-cat >"$mock_bin/helios-cmd-missing" <<'SH'
+cat >"$mock_bin/kestrel-cmd-missing" <<'SH'
 #!/bin/bash
-[[ $1 == ${HELIOS_TEST_MISSING_COMMAND:-} ]]
+[[ $1 == ${KESTREL_TEST_MISSING_COMMAND:-} ]]
 SH
 
-cat >"$mock_bin/helios-launch-tui" <<'SH'
+cat >"$mock_bin/kestrel-launch-tui" <<'SH'
 #!/bin/bash
-printf '%s\0' "$@" >"$HELIOS_TEST_AGENT_LAUNCH_LOG"
+printf '%s\0' "$@" >"$KESTREL_TEST_AGENT_LAUNCH_LOG"
 SH
 
-cat >"$mock_bin/helios-launch-floating-terminal-with-presentation" <<'SH'
+cat >"$mock_bin/kestrel-launch-floating-terminal-with-presentation" <<'SH'
 #!/bin/bash
-printf '%s\0' "$@" >"$HELIOS_TEST_AGENT_TERMINAL_LOG"
+printf '%s\0' "$@" >"$KESTREL_TEST_AGENT_TERMINAL_LOG"
 SH
 
 cat >"$mock_bin/opencode" <<'SH'
 #!/bin/bash
-printf '%s\0' opencode "$@" >"$HELIOS_TEST_AGENT_INLINE_LOG"
+printf '%s\0' opencode "$@" >"$KESTREL_TEST_AGENT_INLINE_LOG"
 SH
 
-cat >"$mock_bin/helios-mise-install" <<'SH'
+cat >"$mock_bin/kestrel-mise-install" <<'SH'
 #!/bin/bash
-printf '%s\n' "$*" >>"$HELIOS_TEST_STUB_LOG"
+printf '%s\n' "$*" >>"$KESTREL_TEST_STUB_LOG"
 SH
 
 cat >"$mock_bin/mise" <<'SH'
 #!/bin/bash
-printf '%s\0' "$@" >"$HELIOS_TEST_MISE_LOG"
-printf '%s\n' "$*" >>"$HELIOS_TEST_MISE_HISTORY"
+printf '%s\0' "$@" >"$KESTREL_TEST_MISE_LOG"
+printf '%s\n' "$*" >>"$KESTREL_TEST_MISE_HISTORY"
 
 if [[ $1 == "where" ]]; then
-  [[ ${HELIOS_TEST_AGENT_INSTALLED:-false} == "true" ]]
+  [[ ${KESTREL_TEST_AGENT_INSTALLED:-false} == "true" ]]
   exit
 fi
 
-if [[ $1 == "ls" && -n ${HELIOS_TEST_MISE_HAS_NPM_GROK:-} ]]; then
+if [[ $1 == "ls" && -n ${KESTREL_TEST_MISE_HAS_NPM_GROK:-} ]]; then
   printf '%s\n' "npm:@xai-official/grok  1.0.44"
   exit 0
 fi
 
-[[ ${HELIOS_TEST_MISE_FAIL:-false} != "true" ]]
+[[ ${KESTREL_TEST_MISE_FAIL:-false} != "true" ]]
 SH
 
-cat >"$mock_bin/helios-menu" <<'SH'
+cat >"$mock_bin/kestrel-menu" <<'SH'
 #!/bin/bash
-printf '%s\0' "$@" >"$HELIOS_TEST_AGENT_MENU_LOG"
+printf '%s\0' "$@" >"$KESTREL_TEST_AGENT_MENU_LOG"
 SH
 
-cat >"$mock_bin/helios-pkg-add" <<'SH'
+cat >"$mock_bin/kestrel-pkg-add" <<'SH'
 #!/bin/bash
 echo "Muse must install through mise" >&2
 exit 1
 SH
-ln -s helios-pkg-add "$mock_bin/helios-pkg-aur-add"
+ln -s kestrel-pkg-add "$mock_bin/kestrel-pkg-aur-add"
 
 cat >"$mock_bin/muse" <<'SH'
 #!/bin/bash
 if [[ ${1:-} == "login" ]]; then
-  printf 'muse %s\n' "$*" >>"$HELIOS_TEST_MUSE_LOGIN_LOG"
+  printf 'muse %s\n' "$*" >>"$KESTREL_TEST_MUSE_LOGIN_LOG"
 else
-  printf '%s\0' muse "$@" >"$HELIOS_TEST_AGENT_INLINE_LOG"
+  printf '%s\0' muse "$@" >"$KESTREL_TEST_AGENT_INLINE_LOG"
 fi
 SH
 
-cat >"$mock_bin/helios-test-noop" <<'SH'
+cat >"$mock_bin/kestrel-test-noop" <<'SH'
 #!/bin/bash
 exit 0
 SH
 
-for command in gum hyprctl helios-webapp-remove-all helios-tui-remove-all helios-pkg-drop; do
-  ln -s helios-test-noop "$mock_bin/$command"
+for command in gum hyprctl kestrel-webapp-remove-all kestrel-tui-remove-all kestrel-pkg-drop; do
+  ln -s kestrel-test-noop "$mock_bin/$command"
 done
 
 chmod +x "$mock_bin"/*
 
 export HOME="$test_home"
 export PATH="$mock_bin:$ROOT/bin:$PATH"
-export HELIOS_TEST_NOTIFICATION_HISTORY="$notification_history"
-export HELIOS_TEST_AGENT_OPEN_LOG="$agent_open_log"
-export HELIOS_TEST_AGENT_LAUNCH_LOG="$launch_log"
-export HELIOS_TEST_AGENT_INLINE_LOG="$inline_log"
-export HELIOS_TEST_MISE_LOG="$mise_log"
-export HELIOS_TEST_MISE_HISTORY="$mise_history"
-export HELIOS_TEST_STUB_LOG="$stub_log"
-export HELIOS_TEST_AGENT_TERMINAL_LOG="$terminal_log"
-export HELIOS_TEST_AGENT_MENU_LOG="$menu_log"
-export HELIOS_TEST_MUSE_LOGIN_LOG="$muse_login_log"
-export HELIOS_PATH="$ROOT"
+export KESTREL_TEST_NOTIFICATION_HISTORY="$notification_history"
+export KESTREL_TEST_AGENT_OPEN_LOG="$agent_open_log"
+export KESTREL_TEST_AGENT_LAUNCH_LOG="$launch_log"
+export KESTREL_TEST_AGENT_INLINE_LOG="$inline_log"
+export KESTREL_TEST_MISE_LOG="$mise_log"
+export KESTREL_TEST_MISE_HISTORY="$mise_history"
+export KESTREL_TEST_STUB_LOG="$stub_log"
+export KESTREL_TEST_AGENT_TERMINAL_LOG="$terminal_log"
+export KESTREL_TEST_AGENT_MENU_LOG="$menu_log"
+export KESTREL_TEST_MUSE_LOGIN_LOG="$muse_login_log"
+export KESTREL_PATH="$ROOT"
 
 grok_package="grok"
 legacy_grok_package="npm:@xai-official/grok"
@@ -139,7 +139,7 @@ assert_lazy_stub() {
   local command=$2
 
   : >"$mise_history"
-  "$ROOT/bin/helios-mise-install" "$package" "$command"
+  "$ROOT/bin/kestrel-mise-install" "$package" "$command"
   "$test_home/.local/bin/$command" --version
   mapfile -t mise_calls <"$mise_history"
 
@@ -155,14 +155,14 @@ assert_lazy_stub "$cursor_agent_package" cursor-agent
 assert_lazy_stub "$muse_package" muse
 pass "custom agent lazy stubs preserve their mise packages"
 
-HELIOS_TEST_MISSING_COMMAND=cursor-agent source "$ROOT/install/user/mise.sh"
+KESTREL_TEST_MISSING_COMMAND=cursor-agent source "$ROOT/install/user/mise.sh"
 grep -Fx "$agy_package agy" "$stub_log" >/dev/null || fail "user setup creates the Antigravity lazy stub"
 grep -Fx "$grok_package" "$stub_log" >/dev/null || fail "user setup creates the Grok lazy stub"
 grep -Fx "$cursor_agent_package" "$stub_log" >/dev/null || fail "user setup creates the Cursor CLI lazy stub"
 grep -Fx "$omp_package omp" "$stub_log" >/dev/null || fail "user setup creates the Oh My Pi lazy stub"
 grep -Fx "$crush_package" "$stub_log" >/dev/null || fail "user setup creates the Crush lazy stub"
 grep -Fx "$ori_package ori" "$stub_log" >/dev/null || fail "user setup creates the Ori lazy stub"
-HELIOS_TEST_MISSING_COMMAND=muse source "$ROOT/install/user/mise.sh"
+KESTREL_TEST_MISSING_COMMAND=muse source "$ROOT/install/user/mise.sh"
 grep -Fx "$muse_package muse" "$stub_log" >/dev/null || fail "user setup creates the Muse lazy stub"
 pass "user setup creates the custom agent lazy stubs"
 
@@ -173,16 +173,16 @@ pass "user setup keeps an existing Cursor CLI install"
 grep -Fx "$muse_package muse" "$stub_log" >/dev/null && fail "user setup replaces an existing Muse command"
 
 : >"$stub_log"
-HELIOS_TEST_MISSING_COMMAND=muse source "$ROOT/migrations/1788724825.sh" >/dev/null
+KESTREL_TEST_MISSING_COMMAND=muse source "$ROOT/migrations/1788724825.sh" >/dev/null
 grep -Fx "$muse_package muse" "$stub_log" >/dev/null || fail "Muse migration creates its lazy stub"
 : >"$stub_log"
 source "$ROOT/migrations/1788724825.sh" >/dev/null
 [[ ! -s $stub_log ]] || fail "Muse migration replaces an existing command"
-mkdir -p "$test_home/.local/state/helios"
-touch "$test_home/.local/state/helios/preinstalls-removed"
-HELIOS_TEST_MISSING_COMMAND=muse source "$ROOT/migrations/1788724825.sh" >/dev/null
+mkdir -p "$test_home/.local/state/kestrel"
+touch "$test_home/.local/state/kestrel/preinstalls-removed"
+KESTREL_TEST_MISSING_COMMAND=muse source "$ROOT/migrations/1788724825.sh" >/dev/null
 [[ ! -s $stub_log ]] || fail "Muse migration ignores the preinstall opt-out"
-rm "$test_home/.local/state/helios/preinstalls-removed"
+rm "$test_home/.local/state/kestrel/preinstalls-removed"
 pass "Muse migration preserves existing installs and the preinstall opt-out"
 
 
@@ -195,9 +195,9 @@ source "$ROOT/migrations/1787342993.sh" >/dev/null
 grep -Fx "$ori_package ori" "$stub_log" >/dev/null || fail "Ori migration creates a working lazy stub"
 
 : >"$stub_log"
-export HELIOS_TEST_MISSING_COMMAND=cursor-agent
+export KESTREL_TEST_MISSING_COMMAND=cursor-agent
 source "$ROOT/migrations/1788577553.sh" >/dev/null
-unset HELIOS_TEST_MISSING_COMMAND
+unset KESTREL_TEST_MISSING_COMMAND
 grep -Fx "$cursor_agent_package" "$stub_log" >/dev/null || fail "Cursor CLI migration creates a working lazy stub"
 
 : >"$stub_log"
@@ -214,18 +214,18 @@ grep -Fx "$crush_package" "$stub_log" >/dev/null || fail "agent migration create
 : >"$stub_log"
 mkdir -p "$(dirname "$agent_file")"
 printf '%s\n' gemini >"$agent_file"
-"$ROOT/bin/helios-mise-install" gemini
-export HELIOS_TEST_MISSING_COMMAND=agy
+"$ROOT/bin/kestrel-mise-install" gemini
+export KESTREL_TEST_MISSING_COMMAND=agy
 source "$ROOT/migrations/1786719479.sh" >/dev/null
-unset HELIOS_TEST_MISSING_COMMAND
+unset KESTREL_TEST_MISSING_COMMAND
 grep -Fx "$agy_package agy" "$stub_log" >/dev/null || fail "Antigravity migration creates its lazy stub"
 [[ $(<"$agent_file") == "agy" ]] || fail "Antigravity migration replaces a Gemini default"
 
 : >"$stub_log"
 printf '  %s  \n' gemini >"$agent_file"
-export HELIOS_TEST_MISSING_COMMAND=agy
+export KESTREL_TEST_MISSING_COMMAND=agy
 source "$ROOT/migrations/1786719479.sh" >/dev/null
-unset HELIOS_TEST_MISSING_COMMAND
+unset KESTREL_TEST_MISSING_COMMAND
 [[ $(<"$agent_file") == "agy" ]] ||
   fail "Antigravity migration replaces a padded Gemini default the launcher would still read"
 pass "Antigravity migration reads the default the way the launcher does"
@@ -249,19 +249,19 @@ source "$ROOT/migrations/1786719479.sh" >/dev/null
 [[ -e $test_home/.local/bin/gemini ]] ||
   fail "Antigravity migration leaves a wrapper that only mentions the installer line"
 rm -f "$test_home/.local/bin/gemini"
-pass "Antigravity migration only removes the Gemini wrapper HeliOS wrote"
+pass "Antigravity migration only removes the Gemini wrapper Kestrel wrote"
 
-[[ -L "$test_home/.gemini/config/skills/helios" && $(readlink "$test_home/.gemini/config/skills/helios") == "$ROOT/default/agents/skills/helios" ]] ||
-   fail "Antigravity migration provisions the helios skill"
+[[ -L "$test_home/.gemini/config/skills/kestrel" && $(readlink "$test_home/.gemini/config/skills/kestrel") == "$ROOT/default/agents/skills/kestrel" ]] ||
+   fail "Antigravity migration provisions the kestrel skill"
 [[ -L "$test_home/.gemini/config/skills/diagnose-crash" && $(readlink "$test_home/.gemini/config/skills/diagnose-crash") == "$ROOT/default/agents/skills/diagnose-crash" ]] ||
    fail "Antigravity migration provisions the diagnose-crash skill"
 pass "Antigravity migration provisions Antigravity skills"
 
 
 : >"$stub_log"
-mkdir -p "$test_home/.local/state/helios"
-touch "$test_home/.local/state/helios/preinstalls-removed"
-export HELIOS_TEST_MISSING_COMMAND=agy
+mkdir -p "$test_home/.local/state/kestrel"
+touch "$test_home/.local/state/kestrel/preinstalls-removed"
+export KESTREL_TEST_MISSING_COMMAND=agy
 source "$ROOT/migrations/1786719479.sh" >/dev/null
 [[ ! -s $stub_log ]] || fail "Antigravity migration preserves removed preinstalls"
 pass "Antigravity migration respects removed preinstalls"
@@ -269,25 +269,25 @@ pass "Antigravity migration respects removed preinstalls"
 : >"$stub_log"
 printf '%s\n' gemini >"$agent_file"
 source "$ROOT/migrations/1786719479.sh" >/dev/null
-unset HELIOS_TEST_MISSING_COMMAND
+unset KESTREL_TEST_MISSING_COMMAND
 grep -Fx "$agy_package agy" "$stub_log" >/dev/null || fail "Antigravity migration installs the agent a Gemini default now names"
 [[ $(<"$agent_file") == "agy" ]] || fail "Antigravity migration replaces a Gemini default after opt-out"
 pass "Antigravity migration never leaves the default naming a missing agent"
 
 : >"$stub_log"
-rm "$test_home/.local/state/helios/preinstalls-removed"
+rm "$test_home/.local/state/kestrel/preinstalls-removed"
 source "$ROOT/migrations/1786719479.sh" >/dev/null
 [[ ! -s $stub_log ]] || fail "Antigravity migration reinstalls an existing Antigravity command"
 pass "Antigravity migration preserves an existing Antigravity install"
 
-mkdir -p "$test_home/.local/state/helios"
-touch "$test_home/.local/state/helios/preinstalls-removed"
-"$ROOT/bin/helios-mise-install" oh-my-pi omp
+mkdir -p "$test_home/.local/state/kestrel"
+touch "$test_home/.local/state/kestrel/preinstalls-removed"
+"$ROOT/bin/kestrel-mise-install" oh-my-pi omp
 : >"$stub_log"
 source "$ROOT/migrations/1785617047.sh" >/dev/null
 source "$ROOT/migrations/1785846769.sh" >/dev/null
 source "$ROOT/migrations/1787342993.sh" >/dev/null
-HELIOS_TEST_MISSING_COMMAND=cursor-agent source "$ROOT/migrations/1788577553.sh" >/dev/null
+KESTREL_TEST_MISSING_COMMAND=cursor-agent source "$ROOT/migrations/1788577553.sh" >/dev/null
 [[ ! -s $stub_log ]] || fail "agent migrations respect the preinstall opt-out"
 [[ ! -e $test_home/.local/bin/omp ]] || fail "agent migration removes the obsolete Oh My Pi wrapper after opt-out"
 
@@ -315,8 +315,8 @@ mkdir -p "$test_home/.grok/bin"
 ln -s "$test_home/.grok/bin/agent" "$test_home/.local/bin/agent"
 : >"$stub_log"
 : >"$mise_history"
-HELIOS_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
-unset HELIOS_TEST_MISE_HAS_NPM_GROK
+KESTREL_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
+unset KESTREL_TEST_MISE_HAS_NPM_GROK
 [[ ! -s $stub_log ]] || fail "Grok registry migration respects the preinstall opt-out"
 [[ ! -e $test_home/.local/bin/grok ]] || fail "Grok registry migration removes the npm wrapper after opt-out"
 [[ ! -e $test_home/.local/bin/agent ]] || fail "Grok registry migration removes the curl-installer agent symlink"
@@ -339,13 +339,13 @@ rm -f "$test_home/.local/bin/agent"
 rm -f "$test_home/.local/bin/grok"
 : >"$stub_log"
 : >"$mise_history"
-HELIOS_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
-unset HELIOS_TEST_MISE_HAS_NPM_GROK
+KESTREL_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
+unset KESTREL_TEST_MISE_HAS_NPM_GROK
 [[ ! -s $stub_log ]] || fail "Grok registry migration does not reinstall after the preinstall opt-out"
 grep -Fx "unuse -g $legacy_grok_package" "$mise_history" >/dev/null &&
   fail "Grok registry migration leaves a user-installed npm tool after the preinstall opt-out"
 
-rm "$test_home/.local/state/helios/preinstalls-removed"
+rm "$test_home/.local/state/kestrel/preinstalls-removed"
 rm -f "$agent_file"
 
 printf '#!/bin/bash\nexport MISE_MINIMUM_RELEASE_AGE=0\nmise use -g --quiet "%s" || exit 1\nexec mise x "%s" -- "grok" "$@"\n' \
@@ -356,8 +356,8 @@ chmod +x "$test_home/.local/bin/grok"
 mkdir -p "$test_home/.grok/bin"
 touch "$test_home/.grok/bin/grok-1.0.44" "$test_home/.grok/bin/settings-keep"
 ln -sfn grok-1.0.44 "$test_home/.grok/bin/grok"
-HELIOS_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
-unset HELIOS_TEST_MISE_HAS_NPM_GROK
+KESTREL_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
+unset KESTREL_TEST_MISE_HAS_NPM_GROK
 grep -Fx "$grok_package" "$stub_log" >/dev/null ||
   fail "Grok registry migration rewrites the npm wrapper"
 [[ ! -e $test_home/.grok/bin/grok && ! -e $test_home/.grok/bin/grok-1.0.44 && -e $test_home/.grok/bin/settings-keep ]] ||
@@ -371,8 +371,8 @@ printf '#!/bin/bash\necho user-grok\n' >"$test_home/.local/bin/grok"
 chmod +x "$test_home/.local/bin/grok"
 : >"$stub_log"
 : >"$mise_history"
-HELIOS_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
-unset HELIOS_TEST_MISE_HAS_NPM_GROK
+KESTREL_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
+unset KESTREL_TEST_MISE_HAS_NPM_GROK
 [[ $("$test_home/.local/bin/grok") == "user-grok" ]] ||
   fail "Grok registry migration keeps a user-managed grok"
 [[ ! -s $stub_log ]] || fail "Grok registry migration does not replace a user-managed grok"
@@ -388,8 +388,8 @@ chmod +x "$test_home/.local/bin/grok"
 cp "$test_home/.local/bin/grok" "$test_tmp/user-mise-grok"
 : >"$stub_log"
 : >"$mise_history"
-HELIOS_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
-unset HELIOS_TEST_MISE_HAS_NPM_GROK
+KESTREL_TEST_MISE_HAS_NPM_GROK=1 source "$ROOT/migrations/1790863209.sh" >/dev/null
+unset KESTREL_TEST_MISE_HAS_NPM_GROK
 cmp -s "$test_home/.local/bin/grok" "$test_tmp/user-mise-grok" ||
   fail "Grok registry migration keeps a user script that calls mise"
 [[ ! -s $stub_log ]] || fail "Grok registry migration does not replace a user script that calls mise"
@@ -400,8 +400,8 @@ rm -f "$test_home/.local/bin/grok"
 rm -f "$test_home/.local/bin/grok"
 : >"$stub_log"
 : >"$mise_history"
-HELIOS_TEST_MISSING_COMMAND=grok source "$ROOT/migrations/1790863209.sh" >/dev/null
-unset HELIOS_TEST_MISSING_COMMAND
+KESTREL_TEST_MISSING_COMMAND=grok source "$ROOT/migrations/1790863209.sh" >/dev/null
+unset KESTREL_TEST_MISSING_COMMAND
 grep -Fx "$grok_package" "$stub_log" >/dev/null ||
   fail "Grok registry migration installs the stub when grok is missing"
 grep -Fx "unuse -g $legacy_grok_package" "$mise_history" >/dev/null &&
@@ -410,18 +410,18 @@ grep -Fx "unuse -g $legacy_grok_package" "$mise_history" >/dev/null &&
 rm -f "$test_home/.local/bin/grok"
 : >"$stub_log"
 : >"$mise_history"
-HELIOS_TEST_MISE_HAS_NPM_GROK=1 HELIOS_TEST_MISSING_COMMAND=grok \
+KESTREL_TEST_MISE_HAS_NPM_GROK=1 KESTREL_TEST_MISSING_COMMAND=grok \
   source "$ROOT/migrations/1790863209.sh" >/dev/null
-unset HELIOS_TEST_MISE_HAS_NPM_GROK HELIOS_TEST_MISSING_COMMAND
+unset KESTREL_TEST_MISE_HAS_NPM_GROK KESTREL_TEST_MISSING_COMMAND
 grep -Fx "$grok_package" "$stub_log" >/dev/null ||
   fail "Grok registry migration installs the stub after dropping a leftover npm tool"
 grep -Fx "unuse -g $legacy_grok_package" "$mise_history" >/dev/null ||
   fail "Grok registry migration drops a leftover npm tool when the wrapper is gone"
 pass "agent migrations install working wrappers without overriding the preinstall opt-out"
 
-"$ROOT/bin/helios-mise-install" "$muse_package" muse
+"$ROOT/bin/kestrel-mise-install" "$muse_package" muse
 touch "$test_home/.local/bin/agy" "$test_home/.local/bin/ori"
-helios-remove-preinstalls >/dev/null
+kestrel-remove-preinstalls >/dev/null
 for command in agy omp ori grok crush cursor-agent muse; do
   [[ ! -e $test_home/.local/bin/$command ]] || fail "Remove Preinstalls deletes the $command lazy stub"
 done
@@ -431,23 +431,23 @@ pass "Remove Preinstalls deletes every optional agent lazy stub"
 # the user's own install.
 touch "$test_home/.local/bin/cursor-agent.official"
 ln -s cursor-agent.official "$test_home/.local/bin/cursor-agent"
-helios-remove-preinstalls >/dev/null
+kestrel-remove-preinstalls >/dev/null
 [[ -L $test_home/.local/bin/cursor-agent ]] || fail "Remove Preinstalls keeps an official Cursor CLI install"
 rm -f "$test_home/.local/bin/cursor-agent" "$test_home/.local/bin/cursor-agent.official"
 pass "Remove Preinstalls keeps an official Cursor CLI install"
 printf '#!/bin/bash\necho user-muse\n' >"$test_home/.local/bin/muse"
 chmod +x "$test_home/.local/bin/muse"
-helios-remove-preinstalls >/dev/null
+kestrel-remove-preinstalls >/dev/null
 [[ $("$test_home/.local/bin/muse") == "user-muse" ]] || fail "Remove Preinstalls deletes a user-managed Muse"
 rm "$test_home/.local/bin/muse"
 pass "Remove Preinstalls keeps a user-managed Muse install"
 
 
-[[ -z $(helios-default-agent) ]] || fail "default agent is unset until one is chosen"
+[[ -z $(kestrel-default-agent) ]] || fail "default agent is unset until one is chosen"
 pass "default agent is unset until one is chosen"
 
 : >"$launch_log"
-if helios-agent >"$test_tmp/no-agent-output" 2>&1; then
+if kestrel-agent >"$test_tmp/no-agent-output" 2>&1; then
   fail "agent launcher refuses to launch without a default"
 fi
 grep -Fq "Choose default agent with" "$test_tmp/no-agent-output" ||
@@ -459,7 +459,7 @@ pass "agent launcher refuses to launch without a default"
 # the keypress look broken. It offers the choice instead.
 : >"$launch_log"
 : >"$menu_log"
-helios-agent --pick
+kestrel-agent --pick
 mapfile -d '' -t menu_args <"$menu_log"
 [[ ${menu_args[*]} == "summon setup.default.agent" ]] ||
   fail "--pick opens the agent defaults menu when none is set"
@@ -467,20 +467,20 @@ mapfile -d '' -t menu_args <"$menu_log"
 pass "--pick opens the agent defaults menu when none is set"
 
 source "$ROOT/default/bash/aliases"
-[[ $(alias a) == "alias a='helios-agent --inline'" ]] ||
+[[ $(alias a) == "alias a='kestrel-agent --inline'" ]] ||
   fail "terminal alias launches the default agent inline"
 pass "terminal alias launches the default agent inline"
 
-grep -Fq 'o.bind("SUPER + SHIFT + CTRL + A", "Agent", "helios-agent --pick")' \
+grep -Fq 'o.bind("SUPER + SHIFT + CTRL + A", "Agent", "kestrel-agent --pick")' \
   "$ROOT/default/hypr/bindings/utilities.lua" ||
   fail "agent launcher has a keyboard shortcut"
 pass "agent launcher has a keyboard shortcut"
 
-cat >"$mock_bin/helios-agent" <<'SH'
+cat >"$mock_bin/kestrel-agent" <<'SH'
 #!/bin/bash
-printf '%s\0' helios-agent "$@" >"$HELIOS_TEST_AGENT_OPEN_LOG"
+printf '%s\0' kestrel-agent "$@" >"$KESTREL_TEST_AGENT_OPEN_LOG"
 SH
-chmod +x "$mock_bin/helios-agent"
+chmod +x "$mock_bin/kestrel-agent"
 hash -r
 
 declare -A expected_agents=(
@@ -529,8 +529,8 @@ for selection in "${!expected_agents[@]}"; do
   expected=${expected_agents[$selection]}
   : >"$agent_open_log"
   : >"$stub_log"
-  HELIOS_TEST_AGENT_INSTALLED=true helios-default-agent "$selection"
-  [[ $(helios-default-agent) == $expected ]] || fail "default agent canonicalizes $selection"
+  KESTREL_TEST_AGENT_INSTALLED=true kestrel-default-agent "$selection"
+  [[ $(kestrel-default-agent) == $expected ]] || fail "default agent canonicalizes $selection"
 
   if [[ $expected == "claude" ]]; then
     grep -qx claude-extension "$stub_log" || fail "Claude selection installs the browser extension"
@@ -547,58 +547,58 @@ for selection in "${!expected_agents[@]}"; do
   esac
 
   mapfile -d '' -t agent_open_args <"$agent_open_log"
-  [[ ${#agent_open_args[@]} == 1 && ${agent_open_args[0]} == "helios-agent" ]] ||
+  [[ ${#agent_open_args[@]} == 1 && ${agent_open_args[0]} == "kestrel-agent" ]] ||
     fail "default agent opens $selection after selecting it"
 done
 pass "default agent selects and opens every supported provider and alias"
-[[ -f $agent_file && ! -e $test_home/.local/state/helios/defaults/agent ]] ||
-  fail "default agent stores its selection in HeliOS user config"
-pass "default agent stores its selection in HeliOS user config"
+[[ -f $agent_file && ! -e $test_home/.local/state/kestrel/defaults/agent ]] ||
+  fail "default agent stores its selection in Kestrel user config"
+pass "default agent stores its selection in Kestrel user config"
 
-HELIOS_TEST_AGENT_INSTALLED=true helios-default-agent pi
+KESTREL_TEST_AGENT_INSTALLED=true kestrel-default-agent pi
 : >"$agent_open_log"
-HELIOS_TEST_AGENT_INSTALLED=true HELIOS_TEST_EXTENSION_FAIL=true helios-default-agent claude >"$test_tmp/extension-failure" 2>&1
-[[ $(helios-default-agent) == "claude" ]] || fail "extension installation failure still selects Claude"
+KESTREL_TEST_AGENT_INSTALLED=true KESTREL_TEST_EXTENSION_FAIL=true kestrel-default-agent claude >"$test_tmp/extension-failure" 2>&1
+[[ $(kestrel-default-agent) == "claude" ]] || fail "extension installation failure still selects Claude"
 mapfile -d '' -t agent_open_args <"$agent_open_log"
-[[ ${agent_open_args[*]} == "helios-agent" ]] || fail "extension installation failure still launches Claude"
+[[ ${agent_open_args[*]} == "kestrel-agent" ]] || fail "extension installation failure still launches Claude"
 [[ ! -s $test_tmp/extension-failure ]] || fail "extension installation failure is silent"
 pass "extension installation failure silently continues selecting and launching Claude"
-HELIOS_TEST_AGENT_INSTALLED=true helios-default-agent pi
+KESTREL_TEST_AGENT_INSTALLED=true kestrel-default-agent pi
 : >"$notification_history"
 : >"$agent_open_log"
 : >"$terminal_log"
-helios-default-agent github-copilot
+kestrel-default-agent github-copilot
 mapfile -d '' -t terminal_args <"$terminal_log"
-[[ ${terminal_args[0]} == "helios-default-agent" && ${terminal_args[1]} == "--install" && ${terminal_args[2]} == "copilot" ]] ||
+[[ ${terminal_args[0]} == "kestrel-default-agent" && ${terminal_args[1]} == "--install" && ${terminal_args[2]} == "copilot" ]] ||
   fail "missing agent installation opens in a terminal"
 [[ ! -s $notification_history ]] || fail "missing agent installation skips notifications"
 [[ ! -s $agent_open_log ]] || fail "missing agent installation waits to open the agent"
-[[ $(helios-default-agent) == "pi" ]] || fail "missing agent installation waits to change the selection"
+[[ $(kestrel-default-agent) == "pi" ]] || fail "missing agent installation waits to change the selection"
 
-helios-default-agent --install github-copilot >"$test_tmp/install-output"
+kestrel-default-agent --install github-copilot >"$test_tmp/install-output"
 mapfile -d '' -t mise_args <"$mise_log"
 [[ ${mise_args[0]} == "use" && ${mise_args[1]} == "-g" && ${mise_args[2]} == "copilot" ]] ||
   fail "visible agent installation activates the provider globally through mise"
-[[ $(helios-default-agent) == "copilot" ]] || fail "visible agent installation changes the selection after mise succeeds"
+[[ $(kestrel-default-agent) == "copilot" ]] || fail "visible agent installation changes the selection after mise succeeds"
 [[ ! -s $notification_history ]] || fail "visible agent installation leaves progress to the terminal"
 [[ $(<"$test_tmp/install-output") == $'\033[2J\033[3J\033[H' ]] ||
   fail "visible agent installation clears its terminal before opening the agent"
 mapfile -d '' -t agent_open_args <"$agent_open_log"
-[[ ${#agent_open_args[@]} == 2 && ${agent_open_args[0]} == "helios-agent" && ${agent_open_args[1]} == "--inline" ]] ||
+[[ ${#agent_open_args[@]} == 2 && ${agent_open_args[0]} == "kestrel-agent" && ${agent_open_args[1]} == "--inline" ]] ||
   fail "newly installed agent opens in the installation terminal"
 pass "missing agents install visibly and open in the same terminal"
 
 : >"$notification_history"
 : >"$agent_open_log"
 : >"$terminal_log"
-HELIOS_TEST_AGENT_INSTALLED=true helios-default-agent github-copilot
+KESTREL_TEST_AGENT_INSTALLED=true kestrel-default-agent github-copilot
 [[ ! -s $terminal_log ]] || fail "installed agent selection skips the terminal"
 [[ ! -s $notification_history ]] || fail "installed agent selection skips notifications"
 mapfile -d '' -t mise_args <"$mise_log"
 [[ ${mise_args[0]} == "use" && ${mise_args[1]} == "-g" && ${mise_args[2]} == "copilot" ]] ||
   fail "default agent still activates an installed provider globally through mise"
 mapfile -d '' -t agent_open_args <"$agent_open_log"
-[[ ${#agent_open_args[@]} == 1 && ${agent_open_args[0]} == "helios-agent" ]] ||
+[[ ${#agent_open_args[@]} == 1 && ${agent_open_args[0]} == "kestrel-agent" ]] ||
   fail "installed agent opens in a new terminal after selection"
 pass "installed agents select and open without notifications"
 
@@ -610,12 +610,12 @@ ln -s cursor-agent.official "$test_home/.local/bin/cursor-agent"
 : >"$terminal_log"
 : >"$mise_log"
 : >"$agent_open_log"
-helios-default-agent cursor-agent
+kestrel-default-agent cursor-agent
 [[ ! -s $terminal_log ]] || fail "an official Cursor CLI install needs no install terminal"
 [[ ! -s $mise_log ]] || fail "an official Cursor CLI install is left to itself by mise"
 [[ $(<"$agent_file") == "cursor-agent" ]] || fail "an official Cursor CLI install becomes the default"
 mapfile -d '' -t agent_open_args <"$agent_open_log"
-[[ ${#agent_open_args[@]} == 1 && ${agent_open_args[0]} == "helios-agent" ]] ||
+[[ ${#agent_open_args[@]} == 1 && ${agent_open_args[0]} == "kestrel-agent" ]] ||
   fail "an official Cursor CLI install opens after selection"
 rm -f "$test_home/.local/bin/cursor-agent" "$test_home/.local/bin/cursor-agent.official"
 printf '%s\n' copilot >"$agent_file"
@@ -624,29 +624,29 @@ pass "selecting an official Cursor CLI install skips mise"
 # A file nothing can run is not an install; the wrapper is still wanted.
 touch "$test_home/.local/bin/cursor-agent"
 : >"$terminal_log"
-helios-default-agent cursor-agent
+kestrel-default-agent cursor-agent
 mapfile -d '' -t terminal_args <"$terminal_log"
-[[ ${terminal_args[*]} == "helios-default-agent --install cursor-agent" ]] ||
+[[ ${terminal_args[*]} == "kestrel-default-agent --install cursor-agent" ]] ||
   fail "a dead file at the wrapper's path still installs Cursor CLI"
 rm -f "$test_home/.local/bin/cursor-agent"
 pass "a dead file at the wrapper's path does not pass for an install"
 
 : >"$agent_open_log"
-if helios-default-agent unsupported >"$test_tmp/invalid-output" 2>&1; then
+if kestrel-default-agent unsupported >"$test_tmp/invalid-output" 2>&1; then
   fail "default agent rejects unsupported providers"
 fi
-grep -F "Usage: helios-default-agent" "$test_tmp/invalid-output" >/dev/null ||
+grep -F "Usage: kestrel-default-agent" "$test_tmp/invalid-output" >/dev/null ||
   fail "default agent explains supported providers"
-[[ $(helios-default-agent) == "copilot" ]] || fail "invalid selection preserves the current default agent"
+[[ $(kestrel-default-agent) == "copilot" ]] || fail "invalid selection preserves the current default agent"
 [[ ! -s $agent_open_log ]] || fail "invalid selection does not open an agent"
 pass "default agent rejects unsupported providers without changing the selection"
 
 : >"$notification_history"
 : >"$agent_open_log"
-if HELIOS_TEST_MISE_FAIL=true helios-default-agent --install codex >"$test_tmp/install-failure-output" 2>&1; then
+if KESTREL_TEST_MISE_FAIL=true kestrel-default-agent --install codex >"$test_tmp/install-failure-output" 2>&1; then
   fail "default agent rejects a failed mise installation"
 fi
-[[ $(helios-default-agent) == "copilot" ]] || fail "failed installation preserves the current default agent"
+[[ $(kestrel-default-agent) == "copilot" ]] || fail "failed installation preserves the current default agent"
 grep -F "Could not install Codex with mise" "$test_tmp/install-failure-output" >/dev/null ||
   fail "default agent reports a failed mise installation in the terminal"
 [[ ! -s $notification_history ]] || fail "failed visible agent installation skips notifications"
@@ -655,10 +655,10 @@ pass "default agent opens only after mise installs the provider"
 
 : >"$notification_history"
 : >"$agent_open_log"
-if HELIOS_TEST_AGENT_INSTALLED=true HELIOS_TEST_MISE_FAIL=true helios-default-agent codex >"$test_tmp/setup-failure-output" 2>&1; then
+if KESTREL_TEST_AGENT_INSTALLED=true KESTREL_TEST_MISE_FAIL=true kestrel-default-agent codex >"$test_tmp/setup-failure-output" 2>&1; then
   fail "default agent rejects a failed mise activation"
 fi
-[[ $(helios-default-agent) == "copilot" ]] || fail "failed activation preserves the current default agent"
+[[ $(kestrel-default-agent) == "copilot" ]] || fail "failed activation preserves the current default agent"
 grep -F "Could not set Codex as the default coding agent" "$test_tmp/setup-failure-output" >/dev/null ||
   fail "default agent reports a failed activation for an installed provider"
 [[ ! -s $notification_history ]] || fail "failed activation skips notifications"
@@ -669,18 +669,18 @@ pass "default agent reports mise failures without notifications"
 : >"$notification_history"
 : >"$agent_open_log"
 : >"$terminal_log"
-helios-default-agent muse
+kestrel-default-agent muse
 mapfile -d '' -t terminal_args <"$terminal_log"
-[[ ${terminal_args[0]} == "helios-default-agent" && ${terminal_args[1]} == "--install" && ${terminal_args[2]} == "muse" ]] ||
+[[ ${terminal_args[0]} == "kestrel-default-agent" && ${terminal_args[1]} == "--install" && ${terminal_args[2]} == "muse" ]] ||
   fail "missing Muse installation opens in a terminal"
 [[ ! -s $notification_history ]] || fail "missing Muse installation skips notifications"
 [[ ! -s $agent_open_log ]] || fail "missing Muse installation waits to open the agent"
-[[ $(helios-default-agent) == "copilot" ]] || fail "missing Muse installation waits to change the selection"
+[[ $(kestrel-default-agent) == "copilot" ]] || fail "missing Muse installation waits to change the selection"
 
-if HELIOS_TEST_MISE_FAIL=true helios-default-agent --install muse >"$test_tmp/muse-install-failure-output" 2>&1; then
+if KESTREL_TEST_MISE_FAIL=true kestrel-default-agent --install muse >"$test_tmp/muse-install-failure-output" 2>&1; then
   fail "missing Muse rejects a failed mise installation"
 fi
-[[ $(helios-default-agent) == "copilot" ]] || fail "failed Muse installation preserves the current default"
+[[ $(kestrel-default-agent) == "copilot" ]] || fail "failed Muse installation preserves the current default"
 [[ ! -s $muse_login_log && ! -s $agent_open_log ]] || fail "failed Muse installation skips login and launch"
 grep -F "Could not install Muse Code with mise" "$test_tmp/muse-install-failure-output" >/dev/null ||
   fail "failed Muse installation identifies mise"
@@ -688,54 +688,54 @@ pass "failed Muse mise installation preserves the selection and skips login"
 
 : >"$mise_history"
 : >"$stub_log"
-helios-default-agent --install muse >"$test_tmp/muse-install-output"
+kestrel-default-agent --install muse >"$test_tmp/muse-install-output"
 grep -Fx "use -g $muse_package" "$mise_history" >/dev/null || fail "visible Muse installation uses the HTTP backend"
 [[ ! -s $stub_log ]] || fail "Muse selection recreates its preinstalled wrapper"
 [[ ! -s $muse_login_log ]] || fail "Muse selection runs a separate login flow"
-[[ $(helios-default-agent) == "muse" ]] || fail "visible Muse installation changes the selection"
+[[ $(kestrel-default-agent) == "muse" ]] || fail "visible Muse installation changes the selection"
 mapfile -d '' -t agent_open_args <"$agent_open_log"
-[[ ${#agent_open_args[@]} == 2 && ${agent_open_args[0]} == "helios-agent" && ${agent_open_args[1]} == "--inline" ]] ||
+[[ ${#agent_open_args[@]} == 2 && ${agent_open_args[0]} == "kestrel-agent" && ${agent_open_args[1]} == "--inline" ]] ||
   fail "newly installed Muse opens in the installation terminal"
 pass "Muse installs visibly through mise and opens directly"
 
 : >"$terminal_log"
 : >"$muse_login_log"
 : >"$agent_open_log"
-HELIOS_TEST_AGENT_INSTALLED=true helios-default-agent muse-code
+KESTREL_TEST_AGENT_INSTALLED=true kestrel-default-agent muse-code
 [[ ! -s $terminal_log ]] || fail "installed Muse selection skips the terminal"
 [[ ! -s $muse_login_log ]] || fail "installed Muse selection skips the login"
-[[ $(helios-default-agent) == "muse" ]] || fail "default agent canonicalizes muse-code"
+[[ $(kestrel-default-agent) == "muse" ]] || fail "default agent canonicalizes muse-code"
 mapfile -d '' -t agent_open_args <"$agent_open_log"
-[[ ${#agent_open_args[@]} == 1 && ${agent_open_args[0]} == "helios-agent" ]] ||
+[[ ${#agent_open_args[@]} == 1 && ${agent_open_args[0]} == "kestrel-agent" ]] ||
   fail "installed Muse opens in a new terminal after selection"
 pass "installed Muse selects and opens directly"
 
-HELIOS_TEST_AGENT_INSTALLED=true helios-default-agent pi
+KESTREL_TEST_AGENT_INSTALLED=true kestrel-default-agent pi
 : >"$agent_open_log"
-if HELIOS_TEST_AGENT_INSTALLED=true HELIOS_TEST_MISE_FAIL=true helios-default-agent musecode >"$test_tmp/muse-failure-output" 2>&1; then
+if KESTREL_TEST_AGENT_INSTALLED=true KESTREL_TEST_MISE_FAIL=true kestrel-default-agent musecode >"$test_tmp/muse-failure-output" 2>&1; then
   fail "default agent rejects a failed Muse activation"
 fi
-[[ $(helios-default-agent) == "pi" ]] || fail "failed Muse activation preserves the current default agent"
+[[ $(kestrel-default-agent) == "pi" ]] || fail "failed Muse activation preserves the current default agent"
 grep -F "Could not set Muse Code as the default coding agent" "$test_tmp/muse-failure-output" >/dev/null ||
   fail "default agent reports a failed Muse activation"
 [[ ! -s $agent_open_log ]] || fail "failed Muse activation does not open an agent"
 pass "default agent reports Muse mise failures without changing the selection"
 
 # A manually installed launcher belongs to the user; selecting it must not
-# install a second copy or replace it with the HeliOS wrapper.
+# install a second copy or replace it with the Kestrel wrapper.
 printf '#!/bin/bash\necho user-muse\n' >"$test_home/.local/bin/muse"
 chmod +x "$test_home/.local/bin/muse"
 : >"$mise_history"
 : >"$stub_log"
 : >"$terminal_log"
-helios-default-agent muse
-[[ $(helios-default-agent) == "muse" ]] || fail "a user-installed Muse can be selected"
+kestrel-default-agent muse
+[[ $(kestrel-default-agent) == "muse" ]] || fail "a user-installed Muse can be selected"
 [[ ! -s $mise_history && ! -s $stub_log && ! -s $terminal_log ]] || fail "a user-installed Muse skips installation and wrapper creation"
 [[ $("$test_home/.local/bin/muse") == "user-muse" ]] || fail "a user-installed Muse is preserved"
 rm "$test_home/.local/bin/muse"
 pass "selecting a user-installed Muse preserves its launcher"
 
-rm "$mock_bin/helios-agent"
+rm "$mock_bin/kestrel-agent"
 hash -r
 
 assert_launched() {
@@ -744,7 +744,7 @@ assert_launched() {
   shift 2
   # Every agent window launches under the same app-id, whichever agent is
   # default, so window rules and themes see one class for all of them.
-  local expected=(--app-id=org.helios.agent "$@")
+  local expected=(--app-id=org.kestrel.agent "$@")
 
   mapfile -d '' -t actual <"$launch_log"
 
@@ -764,7 +764,7 @@ assert_launch() {
   shift
 
   printf '%s\n' "$agent" >"$agent_file"
-  helios-agent-prompt "Review this" project
+  kestrel-agent-prompt "Review this" project
   assert_launched "$agent" "forwards the interactive prompt" "$@"
 }
 
@@ -773,7 +773,7 @@ assert_bypass() {
   shift
 
   printf '%s\n' "$agent" >"$agent_file"
-  helios-agent
+  kestrel-agent
   assert_launched "$agent" "skips permission prompts" "$@"
 }
 
@@ -781,11 +781,11 @@ assert_launch pi pi "Review this project"
 assert_launch omp omp --auto-approve -- "Review this project"
 assert_launch opencode opencode --auto --prompt "Review this project"
 assert_launch ori ori code --interactive --prompt "Review this project"
-assert_launch claude env -u CLAUDE_CONFIG_DIR HELIOS_AGENT_CLAUDE_HOME= claude --permission-mode auto -- "Review this project"
-assert_launch codex env -u CODEX_HOME HELIOS_AGENT_CODEX_HOME= codex --approve-for-me -- "Review this project"
+assert_launch claude env -u CLAUDE_CONFIG_DIR KESTREL_AGENT_CLAUDE_HOME= claude --permission-mode auto -- "Review this project"
+assert_launch codex env -u CODEX_HOME KESTREL_AGENT_CODEX_HOME= codex --approve-for-me -- "Review this project"
 assert_launch muse muse --approval-mode never -- "Review this project"
 assert_launch crush crush run "Review this project"
-assert_launch grok env -u GROK_HOME HELIOS_AGENT_GROK_HOME= grok --permission-mode bypassPermissions -- "Review this project"
+assert_launch grok env -u GROK_HOME KESTREL_AGENT_GROK_HOME= grok --permission-mode bypassPermissions -- "Review this project"
 assert_launch cursor-agent cursor-agent --yolo --trust agent -- "Review this project"
 assert_launch hermes env -u HERMES_SESSION_SOURCE hermes chat --yolo --tui "--query=Review this project"
 assert_launch agy agy --dangerously-skip-permissions --prompt-interactive "Review this project"
@@ -794,13 +794,13 @@ pass "agent launcher adapts initial prompts for every supported agent"
 
 literal_muse_prompt=$'--disable-sandbox !Crash {$(touch must-not-run)}\ntrailing\\ '
 printf '%s\n' "muse" >"$agent_file"
-helios-agent-prompt "$literal_muse_prompt"
+kestrel-agent-prompt "$literal_muse_prompt"
 assert_launched muse "separates prompt text from options" muse --approval-mode never -- "$literal_muse_prompt"
 pass "Muse receives option-like prompts as one literal argument"
 
 literal_hermes_prompt=$' --help !Crash /quit {$(touch must-not-run)}\ntrailing\\ '
 printf '%s\n' "hermes" >"$agent_file"
-helios-agent-prompt "$literal_hermes_prompt"
+kestrel-agent-prompt "$literal_hermes_prompt"
 assert_launched hermes "binds its literal initial prompt" env -u HERMES_SESSION_SOURCE \
   hermes chat --yolo --tui "--query=$literal_hermes_prompt"
 pass "Hermes receives prompted launches as one literal query argument"
@@ -809,11 +809,11 @@ assert_bypass pi pi
 assert_bypass omp omp --auto-approve
 assert_bypass opencode opencode --auto
 assert_bypass ori ori code
-assert_bypass claude env -u CLAUDE_CONFIG_DIR HELIOS_AGENT_CLAUDE_HOME= claude --permission-mode auto
-assert_bypass codex env -u CODEX_HOME HELIOS_AGENT_CODEX_HOME= codex --approve-for-me
+assert_bypass claude env -u CLAUDE_CONFIG_DIR KESTREL_AGENT_CLAUDE_HOME= claude --permission-mode auto
+assert_bypass codex env -u CODEX_HOME KESTREL_AGENT_CODEX_HOME= codex --approve-for-me
 assert_bypass muse muse --approval-mode never
 assert_bypass crush crush --yolo
-assert_bypass grok env -u GROK_HOME HELIOS_AGENT_GROK_HOME= grok --permission-mode bypassPermissions
+assert_bypass grok env -u GROK_HOME KESTREL_AGENT_GROK_HOME= grok --permission-mode bypassPermissions
 assert_bypass cursor-agent cursor-agent --yolo --trust
 assert_bypass hermes hermes --yolo
 assert_bypass agy agy --dangerously-skip-permissions
@@ -821,13 +821,13 @@ assert_bypass copilot copilot --allow-all
 pass "agent launcher skips permission prompts for every supported agent"
 
 printf '%s\n' "opencode" >"$agent_file"
-helios-agent
+kestrel-agent
 mapfile -d '' -t launch_args <"$launch_log"
-[[ ${launch_args[*]} == "--app-id=org.helios.agent opencode --auto" ]] ||
+[[ ${launch_args[*]} == "--app-id=org.kestrel.agent opencode --auto" ]] ||
   fail "agent launcher starts the selected agent without an initial prompt"
 pass "agent launcher starts the selected agent without an initial prompt"
 
-helios-agent-prompt --inline "Review this project"
+kestrel-agent-prompt --inline "Review this project"
 mapfile -d '' -t inline_args <"$inline_log"
 [[ ${inline_args[*]} == "opencode --auto --prompt Review this project" ]] ||
   fail "inline agent launcher runs in the current terminal"
@@ -836,38 +836,38 @@ pass "inline agent launcher runs in the current terminal"
 # The prompt route exists so the router can tell a prompt from a subcommand, so
 # cover the public routes and not only the binaries behind them.
 : >"$launch_log"
-helios agent
+kestrel agent
 mapfile -d '' -t launch_args <"$launch_log"
-[[ ${launch_args[*]} == "--app-id=org.helios.agent opencode --auto" ]] ||
-  fail "helios agent routes to the launcher"
+[[ ${launch_args[*]} == "--app-id=org.kestrel.agent opencode --auto" ]] ||
+  fail "kestrel agent routes to the launcher"
 
 # With an agent chosen there is nothing to pick, so the keybinding launches.
 : >"$launch_log"
 : >"$menu_log"
-helios-agent --pick
+kestrel-agent --pick
 mapfile -d '' -t launch_args <"$launch_log"
-[[ ${launch_args[*]} == "--app-id=org.helios.agent opencode --auto" ]] ||
+[[ ${launch_args[*]} == "--app-id=org.kestrel.agent opencode --auto" ]] ||
   fail "--pick launches once an agent is chosen"
 [[ ! -s $menu_log ]] || fail "--pick opens no menu once an agent is chosen"
 pass "--pick launches once an agent is chosen"
 
 : >"$launch_log"
-helios agent prompt "Review this project"
+kestrel agent prompt "Review this project"
 mapfile -d '' -t launch_args <"$launch_log"
-[[ ${launch_args[*]} == "--app-id=org.helios.agent opencode --auto --prompt Review this project" ]] ||
-  fail "helios agent prompt routes the prompt to the launcher"
+[[ ${launch_args[*]} == "--app-id=org.kestrel.agent opencode --auto --prompt Review this project" ]] ||
+  fail "kestrel agent prompt routes the prompt to the launcher"
 
 : >"$launch_log"
-if helios agent Review this project >"$test_tmp/positional-output" 2>&1; then
-  fail "helios agent rejects a positional prompt"
+if kestrel agent Review this project >"$test_tmp/positional-output" 2>&1; then
+  fail "kestrel agent rejects a positional prompt"
 fi
-grep -F "helios agent prompt" "$test_tmp/positional-output" >/dev/null ||
-  fail "helios agent points a positional prompt at the prompt route"
-[[ ! -s $launch_log ]] || fail "helios agent starts nothing for a positional prompt"
-pass "helios agent keeps prompts on the prompt route"
+grep -F "kestrel agent prompt" "$test_tmp/positional-output" >/dev/null ||
+  fail "kestrel agent points a positional prompt at the prompt route"
+[[ ! -s $launch_log ]] || fail "kestrel agent starts nothing for a positional prompt"
+pass "kestrel agent keeps prompts on the prompt route"
 
 printf '%s\n' "missing" >"$agent_file"
-if HELIOS_TEST_MISSING_COMMAND=missing helios-agent >"$test_tmp/missing-output" 2>&1; then
+if KESTREL_TEST_MISSING_COMMAND=missing kestrel-agent >"$test_tmp/missing-output" 2>&1; then
   fail "agent launcher rejects a missing default command"
 fi
 grep -F "missing is not installed" "$test_tmp/missing-output" >/dev/null ||
@@ -875,65 +875,65 @@ grep -F "missing is not installed" "$test_tmp/missing-output" >/dev/null ||
 pass "agent launcher reports a missing default command"
 
 # OpenClaw is its own self-updating runtime, not mise's: choosing it must route
-# through helios-install-openclaw-cli and never touch a mise environment.
+# through kestrel-install-openclaw-cli and never touch a mise environment.
 # openclaw-cli-test.sh covers the installer itself.
-cat >"$mock_bin/helios-install-openclaw-cli" <<'SH'
+cat >"$mock_bin/kestrel-install-openclaw-cli" <<'SH'
 #!/bin/bash
 if [[ $1 == "--check" ]]; then
-  [[ ${HELIOS_TEST_OPENCLAW_INSTALLED:-false} == "true" ]]
+  [[ ${KESTREL_TEST_OPENCLAW_INSTALLED:-false} == "true" ]]
 else
-  printf '%s\n' "install-openclaw-cli $*" >>"$HELIOS_TEST_STUB_LOG"
+  printf '%s\n' "install-openclaw-cli $*" >>"$KESTREL_TEST_STUB_LOG"
 fi
 SH
-cat >"$mock_bin/helios-launch-openclaw" <<'SH'
+cat >"$mock_bin/kestrel-launch-openclaw" <<'SH'
 #!/bin/bash
-printf '%s\0' helios-launch-openclaw "$@" >"$HELIOS_TEST_AGENT_INLINE_LOG"
+printf '%s\0' kestrel-launch-openclaw "$@" >"$KESTREL_TEST_AGENT_INLINE_LOG"
 SH
 cat >"$mock_bin/openclaw" <<'SH'
 #!/bin/bash
 exit 0
 SH
-chmod +x "$mock_bin/helios-install-openclaw-cli" \
-  "$mock_bin/helios-launch-openclaw" "$mock_bin/openclaw"
+chmod +x "$mock_bin/kestrel-install-openclaw-cli" \
+  "$mock_bin/kestrel-launch-openclaw" "$mock_bin/openclaw"
 
 : >"$launch_log"
 : >"$terminal_log"
 : >"$mise_history"
-HELIOS_TEST_OPENCLAW_INSTALLED=true helios-default-agent openclaw
+KESTREL_TEST_OPENCLAW_INSTALLED=true kestrel-default-agent openclaw
 read -r chosen <"$agent_file"
 [[ $chosen == openclaw ]] || fail "choosing OpenClaw records it as the default agent"
 mapfile -d '' -t launch_args <"$launch_log"
-[[ ${launch_args[*]} == "--app-id=org.helios.agent helios-launch-openclaw --tui" ]] ||
+[[ ${launch_args[*]} == "--app-id=org.kestrel.agent kestrel-launch-openclaw --tui" ]] ||
   fail "choosing OpenClaw launches its terminal UI"
 [[ ! -s $terminal_log ]] || fail "an installed OpenClaw needs no install terminal"
 ! grep -q 'use -g openclaw' "$mise_history" || fail "OpenClaw never installs through mise"
 pass "choosing OpenClaw uses its runtime and launches its terminal UI"
 
 : >"$terminal_log"
-HELIOS_TEST_OPENCLAW_INSTALLED=false helios-default-agent openclaw
+KESTREL_TEST_OPENCLAW_INSTALLED=false kestrel-default-agent openclaw
 mapfile -d '' -t terminal_args <"$terminal_log"
-[[ ${terminal_args[*]} == "helios-default-agent --install openclaw" ]] ||
+[[ ${terminal_args[*]} == "kestrel-default-agent --install openclaw" ]] ||
   fail "a missing OpenClaw routes through the install terminal"
 pass "a missing OpenClaw routes through the install terminal"
 
 : >"$stub_log"
 : >"$inline_log"
-HELIOS_TEST_OPENCLAW_INSTALLED=false helios-default-agent --install openclaw >/dev/null
+KESTREL_TEST_OPENCLAW_INSTALLED=false kestrel-default-agent --install openclaw >/dev/null
 grep -Fx "install-openclaw-cli --now" "$stub_log" >/dev/null ||
   fail "installing OpenClaw as default agent sets up its runtime"
 mapfile -d '' -t inline_args <"$inline_log"
-[[ ${inline_args[*]} == "helios-launch-openclaw --tui" ]] ||
+[[ ${inline_args[*]} == "kestrel-launch-openclaw --tui" ]] ||
   fail "installing OpenClaw as default agent hands over to its terminal UI"
 pass "installing OpenClaw as default agent sets up its runtime"
 
 : >"$launch_log"
-helios agent prompt "Review this project"
+kestrel agent prompt "Review this project"
 mapfile -d '' -t launch_args <"$launch_log"
 # Element-wise: the prompt must travel as one argv entry, which a space-joined
 # comparison could not tell apart from a prompt split into words.
 [[ ${#launch_args[@]} == 5 &&
-  ${launch_args[0]} == "--app-id=org.helios.agent" &&
-  ${launch_args[1]} == "helios-launch-openclaw" &&
+  ${launch_args[0]} == "--app-id=org.kestrel.agent" &&
+  ${launch_args[1]} == "kestrel-launch-openclaw" &&
   ${launch_args[2]} == "--tui" &&
   ${launch_args[3]} == "--message" &&
   ${launch_args[4]} == "Review this project" ]] ||

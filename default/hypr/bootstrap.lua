@@ -1,10 +1,10 @@
--- Hyprland bootstrap for HeliOS's Lua module path.
+-- Hyprland bootstrap for Kestrel's Lua module path.
 
 local home = os.getenv("HOME")
 local reload_prefixes = {
   "default.hypr",
   "hypr",
-  "helios.current.theme",
+  "kestrel.current.theme",
 }
 
 local function should_reload_module(module)
@@ -29,11 +29,11 @@ for _, module in ipairs(modules_to_reload) do
 end
 
 -- Load generated state from ~/.local/state, user modules from ~/.config, and
--- HeliOS defaults from $HELIOS_PATH.
+-- Kestrel defaults from $KESTREL_PATH.
 package.path = home
   .. "/.local/state/?.lua;"
   .. home
   .. "/.config/?.lua;"
-  .. (os.getenv("HELIOS_PATH") or "/usr/share/helios")
+  .. (os.getenv("KESTREL_PATH") or "/usr/share/kestrel")
   .. "/?.lua;"
   .. package.path

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Overwrite the user config for hyprsunset with the HeliOS default and restart the service.
-
-helios-refresh-config hypr/hyprsunset.conf
-helios-restart-hyprsunset

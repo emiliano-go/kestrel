@@ -1,18 +1,18 @@
 echo "Rebuild the boot image when it predates the Limine kernel command line"
 
 # 1784917531 gated its rebuild on initramfs_async=0 being present in the Limine
-# config, but helios-settings ships helios-defaults.conf with that parameter
+# config, but kestrel-settings ships kestrel-defaults.conf with that parameter
 # already in it. On a machine that installed the package and ran the migration
 # in the same update, the guard matched the config the package had just
 # written, skipped the rebuild, and left a boot image baked before the config
-# landed. Such a machine boots without any of helios-defaults.conf's command
+# landed. Such a machine boots without any of kestrel-defaults.conf's command
 # line — including initramfs_async=0, so Plymouth still loses the LUKS prompt.
 
-defaults_conf="${HELIOS_LIMINE_DEFAULTS_CONF:-/etc/limine-entry-tool.d/helios-defaults.conf}"
-running_cmdline="${HELIOS_RUNNING_CMDLINE:-/proc/cmdline}"
-rebuild_marker="${HELIOS_LIMINE_REBUILD_MARKER:-/var/lib/helios/migrations/1786482992}"
+defaults_conf="${KESTREL_LIMINE_DEFAULTS_CONF:-/etc/limine-entry-tool.d/kestrel-defaults.conf}"
+running_cmdline="${KESTREL_RUNNING_CMDLINE:-/proc/cmdline}"
+rebuild_marker="${KESTREL_LIMINE_REBUILD_MARKER:-/var/lib/kestrel/migrations/1786482992}"
 
-helios-cmd-present limine-mkinitcpio || exit 0
+kestrel-cmd-present limine-mkinitcpio || exit 0
 [[ -f $defaults_conf && -r $running_cmdline ]] || exit 0
 
 # The running kernel keeps its old command line until reboot, so a marker

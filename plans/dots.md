@@ -1,15 +1,15 @@
 # Plan: Dots — preserve and sync user configs out of the box
 
 Revision 3. Rev 2 incorporated adversarial review by codex (xhigh) and grok;
-rev 3 names the feature **dots** (`helios dots ...`) and adds the
+rev 3 names the feature **dots** (`kestrel dots ...`) and adds the
 multi-machine sync design.
 
 ## Problem
 
-HeliOS declares `~/.config` "your files" but does little to preserve them:
+Kestrel declares `~/.config` "your files" but does little to preserve them:
 
-- `helios-refresh-config` litters `*.bak.<timestamp>` files next to originals.
-- `helios-reinstall-configs` clobbers everything back to `/etc/skel` defaults.
+- `kestrel-refresh-config` litters `*.bak.<timestamp>` files next to originals.
+- `kestrel-reinstall-configs` clobbers everything back to `/etc/skel` defaults.
 - Snapper only snapshots the `root` config; recovering one config file from a
   root snapshot is not a workflow, and `/home` may not be covered at all.
 - The manual punts to a YouTube video about Stow.
@@ -23,7 +23,7 @@ desktop."
 - **`git init ~/.config`**: dumping ground — Chromium profile, fcitx5 state,
   app tokens, machine churn. A `.git` there gets discovered by editors and
   prompts. Can't cover `~/.bashrc` or `~/.XCompose`.
-- **`~/.config/helios` only**: too narrow; misses hypr, terminals, `.bashrc`.
+- **`~/.config/kestrel` only**: too narrow; misses hypr, terminals, `.bashrc`.
 - **Stow**: inverted model requiring file migration; organization, not history.
 - **chezmoi / yadm**: third-party DSLs we'd be wrapping; overkill.
 - **Raw git passthrough / lazygit over `$HOME`** (rejected in review):
@@ -31,7 +31,7 @@ desktop."
   is a home-directory-eraser; `git add -A` can ingest `~/.ssh` and the object
   store into itself (`status.showUntrackedFiles no` only affects `status`);
   `remote add` + `push` silently defeats local-only. Experts can construct the
-  raw invocation themselves; HeliOS will not bless it.
+  raw invocation themselves; Kestrel will not bless it.
 - **Distributed git across machines**: two machines auto-committing timer and
   update snapshots into a shared branch conflict constantly. History and sync
   are different products (see Sync below).
@@ -39,37 +39,37 @@ desktop."
 ## Chosen design: bare repo over `$HOME`, driven only by constrained commands
 
 ```bash
-git init --bare ~/.local/share/helios/dots.git   # mode 0700
+git init --bare ~/.local/share/kestrel/dots.git   # mode 0700
 ```
 
 No `.git` in any directory tools walk; files stay plain files in place. All
 access goes through one internal helper that runs git **hermetically**:
 
-- Repo-local config only: synthetic identity (`HeliOS <helios@localhost>`),
+- Repo-local config only: synthetic identity (`Kestrel <kestrel@localhost>`),
   `commit.gpgsign=false`, `core.hooksPath` disabled, `--no-verify`,
   `GIT_CONFIG_GLOBAL=/dev/null` so user signing/hooks/templates/excludes and a
   `$HOME/.gitignore` can never break or intercept an automatic commit.
-- Never export `GIT_DIR`/`GIT_WORK_TREE` (would leak into `helios-plugin-*`,
-  `helios-theme-update`, `helios-update-dev`, user hooks).
+- Never export `GIT_DIR`/`GIT_WORK_TREE` (would leak into `kestrel-plugin-*`,
+  `kestrel-theme-update`, `kestrel-update-dev`, user hooks).
 - Serialized via a lock; concurrent refresh/update/manual snapshots queue.
 - **Best-effort everywhere**: a failed snapshot warns and continues. History
   is optional; updates are not. Never on the failure path of
-  `helios-update`/`helios-migrate` (`set -e` there must not see git errors).
+  `kestrel-update`/`kestrel-migrate` (`set -e` there must not see git errors).
 
 ### Audited manifest, not a derived whitelist
 
 Tracking is `git add -f --pathspec-from-file=<manifest>` only. The manifest is
-a hand-audited file shipped with HeliOS — explicitly **not** derived from
-`$HELIOS_PATH/config` (which ships Chromium Preferences, fcitx5,
+a hand-audited file shipped with Kestrel — explicitly **not** derived from
+`$KESTREL_PATH/config` (which ships Chromium Preferences, fcitx5,
 `opencode/opencode.json` where users put API keys, etc.):
 
-- Include: `.config/hypr/*.{lua,conf}`, `.config/helios/shell.json`,
-  `.config/helios/extensions/**`, `.config/helios/hooks/**`,
+- Include: `.config/hypr/*.{lua,conf}`, `.config/kestrel/shell.json`,
+  `.config/kestrel/extensions/**`, `.config/kestrel/hooks/**`,
   terminal configs (alacritty/foot/ghostty/kitty), `.config/btop/btop.conf`,
   `.config/starship.toml`, `.bashrc`, `.XCompose`.
-- Exclude (deliberately): `.config/helios/plugins/**` and
-  `.config/helios/themes/**` (nested git clones managed by
-  `helios-plugin-*` / `helios-theme-update`), backgrounds (multi-MB
+- Exclude (deliberately): `.config/kestrel/plugins/**` and
+  `.config/kestrel/themes/**` (nested git clones managed by
+  `kestrel-plugin-*` / `kestrel-theme-update`), backgrounds (multi-MB
   binaries), `.config/btop/themes/` (symlink into `~/.local/state`), anything
   Chromium/fcitx5/opencode/xournalpp.
 - **Two tiers**: every manifest path is history-tracked, but some are marked
@@ -89,7 +89,7 @@ regular file. Therefore:
 
 - At seed time and before each snapshot: if manifest paths are symlinks or a
   known manager (yadm, chezmoi, existing bare-repo alias, `~/.git`) is
-  detected, mark the repo dormant and say so in `helios dots status`.
+  detected, mark the repo dormant and say so in `kestrel dots status`.
 - `restore` refuses type changes (symlink↔file) and paths outside the
   manifest.
 - These users keep `.bak` behavior, which genuinely works for them (copies
@@ -98,23 +98,23 @@ regular file. Therefore:
 ### Snapshot points: batch boundaries, before *and* after
 
 The unit is a labeled snapshot pair around each *batch* mutation, via an
-internal `helios-dots-snapshot "<label>"`:
+internal `kestrel-dots-snapshot "<label>"`:
 
-1. **`helios-provision-user`**: seed repo + initial commit, after `git.sh`
+1. **`kestrel-provision-user`**: seed repo + initial commit, after `git.sh`
    and `.XCompose` are in place. Idempotent; `--force` must not re-init.
-2. **`helios-migrate`**: before/after pair labeled with version. Covers both
-   `helios-update` *and* the login-time migration path, and separates
+2. **`kestrel-migrate`**: before/after pair labeled with version. Covers both
+   `kestrel-update` *and* the login-time migration path, and separates
    migration changes from prior user dirt — the "before" commit captures user
    edits, the "after" commit is purely what migrations did.
-3. **Batch refresh commands** (`helios-refresh-hyprland` etc.): one pair per
-   command, not one commit per `helios-refresh-config` call (hyprland calls
+3. **Batch refresh commands** (`kestrel-refresh-hyprland` etc.): one pair per
+   command, not one commit per `kestrel-refresh-config` call (hyprland calls
    it seven times).
-4. **`helios-reinstall-configs`**: a "before" snapshot — honestly labeled.
+4. **`kestrel-reinstall-configs`**: a "before" snapshot — honestly labeled.
    This operation replays all of `/etc/skel`; a manifest repo does **not**
    make it reversible and we don't claim it does.
 5. **Timer**: an hourly-ish systemd user timer committing only if dirty, so
    hand edits are captured — without it, "restore my bindings from last week"
-   fails for any edit not followed by an HeliOS operation.
+   fails for any edit not followed by an Kestrel operation.
 
 `.bak` files **stay** in v1. They serve symlink users, they're documented
 (manual, agent skill, `refresh-config-test.sh` asserts them), and git history
@@ -127,11 +127,11 @@ The local snapshot history is machine-generated noise (timer commits,
 before/after pairs) and stays private. Sync happens on a shared `sync` branch
 in the same repo that only two operations touch:
 
-- **`helios dots push`** — *squash-publishes* the current manifest state
+- **`kestrel dots push`** — *squash-publishes* the current manifest state
   (minus `local`-tier files) as one commit: "Published from <hostname>". Only
   present-state files leave the machine — a token the timer captured last
   month and you since deleted is not in any published commit.
-- **`helios dots pull [url]`** — fetches `sync`, takes a local pre-pull
+- **`kestrel dots pull [url]`** — fetches `sync`, takes a local pre-pull
   snapshot (so pull is undoable via `restore`), then applies the files.
   Never touches `local`-tier files. With a URL argument on a fresh machine,
   it configures the remote first — the second-machine straight shot is one
@@ -140,11 +140,11 @@ in the same repo that only two operations touch:
 Conflict story stays simple because publishes are whole-state: push refuses
 when the remote moved since your last pull ("pull first"); pull attempts a
 per-file three-way merge and falls back to taking remote — your version is
-one `helios dots restore` away.
+one `kestrel dots restore` away.
 
 Remote setup UX:
 
-- `helios dots push` with no remote runs setup inline: paste a git URL, or
+- `kestrel dots push` with no remote runs setup inline: paste a git URL, or
   create a **private** GitHub repo via `gh` when authenticated. Verify the
   repo is private; warn loudly if not.
 - Manual by default. Push is an intentional "my setup is good" moment — no
@@ -153,39 +153,39 @@ Remote setup UX:
   because every pull is snapshot-guarded.
 - Dormant mode (dotfile-manager users) disables sync too — they have their
   own.
-- v2 candidate: `helios-provision-first-run` asks "Got a dots repo?" so a
+- v2 candidate: `kestrel-provision-first-run` asks "Got a dots repo?" so a
   new machine is yours before first login completes. Held back from v1 —
   drags SSH/auth bootstrapping into first-run.
 
 ## User-facing surface (v1)
 
 Constrained commands only — a new `dots` group in `GROUP_DESCRIPTIONS`,
-invoked as `helios dots <verb>`:
+invoked as `kestrel dots <verb>`:
 
-- `helios dots snapshot [label]` — take a snapshot now
-- `helios dots log` — history with labels
-- `helios dots diff [ref]` — default range: the last before/after pair
-- `helios dots restore <file> [--at <ref>]` — accepts `~/.config/...`,
+- `kestrel dots snapshot [label]` — take a snapshot now
+- `kestrel dots log` — history with labels
+- `kestrel dots diff [ref]` — default range: the last before/after pair
+- `kestrel dots restore <file> [--at <ref>]` — accepts `~/.config/...`,
   `.config/...`, or manifest-relative paths; takes a pre-restore snapshot
   first so restore is itself undoable; refuses untracked paths and type
   changes; confirms over dirty files
-- `helios dots push` / `helios dots pull [url]` — sync (above)
-- `helios dots status` — repo state, dormant/active, remote, last
+- `kestrel dots push` / `kestrel dots pull [url]` — sync (above)
+- `kestrel dots status` — repo state, dormant/active, remote, last
   snapshot/publish
 
 No raw git surface. No lazygit integration.
 
 ## Rollout
 
-- New users: seeded by `helios-provision-user`.
+- New users: seeded by `kestrel-provision-user`.
 - Existing users: migration inits the repo + initial commit — **skippable and
   bounded**: no-op if repo path exists, another manager is detected, or
   identity can't be synthesized; never adds beyond the manifest; never fails
-  `helios update`.
+  `kestrel update`.
 - Docs/tests alignment: manual `31-dotfiles.md` gets the built-in story
   (honest framing: local event history + sync of published states, *not* a
   backup — the local repo dies with the disk); a `docs/dots.md` reference doc
-  per the documentation layout; `default/agents/skills/helios/SKILL.md`
+  per the documentation layout; `default/agents/skills/kestrel/SKILL.md`
   updated; CLI routing/metadata tests extended; new tests for identity-less
   commit, batch snapshot pairing, restore round-trip, dormant-mode detection,
   push/pull round-trip against a local bare remote, `local`-tier exclusion,
@@ -193,12 +193,12 @@ No raw git surface. No lazygit integration.
 
 ## Open questions
 
-1. Manifest location: `default/helios/dots-manifest` vs alongside the
+1. Manifest location: `default/kestrel/dots-manifest` vs alongside the
    helper; and whether users may extend it via
-   `~/.config/helios/dots-manifest.d/`.
-2. Whether `.config/helios/hooks/**` belongs in the manifest at all (small
+   `~/.config/kestrel/dots-manifest.d/`.
+2. Whether `.config/kestrel/hooks/**` belongs in the manifest at all (small
    scripts, but the likeliest place for a pasted token).
-3. Harden `helios-refresh-config` against `..` path escape (documented today
+3. Harden `kestrel-refresh-config` against `..` path escape (documented today
    in AGENTS.md) as part of this work or separately.
 4. Timer cadence (hourly vs daily) and whether the dirty-check should debounce
    against an active editing session.

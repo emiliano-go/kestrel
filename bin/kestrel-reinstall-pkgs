@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# kestrel:summary=Reinstall all default Kestrel packages from the Arch repositories and the AUR
+# kestrel:requires-sudo=true
+
+set -e
+
+# Reinstall all default Kestrel packages and downgrade any packages that are too new.
+
+# Set the package repository to the Arch mirrors
+kestrel-refresh-pacman
+
+# Downgrade any packages to the Arch setup
+kestrel-update-pacman -Suu --noconfirm
+
+# Ensure all Arch packages are installed
+mapfile -t packages < <(grep -v '^#' "$KESTREL_PATH/install/kestrel-base.packages" | grep -v '^$')
+kestrel-update-pacman -Syu --noconfirm --needed "${packages[@]}"
+
+# Ensure the frozen AUR packages are installed (names only; versions are the
+# snapshot Kestrel was audited against and recorded in the file).
+mapfile -t aur_packages < <(grep -v '^#' "$KESTREL_PATH/install/kestrel-aur.packages" | grep -v '^$' | sed 's/=.*//')
+if (( ${#aur_packages[@]} )); then
+  kestrel-pkg-aur-add "${aur_packages[@]}"
+fi

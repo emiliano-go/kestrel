@@ -6,16 +6,16 @@ TEST_HOME=$(mktemp -d)
 trap 'rm -rf "$TEST_HOME"' EXIT
 
 FAKE_BIN="$TEST_HOME/bin"
-CURRENT_THEME="$TEST_HOME/.local/state/helios/current/theme"
+CURRENT_THEME="$TEST_HOME/.local/state/kestrel/current/theme"
 mkdir -p "$FAKE_BIN" "$CURRENT_THEME"
 
-cat >"$FAKE_BIN/helios-cmd-present" <<'EOF'
+cat >"$FAKE_BIN/kestrel-cmd-present" <<'EOF'
 #!/bin/bash
 printf '%s\n' "$1" >>"$EDITOR_PROBE_LOG"
 exit 1
 EOF
 
-cat >"$FAKE_BIN/helios-toggle-enabled" <<'EOF'
+cat >"$FAKE_BIN/kestrel-toggle-enabled" <<'EOF'
 #!/bin/bash
 exit 1
 EOF
@@ -33,7 +33,7 @@ EDITOR_PROBE_LOG="$TEST_HOME/editor-probes.log" \
   CURSOR_SHIM_CALLED="$TEST_HOME/cursor-shim-called" \
   PATH="$FAKE_BIN:$ROOT/bin:$PATH" \
   HOME="$TEST_HOME" \
-  "$ROOT/bin/helios-theme-set-vscode"
+  "$ROOT/bin/kestrel-theme-set-vscode"
 
 grep -Fxq '/usr/bin/cursor' "$TEST_HOME/editor-probes.log" || fail "VS Code theme sync probes the packaged Cursor executable"
 [[ ! -e $TEST_HOME/cursor-shim-called ]] || fail "VS Code theme sync ignores a PATH-provided Cursor Agent shim"

@@ -26,7 +26,7 @@ expected=$(
 WORDMARK
 )
 
-output=$(helios-ascii HeliOS)
+output=$(kestrel-ascii Kestrel)
 [[ $output == "$expected" ]] || fail "the wordmark matches the reference rendering" "expected:
 $expected
 actual:
@@ -51,97 +51,97 @@ expected_m=$(
 LETTER_M
 )
 
-output=$(helios-ascii M)
+output=$(kestrel-ascii M)
 [[ $output == "$expected_m" ]] || fail "a leading M keeps the blanks figlet.js gives it" "expected:
 $expected_m
 actual:
 $output"
 pass "a leading M keeps the blanks figlet.js gives it"
 
-output=$(printf 'HeliOS' | helios-ascii)
+output=$(printf 'Kestrel' | kestrel-ascii)
 [[ $output == "$expected" ]] || fail "text can arrive on stdin"
 pass "text can arrive on stdin"
 
 # The route is the way a user reaches this, and it dispatches on whether the
 # metadata says an argument is required -- so a piped run has to be exercised
-# through `helios` itself, not just through the binary.
-output=$(printf 'HeliOS' | helios ascii)
-[[ $output == "$expected" ]] || fail "piped text renders through the helios route" "got:
+# through `kestrel` itself, not just through the binary.
+output=$(printf 'Kestrel' | kestrel ascii)
+[[ $output == "$expected" ]] || fail "piped text renders through the kestrel route" "got:
 $output"
-pass "piped text renders through the helios route"
+pass "piped text renders through the kestrel route"
 
 # The block characters are three bytes each, so the column arithmetic has to
 # count columns rather than bytes wherever the locale lands.
-output=$(LC_ALL=C helios-ascii HeliOS)
+output=$(LC_ALL=C kestrel-ascii Kestrel)
 [[ $output == "$expected" ]] || fail "a byte-only locale draws the same wordmark"
 pass "a byte-only locale draws the same wordmark"
 
-blanks=$(helios-ascii HeliOS | grep -c ' $' || true)
+blanks=$(kestrel-ascii Kestrel | grep -c ' $' || true)
 [[ $blanks == "0" ]] || fail "no line is padded with trailing blanks" "$blanks lines end in a blank"
 pass "no line is padded with trailing blanks"
 
 # The space is a glyph of five hardblank columns, so it is worth exactly five
 # columns of art -- not merely more than none.
-tight=$(helios-ascii "Hi" | columns)
-spaced=$(helios-ascii "H i" | columns)
+tight=$(kestrel-ascii "Hi" | columns)
+spaced=$(kestrel-ascii "H i" | columns)
 (( tight == 18 )) || fail "Hi is 18 columns wide" "got $tight"
 (( spaced == tight + 5 )) || fail "a space between words is five columns" "expected $((tight + 5)), got $spaced"
 pass "a space between words is five columns"
 
-rows=$(helios-ascii Hi | wc -l)
+rows=$(kestrel-ascii Hi | wc -l)
 (( rows == 9 )) || fail "a block is nine rows" "got $rows"
 pass "a block is nine rows"
 
 # An empty line is a block of its own in figlet, and dropping it would silently
 # close up the gap someone put there on purpose.
-rows=$(printf 'A\n\nB\n' | helios-ascii | wc -l)
+rows=$(printf 'A\n\nB\n' | kestrel-ascii | wc -l)
 (( rows == 27 )) || fail "an empty line still draws its block" "expected 27 rows, got $rows"
 pass "an empty line still draws its block"
 
 # awk reads escapes in a variable it is given on the command line, so text has
 # to reach it as input instead: a backslash is a character the font lacks, not
 # the start of an escape.
-rows=$(helios-ascii 'A\nB' 2>/dev/null | wc -l)
+rows=$(kestrel-ascii 'A\nB' 2>/dev/null | wc -l)
 (( rows == 9 )) || fail "a backslash in the text is not an escape" "expected 9 rows, got $rows"
 pass "a backslash in the text is not an escape"
 
 # Delta Corps Priest 1 carries letters and spaces only. Dropping the rest in
 # silence would leave a version number looking like a bug in the renderer.
 status=0
-warning=$(helios-ascii "HeliOS 4.0" 2>&1 >/dev/null) || status=$?
+warning=$(kestrel-ascii "Kestrel 4.0" 2>&1 >/dev/null) || status=$?
 (( status == 0 )) || fail "text with unusable characters still draws" "exited $status"
 [[ $warning == *"Skipped"* && $warning == *"4"* && $warning == *"."* && $warning == *"0"* ]] ||
   fail "skipped characters are named on stderr" "got: $warning"
 pass "skipped characters are named on stderr"
 
-output=$(helios-ascii "HeliOS 4.0" 2>/dev/null)
+output=$(kestrel-ascii "Kestrel 4.0" 2>/dev/null)
 [[ $output == "$expected" ]] || fail "the drawable characters still render"
 pass "the drawable characters still render"
 
 # Naming a skipped control character by writing it out would send it to the
 # terminal as a control character.
-warning=$(printf 'A\001B\n' | helios-ascii 2>&1 >/dev/null)
+warning=$(printf 'A\001B\n' | kestrel-ascii 2>&1 >/dev/null)
 [[ $warning == *'\x01'* ]] || fail "a skipped control character is named by code" "got: $warning"
 [[ $warning != *$'\001'* ]] || fail "a skipped control character is not written out raw"
 pass "a skipped control character is named by code"
 
 status=0
-output=$(helios-ascii "4.0" 2>/dev/null) || status=$?
+output=$(kestrel-ascii "4.0" 2>/dev/null) || status=$?
 (( status == 1 )) || fail "text the font cannot draw at all fails" "exited $status"
 [[ -z $output ]] || fail "text the font cannot draw at all prints nothing"
 pass "text the font cannot draw at all fails"
 
 # A mistyped option would otherwise be drawn as art, silently.
 status=0
-output=$(helios-ascii --width 40 2>&1 >/dev/null) || status=$?
+output=$(kestrel-ascii --width 40 2>&1 >/dev/null) || status=$?
 (( status == 1 )) || fail "an unknown option is refused" "exited $status"
 [[ $output == *"Unknown option: --width"* ]] || fail "an unknown option is named" "got: $output"
 pass "an unknown option is refused"
 
-output=$(helios-ascii -- Hi | columns)
+output=$(kestrel-ascii -- Hi | columns)
 (( output == 18 )) || fail "text after -- is still text" "got $output columns"
 pass "text after -- is still text"
 
-output=$(helios-ascii --help)
-[[ $output == *"Usage: helios-ascii"* ]] || fail "help renders"
+output=$(kestrel-ascii --help)
+[[ $output == *"Usage: kestrel-ascii"* ]] || fail "help renders"
 pass "help renders"

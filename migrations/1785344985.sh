@@ -6,7 +6,7 @@ echo "Add the agents widget to the bar"
 # active days, or a rate limit. So adding it to every existing bar is free:
 # machines without Claude Code or Codex never see it.
 
-config_file="$HOME/.config/helios/shell.json"
+config_file="$HOME/.config/kestrel/shell.json"
 
 if [[ -s $config_file ]]; then
   tmp=$(mktemp)
@@ -38,10 +38,10 @@ if [[ -s $config_file ]]; then
 
     # Respect a bar the user already curated: only place the widget when it is
     # absent from every section, never a second copy.
-    if has_widget("helios.agents") then
+    if has_widget("kestrel.agents") then
       .
     else
-      .bar.layout.right |= insert_after("helios.tray"; { id: "helios.agents" })
+      .bar.layout.right |= insert_after("kestrel.tray"; { id: "kestrel.agents" })
     end
   ' "$config_file" >"$tmp" && mv "$tmp" "$config_file" || rm -f "$tmp"
 fi

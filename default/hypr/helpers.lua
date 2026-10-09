@@ -61,7 +61,7 @@ local shell_shortcuts = nil
 local function shell_shortcut_registered(name)
   if not shell_shortcuts then
     shell_shortcuts = {}
-    local file = io.open(paths.helios_path .. "/default/helios/shortcuts", "r")
+    local file = io.open(paths.kestrel_path .. "/default/kestrel/shortcuts", "r")
     if file then
       for line in file:lines() do
         local kind, target = line:match("^(%a+)%s+(%S+)%s*$")
@@ -81,7 +81,7 @@ end
 local function shell_dispatcher(kind, target, command)
   local name = kind .. "." .. target
   if shell_shortcut_registered(name) then
-    return hl.dsp.global("helios:" .. name)
+    return hl.dsp.global("kestrel:" .. name)
   end
 
   return command
@@ -92,20 +92,20 @@ local function command_from(value, description)
     return value
   end
 
-  if value.helios then
-    return "helios-launch-" .. value.helios
+  if value.kestrel then
+    return "kestrel-launch-" .. value.kestrel
   elseif value.menu then
-    return shell_dispatcher("menu", value.menu, "helios-menu toggle " .. shell_quote(value.menu))
+    return shell_dispatcher("menu", value.menu, "kestrel-menu toggle " .. shell_quote(value.menu))
   elseif value.panel then
-    return shell_dispatcher("panel", value.panel, "helios-shell shell toggle " .. shell_quote(value.panel))
+    return shell_dispatcher("panel", value.panel, "kestrel-shell shell toggle " .. shell_quote(value.panel))
   elseif value.audio then
-    return shell_dispatcher("audio", value.audio, "helios-audio-output-volume " .. shell_quote(value.audio))
+    return shell_dispatcher("audio", value.audio, "kestrel-audio-output-volume " .. shell_quote(value.audio))
   elseif value.brightness then
     local step = value.brightness == "raise" and "+5%" or "5%-"
-    return shell_dispatcher("brightness", value.brightness, "helios-brightness-display " .. step)
+    return shell_dispatcher("brightness", value.brightness, "kestrel-brightness-display " .. step)
   elseif value.ipc then
     local target, method = value.ipc:match("^([^.]+)%.(.+)$")
-    return shell_dispatcher("ipc", value.ipc, "helios-shell " .. shell_quote(target) .. " " .. shell_quote(method))
+    return shell_dispatcher("ipc", value.ipc, "kestrel-shell " .. shell_quote(target) .. " " .. shell_quote(method))
   elseif value.focus and value.launch then
     return o.launch_sole(value.focus, value.launch)
   elseif value.launch then
@@ -118,9 +118,9 @@ local function command_from(value, description)
     end
   elseif value.tui then
     if value.focus then
-      return "helios-launch-or-focus-tui " .. shell_quote(value.tui)
+      return "kestrel-launch-or-focus-tui " .. shell_quote(value.tui)
     else
-      return "helios-launch-tui " .. shell_quote(value.tui)
+      return "kestrel-launch-tui " .. shell_quote(value.tui)
     end
   end
 
@@ -128,11 +128,11 @@ local function command_from(value, description)
 end
 
 function o.preinstalled_bindings_enabled()
-  if _G.helios_preinstalled_bindings ~= nil then
-    return _G.helios_preinstalled_bindings == true
+  if _G.kestrel_preinstalled_bindings ~= nil then
+    return _G.kestrel_preinstalled_bindings == true
   end
 
-  return not file_exists((os.getenv("HOME") or "") .. "/.local/state/helios/preinstalls-removed")
+  return not file_exists((os.getenv("HOME") or "") .. "/.local/state/kestrel/preinstalls-removed")
 end
 
 function o.bind(keys, description, dispatcher, options)
@@ -170,13 +170,13 @@ function o.launch_terminal()
   local function launch()
     local window = hl.get_active_window()
     if window and window.pid then
-      hl.exec_cmd("helios-launch-terminal --pid=" .. window.pid)
+      hl.exec_cmd("kestrel-launch-terminal --pid=" .. window.pid)
     else
-      hl.exec_cmd("helios-launch-terminal")
+      hl.exec_cmd("kestrel-launch-terminal")
     end
   end
 
-  o.bind_commands[launch] = "helios-launch-terminal"
+  o.bind_commands[launch] = "kestrel-launch-terminal"
   return launch
 end
 
@@ -191,23 +191,23 @@ function o.launch_on_start(command)
 end
 
 function o.launch_webapp(url)
-  return "helios-launch-webapp " .. shell_quote(url)
+  return "kestrel-launch-webapp " .. shell_quote(url)
 end
 
 function o.launch_webapp_sole(name, url)
-  return "helios-launch-or-focus-webapp " .. shell_quote(name) .. " " .. shell_quote(url)
+  return "kestrel-launch-or-focus-webapp " .. shell_quote(name) .. " " .. shell_quote(url)
 end
 
 function o.launch_sole(match, command)
-  return "helios-launch-or-focus " .. shell_quote(match) .. " " .. shell_quote(o.launch(command))
+  return "kestrel-launch-or-focus " .. shell_quote(match) .. " " .. shell_quote(o.launch(command))
 end
 
 function o.bind_toggle(keys, description, toggle, options)
-  o.bind(keys, description, "helios-toggle-" .. toggle, options)
+  o.bind(keys, description, "kestrel-toggle-" .. toggle, options)
 end
 
 function o.notify(message)
-  return "helios-notification-send -u low " .. shell_quote(message)
+  return "kestrel-notification-send -u low " .. shell_quote(message)
 end
 
 function o.window(match, rules)
@@ -224,7 +224,7 @@ function o.window(match, rules)
   hl.window_rule(rules)
 end
 
--- Opt a window in to HeliOS's standard active/inactive transparency.
+-- Opt a window in to Kestrel's standard active/inactive transparency.
 function o.transparent_window(match, opacity)
   o.window(match, { opacity = opacity or "0.985 0.96" })
 end

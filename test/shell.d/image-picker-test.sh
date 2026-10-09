@@ -129,11 +129,11 @@ assert(
   'image picker opens themes from held rows before refreshing them'
 )
 assert(
-  /command: \[root\.heliosPath \+ "\/bin\/helios-theme-switcher", "--print-rows"\]/.test(imagePickerQml),
+  /command: \[root\.kestrelPath \+ "\/bin\/kestrel-theme-switcher", "--print-rows"\]/.test(imagePickerQml),
   'image picker refreshes theme rows from the theme switcher'
 )
 assert(
-  /if \(themeMode\) \{[\s\S]*Util\.execArgv\(\["helios-theme-set", nameForPath\(path\)\]\)/.test(imagePickerQml),
+  /if \(themeMode\) \{[\s\S]*Util\.execArgv\(\["kestrel-theme-set", nameForPath\(path\)\]\)/.test(imagePickerQml),
   'image picker applies a chosen theme itself'
 )
 assert(

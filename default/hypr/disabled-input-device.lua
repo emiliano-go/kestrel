@@ -4,10 +4,10 @@
 local paths = require("default.hypr.paths")
 
 return function(kind)
-  -- Hardcoded to ~/.local/state to match helios-toggle-input-device and the
+  -- Hardcoded to ~/.local/state to match kestrel-toggle-input-device and the
   -- sibling bash toggle tools, which all write there regardless of
   -- XDG_STATE_HOME.
-  local file = io.open(paths.home .. "/.local/state/helios/toggles/hypr/" .. kind .. "-disabled-name", "r")
+  local file = io.open(paths.home .. "/.local/state/kestrel/toggles/hypr/" .. kind .. "-disabled-name", "r")
   if not file then
     return
   end

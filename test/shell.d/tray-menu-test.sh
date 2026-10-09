@@ -50,8 +50,8 @@ mock_log="$TMPDIR/mock-sni.log"
 mkdir -p "$config_dir" "$TMPDIR/home"
 cp "$SHELL_TEST_DIR/fixtures/tray-menu-activation/shell.qml" "$config_dir/shell.qml"
 
-HELIOS_PATH="$ROOT" \
-HELIOS_QML_TEST_RESULT="$result" \
+KESTREL_PATH="$ROOT" \
+KESTREL_QML_TEST_RESULT="$result" \
 HOME="$TMPDIR/home" \
 XDG_CONFIG_HOME="$TMPDIR/home/.config" \
 XDG_CACHE_HOME="$TMPDIR/home/.cache" \
@@ -59,8 +59,8 @@ XDG_STATE_HOME="$TMPDIR/home/.local/state" \
   quickshell -p "$config_dir" --no-color >"$qs_log" 2>&1 &
 QS_PID=$!
 
-HELIOS_TRAY_MENU_EVENT_RESULT="$event_result" \
-HELIOS_TRAY_MENU_READY="$ready" \
+KESTREL_TRAY_MENU_EVENT_RESULT="$event_result" \
+KESTREL_TRAY_MENU_READY="$ready" \
   python "$SHELL_TEST_DIR/fixtures/tray-menu-activation/mock-sni.py" >"$mock_log" 2>&1 &
 MOCK_PID=$!
 

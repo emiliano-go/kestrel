@@ -71,19 +71,19 @@ fs.writeFileSync(`${stage}/network/Panel.qml`, source)
 JS
 printf '#!/bin/bash\nexit 0\n' > "$stage/bin/noop"
 chmod +x "$stage/bin/noop"
-for command in helios-dns helios-network-band; do
+for command in kestrel-dns kestrel-network-band; do
   ln -s noop "$stage/bin/$command"
 done
 # Preview uses only synthetic details, never the host's SSID or addresses.
 # Normal assertions keep the details empty to exercise missing-route handling.
-printf '#!/bin/bash\nif [[ -n ${NETWORK_TEST_PREVIEW:-} ]]; then\n  printf "type\\twifi\\niface\\ttest-wifi\\nssid\\tGuest Wi-Fi\\nip\\t192.0.2.10\\ngateway\\t192.0.2.1\\n"\nfi\n' > "$stage/bin/helios-network-status"
-chmod +x "$stage/bin/helios-network-status"
-printf '#!/bin/bash\nprintf "%%s\\n" "$@" >> "$NETWORK_TEST_BROWSER_LOG"\n' > "$stage/bin/helios-launch-browser"
-chmod +x "$stage/bin/helios-launch-browser"
+printf '#!/bin/bash\nif [[ -n ${NETWORK_TEST_PREVIEW:-} ]]; then\n  printf "type\\twifi\\niface\\ttest-wifi\\nssid\\tGuest Wi-Fi\\nip\\t192.0.2.10\\ngateway\\t192.0.2.1\\n"\nfi\n' > "$stage/bin/kestrel-network-status"
+chmod +x "$stage/bin/kestrel-network-status"
+printf '#!/bin/bash\nprintf "%%s\\n" "$@" >> "$NETWORK_TEST_BROWSER_LOG"\n' > "$stage/bin/kestrel-launch-browser"
+chmod +x "$stage/bin/kestrel-launch-browser"
 
 # All networking and external actions are mocked; the real connection and
 # browser are never touched, and the fixture writes only to its scratch HOME.
-output=$(HOME="$stage/home" HELIOS_PATH="$ROOT" PATH="$stage/bin:$PATH" \
+output=$(HOME="$stage/home" KESTREL_PATH="$ROOT" PATH="$stage/bin:$PATH" \
   NETWORK_TEST_BROWSER_LOG="$stage/browser.log" \
   timeout 30 quickshell -p "$stage" --no-color 2>&1) || fail "network portal fixture exits cleanly" "$output"
 [[ $output == *"RESULT pass"* ]] || fail "network portal runtime assertions pass" "$output"

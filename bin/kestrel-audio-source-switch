@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# kestrel:summary=Cycle to the next media source and transfer playback when the current source is playing
+# kestrel:args=[next|previous]
+# kestrel:examples=kestrel audio source switch | kestrel-audio-source-switch previous
+
+direction="${1:-next}"
+
+case "$direction" in
+  next)
+    kestrel-shell media sourceSwitch
+    ;;
+  previous)
+    kestrel-shell media sourceSwitchPrevious
+    ;;
+  *)
+    echo "Usage: kestrel-audio-source-switch [next|previous]" >&2
+    exit 1
+    ;;
+esac

@@ -7,11 +7,11 @@ export TERMINAL=xdg-terminal-exec
 # refuse to change the default browser, which breaks the browsers' own "Set as
 # default" buttons. Interactive shells get BROWSER from default/bash/envs instead.
 
-# Used by terminal programs to open files with the selected HeliOS default editor
-export EDITOR="helios-launch-editor --inline"
+# Used by terminal programs to open files with the selected Kestrel default editor
+export EDITOR="kestrel-launch-editor --inline"
 
 # Use a custom directory for screenshots
 # export OMASNAP_SCREENSHOT_DIR="$HOME/Pictures/Screenshots"
 
 # Use a custom directory for screenrecordings (remember to make the directory!)
-# export HELIOS_SCREENRECORD_DIR="$HOME/Videos/Screencasts"
+# export KESTREL_SCREENRECORD_DIR="$HOME/Videos/Screencasts"

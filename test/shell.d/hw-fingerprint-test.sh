@@ -35,7 +35,7 @@ write_usb_devices() {
 }
 
 hw_fingerprint() {
-  HELIOS_USB_DEVICES_PATH="$tmp_dir/devices" "$ROOT/bin/helios-hw-fingerprint"
+  KESTREL_USB_DEVICES_PATH="$tmp_dir/devices" "$ROOT/bin/kestrel-hw-fingerprint"
 }
 
 assert_detects() {

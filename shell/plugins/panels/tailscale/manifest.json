@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "helios.tailscale",
+  "id": "kestrel.tailscale",
   "name": "Tailscale",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "license": "MIT",
-  "description": "Tailscale status, connection switching, machine browsing, and quick copy actions in the HeliOS bar.",
+  "description": "Tailscale status, connection switching, machine browsing, and quick copy actions in the Kestrel bar.",
   "kinds": [
     "bar-widget"
   ],

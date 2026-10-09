@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# kestrel:summary=Set the default editor used by kestrel-launch-editor
+# kestrel:args=[code|cursor|zed|sublime_text|helix|vim|emacs|nvim]
+# kestrel:examples=kestrel default editor | kestrel default editor code | kestrel default editor helix
+
+installing=false
+if [[ ${1:-} == "--install" ]]; then
+  installing=true
+  shift
+fi
+
+editor_file="$HOME/.local/state/kestrel/defaults/editor"
+
+if (($# == 0)); then
+  if [[ -f $editor_file ]]; then
+    read -r editor <"$editor_file"
+  fi
+
+  # sublime-text-4 ships `subl`; older defaults stored `sublime_text`.
+  [[ $editor == sublime_text ]] && editor=subl
+
+  [[ -n $editor ]] && echo "$editor" || echo "nvim"
+  exit 0
+fi
+
+case "$1" in
+code) selection="code"; editor="code"; name="VSCode"; glyph= ;;
+cursor) selection="cursor"; editor="cursor"; name="Cursor"; glyph= ;;
+zed | zeditor) selection="zed"; editor="zeditor"; name="Zed"; glyph= ;;
+sublime_text | subl) selection="sublime_text"; editor="subl"; name="Sublime Text"; glyph= ;;
+helix) selection="helix"; editor="helix"; name="Helix"; glyph= ;;
+vim) selection="vim"; editor="vim"; name="Vim"; glyph= ;;
+emacs) selection="emacs"; editor="emacs"; name="Emacs"; glyph= ;;
+nvim) selection="nvim"; editor="nvim"; name="Neovim"; glyph= ;;
+*)
+  echo "Usage: kestrel-default-editor <code|cursor|zed|sublime_text|helix|vim|emacs|nvim>"
+  exit 1
+  ;;
+esac
+
+if kestrel-cmd-missing "$editor"; then
+  if [[ $installing == "false" ]]; then
+    exec kestrel-launch-floating-terminal-with-presentation kestrel-default-editor --install "$selection"
+  else
+    case "$selection" in
+    code) kestrel-install-editor-vscode ;;
+    cursor) kestrel-pkg-add cursor-bin ;;
+    zed) kestrel-install-editor-zed ;;
+    sublime_text) kestrel-pkg-add sublime-text-4 ;;
+    helix) kestrel-install-editor-helix ;;
+    vim) kestrel-pkg-add vim ;;
+    emacs) kestrel-install-editor-emacs ;;
+    nvim) kestrel-pkg-add neovim ;;
+    esac || exit 1
+  fi
+fi
+
+mkdir -p "$(dirname "$editor_file")"
+printf '%s\n' "$editor" >"$editor_file"
+
+kestrel-notification-send -g $glyph "$name is now the default editor"

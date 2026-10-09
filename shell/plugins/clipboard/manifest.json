@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.clipboard",
+  "id": "kestrel.clipboard",
   "name": "Clipboard",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "A clipboard manager to view and paste history",
   "kinds": [
     "overlay"

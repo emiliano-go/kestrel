@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# kestrel:summary=Remove Tailscale and its bar plugin.
+# kestrel:requires-sudo=true
+
+tailscale down 2>/dev/null || true
+systemctl --user disable --now kestrel-tailscale-receive.service 2>/dev/null || true
+sudo systemctl disable --now tailscaled.service 2>/dev/null || true
+kestrel-plugin-disable kestrel.tailscale
+kestrel-webapp-remove "Tailscale" 2>/dev/null || true
+kestrel-pkg-drop tailscale
+
+echo ""
+echo "Tailscale has been removed."

@@ -26,7 +26,7 @@ local function read_vconsole()
 end
 
 -- Layouts that can't type Latin letters. Keep in sync with the list in
--- etc/mkinitcpio.conf.d/helios_hooks.conf and default/hypr/input.lua.
+-- etc/mkinitcpio.conf.d/kestrel_hooks.conf and default/hypr/input.lua.
 local non_latin_layouts =
   " af am ara bd bg by et ge gr il in iq ir kg kh kz la lk mk mm mn mv np rs ru sy th tj ua "
 

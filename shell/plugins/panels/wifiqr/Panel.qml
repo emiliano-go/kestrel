@@ -11,14 +11,14 @@ import "Model.js" as Model
 // heavy scrim. Esc or the scrim dismiss it.
 //
 // Standalone panel plugin: each summon regenerates the code via
-// helios-network-qr, which emits the interface, security, and SSID it
+// kestrel-network-qr, which emits the interface, security, and SSID it
 // shared ahead of the module matrix — so a bare summon self-detects the
 // connection. The payload may pin the interface and pre-title the card:
 // {"iface": "wlan0", "ssid": "MyWifi"}.
 Item {
   id: root
 
-  property string heliosPath: Quickshell.env("HELIOS_PATH")
+  property string kestrelPath: Quickshell.env("KESTREL_PATH")
   property var shell: null
   property var manifest: null
 
@@ -89,7 +89,7 @@ Item {
 
   function dismiss() {
     if (root.shell && typeof root.shell.hide === "function")
-      root.shell.hide((root.manifest && root.manifest.id) || "helios.wifiqr")
+      root.shell.hide((root.manifest && root.manifest.id) || "kestrel.wifiqr")
     else close()
   }
 
@@ -125,8 +125,8 @@ Item {
       pwProc.running = false
     }
     qrProc.command = requestedIface
-      ? ["helios-network-qr", "--meta", requestedIface]
-      : ["helios-network-qr", "--meta"]
+      ? ["kestrel-network-qr", "--meta", requestedIface]
+      : ["kestrel-network-qr", "--meta"]
     qrProc.running = true
   }
 
@@ -150,7 +150,7 @@ Item {
     // Only a deliberate new lookup lowers the canceled-fetch guard, right as
     // it launches -- see the pwProc comment.
     pwExpectedStop = false
-    pwProc.command = ["helios-network-password", iface]
+    pwProc.command = ["kestrel-network-password", iface]
     pwProc.running = true
   }
 
@@ -212,7 +212,7 @@ Item {
 
   OverlayWindow {
     shown: root.opened
-    WlrLayershell.namespace: "helios-network-qr"
+    WlrLayershell.namespace: "kestrel-network-qr"
 
     // Deep scrim: the floating code needs the backdrop to carry the contrast
     // on any wallpaper.

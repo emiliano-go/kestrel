@@ -246,7 +246,7 @@ Item {
 
   function showOsd(actionLabel, iconName, player) {
     if (!shell) return
-    shell.summon("helios.osd", JSON.stringify({
+    shell.summon("kestrel.osd", JSON.stringify({
       icon: iconName || "media",
       message: osdMessage(player || activePlayer, actionLabel)
     }))
@@ -460,7 +460,7 @@ Item {
   //
   // The volume keys arrive as global shortcuts and change the volume here,
   // with no process per press, stepping, clamping, unmuting and debouncing the
-  // way helios-audio-output-volume does, so either path lands on the same
+  // way kestrel-audio-output-volume does, so either path lands on the same
   // volume and OSD. That script resolves a DSP sink through to the physical
   // sink it feeds on every press, from the live routing. An ALSA sink is its
   // own physical sink, so only then do the keys act here; any other default
@@ -490,9 +490,9 @@ Item {
       audio.volume = step.percent / 100
     }
 
-    // The payload helios-osd builds, from the values just set: the node may
+    // The payload kestrel-osd builds, from the values just set: the node may
     // not report them back before the OSD draws.
-    shell.summon("helios.osd", JSON.stringify({
+    shell.summon("kestrel.osd", JSON.stringify({
       icon: MediaModel.volumeOsdIcon(step.percent, step.muted),
       message: "",
       value: String(step.percent),

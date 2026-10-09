@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kestrel:summary=Enable, disable, or toggle the touchpad
+# kestrel:args=[on|off|toggle]
+
+exec kestrel-toggle-input-device touchpad "${1:-toggle}"

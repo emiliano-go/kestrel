@@ -24,7 +24,7 @@ write_connectors() {
 }
 
 has_external_monitor() {
-  HELIOS_DRM_PATH="$drm_path" "$ROOT/bin/helios-hw-external-monitors"
+  KESTREL_DRM_PATH="$drm_path" "$ROOT/bin/kestrel-hw-external-monitors"
 }
 
 write_connectors

@@ -10,7 +10,7 @@ import "EmojiSearch.js" as EmojiSearch
 Item {
   id: root
 
-  property string heliosPath: Quickshell.env("HELIOS_PATH")
+  property string kestrelPath: Quickshell.env("KESTREL_PATH")
   property var shell: null
   property var manifest: null
 
@@ -59,7 +59,7 @@ Item {
   function dismiss() {
     root.opened = false
     if (root.shell && typeof root.shell.hide === "function")
-      root.shell.hide((root.manifest && root.manifest.id) || "helios.emojis")
+      root.shell.hide((root.manifest && root.manifest.id) || "kestrel.emojis")
   }
 
   function toggle() {
@@ -149,19 +149,19 @@ Item {
   function applySelected(emoji) {
     if (!emoji) return
     root.dismiss()
-    Quickshell.execDetached([root.heliosPath + "/bin/helios-menu-emoji-insert", emoji])
+    Quickshell.execDetached([root.kestrelPath + "/bin/kestrel-menu-emoji-insert", emoji])
   }
 
   ListModel { id: displayModel }
 
   FileView {
-    path: root.heliosPath + "/shell/plugins/emojis/emojis.json"
+    path: root.kestrelPath + "/shell/plugins/emojis/emojis.json"
     onLoaded: root.loadEmojis(text())
   }
   OverlayWindow {
     id: panel
     shown: root.opened
-    WlrLayershell.namespace: "helios-emojis"
+    WlrLayershell.namespace: "kestrel-emojis"
 
     Rectangle {
       anchors.fill: parent

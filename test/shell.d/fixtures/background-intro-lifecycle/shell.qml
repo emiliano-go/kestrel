@@ -29,7 +29,7 @@ ShellRoot {
     running: true
     onTriggered: {
       test.check(intro.checked, "startup runs even when OWE left the background disabled for a video")
-      test.services = ({ "helios.background": retainedBackground })
+      test.services = ({ "kestrel.background": retainedBackground })
       intro.prepareTheme(Quickshell.env("INTRO_TEST_COVER"), "theme-one", Qt.btoa('background = "#123456"'), "")
       test.check(intro.themeCoverStatus("theme-one") === "loading", "the cover waits for decoding and presentation")
       test.check(intro.themeStatus("theme-one") === "pending", "app retints wait for the intro reveal")

@@ -9,10 +9,10 @@ file_sha() {
 }
 
 packaged_hypr_config() {
-  local helios_config="$HELIOS_PATH/config/hypr/$1"
+  local kestrel_config="$KESTREL_PATH/config/hypr/$1"
 
-  if [[ -f $helios_config ]]; then
-    printf '%s\n' "$helios_config"
+  if [[ -f $kestrel_config ]]; then
+    printf '%s\n' "$kestrel_config"
   else
     printf '/etc/skel/.config/hypr/%s\n' "$1"
   fi
@@ -100,8 +100,8 @@ if [[ -f $bindings_file ]]; then
       replace_with_packaged_config bindings.lua
       ;;
     "$plain_bindings_sha")
-      mkdir -p "$HOME/.local/state/helios"
-      touch "$HOME/.local/state/helios/preinstalls-removed"
+      mkdir -p "$HOME/.local/state/kestrel"
+      touch "$HOME/.local/state/kestrel/preinstalls-removed"
       replace_with_packaged_config bindings.lua
       ;;
   esac

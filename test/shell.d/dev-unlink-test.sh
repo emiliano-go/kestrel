@@ -9,20 +9,20 @@ trap 'rm -rf "$test_tmp"' EXIT
 
 stub_bin="$test_tmp/bin"
 log_file="$test_tmp/dev-unlink.log"
-conf_file="$test_tmp/helios.conf"
+conf_file="$test_tmp/kestrel.conf"
 mkdir -p "$stub_bin" "$test_tmp/home"
 
 cat >"$stub_bin/sudo" <<'SH'
 #!/bin/bash
 
-printf 'sudo' >>"$HELIOS_DEV_UNLINK_TEST_LOG"
+printf 'sudo' >>"$KESTREL_DEV_UNLINK_TEST_LOG"
 for arg in "$@"; do
-  printf '\t%s' "$arg" >>"$HELIOS_DEV_UNLINK_TEST_LOG"
+  printf '\t%s' "$arg" >>"$KESTREL_DEV_UNLINK_TEST_LOG"
 done
-printf '\n' >>"$HELIOS_DEV_UNLINK_TEST_LOG"
+printf '\n' >>"$KESTREL_DEV_UNLINK_TEST_LOG"
 
 if [[ $1 == "tee" ]]; then
-  cat >"$HELIOS_DEV_UNLINK_TEST_CONF"
+  cat >"$KESTREL_DEV_UNLINK_TEST_CONF"
 fi
 SH
 chmod +x "$stub_bin/sudo"
@@ -30,39 +30,39 @@ chmod +x "$stub_bin/sudo"
 cat >"$stub_bin/gum" <<'SH'
 #!/bin/bash
 
-printf 'gum' >>"$HELIOS_DEV_UNLINK_TEST_LOG"
+printf 'gum' >>"$KESTREL_DEV_UNLINK_TEST_LOG"
 for arg in "$@"; do
-  printf '\t%s' "$arg" >>"$HELIOS_DEV_UNLINK_TEST_LOG"
+  printf '\t%s' "$arg" >>"$KESTREL_DEV_UNLINK_TEST_LOG"
 done
-printf '\n' >>"$HELIOS_DEV_UNLINK_TEST_LOG"
+printf '\n' >>"$KESTREL_DEV_UNLINK_TEST_LOG"
 SH
 chmod +x "$stub_bin/gum"
 
-cat >"$stub_bin/helios-system-reboot" <<'SH'
+cat >"$stub_bin/kestrel-system-reboot" <<'SH'
 #!/bin/bash
 
-printf 'reboot\n' >>"$HELIOS_DEV_UNLINK_TEST_LOG"
+printf 'reboot\n' >>"$KESTREL_DEV_UNLINK_TEST_LOG"
 SH
-chmod +x "$stub_bin/helios-system-reboot"
+chmod +x "$stub_bin/kestrel-system-reboot"
 
 run_unlink() {
   HOME="$test_tmp/home" \
-    HELIOS_DEV_UNLINK_TEST_LOG="$log_file" \
-    HELIOS_DEV_UNLINK_TEST_CONF="$conf_file" \
+    KESTREL_DEV_UNLINK_TEST_LOG="$log_file" \
+    KESTREL_DEV_UNLINK_TEST_CONF="$conf_file" \
     PATH="$stub_bin:$PATH" \
-    "$ROOT/bin/helios-dev-unlink" "$@"
+    "$ROOT/bin/kestrel-dev-unlink" "$@"
 }
 
 : >"$log_file"
 run_unlink --no-reboot
 
-grep -Fx $'sudo\ttee\t/etc/helios.conf' "$log_file" >/dev/null ||
+grep -Fx $'sudo\ttee\t/etc/kestrel.conf' "$log_file" >/dev/null ||
   fail "dev unlink writes the package path without rebooting" "$(cat "$log_file")"
-[[ $(<"$conf_file") == 'export HELIOS_PATH="/usr/share/helios"' ]] ||
+[[ $(<"$conf_file") == 'export KESTREL_PATH="/usr/share/kestrel"' ]] ||
   fail "dev unlink writes the package path guard" "$(<"$conf_file")"
 
 # Left behind, it keeps sudo running a checkout nothing else points at.
-grep -Fx $'sudo\trm\t-f\t/etc/sudoers.d/helios-dev-path' "$log_file" >/dev/null ||
+grep -Fx $'sudo\trm\t-f\t/etc/sudoers.d/kestrel-dev-path' "$log_file" >/dev/null ||
   fail "dev unlink drops the sudo secure_path drop-in" "$(cat "$log_file")"
 pass "dev unlink drops the sudo secure_path drop-in"
 
@@ -83,6 +83,6 @@ pass "interactive dev unlink keeps its reboot prompt"
 if run_unlink --invalid >"$test_tmp/invalid.out" 2>"$test_tmp/invalid.err"; then
   fail "dev unlink rejects unknown arguments"
 fi
-grep -F 'Usage: helios dev unlink [--no-reboot]' "$test_tmp/invalid.err" >/dev/null ||
+grep -F 'Usage: kestrel dev unlink [--no-reboot]' "$test_tmp/invalid.err" >/dev/null ||
   fail "dev unlink explains valid arguments" "$(cat "$test_tmp/invalid.err")"
 pass "dev unlink rejects unknown arguments"

@@ -11,7 +11,7 @@ Item {
 
   property var host: null
   property bool cover: true
-  readonly property bool sessionConsumed: String(sessionMarker.text() || "").trim() === (Quickshell.env("HELIOS_SESSION_ID") || Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE"))
+  readonly property bool sessionConsumed: String(sessionMarker.text() || "").trim() === (Quickshell.env("KESTREL_SESSION_ID") || Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE"))
   property bool startupSettled: sessionConsumed
   property bool startupPending: !sessionConsumed
   property bool startupMediaReady: false
@@ -20,24 +20,24 @@ Item {
   property bool checked: false
   property string themeToken: ""
   property string transitionToken: ""
-  readonly property string startupBackgroundPath: Quickshell.env("HELIOS_STARTUP_BACKGROUND")
+  readonly property string startupBackgroundPath: Quickshell.env("KESTREL_STARTUP_BACKGROUND")
   property string themeBackground: sessionConsumed && !Util.isVideoPath(startupBackgroundPath) ? startupBackgroundPath : ""
   property var themeNativeSize: null
   property string themeColors: ""
   property string themeShell: ""
   property real themeOpacity: 1
-  readonly property var backgroundService: host && host.services ? host.firstPartyServiceFor("helios.background") : null
+  readonly property var backgroundService: host && host.services ? host.firstPartyServiceFor("kestrel.background") : null
   readonly property bool backgroundActive: !!backgroundService && !backgroundService.suspended
   readonly property bool backgroundReady: backgroundActive && backgroundService.ready !== false
 
   function restoreStartupCursor() {
-    Quickshell.execDetached(["hyprctl", "eval", "if helios_startup_cursor_restore then helios_startup_cursor_restore() end"])
+    Quickshell.execDetached(["hyprctl", "eval", "if kestrel_startup_cursor_restore then kestrel_startup_cursor_restore() end"])
   }
 
   function finishStartup() {
     if (!cover || !startupSettled) return
     var registry = host ? host.pluginRegistry : null
-    var backgroundId = registry ? registry.resolveEnabledId("helios.background") : ""
+    var backgroundId = registry ? registry.resolveEnabledId("kestrel.background") : ""
     var disabled = registry && registry.installedPlugins[backgroundId] && !registry.isEnabled(backgroundId)
     if (!backgroundReady && !disabled) return
     cover = false
@@ -178,7 +178,7 @@ Item {
 
   Process {
     id: frameStatus
-    // HeliOS has no video wallpaper engine, so there is never a renderer to
+    // Kestrel has no video wallpaper engine, so there is never a renderer to
     // poll. Keep the process as an inert no-op so the intro plumbing stays
     // harmless until it is removed with the shell in a later milestone.
     command: ["/bin/true"]
@@ -198,7 +198,7 @@ Item {
   // A shell restart shares this compositor session; a new login does not.
   FileView {
     id: sessionMarker
-    path: Quickshell.env("HOME") + "/.local/state/helios/background-intro.session-id"
+    path: Quickshell.env("HOME") + "/.local/state/kestrel/background-intro.session-id"
     blockLoading: true
     watchChanges: false
     printErrors: false
@@ -206,7 +206,7 @@ Item {
 
   Process {
     id: startupBackground
-    command: ["readlink", "-f", Quickshell.env("HOME") + "/.local/state/helios/current/background"]
+    command: ["readlink", "-f", Quickshell.env("HOME") + "/.local/state/kestrel/current/background"]
     stdout: StdioCollector { id: startupBackgroundOut }
     onExited: function(exitCode) {
       var path = String(startupBackgroundOut.text || "").trim()
@@ -250,7 +250,7 @@ Item {
       exclusionMode: ExclusionMode.Ignore
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-      WlrLayershell.namespace: "helios-background"
+      WlrLayershell.namespace: "kestrel-background"
 
       Rectangle {
         anchors.fill: parent
@@ -288,7 +288,7 @@ Item {
       exclusionMode: ExclusionMode.Ignore
       WlrLayershell.layer: WlrLayer.Bottom
       WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-      WlrLayershell.namespace: "helios-background"
+      WlrLayershell.namespace: "kestrel-background"
 
       Rectangle {
         anchors.fill: parent
@@ -324,7 +324,7 @@ Item {
 
   Process {
     id: introProc
-    command: ["helios-theme-bg-boot-intro"]
+    command: ["kestrel-theme-bg-boot-intro"]
     onExited: {
       root.startupSettled = true
       root.finishStartup()

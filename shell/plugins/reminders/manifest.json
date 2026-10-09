@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.reminders",
+  "id": "kestrel.reminders",
   "name": "Reminders",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Interactive reminder setup flow",
   "kinds": [
     "overlay"

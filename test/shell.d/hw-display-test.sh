@@ -18,7 +18,7 @@ write_backlights() {
 }
 
 hw_display() {
-  HELIOS_BACKLIGHT_PATH="$tmp_dir/backlight" "$ROOT/bin/helios-hw-display"
+  KESTREL_BACKLIGHT_PATH="$tmp_dir/backlight" "$ROOT/bin/kestrel-hw-display"
 }
 
 write_backlights intel_backlight

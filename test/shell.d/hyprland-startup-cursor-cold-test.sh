@@ -24,7 +24,7 @@ with tempfile.TemporaryDirectory() as directory:
   home.mkdir()
   (stage / "release").write_text("")
   (stage / "bin").mkdir()
-  launcher = stage / "bin/helios-theme-bg-boot-intro"
+  launcher = stage / "bin/kestrel-theme-bg-boot-intro"
   launcher.write_text("#!/bin/bash\nexit 0\n")
   launcher.chmod(0o755)
   for name in ("Commons", "services"):
@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory() as directory:
   fixture = root / "test/shell.d/fixtures/startup-cursor"
   (stage / "shell.qml").write_text((fixture / "shell.qml").read_text())
   env = os.environ.copy()
-  env.update(HOME=str(home), HELIOS_PATH=str(root), CURSOR_TEST_STAGE=str(stage),
+  env.update(HOME=str(home), KESTREL_PATH=str(root), CURSOR_TEST_STAGE=str(stage),
          PATH=str(stage / "bin") + ":" + env["PATH"], AQ_BACKEND="wayland",
          HYPRLAND_NO_SD_VARS="1", HYPRLAND_NO_SD_NOTIFY="1", GSETTINGS_BACKEND="memory",
          XCURSOR_THEME="Adwaita", XCURSOR_PATH="/usr/share/icons:/usr/share/pixmaps", XCURSOR_SIZE="24", HYPRCURSOR_SIZE="24")

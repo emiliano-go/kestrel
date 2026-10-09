@@ -83,7 +83,7 @@ PanelWindow {
   color: "transparent"
   exclusionMode: ExclusionMode.Ignore
 
-  WlrLayershell.namespace: "helios-keyboard-panel"
+  WlrLayershell.namespace: "kestrel-keyboard-panel"
   WlrLayershell.layer: WlrLayer.Overlay
   // Keyboard focus follows `open` (NOT `visible`). The window remains
   // mapped during the fade-out so the opacity animation has something to
@@ -355,7 +355,7 @@ PanelWindow {
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
 
-        WlrLayershell.namespace: "helios-keyboard-panel-dismiss"
+        WlrLayershell.namespace: "kestrel-keyboard-panel-dismiss"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 

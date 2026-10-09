@@ -9,7 +9,7 @@
 # polkit prompt, and the plain `docker` CLI runs under sudo. Users who want the
 # convenience back can opt in, behind a warning, with:
 #
-#   helios-setup-security-sudoless-docker   (Setup > Security > Sudoless Docker)
+#   kestrel-setup-security-sudoless-docker   (Setup > Security > Sudoless Docker)
 #
 # Nothing to do here now that the group is no longer granted, but the file stays
 # as the recorded home of this decision and a hook for future daemon config.

@@ -22,14 +22,14 @@ ShellRoot {
 
   FileView {
     id: resultFile
-    path: Quickshell.env("HELIOS_QML_TEST_RESULT")
+    path: Quickshell.env("KESTREL_QML_TEST_RESULT")
     atomicWrites: true
   }
 
   Component.onCompleted: {
     var caller = "example.safe"
-    authStoreOwner.retain("helios.lock", root.ownService)
-    authStoreOwner.updateManifest("helios.lock", { version: "kept" })
+    authStoreOwner.retain("kestrel.lock", root.ownService)
+    authStoreOwner.updateManifest("kestrel.lock", { version: "kept" })
     var api = apiComponent.createObject(null, {
       pluginId: caller,
       idleConfig: { screensaver: 60, lock: 120 },
@@ -63,24 +63,24 @@ ShellRoot {
     var result = {
       detached: api.parent === undefined || api.parent === null,
       ownService: own && own.marker === "own",
-      foreignService: api.serviceFor("helios.lock") === null,
-      firstPartyService: api.firstPartyServiceFor("helios.polkit") === null,
+      foreignService: api.serviceFor("kestrel.lock") === null,
+      firstPartyService: api.firstPartyServiceFor("kestrel.polkit") === null,
       ownSummon: api.summon(caller, "{}") === true,
-      foreignSummon: api.summon("helios.lock", "{}") === false,
+      foreignSummon: api.summon("kestrel.lock", "{}") === false,
       ownHide: api.hide(caller) === true,
-      foreignHide: api.hide("helios.lock") === false,
+      foreignHide: api.hide("kestrel.lock") === false,
       ownToggle: api.toggle(caller, "{}") === true,
-      foreignToggle: api.toggle("helios.lock", "{}") === false,
+      foreignToggle: api.toggle("kestrel.lock", "{}") === false,
       ownOpen: api.isPluginOpen(caller) === true,
-      foreignOpen: api.isPluginOpen("helios.lock") === false,
+      foreignOpen: api.isPluginOpen("kestrel.lock") === false,
       ownSettings: api.updateEntryInline(caller, {}) === true,
-      foreignSettings: api.updateEntryInline("helios.lock", {}) === false,
+      foreignSettings: api.updateEntryInline("kestrel.lock", {}) === false,
       detachedIdleConfig: api.idleConfig.screensaver === 60 && api.idleConfig.lock === 120,
-      authStoreOwnerRetains: authStoreOwner.has("helios.lock") === true,
-      authStoreOwnerRemembersTrust: authStoreOwner.isTrusted("helios.lock") === true,
+      authStoreOwnerRetains: authStoreOwner.has("kestrel.lock") === true,
+      authStoreOwnerRemembersTrust: authStoreOwner.isTrusted("kestrel.lock") === true,
       authStoreOwnerUpdatesManifest: root.ownService.manifest
         && root.ownService.manifest.version === "kept",
-      authStoreImportIsolated: authStoreReader.has("helios.lock") === false,
+      authStoreImportIsolated: authStoreReader.has("kestrel.lock") === false,
       noGenericPluginShellFactory: typeof api.pluginShellForId !== "function",
       calls: root.calls
     }

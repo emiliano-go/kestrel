@@ -1,3 +1,3 @@
-if helios-hw-asus-rog; then
-  helios-pkg-add asusctl
+if kestrel-hw-asus-rog; then
+  kestrel-pkg-add asusctl
 fi

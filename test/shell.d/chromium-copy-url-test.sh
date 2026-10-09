@@ -47,7 +47,7 @@ jq -e '
   .background.service_worker == "background-4.js"
 ' "$ROOT/default/chromium/extensions/copy-url/manifest.json" >/dev/null ||
   fail "copy-url extension uses its native messaging host"
-grep -q "sendNativeMessage('com.helios.copy_url'" \
+grep -q "sendNativeMessage('com.kestrel.copy_url'" \
   "$ROOT/default/chromium/extensions/copy-url/background-4.js" ||
   fail "copy-url extension sends URLs to its native messaging host"
 pass "copy-url extension uses its native messaging host"
@@ -59,42 +59,42 @@ pass "copy-url extension is clickable from the toolbar"
 
 TMPDIR=$(mktemp -d)
 test_home="$TMPDIR/home"
-native_manifest="$test_home/.config/chromium/NativeMessagingHosts/com.helios.copy_url.json"
+native_manifest="$test_home/.config/chromium/NativeMessagingHosts/com.kestrel.copy_url.json"
 
-HOME="$test_home" HELIOS_PATH="$ROOT" helios-install-chromium-copy-url
+HOME="$test_home" KESTREL_PATH="$ROOT" kestrel-install-chromium-copy-url
 
 [[ -f $native_manifest ]] || fail "copy-url native host installer creates fresh Chromium profile root"
-jq -e --arg path "$ROOT/bin/helios-chromium-copy-url-host" '
-  .name == "com.helios.copy_url" and
+jq -e --arg path "$ROOT/bin/kestrel-chromium-copy-url-host" '
+  .name == "com.kestrel.copy_url" and
   .path == $path and
   (.allowed_origins | index("chrome-extension://bgpiichlckmfanooecilcjemknkcpngb/"))
-' "$native_manifest" >/dev/null || fail "copy-url native host manifest uses HeliOS host path and extension id"
+' "$native_manifest" >/dev/null || fail "copy-url native host manifest uses Kestrel host path and extension id"
 pass "copy-url native host installer registers the stable extension id"
 
-[[ -f $test_home/.config/BraveSoftware/Brave-Origin/NativeMessagingHosts/com.helios.copy_url.json ]] ||
+[[ -f $test_home/.config/BraveSoftware/Brave-Origin/NativeMessagingHosts/com.kestrel.copy_url.json ]] ||
   fail "copy-url native host installer covers Brave Origin"
 pass "copy-url native host installer covers Brave Origin"
 
 # Chromium ships in the base packages, so fresh installs do not go through
-# helios-install-browser, and they mark every migration as already applied.
+# kestrel-install-browser, and they mark every migration as already applied.
 # The user install still has to register the host itself.
 grep -q 'user/chromium.sh' "$ROOT/install/user/all.sh" ||
   fail "user install runs the Chromium native messaging host setup"
 
 fresh_home="$TMPDIR/fresh-install"
-HOME="$fresh_home" HELIOS_PATH="$ROOT" PATH="$ROOT/bin:$PATH" \
+HOME="$fresh_home" KESTREL_PATH="$ROOT" PATH="$ROOT/bin:$PATH" \
   bash -euo pipefail -c 'source "$ROOT/install/user/chromium.sh"'
 
-[[ -f $fresh_home/.config/chromium/NativeMessagingHosts/com.helios.copy_url.json ]] ||
+[[ -f $fresh_home/.config/chromium/NativeMessagingHosts/com.kestrel.copy_url.json ]] ||
   fail "fresh install registers the copy-url native messaging host"
 pass "fresh install registers the copy-url native messaging host"
 
 copied_url=$(bash -c '
   source "$1"
   wl-copy() { cat; }
-  helios-notification-send() { :; }
+  kestrel-notification-send() { :; }
   copy_url "$2"
-' bash "$ROOT/bin/helios-chromium-copy-url-host" 'https://example.test/path?q=one&name=two')
+' bash "$ROOT/bin/kestrel-chromium-copy-url-host" 'https://example.test/path?q=one&name=two')
 
 [[ $copied_url == "https://example.test/path?q=one&name=two" ]] ||
   fail "copy-url native host writes the complete URL" "$copied_url"
@@ -103,7 +103,7 @@ pass "copy-url native host writes the complete URL"
 native_reply=$(bash -c '
   source "$1"
   reply_copied true
-' bash "$ROOT/bin/helios-chromium-copy-url-host" | od -An -v -tx1 | tr -d ' \n')
+' bash "$ROOT/bin/kestrel-chromium-copy-url-host" | od -An -v -tx1 | tr -d ' \n')
 
 [[ $native_reply == "0f0000007b22636f70696564223a747275657d" ]] ||
   fail "copy-url native host returns a framed success response" "$native_reply"

@@ -17,15 +17,15 @@ STUB
 chmod +x "$test_dir/bin/qs"
 
 export PATH="$test_dir/bin:$PATH"
-export HELIOS_PATH="$ROOT"
+export KESTREL_PATH="$ROOT"
 export XDG_RUNTIME_DIR="$test_dir/run"
 
 # Callers from a stripped environment have no WAYLAND_DISPLAY, and qs matches
 # instances by display.
-output=$(env -u WAYLAND_DISPLAY "$ROOT/bin/helios-shell" helios.indicators refresh)
+output=$(env -u WAYLAND_DISPLAY "$ROOT/bin/kestrel-shell" kestrel.indicators refresh)
 [[ $output == "display=[wayland-1]" ]] || fail "shell ipc recovers a missing display" "$output"
 pass "shell ipc recovers a missing display"
 
-output=$(WAYLAND_DISPLAY=wayland-9 "$ROOT/bin/helios-shell" helios.indicators refresh)
+output=$(WAYLAND_DISPLAY=wayland-9 "$ROOT/bin/kestrel-shell" kestrel.indicators refresh)
 [[ $output == "display=[wayland-9]" ]] || fail "shell ipc keeps an existing display" "$output"
 pass "shell ipc keeps an existing display"

@@ -1,3 +1,3 @@
-if helios-hw-surface; then
-  helios-pkg-add linux-firmware-marvell
+if kestrel-hw-surface; then
+  kestrel-pkg-add linux-firmware-marvell
 fi

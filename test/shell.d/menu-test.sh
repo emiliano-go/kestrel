@@ -8,21 +8,21 @@ run_node_test <<'JS'
 const fs = require('fs')
 const menu = requireFromRoot('shell/plugins/menu/MenuModel.js')
 const menuQml = fs.readFileSync(path.join(root, 'shell/plugins/menu/Menu.qml'), 'utf8')
-const defaultMenuJsonc = fs.readFileSync(path.join(root, 'default/helios/helios-menu.jsonc'), 'utf8')
+const defaultMenuJsonc = fs.readFileSync(path.join(root, 'default/kestrel/kestrel-menu.jsonc'), 'utf8')
 
 assertDeepEqual(
-  menu.summonAction("helios-shell shell summon helios.speedtest"),
-  { id: 'helios.speedtest', payload: '{}' },
+  menu.summonAction("kestrel-shell shell summon kestrel.speedtest"),
+  { id: 'kestrel.speedtest', payload: '{}' },
   'menu runs a bare summon action in-process'
 )
 assertDeepEqual(
-  menu.summonAction(`helios-shell shell summon helios.image-picker '{"source":"themes"}'`),
-  { id: 'helios.image-picker', payload: '{"source":"themes"}' },
+  menu.summonAction(`kestrel-shell shell summon kestrel.image-picker '{"source":"themes"}'`),
+  { id: 'kestrel.image-picker', payload: '{"source":"themes"}' },
   'menu keeps a single-quoted summon payload'
 )
-assertEqual(menu.summonAction("helios-shell shell summon helios.speedtest && echo done"), null, 'menu leaves compound summon commands to bash')
-assertEqual(menu.summonAction(`helios-shell shell summon helios.x "$(id)"`), null, 'menu leaves shell-expanded payloads to bash')
-assertEqual(menu.summonAction("helios-theme-set nord"), null, 'menu leaves ordinary actions to bash')
+assertEqual(menu.summonAction("kestrel-shell shell summon kestrel.speedtest && echo done"), null, 'menu leaves compound summon commands to bash')
+assertEqual(menu.summonAction(`kestrel-shell shell summon kestrel.x "$(id)"`), null, 'menu leaves shell-expanded payloads to bash')
+assertEqual(menu.summonAction("kestrel-theme-set nord"), null, 'menu leaves ordinary actions to bash')
 assert(
   /var summon = MenuModel\.summonAction\(command\)\s*if \(summon && root\.shell && root\.shell\.summon\(summon\.id, summon\.payload\)\) return\s*Util\.execDetached\(command\)/.test(menuQml),
   'menu falls back to bash when an in-process summon is refused'
@@ -38,7 +38,7 @@ const parsed = menu.parseMenuJsonc(`
       "label": "Themes",
       "aliases": "theme",
       "description": "appearance colors",
-      "action": "helios-theme-set"
+      "action": "kestrel-theme-set"
     },
   },
 }
@@ -57,7 +57,7 @@ assertDeepEqual(
     title: '',
     target: '',
     description: 'appearance colors',
-    action: 'helios-theme-set',
+    action: 'kestrel-theme-set',
     provider: '',
     aliases: ['theme'],
     when: '',
@@ -101,7 +101,7 @@ assert(menu.isVisible(visibilityItems, visibilityOrder, {}, visibilityItems.dyna
 
 // `disabled:` is the softer guard: the row stays listed and only loses the
 // cursor, which is how an already-installed app keeps its place in Install.
-const installed = menu.normalizeItem('install.browser.zen', { label: 'Zen', disabled: 'helios-pkg-present zen-browser-bin', action: 'install-zen' })
+const installed = menu.normalizeItem('install.browser.zen', { label: 'Zen', disabled: 'kestrel-pkg-present zen-browser-bin', action: 'install-zen' })
 assert(menu.isVisible({ 'install.browser.zen': installed }, ['install.browser.zen'], { 'install.browser.zen': false }, installed), 'menu keeps a disabled row visible')
 assert(menu.isDisabled({ 'install.browser.zen': true }, installed), 'menu disables a row whose disabled: succeeded')
 assert(!menu.isDisabled({ 'install.browser.zen': false }, installed), 'menu leaves a row selectable when its disabled: failed')
@@ -199,20 +199,20 @@ assertEqual(
 )
 assertEqual(
   defaultById['trigger.emoji'].action,
-  'helios-menu-emoji',
+  'kestrel-menu-emoji',
   'menu opens the emoji picker from Trigger'
 )
 assert(
-  defaultById['update.helios'].icon === '\ue900',
-  'menu update HeliOS entry uses the HeliOS glyph'
+  defaultById['update.kestrel'].icon === '\ue900',
+  'menu update Kestrel entry uses the Kestrel glyph'
 )
 assert(
-  defaultById['update.helios'].iconFont === 'helios',
-  'menu update HeliOS entry renders the private glyph with the HeliOS font'
+  defaultById['update.kestrel'].iconFont === 'kestrel',
+  'menu update Kestrel entry renders the private glyph with the Kestrel font'
 )
 assertEqual(
   defaultById['update.themes'].when,
-  'helios-theme-extras',
+  'kestrel-theme-extras',
   'menu hides Extra Themes until a theme cloned from git is there to update'
 )
 assert(
@@ -220,11 +220,11 @@ assert(
   'menu keeps Input as a direct config action'
 )
 assert(
-  defaultById['setup.direct-boot'].action.includes('helios-setup-direct-boot'),
+  defaultById['setup.direct-boot'].action.includes('kestrel-setup-direct-boot'),
   'menu places Direct Boot directly under Setup'
 )
 assert(
-  defaultById['setup.reset'].action.includes('helios-system-factory-reset'),
+  defaultById['setup.reset'].action.includes('kestrel-system-factory-reset'),
   'menu exposes Reset Computer under Setup'
 )
 const setupEntries = defaultItems.filter(item => item.parent === 'setup')
@@ -235,19 +235,19 @@ assertEqual(
 )
 const expectedAgents = {
   agy: { icon: '󰫢', label: 'Antigravity' },
-  pi: { icon: '\ue901', iconFont: 'helios', label: 'Pi' },
-  omp: { icon: '\ue903', iconFont: 'helios', label: 'omp' },
-  opencode: { icon: '\ue902', iconFont: 'helios', label: 'OpenCode' },
-  ori: { icon: '\ue909', iconFont: 'helios', label: 'Ori' },
+  pi: { icon: '\ue901', iconFont: 'kestrel', label: 'Pi' },
+  omp: { icon: '\ue903', iconFont: 'kestrel', label: 'omp' },
+  opencode: { icon: '\ue902', iconFont: 'kestrel', label: 'OpenCode' },
+  ori: { icon: '\ue909', iconFont: 'kestrel', label: 'Ori' },
   claude: { icon: '󰛄', label: 'Claude' },
-  codex: { icon: '\ue905', iconFont: 'helios', label: 'Codex' },
-  grok: { icon: '\ue904', iconFont: 'helios', label: 'Grok' },
-  hermes: { icon: '\ue90a', iconFont: 'helios', label: 'Hermes' },
-  openclaw: { icon: '\ue90c', iconFont: 'helios', label: 'OpenClaw' },
+  codex: { icon: '\ue905', iconFont: 'kestrel', label: 'Codex' },
+  grok: { icon: '\ue904', iconFont: 'kestrel', label: 'Grok' },
+  hermes: { icon: '\ue90a', iconFont: 'kestrel', label: 'Hermes' },
+  openclaw: { icon: '\ue90c', iconFont: 'kestrel', label: 'OpenClaw' },
   copilot: { icon: '', label: 'Copilot' },
   crush: { icon: '󰋑', label: 'Crush' },
   muse: { icon: '󰛤', label: 'Muse Code' },
-  'cursor-agent': { icon: '\ue90d', iconFont: 'helios', label: 'Cursor CLI' },
+  'cursor-agent': { icon: '\ue90d', iconFont: 'kestrel', label: 'Cursor CLI' },
 
 }
 assert(
@@ -257,7 +257,7 @@ assert(
       && entry.icon === expected.icon
       && entry.iconFont === (expected.iconFont || '')
       && entry.label === expected.label
-      && entry.action === `helios-default-agent ${agent}`
+      && entry.action === `kestrel-default-agent ${agent}`
       && !entry.when
       && entry.checked.includes(`== \"${agent}\"`)
   }),
@@ -285,7 +285,7 @@ assert(
 )
 assert(!defaultById['install.ai.crush'], 'menu removes Crush from Install > AI')
 // Software you already have keeps its place in Install, dimmed rather than
-// dropped, so the list reads as a catalog of what HeliOS can install.
+// dropped, so the list reads as a catalog of what Kestrel can install.
 // Chromium Account is the sole Install row with anything left to hide for, so
 // any other `when:` here is a row that went back to vanishing once installed.
 assertDeepEqual(
@@ -303,7 +303,7 @@ assert(
 )
 assertEqual(
   defaultById['install.browser.zen'].disabled,
-  'helios-pkg-present zen-browser-bin',
+  'kestrel-pkg-present zen-browser-bin',
   'menu asks the same presence question it used to hide the row with'
 )
 // A guard can still be about something other than having the software: no
@@ -315,7 +315,7 @@ assert(
 )
 assert(
   defaultItems.filter(item => item.id.startsWith('remove.')).every(item => !item.disabled)
-    && defaultById['remove.browser.zen'].when === 'helios-pkg-present zen-browser-bin',
+    && defaultById['remove.browser.zen'].when === 'kestrel-pkg-present zen-browser-bin',
   'menu still hides Remove rows for software that is not installed'
 )
 assertDeepEqual(
@@ -340,7 +340,7 @@ assertDeepEqual(
   'menu keeps the Remove category order'
 )
 assert(
-  defaultById['setup.security.passwordless-sudo'].action.includes('helios-sudo-passwordless'),
+  defaultById['setup.security.passwordless-sudo'].action.includes('kestrel-sudo-passwordless'),
   'menu places Passwordless Sudo under Setup > Security'
 )
 assert(
@@ -352,17 +352,17 @@ assert(
   'menu groups Menu Bar positions in a submenu'
 )
 assert(
-  ['top', 'bottom', 'left', 'right'].every(position => defaultById[`style.bar.position.${position}`].action === `helios-bar position ${position}`),
+  ['top', 'bottom', 'left', 'right'].every(position => defaultById[`style.bar.position.${position}`].action === `kestrel-bar position ${position}`),
   'menu lists all Menu Bar positions under Position'
 )
 assertEqual(
   defaultById['style.bar.transparency'].action,
-  'helios-bar transparent toggle',
+  'kestrel-bar transparent toggle',
   'menu exposes Menu Bar transparency as a toggle'
 )
 assert(
   !defaultItems.some(item => item.id.startsWith('style.background-intro'))
-    && defaultById['trigger.toggle.animations'].action === 'helios-toggle-animations',
+    && defaultById['trigger.toggle.animations'].action === 'kestrel-toggle-animations',
   'menu uses the existing animations toggle without separate background intro controls'
 )
 assertDeepEqual(
@@ -372,7 +372,7 @@ assertDeepEqual(
 )
 assert(
   ['enable', 'disable', 'clone', 'remove'].every(
-    verb => defaultById[`setup.plugin.${verb}`].action === `helios-menu-plugin ${verb}`
+    verb => defaultById[`setup.plugin.${verb}`].action === `kestrel-menu-plugin ${verb}`
   ),
   'menu picks a plugin the way it already picks a theme or a timezone'
 )
@@ -381,15 +381,15 @@ assert(
   'menu always offers Enable and Disable, which cover the built-in plugins too'
 )
 assert(
-  defaultById['setup.plugin.remove'].when.includes('.config/helios/plugins'),
+  defaultById['setup.plugin.remove'].when.includes('.config/kestrel/plugins'),
   'menu hides Remove until a plugin the user installed exists to delete'
 )
 assert(
-  defaultById['setup.plugin.add'].action.includes('helios-plugin-add'),
+  defaultById['setup.plugin.add'].action.includes('kestrel-plugin-add'),
   'menu adds a plugin through the CLI, where the trust warning and clone output are visible'
 )
 
-const pluginPicker = fs.readFileSync(path.join(root, 'bin/helios-menu-plugin'), 'utf8')
+const pluginPicker = fs.readFileSync(path.join(root, 'bin/kestrel-menu-plugin'), 'utf8')
 assert(
   /enable\).*\(\.enabled \| not\)/.test(pluginPicker) && /disable\).*\.canDisable and \.enabled/.test(pluginPicker),
   'plugin picker offers what each verb can act on'
@@ -401,11 +401,11 @@ assert(
   'plugin picker leaves plugin-kind decisions to its data and the plugin command'
 )
 
-const pluginAdd = fs.readFileSync(path.join(root, 'bin/helios-plugin-add'), 'utf8')
-const pluginEnable = fs.readFileSync(path.join(root, 'bin/helios-plugin-enable'), 'utf8')
+const pluginAdd = fs.readFileSync(path.join(root, 'bin/kestrel-plugin-add'), 'utf8')
+const pluginEnable = fs.readFileSync(path.join(root, 'bin/kestrel-plugin-enable'), 'utf8')
 assert(
   /Now using \$id as the bar/.test(pluginEnable)
-    && /helios-plugin-enable "\$id" "\$\{ENABLE_PLACEMENT\[@\]\}"/.test(pluginAdd),
+    && /kestrel-plugin-enable "\$id" "\$\{ENABLE_PLACEMENT\[@\]\}"/.test(pluginAdd),
   'plugin enable reports a bar as replacing the one in use, whether enabled or freshly added'
 )
 assert(
@@ -414,7 +414,7 @@ assert(
   'interactive plugin add selects the manifest placement or center fallback by default'
 )
 assert(
-  /"helios-plugin-\$1" "\$id"/.test(pluginPicker),
+  /"kestrel-plugin-\$1" "\$id"/.test(pluginPicker),
   'plugin picker delegates enable and disable without interpreting plugin kinds'
 )
 // Icons ride along as "<glyph>\tlabel\tsubtext"; the menu shows the glyph,
@@ -431,7 +431,7 @@ assert(
   'menu select mode reads a leading icon and a trailing subtext off an option'
 )
 assert(
-  /helios-launch-floating-terminal-with-presentation "helios-plugin-remove/.test(pluginPicker),
+  /kestrel-launch-floating-terminal-with-presentation "kestrel-plugin-remove/.test(pluginPicker),
   'plugin picker removes where the confirmation and backup path are visible'
 )
 
@@ -454,17 +454,17 @@ assert(
 )
 assertEqual(
   defaultById['trigger.hardware.laptop-display'].when,
-  'helios-hw-laptop',
+  'kestrel-hw-laptop',
   'menu only shows Laptop Display on laptops'
 )
 assertEqual(
   defaultById['trigger.hardware.mirror-display'].when,
-  'helios-hw-laptop',
+  'kestrel-hw-laptop',
   'menu only shows Mirror Display on laptops'
 )
 assertEqual(
   defaultById['trigger.capture.screenrecord.webcam'].when,
-  'helios-hw-webcam',
+  'kestrel-hw-webcam',
   'menu only shows webcam screen recording when a webcam is available'
 )
 assert(
@@ -664,6 +664,6 @@ assert(
 )
 JS
 
-font_charset=$(fc-query --format='%{charset}' "$ROOT/default/fonts/helios/helios.ttf")
-[[ $font_charset == *"e900-e90e"* ]] || fail "HeliOS icon font includes every custom menu glyph"
-pass "HeliOS icon font includes the official agent marks"
+font_charset=$(fc-query --format='%{charset}' "$ROOT/default/fonts/kestrel/kestrel.ttf")
+[[ $font_charset == *"e900-e90e"* ]] || fail "Kestrel icon font includes every custom menu glyph"
+pass "Kestrel icon font includes the official agent marks"

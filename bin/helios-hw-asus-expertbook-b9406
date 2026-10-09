@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# helios:summary=Detect ASUS ExpertBook B9406 series laptops on Intel Panther Lake.
-
-helios-hw-match "B9406" && helios-hw-intel-ptl

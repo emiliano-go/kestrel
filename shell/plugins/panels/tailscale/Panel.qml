@@ -9,8 +9,8 @@ import qs.Ui
 
 Panel {
   id: root
-  moduleName: "helios.tailscale"
-  ipcTarget: "helios.tailscale"
+  moduleName: "kestrel.tailscale"
+  ipcTarget: "kestrel.tailscale"
   manageIpc: false
 
   property string focusSection: "header"

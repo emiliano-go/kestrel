@@ -265,14 +265,14 @@ QtObject {
   // ---------------------------------------------------------- typography
   //
   // `fontFamily` defaults to "monospace" so the bar and every qs.Ui
-  // component follows the fontconfig alias `helios-font-set` writes.
+  // component follows the fontconfig alias `kestrel-font-set` writes.
   // Themes can override per-token via [font] in shell.toml, but the
   // family stays system-wide.
   property string fontFamily: "monospace"
 
   // The concrete family `monospace` resolves to right now, e.g.
   // "JetBrainsMono Nerd Font". Bind `font.family` to `fontFamily` (so the
-  // alias path keeps working when the user runs `helios font set`), but
+  // alias path keeps working when the user runs `kestrel font set`), but
   // read `resolvedFontFamily` when you want to *display* what's drawing.
   property string resolvedFontFamily: "monospace"
 
@@ -312,11 +312,11 @@ QtObject {
   }
 
   // The menu, polkit, emojis, and clipboard surfaces honor an
-  // HELIOS_MENU_FONT override for users who want a different family on the
+  // KESTREL_MENU_FONT override for users who want a different family on the
   // summoned popups than on the bar. Resolved once at startup; an empty env
   // value falls back to the shared fontconfig alias.
   readonly property string menuFontFamily: {
-    var override = Quickshell.env("HELIOS_MENU_FONT")
+    var override = Quickshell.env("KESTREL_MENU_FONT")
     return (override && override.length > 0) ? override : fontFamily
   }
 
@@ -349,7 +349,7 @@ QtObject {
     readonly property int statusSlot:     root.barToken("status-slot",     21)
   }
 
-  // Off with Hyprland's own animations, as `helios toggle animations` turns
+  // Off with Hyprland's own animations, as `kestrel toggle animations` turns
   // them off for machines that render on the CPU. Every shell animation runs
   // for Style.duration(ms), which is then 0, so nothing is drawn in between.
   property bool reduceMotion: false
@@ -493,7 +493,7 @@ QtObject {
     }
   }
 
-  // Resolve the fontconfig alias to a concrete family name. `helios font
+  // Resolve the fontconfig alias to a concrete family name. `kestrel font
   // set <name>` rewrites ~/.config/fontconfig/fonts.conf and restarts the
   // shell, but rerun on file change anyway so manual edits propagate too.
   function resolveFontFamily() {
@@ -532,11 +532,11 @@ QtObject {
     onTriggered: root.refresh()
   }
 
-  // `helios toggle window-gaps` creates/removes this flag file. Hyprland
+  // `kestrel toggle window-gaps` creates/removes this flag file. Hyprland
   // reloads its config when sourced files change, then hyprctl reflects
   // the new effective value.
   property FileView windowNoGapsToggle: FileView {
-    path: Quickshell.env("HOME") + "/.local/state/helios/toggles/hypr/window-no-gaps.lua"
+    path: Quickshell.env("HOME") + "/.local/state/kestrel/toggles/hypr/window-no-gaps.lua"
     watchChanges: true
     printErrors: false
     onFileChanged: refreshTimer.restart()

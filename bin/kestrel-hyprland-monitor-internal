@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# kestrel:summary=Enable, disable, toggle, or recover the internal laptop display
+# kestrel:args=<on|off|toggle|recover>
+
+TOGGLE="internal-monitor-disable"
+TOGGLE_FLAG="$HOME/.local/state/kestrel/toggles/hypr/$TOGGLE.lua"
+MIRROR_TOGGLE="internal-monitor-mirror"
+
+INTERNAL=$(kestrel-hyprland-monitor-laptop)
+
+wake() {
+  hyprctl dispatch 'hl.dsp.dpms({ action = "enable" })' >/dev/null 2>&1 || true
+}
+
+on() {
+  if kestrel-hyprland-toggle-enabled $TOGGLE; then
+    kestrel-hyprland-toggle $TOGGLE off
+    kestrel-notification-send -g 󰍹 "Laptop display enabled"
+  fi
+
+  wake
+}
+
+off() {
+  if [[ -z $INTERNAL ]]; then
+    kestrel-notification-send -g 󰍹 "No laptop display found"
+    exit 1
+  fi
+
+  # The name is written into generated Lua below, so only a plain connector
+  # name may pass; anything else could execute on the next reload.
+  if [[ ! $INTERNAL =~ ^[A-Za-z0-9._-]+$ ]]; then
+    kestrel-notification-send -g 󰍹 "Refusing unsafe monitor name"
+    exit 1
+  fi
+
+  if ! kestrel-hyprland-monitor-external-active; then
+    kestrel-notification-send -g 󰍹 "Can't disable the only active display"
+    exit 1
+  fi
+
+  if kestrel-hyprland-toggle-disabled $TOGGLE && kestrel-hyprland-toggle-disabled $MIRROR_TOGGLE; then
+    printf 'hl.monitor({ output = "%s", disabled = true })\n' "$INTERNAL" >"$TOGGLE_FLAG"
+    kestrel-notification-send -g 󰍹 "Laptop display disabled"
+    hyprctl reload
+  fi
+}
+
+recover() {
+  # Runs from the clamshell watcher every few seconds, so it must be a no-op
+  # unless it actually re-enables a display: an unconditional wake here undoes
+  # lock-screen blanking and races the resume modeset into a visible flash.
+  kestrel-hyprland-monitor-external-active && return 0
+  kestrel-hyprland-toggle-enabled $TOGGLE || return 0
+
+  kestrel-hyprland-toggle $TOGGLE off
+  wake
+}
+
+toggle() {
+  if kestrel-hyprland-toggle-enabled $TOGGLE; then
+    on
+  else
+    off
+  fi
+}
+
+case "$1" in
+  on) on ;;
+  off) off ;;
+  toggle) toggle ;;
+  recover) recover ;;
+  *)
+    echo "Usage: $(basename "$0") {on|off|toggle|recover}" >&2
+    exit 1
+    ;;
+esac

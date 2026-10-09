@@ -1,0 +1,12 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = kestrel-settings
+Target = kestrel-settings-dev
+
+[Action]
+Description = Pausing Hyprland config auto-reload for Kestrel settings update...
+When = PreTransaction
+Depends = kestrel
+Exec = /usr/bin/kestrel-hyprland-reload-guard pause

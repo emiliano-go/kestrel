@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "helios.polkit",
+  "id": "kestrel.polkit",
   "name": "Polkit Agent",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Theme-aware authentication dialog for privileged actions.",
-  "helios": {
+  "kestrel": {
     "capabilities": [
       "authentication"
     ]

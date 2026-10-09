@@ -3,11 +3,11 @@ echo "Install the fingerprint resume hook on existing fingerprint setups"
 # Existing enrolled machines never rerun setup. Install only missing files
 # so administrator changes survive an upgrade.
 
-hook_src="${HELIOS_FPRINTD_RESUME_SRC:-$HELIOS_PATH/default/systemd/system-sleep/fprintd-resume}"
-hook_dst="${HELIOS_FPRINTD_RESUME_DST:-/usr/lib/systemd/system-sleep/fprintd-resume}"
-stop_timeout_src="${HELIOS_FPRINTD_STOP_TIMEOUT_SRC:-$HELIOS_PATH/default/systemd/system/fprintd.service.d/10-stop-timeout.conf}"
-stop_timeout_dst="${HELIOS_FPRINTD_STOP_TIMEOUT_DST:-/etc/systemd/system/fprintd.service.d/10-stop-timeout.conf}"
-lock_pam="${HELIOS_LOCK_FINGERPRINT_PAM:-/etc/pam.d/helios-lock-fingerprint}"
+hook_src="${KESTREL_FPRINTD_RESUME_SRC:-$KESTREL_PATH/default/systemd/system-sleep/fprintd-resume}"
+hook_dst="${KESTREL_FPRINTD_RESUME_DST:-/usr/lib/systemd/system-sleep/fprintd-resume}"
+stop_timeout_src="${KESTREL_FPRINTD_STOP_TIMEOUT_SRC:-$KESTREL_PATH/default/systemd/system/fprintd.service.d/10-stop-timeout.conf}"
+stop_timeout_dst="${KESTREL_FPRINTD_STOP_TIMEOUT_DST:-/etc/systemd/system/fprintd.service.d/10-stop-timeout.conf}"
+lock_pam="${KESTREL_LOCK_FINGERPRINT_PAM:-/etc/pam.d/kestrel-lock-fingerprint}"
 
 [[ -f $lock_pam ]] || exit 0
 

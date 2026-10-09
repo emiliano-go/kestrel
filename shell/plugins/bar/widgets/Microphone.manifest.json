@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "helios.microphone",
+  "id": "kestrel.microphone",
   "name": "Microphone",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Mic input state and mute toggle",
   "kinds": [
     "bar-widget"

@@ -4,10 +4,10 @@
 # heredoc has no slash and the value never resolves to a literal path, so a scan
 # that rescues unresolved values would exempt a unit baking the user's home into
 # /etc/systemd/system.
-helper="$HOME/.local/share/helios/bin/helios-agent"
+helper="$HOME/.local/share/kestrel/bin/kestrel-agent"
 
-# helios:heredoc-expands paths=none -- helper is just the agent command name
-cat <<EOF | sudo tee /etc/systemd/system/helios-agent.service >/dev/null
+# kestrel:heredoc-expands paths=none -- helper is just the agent command name
+cat <<EOF | sudo tee /etc/systemd/system/kestrel-agent.service >/dev/null
 [Service]
 ExecStart=$helper
 EOF

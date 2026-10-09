@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "helios.dev-gallery",
+  "id": "kestrel.dev-gallery",
   "name": "Dev gallery",
   "version": "1.0.0",
-  "author": "HeliOS",
-  "description": "Visual reference for helios-shell common UI components. Summon with: helios-shell shell summon helios.dev-gallery '{}' (or run: helios dev ui-preview).",
+  "author": "Kestrel",
+  "description": "Visual reference for kestrel-shell common UI components. Summon with: kestrel-shell shell summon kestrel.dev-gallery '{}' (or run: kestrel dev ui-preview).",
   "kinds": [
     "panel"
   ],

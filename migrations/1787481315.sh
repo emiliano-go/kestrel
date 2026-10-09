@@ -6,7 +6,7 @@ echo "Re-stage the current theme so an installed theme's code is dropped"
 # them now, but an install that already applied such a theme keeps the staged
 # copies until something changes the theme, which may be never. Re-stage once so
 # the fix reaches the themes already in place rather than only the next one.
-theme_name_path="$HOME/.local/state/helios/current/theme.name"
+theme_name_path="$HOME/.local/state/kestrel/current/theme.name"
 
 [[ -s $theme_name_path ]] || exit 0
 
@@ -16,10 +16,10 @@ theme_name=$(<"$theme_name_path")
 # staged copy behind, so there is nothing left to re-stage from and those staged
 # files are exactly the ones this is here to drop. Seed the default instead,
 # which is where a fresh install starts and what the removal should have left.
-if [[ ! -d $HELIOS_PATH/themes/$theme_name && ! -d $HOME/.config/helios/themes/$theme_name ]]; then
+if [[ ! -d $KESTREL_PATH/themes/$theme_name && ! -d $HOME/.config/kestrel/themes/$theme_name ]]; then
   echo "Theme '$theme_name' no longer exists; applying the default instead"
-  helios-theme-set "Tokyo Night"
+  kestrel-theme-set "Tokyo Night"
   exit 0
 fi
 
-helios-theme-refresh
+kestrel-theme-refresh

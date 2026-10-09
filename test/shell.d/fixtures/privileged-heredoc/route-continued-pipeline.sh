@@ -1,4 +1,4 @@
 cat <<EOF |
-command=$HOME/.local/share/helios/bin/example
+command=$HOME/.local/share/kestrel/bin/example
 EOF
-  sudo tee /etc/helios/example.conf
+  sudo tee /etc/kestrel/example.conf

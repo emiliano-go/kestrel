@@ -1,22 +1,22 @@
-# HeliOS bar
+# Kestrel bar
 
-This is the Quickshell implementation of the HeliOS status bar. It is
-shipped as a first-party plugin of [`helios-shell`](../../README.md), the
+This is the Quickshell implementation of the Kestrel status bar. It is
+shipped as a first-party plugin of [`kestrel-shell`](../../README.md), the
 long-running shell host. The bar is mounted at startup and lives inside
 the shell for its whole session.
 
-- `manifest.json` declares the plugin (`id: helios.bar`, `kind: bar`) and points at `Bar.qml` as the entry point.
-- `Bar.qml` is HeliOS-owned bar engine code, loaded by the helios-shell host. Users should not edit it directly.
+- `manifest.json` declares the plugin (`id: kestrel.bar`, `kind: bar`) and points at `Bar.qml` as the entry point.
+- `Bar.qml` is Kestrel-owned bar engine code, loaded by the kestrel-shell host. Users should not edit it directly.
 - `widgets/` holds simple first-party bar widgets with sibling manifests.
 - Feature plugins such as `../panels/audio/`, `../panels/network/`, `../panels/power/`, and `../agents/` provide richer popup bar plugins.
-- The bar receives its config from the host shell as a `barConfig` property; the host loads it from `~/.config/helios/shell.json` (or `config/helios/shell.json` when the user has no file).
-- `helios bar position` updates only the user shell.json file.
+- The bar receives its config from the host shell as a `barConfig` property; the host loads it from `~/.config/kestrel/shell.json` (or `config/kestrel/shell.json` when the user has no file).
+- `kestrel bar position` updates only the user shell.json file.
 
 ## Customizing
 
-The bar config lives under the `bar:` key of [`~/.config/helios/shell.json`](../../../docs/helios-shell.md#shelljson). Out of the box the shell uses [`config/helios/shell.json`](../../../config/helios/shell.json). Once you customize anything via the bar gestures, `helios bar ...`, or by editing shell.json directly, your file is canonical — there is no deep-merge.
+The bar config lives under the `bar:` key of [`~/.config/kestrel/shell.json`](../../../docs/kestrel-shell.md#shelljson). Out of the box the shell uses [`config/kestrel/shell.json`](../../../config/kestrel/shell.json). Once you customize anything via the bar gestures, `kestrel bar ...`, or by editing shell.json directly, your file is canonical — there is no deep-merge.
 
-The bar is configured directly on the bar itself: drag empty bar space (or click-and-hold) to move the bar to another screen edge, double-left-click empty center-bar space to toggle transparency, and drag widgets to reorder them. The `helios bar position`, `helios bar transparent`, `helios bar move`, and `helios bar set` commands do the same from scripts. Enable or disable widgets with `helios plugin enable` and `helios plugin disable` (widget ids come from `helios plugin list`).
+The bar is configured directly on the bar itself: drag empty bar space (or click-and-hold) to move the bar to another screen edge, double-left-click empty center-bar space to toggle transparency, and drag widgets to reorder them. The `kestrel bar position`, `kestrel bar transparent`, `kestrel bar move`, and `kestrel bar set` commands do the same from scripts. Enable or disable widgets with `kestrel plugin enable` and `kestrel plugin disable` (widget ids come from `kestrel plugin list`).
 
 Example `shell.json` (bar subtree only shown):
 
@@ -26,20 +26,20 @@ Example `shell.json` (bar subtree only shown):
   "bar": {
     "position": "top",
     "transparent": false,
-    "centerAnchor": "helios.clock",
+    "centerAnchor": "kestrel.clock",
     "layout": {
       "left": [
-        { "id": "helios.menu" },
-        { "id": "helios.spacer", "size": 12 },
-        { "id": "helios.workspaces" }
+        { "id": "kestrel.menu" },
+        { "id": "kestrel.spacer", "size": 12 },
+        { "id": "kestrel.workspaces" }
       ],
       "center": [
-        { "id": "helios.media" },
-        { "id": "helios.clock", "format": "HH:mm" }
+        { "id": "kestrel.media" },
+        { "id": "kestrel.clock", "format": "HH:mm" }
       ],
       "right": [
-        { "id": "helios.audio" },
-        { "id": "helios.power" }
+        { "id": "kestrel.audio" },
+        { "id": "kestrel.power" }
       ]
     }
   }
@@ -54,25 +54,25 @@ Example `shell.json` (bar subtree only shown):
 
 | Name | What it does | Interactions |
 |---|---|---|
-| `helios.menu` | HeliOS menu launcher | left = menu · right = terminal |
-| `helios.workspaces` | Hyprland workspace switcher | left = focus workspace |
-| `helios.clock` | Date/time label + popup with a month grid, ISO week numbers, and month stepping | left = popup · right = cycle label format · middle = timezone selector |
-| `helios.media` | MPRIS now-playing — scrolling track + artist, cover-art popup | left = play/pause · middle = next · scroll = prev/next · right = popup |
-| `helios.indicators` | Manual state indicators | left = indicator action |
-| `helios.system-update` | Available update indicator | left = update |
-| `helios.tray` | System tray | hover = reveal drawer · right on chevron = manage |
-| `helios.weather` | Weather icon + popup with forecast | left = popup · right = full notification |
-| `helios.microphone` | Mic icon + scroll volume | left = mute toggle · middle = audio panel · scroll = source volume |
+| `kestrel.menu` | Kestrel menu launcher | left = menu · right = terminal |
+| `kestrel.workspaces` | Hyprland workspace switcher | left = focus workspace |
+| `kestrel.clock` | Date/time label + popup with a month grid, ISO week numbers, and month stepping | left = popup · right = cycle label format · middle = timezone selector |
+| `kestrel.media` | MPRIS now-playing — scrolling track + artist, cover-art popup | left = play/pause · middle = next · scroll = prev/next · right = popup |
+| `kestrel.indicators` | Manual state indicators | left = indicator action |
+| `kestrel.system-update` | Available update indicator | left = update |
+| `kestrel.tray` | System tray | hover = reveal drawer · right on chevron = manage |
+| `kestrel.weather` | Weather icon + popup with forecast | left = popup · right = full notification |
+| `kestrel.microphone` | Mic icon + scroll volume | left = mute toggle · middle = audio panel · scroll = source volume |
 
-| `helios.audio` | Volume icon + popup with master slider, output-device picker, per-app mixer | left = popup · right = mute · middle = popup · scroll = volume |
-| `helios.network` | Wi-Fi/Ethernet icon + popup with Wi-Fi scan, signal, connect, DNS provider selection | left = popup |
-| `helios.tailscale` | Tailscale status, connection switcher, machine browser, and copy actions | left = popup · right = toggle · middle = refresh |
-| `helios.agents` | AI coding agent limits with pace, today, last week, and all-time model breakdown | left = panel · right = launch agent · middle = next subscription |
-| `helios.power` | Battery/AC icon + popup with battery stats, power profiles, and system info | left = popup · right = toggle percentage |
-| `helios.bluetooth` | Bluetooth icon + popup with device list, connect/disconnect, battery | left = popup · right = toggle radio |
-| `helios.monitor` | Brightness and laptop display controls | left = popup |
+| `kestrel.audio` | Volume icon + popup with master slider, output-device picker, per-app mixer | left = popup · right = mute · middle = popup · scroll = volume |
+| `kestrel.network` | Wi-Fi/Ethernet icon + popup with Wi-Fi scan, signal, connect, DNS provider selection | left = popup |
+| `kestrel.tailscale` | Tailscale status, connection switcher, machine browser, and copy actions | left = popup · right = toggle · middle = refresh |
+| `kestrel.agents` | AI coding agent limits with pace, today, last week, and all-time model breakdown | left = panel · right = launch agent · middle = next subscription |
+| `kestrel.power` | Battery/AC icon + popup with battery stats, power profiles, and system info | left = popup · right = toggle percentage |
+| `kestrel.bluetooth` | Bluetooth icon + popup with device list, connect/disconnect, battery | left = popup · right = toggle radio |
+| `kestrel.monitor` | Brightness and laptop display controls | left = popup |
 
-The `helios.indicators` widget loads individual bar indicators from `indicators/`. Omit `items` (or set it to an empty array) to show all indicators in the default order, or set `items` to a subset such as `["Dnd", "Reminder", "NightLight"]`. Set `alwaysShow` to `true` to keep inactive indicators visible instead of revealing them only on hover. Multiple `helios.indicators` instances are allowed, so different sections can show different subsets.
+The `kestrel.indicators` widget loads individual bar indicators from `indicators/`. Omit `items` (or set it to an empty array) to show all indicators in the default order, or set `items` to a subset such as `["Dnd", "Reminder", "NightLight"]`. Set `alwaysShow` to `true` to keep inactive indicators visible instead of revealing them only on hover. Multiple `kestrel.indicators` instances are allowed, so different sections can show different subsets.
 
 ## Orientation
 
@@ -90,9 +90,9 @@ Command module:
   "bar": {
     "layout": {
       "right": [
-        { "id": "helios.tray" },
-        { "id": "vpn", "type": "command", "exec": "~/.config/helios/bar/scripts/vpn-status", "interval": 5, "tooltip": "VPN", "onClick": "nm-connection-editor" },
-        { "id": "helios.audio" }
+        { "id": "kestrel.tray" },
+        { "id": "vpn", "type": "command", "exec": "~/.config/kestrel/bar/scripts/vpn-status", "interval": 5, "tooltip": "VPN", "onClick": "nm-connection-editor" },
+        { "id": "kestrel.audio" }
       ]
     }
   }
@@ -114,14 +114,14 @@ QML module:
     "layout": {
       "right": [
         { "id": "gpu", "type": "qml" },
-        { "id": "helios.audio" }
+        { "id": "kestrel.audio" }
       ]
     }
   }
 }
 ```
 
-Then create `~/.config/helios/bar/modules/gpu.qml`. If you want to store it elsewhere, add a `source` path.
+Then create `~/.config/kestrel/bar/modules/gpu.qml`. If you want to store it elsewhere, add a `source` path.
 
 Custom QML modules should be an `Item` with `implicitWidth` and `implicitHeight`. They may optionally define these properties, which the bar fills after loading:
 
@@ -146,7 +146,7 @@ Item {
 
   MouseArea {
     anchors.fill: parent
-    onClicked: if (bar) bar.run("helios-launch-or-focus-tui btop")
+    onClicked: if (bar) bar.run("kestrel-launch-or-focus-tui btop")
   }
 }
 ```
@@ -168,8 +168,8 @@ First-party bar widgets are manifest-backed just like third-party widgets.
 Simple widgets carry sibling manifests such as `widgets/Workspaces.manifest.json`;
 richer popup plugins live in feature directories such as `../panels/audio/`,
 `../panels/network/`, and `../agents/`; and feature plugins such as
-`helios.menu` and `helios.media` declare their bar-widget entry points in their own
-`manifest.json`. Bar layout ids are namespaced, e.g. `helios.audio`,
-`helios.network`, and `helios.clock`.
+`kestrel.menu` and `kestrel.media` declare their bar-widget entry points in their own
+`manifest.json`. Bar layout ids are namespaced, e.g. `kestrel.audio`,
+`kestrel.network`, and `kestrel.clock`.
 
-Third-party widgets ship as separate plugins under `~/.config/helios/plugins/<plugin-id>/` with their own `manifest.json` declaring `kinds: ["bar-widget"]` and a `barWidget` entry point. See the [shell reference](../../../docs/helios-shell.md#plugin-manifest) for the manifest schema. Rescan, enable, and place third-party plugins with `helios-shell shell rescanPlugins`, `helios plugin enable`, and `helios bar move`.
+Third-party widgets ship as separate plugins under `~/.config/kestrel/plugins/<plugin-id>/` with their own `manifest.json` declaring `kinds: ["bar-widget"]` and a `barWidget` entry point. See the [shell reference](../../../docs/kestrel-shell.md#plugin-manifest) for the manifest schema. Rescan, enable, and place third-party plugins with `kestrel-shell shell rescanPlugins`, `kestrel plugin enable`, and `kestrel bar move`.

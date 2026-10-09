@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# kestrel:summary=Show the current Kestrel dev-link state
+# kestrel:group=dev
+
+set -euo pipefail
+
+default_target="/usr/share/kestrel"
+sudoers_file="/etc/sudoers.d/kestrel-dev-path"
+configured="$default_target"
+conf_present=0
+linked=0
+
+if [[ -f /etc/kestrel.conf ]]; then
+  conf_present=1
+  configured=$(
+    KESTREL_PATH=
+    # shellcheck disable=SC1091
+    . /etc/kestrel.conf
+    printf '%s' "${KESTREL_PATH:-<empty>}"
+  )
+  if [[ $configured != "$default_target" ]]; then
+    linked=1
+  fi
+fi
+
+# /etc/sudoers.d is root-only, so report what sudo resolves rather than reading
+# the drop-in — and say so plainly instead of guessing when there is no cached
+# credential to ask with. A missing entry here is what makes `sudo kestrel-*`
+# run the packaged copy of a command the checkout has changed.
+sudo_bin_dir() {
+  local resolved
+
+  if ! sudo -n true 2>/dev/null; then
+    echo "unknown (needs sudo)"
+    return
+  fi
+
+  resolved=$(sudo -n bash -c 'type -P kestrel-dev-status' 2>/dev/null) || {
+    echo "not on sudo's PATH"
+    return
+  }
+
+  dirname "$resolved"
+}
+
+if (( linked )); then
+  echo "dev-link: configured"
+  echo "  /etc/kestrel.conf -> KESTREL_PATH=$configured"
+  echo "  sudo resolves kestrel-* from: $(sudo_bin_dir)"
+  echo "  status: reboot required before all session layers use this checkout"
+else
+  echo "dev-link: inactive"
+  if (( conf_present )); then
+    echo "  /etc/kestrel.conf -> KESTREL_PATH=$configured (default guard)"
+  fi
+fi
+
+echo "  current shell:       KESTREL_PATH=${KESTREL_PATH:-<unset>}"
+
+if [[ ${KESTREL_PATH:-$default_target} != "$configured" ]]; then
+  echo
+  echo "Note: the running session does not match /etc/kestrel.conf. Reboot to settle it."
+fi

@@ -1,12 +1,12 @@
 echo "Regenerate mise wrappers that still print mise's own output to stdout"
 
-# helios-mise-install gained `--quiet` on its `mise use -g` line so a wrapper
+# kestrel-mise-install gained `--quiet` on its `mise use -g` line so a wrapper
 # stops printing mise's "tools: pkg@version" ahead of the tool's own output.
 # That only changes wrappers written from then on, and the migration that
 # installed the current ones is already marked complete, so every wrapper on
 # disk keeps polluting stdout -- `claude --version` still answers with two
 # lines, and a wrapper for a protocol-speaking command answers with a line its
-# caller cannot parse. Rewrite them through helios-mise-install so the
+# caller cannot parse. Rewrite them through kestrel-mise-install so the
 # template stays in one place.
 
 # Every generated form that predates --quiet, rebuilt from the package and bin
@@ -65,5 +65,5 @@ for wrapper in "$bin_dir"/*; do
 
   ((stale)) || continue
 
-  helios-mise-install "$package" "${wrapper##*/}" "$bin"
+  kestrel-mise-install "$package" "${wrapper##*/}" "$bin"
 done

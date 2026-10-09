@@ -1,9 +1,9 @@
 echo "Normalize Snapper snapshot services"
 
-HELIOS_PATH="${HELIOS_PATH:-/usr/share/helios}"
-snapper_config_script=/usr/share/helios/install/config/snapper.sh
+KESTREL_PATH="${KESTREL_PATH:-/usr/share/kestrel}"
+snapper_config_script=/usr/share/kestrel/install/config/snapper.sh
 if [[ ! -f $snapper_config_script ]]; then
-  snapper_config_script="$HELIOS_PATH/install/config/snapper.sh"
+  snapper_config_script="$KESTREL_PATH/install/config/snapper.sh"
 fi
 
 as_root() {
@@ -36,4 +36,4 @@ fi
 
 (( needs_repair )) || exit 0
 
-as_root env HELIOS_PATH="$HELIOS_PATH" bash -euo pipefail "$snapper_config_script"
+as_root env KESTREL_PATH="$KESTREL_PATH" bash -euo pipefail "$snapper_config_script"

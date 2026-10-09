@@ -1,3 +1,3 @@
-sudo dd status=none of=/etc/helios/boot.conf <<EOF
+sudo dd status=none of=/etc/kestrel/boot.conf <<EOF
 cmdline=$boot_params
 EOF

@@ -1,6 +1,6 @@
-# Tailscale HeliOS Widget
+# Tailscale Kestrel Widget
 
-Native HeliOS bar widget for Tailscale.
+Native Kestrel bar widget for Tailscale.
 
 ## Features
 
@@ -35,9 +35,9 @@ Inside the panel:
 ## Receiving files
 
 Incoming Taildrop files are saved to `~/Downloads` by the
-`helios-tailscale-receive` service, which announces each one with a
+`kestrel-tailscale-receive` service, which announces each one with a
 notification (an image preview when the file is an image, and a click to open
-it). The Tailscale service install enables it; `helios tailscale receive`
+it). The Tailscale service install enables it; `kestrel tailscale receive`
 runs the same loop by hand.
 
 ## Icon
@@ -46,4 +46,4 @@ Renders the Tailscale mark natively as a theme-colored 3×3 dot grid, matching t
 
 ## Add to the bar
 
-This widget ships as first-party plugin `helios.tailscale`. Add it with `helios plugin enable helios.tailscale`, then place it with `helios bar move helios.tailscale` if desired.
+This widget ships as first-party plugin `kestrel.tailscale`. Add it with `kestrel plugin enable kestrel.tailscale`, then place it with `kestrel bar move kestrel.tailscale` if desired.

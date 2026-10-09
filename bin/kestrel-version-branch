@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# kestrel:summary=Print the active Kestrel dev-link git branch
+# kestrel:hidden=true
+
+kestrel_path=${KESTREL_PATH:-/usr/share/kestrel}
+kestrel_path=${kestrel_path%/}
+
+[[ $kestrel_path != "/usr/share/kestrel" ]] || exit 1
+
+branch=$(git -C "$kestrel_path" branch --show-current 2>/dev/null || true)
+if [[ -z $branch ]]; then
+  hash=$(git -C "$kestrel_path" rev-parse --short HEAD 2>/dev/null || true)
+  [[ -n $hash ]] || exit 1
+  branch="detached@$hash"
+fi
+
+echo "$branch"

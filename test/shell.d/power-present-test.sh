@@ -20,19 +20,19 @@ write_supply() {
 write_supply AC Mains 0
 write_supply USBC USB 1
 
-HELIOS_POWER_SUPPLY_PATH="$tmp_dir" "$ROOT/bin/helios-power-present" ||
+KESTREL_POWER_SUPPLY_PATH="$tmp_dir" "$ROOT/bin/kestrel-power-present" ||
   fail "power present detects online USB-C supply"
 pass "power present detects online USB-C supply"
 
 printf '0\n' >"$tmp_dir/USBC/online"
 
-if HELIOS_POWER_SUPPLY_PATH="$tmp_dir" "$ROOT/bin/helios-power-present"; then
+if KESTREL_POWER_SUPPLY_PATH="$tmp_dir" "$ROOT/bin/kestrel-power-present"; then
   fail "power present rejects offline supplies"
 fi
 pass "power present rejects offline supplies"
 
 write_supply AC Mains 1
 
-HELIOS_POWER_SUPPLY_PATH="$tmp_dir" "$ROOT/bin/helios-power-present" ||
+KESTREL_POWER_SUPPLY_PATH="$tmp_dir" "$ROOT/bin/kestrel-power-present" ||
   fail "power present detects online mains supply"
 pass "power present detects online mains supply"

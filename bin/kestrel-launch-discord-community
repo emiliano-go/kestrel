@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# kestrel:summary=Open the Kestrel Discord community in the Discord app or a browser.
+
+invite="https://discord.gg/tXFUdasqhY"
+
+if kestrel-cmd-present discord; then
+  exec setsid uwsm-app -- discord --url -- "discord://-/invite/${invite##*/}"
+else
+  exec kestrel-launch-webapp "$invite"
+fi

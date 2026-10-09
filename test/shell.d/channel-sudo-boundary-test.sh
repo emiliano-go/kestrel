@@ -4,28 +4,28 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 source "$SHELL_TEST_DIR/fixtures/sudo-boundary-test.sh"
-copy_boundary_file bin/helios-channel-set
-copy_boundary_file bin/helios-refresh-pacman
-copy_boundary_file bin/helios-update
-export HELIOS_UPDATE_LOGGED=1
+copy_boundary_file bin/kestrel-channel-set
+copy_boundary_file bin/kestrel-refresh-pacman
+copy_boundary_file bin/kestrel-update
+export KESTREL_UPDATE_LOGGED=1
 
 # Relocate the package root into the fixture, including the explicit handoff
 # from the development checkout. All privileged operations remain stand-ins.
-python3 - "$SUDO_TEST_ROOT/bin/helios-channel-set" "$SUDO_TEST_ROOT" <<'PY'
+python3 - "$SUDO_TEST_ROOT/bin/kestrel-channel-set" "$SUDO_TEST_ROOT" <<'PY'
 import sys
 from pathlib import Path
 p = Path(sys.argv[1])
-p.write_text(p.read_text().replace('/usr/share/helios', sys.argv[2]))
+p.write_text(p.read_text().replace('/usr/share/kestrel', sys.argv[2]))
 PY
 
-for command in helios-dev-link helios-dev-unlink helios-state gum git; do
+for command in kestrel-dev-link kestrel-dev-unlink kestrel-state gum git; do
   cat >"$SUDO_TEST_ROOT/bin/$command" <<'STUB'
 #!/bin/bash
 set -euo pipefail
 step=${0##*/}
 printf 'step:%s %s\n' "$step" "$*" >>"$SUDO_TEST_LOG"
 case "$step" in
-  helios-dev-link|helios-dev-unlink) sudo /usr/bin/true ;;
+  kestrel-dev-link|kestrel-dev-unlink) sudo /usr/bin/true ;;
   git)
     [[ $1 == "clone" ]] || exit 90
     /usr/bin/cp -a "$SUDO_TEST_ROOT" "${@: -1}"
@@ -48,10 +48,10 @@ assert events[0] == 'sudo -k', events
 auth = events.index('sudo /usr/bin/true')
 sudo = [event for event in events[:auth] if event.startswith('sudo ')]
 assert all(event in ('sudo -h', 'sudo -k') or event.startswith('sudo -N ') for event in sudo), events
-hooks = [i for i, event in enumerate(events) if event.startswith('step:helios-hook ')]
+hooks = [i for i, event in enumerate(events) if event.startswith('step:kestrel-hook ')]
 assert len(hooks) == 2, events
-assert events[hooks[0]] == 'step:helios-hook pre-refresh-pacman', events
-assert events[hooks[1]] == 'step:helios-hook post-update', events
+assert events[hooks[0]] == 'step:kestrel-hook pre-refresh-pacman', events
+assert events[hooks[1]] == 'step:kestrel-hook post-update', events
 assert events[hooks[0] - 1] == 'sudo -k' and events[hooks[0] + 1] == 'sudo -k', events
 transaction = next(i for i, event in enumerate(events) if event.startswith('step:pacman '))
 assert hooks[0] < transaction < auth < hooks[1], events
@@ -60,7 +60,7 @@ PY
 }
 
 run_channel() {
-  "$HELIOS_PATH/bin/helios-channel-set" "$@" >"$boundary_tmp/output" 2>&1
+  "$KESTREL_PATH/bin/kestrel-channel-set" "$@" >"$boundary_tmp/output" 2>&1
 }
 for channel in stable rc edge dev; do
   reset_boundary
@@ -70,10 +70,10 @@ for channel in stable rc edge dev; do
 done
 
 reset_boundary
-wrapper="$SUDO_TEST_HOME/helios/default/helios/sudo-no-update/sudo"
+wrapper="$SUDO_TEST_HOME/kestrel/default/kestrel/sudo-no-update/sudo"
 mv "$wrapper" "$boundary_tmp/saved-wrapper"
 if run_channel dev; then fail "an old checkout without the wrapper was accepted"; fi
-if grep -Eq '^step:helios-(dev-link|state)|^sudo -N ' "$SUDO_TEST_LOG"; then
+if grep -Eq '^step:kestrel-(dev-link|state)|^sudo -N ' "$SUDO_TEST_LOG"; then
   fail "an incompatible dev checkout changed the system before rejection"
 fi
 grep -q 'Update the checkout before switching to dev' "$boundary_tmp/output" || fail "stale checkout rejection lacks recovery guidance"
@@ -82,7 +82,7 @@ mv "$boundary_tmp/saved-wrapper" "$wrapper"
 pass "a stale dev checkout is rejected before linking or privileged work"
 
 reset_boundary
-HELIOS_PATH="$SUDO_TEST_HOME/helios" run_channel stable || fail "leaving dev failed" "$(<"$boundary_tmp/output")"
+KESTREL_PATH="$SUDO_TEST_HOME/kestrel" run_channel stable || fail "leaving dev failed" "$(<"$boundary_tmp/output")"
 assert_scoped_channel "dev to stable"
 pass "leaving dev preserves no-update sudo through unlink and hands off to the packaged update"
 
@@ -90,20 +90,20 @@ pass "leaving dev preserves no-update sudo through unlink and hands off to the p
 # package is installed. Its updater authenticates without --no-update, so the
 # switch must not launch it: it stops at a consistent point with instructions.
 reset_boundary
-mv "$SUDO_TEST_ROOT/default/helios/sudo-no-update/sudo" "$boundary_tmp/saved-package-wrapper"
-mv "$SUDO_TEST_ROOT/bin/helios-update" "$boundary_tmp/saved-package-update"
-ln -s test-step "$SUDO_TEST_ROOT/bin/helios-update"
-if HELIOS_PATH="$SUDO_TEST_HOME/helios" run_channel stable; then fail "an older packaged destination was updated with ordinary sudo" "$(<"$SUDO_TEST_LOG")"; fi
+mv "$SUDO_TEST_ROOT/default/kestrel/sudo-no-update/sudo" "$boundary_tmp/saved-package-wrapper"
+mv "$SUDO_TEST_ROOT/bin/kestrel-update" "$boundary_tmp/saved-package-update"
+ln -s test-step "$SUDO_TEST_ROOT/bin/kestrel-update"
+if KESTREL_PATH="$SUDO_TEST_HOME/kestrel" run_channel stable; then fail "an older packaged destination was updated with ordinary sudo" "$(<"$SUDO_TEST_LOG")"; fi
 grep -q "predates command-scoped sudo" "$boundary_tmp/output" || fail "an older packaged destination was not reported" "$(<"$boundary_tmp/output")"
-grep -q "Run 'helios update' from a new terminal to finish" "$boundary_tmp/output" || fail "an older packaged destination lacks recovery guidance" "$(<"$boundary_tmp/output")"
-grep -Fxq 'step:helios-dev-unlink --no-reboot' "$SUDO_TEST_LOG" || fail "the package switch was not completed before stopping" "$(<"$SUDO_TEST_LOG")"
-grep -Fxq 'step:helios-state set reboot-required' "$SUDO_TEST_LOG" || fail "leaving dev for an older release did not mark the reboot" "$(<"$SUDO_TEST_LOG")"
-if grep -q '^step:helios-update ' "$SUDO_TEST_LOG"; then fail "an older packaged updater was launched from the hardened switch" "$(<"$SUDO_TEST_LOG")"; fi
+grep -q "Run 'kestrel update' from a new terminal to finish" "$boundary_tmp/output" || fail "an older packaged destination lacks recovery guidance" "$(<"$boundary_tmp/output")"
+grep -Fxq 'step:kestrel-dev-unlink --no-reboot' "$SUDO_TEST_LOG" || fail "the package switch was not completed before stopping" "$(<"$SUDO_TEST_LOG")"
+grep -Fxq 'step:kestrel-state set reboot-required' "$SUDO_TEST_LOG" || fail "leaving dev for an older release did not mark the reboot" "$(<"$SUDO_TEST_LOG")"
+if grep -q '^step:kestrel-update ' "$SUDO_TEST_LOG"; then fail "an older packaged updater was launched from the hardened switch" "$(<"$SUDO_TEST_LOG")"; fi
 grep -q 'The channel switch did not complete' "$boundary_tmp/output" && fail "the stop was reported as an error needing a rerun" "$(<"$boundary_tmp/output")"
 assert_boundary_cold "older packaged destination"
-rm "$SUDO_TEST_ROOT/bin/helios-update"
-mv "$boundary_tmp/saved-package-update" "$SUDO_TEST_ROOT/bin/helios-update"
-mv "$boundary_tmp/saved-package-wrapper" "$SUDO_TEST_ROOT/default/helios/sudo-no-update/sudo"
+rm "$SUDO_TEST_ROOT/bin/kestrel-update"
+mv "$boundary_tmp/saved-package-update" "$SUDO_TEST_ROOT/bin/kestrel-update"
+mv "$boundary_tmp/saved-package-wrapper" "$SUDO_TEST_ROOT/default/kestrel/sudo-no-update/sudo"
 pass "an older packaged destination stops the switch cold with instructions instead of running its updater"
 
 # A package-backed source can be downgraded by its own transaction to a release
@@ -117,7 +117,7 @@ printf 'unwrapped-sudo %s\n' "$*" >>"$SUDO_TEST_LOG"
 exit 97
 STUB
 chmod +x "$SUDO_TEST_ROOT/bin/sudo"
-cp "$SUDO_TEST_ROOT/default/helios/sudo-no-update/sudo" "$boundary_tmp/saved-package-wrapper"
+cp "$SUDO_TEST_ROOT/default/kestrel/sudo-no-update/sudo" "$boundary_tmp/saved-package-wrapper"
 for pattern in 'pacman -Syyuu*' 'pacman -S --needed*'; do
   reset_boundary
   export SUDO_TEST_REMOVE_WRAPPER_STEP=$pattern
@@ -125,8 +125,8 @@ for pattern in 'pacman -Syyuu*' 'pacman -S --needed*'; do
   unset SUDO_TEST_REMOVE_WRAPPER_STEP
   grep -q "predates command-scoped sudo" "$boundary_tmp/output" || fail "downgrade during '$pattern' was not reported" "$(<"$boundary_tmp/output")"
   if grep -q '^unwrapped-sudo ' "$SUDO_TEST_LOG"; then fail "downgrade during '$pattern' reached ordinary sudo" "$(<"$SUDO_TEST_LOG")"; fi
-  if grep -q '^step:helios-dev-unlink' "$SUDO_TEST_LOG"; then fail "downgrade during '$pattern' still unlinked" "$(<"$SUDO_TEST_LOG")"; fi
-  if grep -q '^step:helios-update ' "$SUDO_TEST_LOG"; then fail "downgrade during '$pattern' still updated" "$(<"$SUDO_TEST_LOG")"; fi
+  if grep -q '^step:kestrel-dev-unlink' "$SUDO_TEST_LOG"; then fail "downgrade during '$pattern' still unlinked" "$(<"$SUDO_TEST_LOG")"; fi
+  if grep -q '^step:kestrel-update ' "$SUDO_TEST_LOG"; then fail "downgrade during '$pattern' still updated" "$(<"$SUDO_TEST_LOG")"; fi
   python3 - "$SUDO_TEST_LOG" "$pattern" <<'PY'
 import sys
 events = open(sys.argv[1]).read().splitlines()
@@ -135,7 +135,7 @@ assert len(transactions) == (1 if sys.argv[2].startswith('pacman -Syyuu') else 2
 assert all(e in ('sudo -h', 'sudo -k') or e.startswith('sudo -N ') for e in events if e.startswith('sudo ')), events
 PY
   assert_boundary_cold "downgrade during $pattern"
-  cp "$boundary_tmp/saved-package-wrapper" "$SUDO_TEST_ROOT/default/helios/sudo-no-update/sudo"
+  cp "$boundary_tmp/saved-package-wrapper" "$SUDO_TEST_ROOT/default/kestrel/sudo-no-update/sudo"
   pass "a transaction that removes the wrapper stops the switch before any further sudo ($pattern)"
 done
 rm "$SUDO_TEST_ROOT/bin/sudo"
@@ -147,16 +147,16 @@ cat >"$boundary_tmp/user tools/channel-user-tool" <<'STUB'
 printf 'user-tool:%s\n' "$*" >>"$SUDO_TEST_LOG"
 STUB
 chmod +x "$boundary_tmp/user tools/channel-user-tool"
-for command in helios-hook helios-update-mise; do
+for command in kestrel-hook kestrel-update-mise; do
   rm "$SUDO_TEST_ROOT/bin/$command"
   cat >"$SUDO_TEST_ROOT/bin/$command" <<'STUB'
 #!/bin/bash
 if [[ ${1:-} == "pre-refresh-pacman" ]]; then
   [[ ! -e $SUDO_TEST_CACHE ]] || exit 91
-  [[ $(command -v sudo) == "$HELIOS_PATH/default/helios/sudo-no-update/sudo" ]] || exit 92
+  [[ $(command -v sudo) == "$KESTREL_PATH/default/kestrel/sudo-no-update/sudo" ]] || exit 92
 else
   [[ -e $SUDO_TEST_CACHE ]] || exit 94
-  [[ $(command -v sudo) != "$HELIOS_PATH/default/helios/sudo-no-update/sudo" ]] || exit 95
+  [[ $(command -v sudo) != "$KESTREL_PATH/default/kestrel/sudo-no-update/sudo" ]] || exit 95
 fi
 channel-user-tool "${0##*/}" "$@"
 STUB
@@ -164,33 +164,33 @@ STUB
 done
 reset_boundary
 PATH="$boundary_tmp/user tools:$PATH" run_channel stable || fail "channel hooks lost the user's PATH" "$(<"$boundary_tmp/output")"
-for event in 'helios-hook post-update' 'helios-update-mise' 'helios-hook pre-refresh-pacman'; do
+for event in 'kestrel-hook post-update' 'kestrel-update-mise' 'kestrel-hook pre-refresh-pacman'; do
   grep -Fxq "user-tool:$event" "$SUDO_TEST_LOG" || fail "user PATH was not preserved for $event"
 done
 assert_boundary_cold "channel user PATH"
-for command in helios-hook helios-update-mise; do
+for command in kestrel-hook kestrel-update-mise; do
   ln -sfn test-step "$SUDO_TEST_ROOT/bin/$command"
 done
 pass "channel switching preserves user tools for both hooks and mise"
 
-for step in pacman helios-update-system-pkgs helios-hook; do
+for step in pacman kestrel-update-system-pkgs kestrel-hook; do
   reset_boundary
   if SUDO_TEST_FAIL_STEP="$step" run_channel stable; then fail "$step failure was ignored"; fi
   assert_boundary_cold "$step failure"
-  if grep -q '^step:helios-hook post-update$' "$SUDO_TEST_LOG"; then fail "$step failure reached the post-update hook"; fi
+  if grep -q '^step:kestrel-hook post-update$' "$SUDO_TEST_LOG"; then fail "$step failure reached the post-update hook"; fi
   pass "$step failure exits cold without the post-update hook"
 done
 
 for signal in HUP INT TERM; do
   reset_boundary
-  cat >"$SUDO_TEST_ROOT/bin/helios-dev-unlink" <<'STUB'
+  cat >"$SUDO_TEST_ROOT/bin/kestrel-dev-unlink" <<'STUB'
 #!/bin/bash
 sudo /usr/bin/true || exit 1
 kill -s "$SUDO_TEST_CHANNEL_SIGNAL" "$PPID"
 STUB
   if SUDO_TEST_CHANNEL_SIGNAL="$signal" run_channel stable; then fail "$signal was ignored"; fi
   assert_boundary_cold "$signal"
-  if grep -q '^step:helios-hook post-update$' "$SUDO_TEST_LOG"; then fail "$signal reached the post-update hook"; fi
+  if grep -q '^step:kestrel-hook post-update$' "$SUDO_TEST_LOG"; then fail "$signal reached the post-update hook"; fi
   pass "$signal stops the channel transition and revokes authorization"
 done
 
@@ -201,7 +201,7 @@ for refusal in unsupported-sudo failed-revocation ordinary-bash; do
     failed-revocation) export SUDO_TEST_REVOKE_FAIL=1 ;;
   esac
   if [[ $refusal == "ordinary-bash" ]]; then
-    if /usr/bin/bash "$SUDO_TEST_ROOT/bin/helios-channel-set" -p >"$boundary_tmp/output" 2>&1; then fail "$refusal was accepted"; fi
+    if /usr/bin/bash "$SUDO_TEST_ROOT/bin/kestrel-channel-set" -p >"$boundary_tmp/output" 2>&1; then fail "$refusal was accepted"; fi
   elif run_channel stable; then
     fail "$refusal was accepted"
   fi

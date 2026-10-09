@@ -12,19 +12,19 @@ trap 'rm -rf "$test_tmp"' EXIT
 
 mkdir -p "$test_tmp/bin" "$test_tmp/home/.claude"
 notifications="$test_tmp/notifications"
-cat >"$test_tmp/bin/helios-notification-send" <<'SH'
+cat >"$test_tmp/bin/kestrel-notification-send" <<'SH'
 #!/bin/bash
-printf '%s\n' "$*" >>"$HELIOS_TEST_NOTIFICATIONS"
+printf '%s\n' "$*" >>"$KESTREL_TEST_NOTIFICATIONS"
 SH
-chmod +x "$test_tmp/bin/helios-notification-send"
+chmod +x "$test_tmp/bin/kestrel-notification-send"
 
 export HOME="$test_tmp/home"
 export XDG_STATE_HOME="$test_tmp/state"
 export PATH="$test_tmp/bin:$ROOT/bin:$PATH"
-export HELIOS_TEST_NOTIFICATIONS="$notifications"
+export KESTREL_TEST_NOTIFICATIONS="$notifications"
 
-accounts="$XDG_STATE_HOME/helios/agents/accounts"
-usage="$XDG_STATE_HOME/helios/agents/usage"
+accounts="$XDG_STATE_HOME/kestrel/agents/accounts"
+usage="$XDG_STATE_HOME/kestrel/agents/usage"
 mkdir -p "$accounts/claude/work" "$usage"
 
 soon=$(python3 -c 'import datetime as dt; print((dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=72)).isoformat())')
@@ -59,7 +59,7 @@ record() {
 
 autoswitch() {
   : >"$notifications"
-  helios-agent-account-state autoswitch claude
+  kestrel-agent-account-state autoswitch claude
 }
 
 active() {
@@ -71,7 +71,7 @@ active() {
 registry main manual
 record 0.97 "$soon" 0.12 "$later"
 [[ -z $(autoswitch) && $(active) == "main" ]] || fail "manual mode never moves the active account"
-grep -q "Main is at 97% of a Claude limit Work is at 12%. Click to switch new sessions to it. --exec helios-agent-account-use claude work" "$notifications" ||
+grep -q "Main is at 97% of a Claude limit Work is at 12%. Click to switch new sessions to it. --exec kestrel-agent-account-use claude work" "$notifications" ||
   fail "manual mode offers the switch as the notification's click" "$(cat "$notifications")"
 pass "manual mode notifies with a one-click switch"
 

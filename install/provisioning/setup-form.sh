@@ -1,8 +1,8 @@
-# The setup form: every question HeliOS asks a human to describe their machine
+# The setup form: every question Kestrel asks a human to describe their machine
 # — keyboard, account, hostname, timezone — plus the rules those answers are
 # checked against. Shared by the two places that ask them: the ISO
 # configurator's user step and this package's first-boot owner setup
-# (helios-provision-owner). Sourced by both, so the copies cannot drift the way
+# (kestrel-provision-owner). Sourced by both, so the copies cannot drift the way
 # the keyboard list already did.
 #
 # Every prompt reports one of three statuses, and both callers read them the
@@ -21,15 +21,15 @@
 # the variables these prompts write: keyboard, keyboard_label, username,
 # password, password_confirmation, full_name, email_address, hostname, timezone.
 
-HELIOS_FORM_BACK=1
-HELIOS_FORM_SIGNAL=130
+KESTREL_FORM_BACK=1
+KESTREL_FORM_SIGNAL=130
 
 # The English layouts lead, then everything else alphabetically. gum choose
 # paginates in --height-sized pages and jumps to the page holding --selected,
 # so an alphabetical English (US) landed deep enough to sit alone at the edge
 # of a page of layouts nobody scanning for it reads. Up here the default and
 # its variants are the first thing on screen no matter how the list grows.
-HELIOS_KEYBOARD_LAYOUTS=$'English (US)|us
+KESTREL_KEYBOARD_LAYOUTS=$'English (US)|us
 English (UK)|uk
 English (US, Dvorak)|dvorak
 English (US, Colemak)|colemak
@@ -78,39 +78,39 @@ Tajik|tj_alt-UTF8
 Turkish|trq
 Ukrainian|ua'
 
-HELIOS_USERNAME_PATTERN='^[a-z_][a-z0-9_-]*[$]?$'
-HELIOS_RESERVED_USERNAMES='^(root|bin|daemon|mail|ftp|http|nobody|dbus|systemd-coredump|systemd-network|systemd-oom|systemd-journal-remote|systemd-resolve|systemd-timesync|tss|uuidd|alpm|git|avahi|cups|cups-browsed|lp|_talkd|polkitd|rtkit|qemu|brltty|gluster|rpc|libvirt-qemu|pcscd|nvidia-persistenced|sddm)$'
-HELIOS_HOSTNAME_PATTERN='^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$'
-HELIOS_HOSTNAME_DEFAULT='helios'
+KESTREL_USERNAME_PATTERN='^[a-z_][a-z0-9_-]*[$]?$'
+KESTREL_RESERVED_USERNAMES='^(root|bin|daemon|mail|ftp|http|nobody|dbus|systemd-coredump|systemd-network|systemd-oom|systemd-journal-remote|systemd-resolve|systemd-timesync|tss|uuidd|alpm|git|avahi|cups|cups-browsed|lp|_talkd|polkitd|rtkit|qemu|brltty|gluster|rpc|libvirt-qemu|pcscd|nvidia-persistenced|sddm)$'
+KESTREL_HOSTNAME_PATTERN='^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$'
+KESTREL_HOSTNAME_DEFAULT='kestrel'
 
 # Installer targets are empty, so any account is fair game; first-boot setup
 # overrides this because its machine already has users.
-helios_username_taken() { return 1; }
+kestrel_username_taken() { return 1; }
 
 # `x=$(gum ...) && status=0 || status=$?` rather than a bare assignment followed
 # by `status=$?`: one caller runs under `set -e`, where a cancelled prompt is a
 # failing assignment that would kill the script before the status is read.
 
-helios_prompt_keyboard() {
+kestrel_prompt_keyboard() {
   local choice status
-  choice=$(printf '%s\n' "$HELIOS_KEYBOARD_LAYOUTS" | cut -d'|' -f1 |
+  choice=$(printf '%s\n' "$KESTREL_KEYBOARD_LAYOUTS" | cut -d'|' -f1 |
     gum choose --height 10 --selected "English (US)" --header "Select keyboard layout") && status=0 || status=$?
   ((status == 0)) || return $status
 
   keyboard_label="$choice"
-  keyboard=$(printf '%s\n' "$HELIOS_KEYBOARD_LAYOUTS" | awk -F'|' -v c="$choice" '$1==c{print $2; exit}')
+  keyboard=$(printf '%s\n' "$KESTREL_KEYBOARD_LAYOUTS" | awk -F'|' -v c="$choice" '$1==c{print $2; exit}')
 }
 
-helios_prompt_username() {
+kestrel_prompt_username() {
   local status
   while true; do
     username=$(gum input --placeholder "Alphanumeric without spaces (like dhh)" --prompt.foreground="#845DF9" --prompt "Username> ") && status=0 || status=$?
     ((status == 0)) || return $status
 
-    if [[ "$username" =~ $HELIOS_USERNAME_PATTERN ]]; then
-      if [[ "$username" =~ $HELIOS_RESERVED_USERNAMES ]]; then
+    if [[ "$username" =~ $KESTREL_USERNAME_PATTERN ]]; then
+      if [[ "$username" =~ $KESTREL_RESERVED_USERNAMES ]]; then
         notice "Username is reserved for system" 1
-      elif helios_username_taken "$username"; then
+      elif kestrel_username_taken "$username"; then
         notice "That username already exists on this machine" 1
       else
         return 0
@@ -121,7 +121,7 @@ helios_prompt_username() {
   done
 }
 
-helios_prompt_password() {
+kestrel_prompt_password() {
   local status
   while true; do
     password=$(gum input --placeholder "Used for user + root, and disk encryption when enabled" --prompt.foreground="#845DF9" --password --prompt "Password> ") && status=0 || status=$?
@@ -141,7 +141,7 @@ helios_prompt_password() {
 
 # Both fields are skippable with Return, so an empty value is a real answer and
 # only Esc/Ctrl+C end the prompt early.
-helios_prompt_identity() {
+kestrel_prompt_identity() {
   local status
   full_name=$(gum input --placeholder "Used for git authentication (hit return to skip)" --prompt.foreground="#845DF9" --prompt "Full name> ") && status=0 || status=$?
   ((status == 0)) || return $status
@@ -149,16 +149,16 @@ helios_prompt_identity() {
   return $status
 }
 
-helios_prompt_hostname() {
+kestrel_prompt_hostname() {
   local status
   while true; do
-    hostname=$(gum input --placeholder "Letters, digits, and dashes (or return for 'helios')" --prompt.foreground="#845DF9" --prompt "Hostname> ") && status=0 || status=$?
+    hostname=$(gum input --placeholder "Letters, digits, and dashes (or return for 'kestrel')" --prompt.foreground="#845DF9" --prompt "Hostname> ") && status=0 || status=$?
     ((status == 0)) || return $status
 
     if [[ -z $hostname ]]; then
-      hostname="$HELIOS_HOSTNAME_DEFAULT"
+      hostname="$KESTREL_HOSTNAME_DEFAULT"
       return 0
-    elif [[ "$hostname" =~ $HELIOS_HOSTNAME_PATTERN ]]; then
+    elif [[ "$hostname" =~ $KESTREL_HOSTNAME_PATTERN ]]; then
       return 0
     else
       notice "Hostname must be 1-63 letters, digits, or dashes, and cannot start or end with a dash" 1
@@ -168,7 +168,7 @@ helios_prompt_hostname() {
 
 # A fresh machine often hasn't joined a network yet, so the geo guess fails
 # often; guard it or a `set -e` caller dies before the filter fallback.
-helios_prompt_timezone() {
+kestrel_prompt_timezone() {
   local guess status
   guess=$(tzupdate -p 2>/dev/null) || guess=""
 

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# kestrel:summary=Toggle animations, transparency and other effects that are slow without a GPU
+# kestrel:args=[toggle|on|off]
+# kestrel:examples=kestrel toggle animations | kestrel toggle animations off | kestrel toggle animations on
+
+# The flag records animations being off, so on and off swap on the way through.
+case ${1:-toggle} in
+toggle) kestrel-hyprland-toggle no-animations toggle ;;
+on) kestrel-hyprland-toggle no-animations off ;;
+off) kestrel-hyprland-toggle no-animations on ;;
+*)
+  echo "Usage: kestrel-toggle-animations [toggle|on|off]" >&2
+  exit 1
+  ;;
+esac
+
+if kestrel-hyprland-toggle-enabled no-animations; then
+  kestrel-notification-send -g 󰕟 "Animations disabled"
+else
+  kestrel-notification-send -g 󰕟 "Animations enabled"
+fi

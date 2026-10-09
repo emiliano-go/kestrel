@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kestrel:summary=Compatibility wrapper for kestrel-migrate-notify.
+# kestrel:hidden=true
+
+exec kestrel-migrate-notify "$@"

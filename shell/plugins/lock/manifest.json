@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "helios.lock",
+  "id": "kestrel.lock",
   "name": "Lock Screen",
   "version": "1.0.0",
-  "author": "HeliOS",
+  "author": "Kestrel",
   "description": "Quickshell session lock with separate password and fingerprint PAM flows.",
-  "helios": {
+  "kestrel": {
     "capabilities": [
       "authentication"
     ]

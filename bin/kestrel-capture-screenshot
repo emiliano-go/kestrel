@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# kestrel:summary=Take a screenshot
+# kestrel:group=capture
+# kestrel:args=[smart|region|windows|fullscreen|scroll] [copy|save]
+# kestrel:examples=kestrel screenshot | kestrel capture screenshot region
+# kestrel:aliases=kestrel screenshot
+
+# grim + slurp capture, satty annotation.
+screenshot_dir="${KESTREL_SCREENSHOT_DIR:-$HOME/Pictures/Screenshots}"
+mkdir -p "$screenshot_dir"
+
+mode="smart"
+action=""
+for arg in "$@"; do
+  case "$arg" in
+    copy | save) action="$arg" ;;
+    smart | region | windows | fullscreen | scroll) mode="$arg" ;;
+  esac
+done
+
+capture() {
+  if [[ $mode == "fullscreen" ]]; then
+    grim -
+  else
+    # smart/region/windows/scroll all start from a slurp selection; satty is the
+    # annotation step.
+    grim -g "$(slurp)" -
+  fi
+}
+
+output="$screenshot_dir/$(date +%Y%m%d%H%M%S).png"
+satty_args=(--filename -)
+case "$action" in
+  copy) satty_args+=(--copy-command wl-copy) ;;
+  save | *) satty_args+=(--output-filename "$output") ;;
+esac
+
+capture | satty "${satty_args[@]}"

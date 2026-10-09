@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kestrel:summary=Overwrite the user config for hyprsunset with the Kestrel default and restart the service.
+
+kestrel-refresh-config hypr/hyprsunset.conf
+kestrel-restart-hyprsunset

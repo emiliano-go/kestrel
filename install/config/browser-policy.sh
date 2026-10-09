@@ -1,2 +1,2 @@
-source "$HELIOS_PATH/install/helpers/browser-policy.sh"
+source "$KESTREL_PATH/install/helpers/browser-policy.sh"
 browser_policy_setup_dir /etc/chromium/policies/managed

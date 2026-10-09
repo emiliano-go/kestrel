@@ -11,10 +11,10 @@ default/audio/tunings/<vendor>-<model>/
 └── filter-chain.conf  # the graph, with @SPEAKER_SINK@ substituted on install
 ```
 
-`on` renders the graph into `~/.config/pipewire/helios-speaker-tuning.conf.d/`
-(plus the shared host config `helios-speaker-tuning.conf`, from
+`on` renders the graph into `~/.config/pipewire/kestrel-speaker-tuning.conf.d/`
+(plus the shared host config `kestrel-speaker-tuning.conf`, from
 `default/audio/filter-chain-host.conf`) and runs it as its own PipeWire client via
-`helios-speaker-tuning.service`, rather than
+`kestrel-speaker-tuning.service`, rather than
 loading it into the audio daemon. The daemon only reads its own config at startup,
 so a daemon-loaded tuning could only be switched by restarting PipeWire — which
 drops every PulseAudio client's connection, and applications that do not reconnect
@@ -34,9 +34,9 @@ install. Matching itself deliberately does not consult the audio graph, so the
 LV2 dependency is still installed in the chroot.
 
 ```bash
-helios audio tuning on        # install the matching tuning
-helios audio tuning off       # remove it, back to raw speakers
-helios audio tuning status    # installed? in use? what matches?
+kestrel audio tuning on        # install the matching tuning
+kestrel audio tuning off       # remove it, back to raw speakers
+kestrel audio tuning status    # installed? in use? what matches?
 ```
 
 `match` and `fronted-sink` are also accepted; they exist for the install hooks
@@ -74,7 +74,7 @@ defining none never matches.
 
 `sink_pattern` is required whichever method you use, since the graph's target sink
 is substituted from it. The graph must also keep two fixed properties: the sink
-node is named `helios_speaker_tuning` (the install checks for that exact name,
+node is named `kestrel_speaker_tuning` (the install checks for that exact name,
 so renaming it silently fails verification), and its output stream sets
 `node.dont-fallback` alongside `node.dont-move`, so WirePlumber cannot link it
 somewhere else when the target sink is absent at host start.
@@ -94,12 +94,12 @@ Two hard requirements:
 ## Building one
 
 Measuring a laptop and fitting a filter-chain to it is a separate job with its own
-tools, in [helios-audio-tuner](https://github.com/omacom-io/helios-audio-tuner).
+tools, in [kestrel-audio-tuner](https://github.com/omacom-io/kestrel-audio-tuner).
 It is not installed by default — almost nobody authoring a tuning, and it needs
 python, ffmpeg and mpv.
 
 ```bash
-helios pkg add helios-audio-tuner
+kestrel pkg add kestrel-audio-tuner
 ```
 
 Its README is the walkthrough, and covers both cases: copying a reference that
@@ -131,7 +131,7 @@ real bugs:
   becomes the default output, and changing *its* volume would alter the level
   going into the processing — moving the display while the speakers stay put, and
   changing the tone of anything with a compressor or limiter in it.
-  `helios-audio-output-sink` is the single definition of "which sink does this
+  `kestrel-audio-output-sink` is the single definition of "which sink does this
   output's volume really use": it resolves a sink through any DSP sink to the
   physical one, and with no argument resolves the current default output. The
   volume keys, the output switcher's OSD and the audio panel all use it, so they
@@ -140,8 +140,8 @@ real bugs:
   tuning still exists.
 - **The fronted sink is hidden.** The tuning and the physical speakers both exist
   in the graph, and selecting the physical one would only bypass the tuning. So
-  `helios-audio-sink-availability` reports it unavailable and
-  `helios-audio-output-switch` skips it, leaving one speaker entry in the panel.
+  `kestrel-audio-sink-availability` reports it unavailable and
+  `kestrel-audio-output-switch` skips it, leaving one speaker entry in the panel.
   A WirePlumber smart filter would remove the need for both — it leaves the real
   device as the default output — but on PipeWire 1.6.8 / WirePlumber 0.5.15 the
   graph loads and links correctly as a smart filter and then passes audio through
@@ -154,5 +154,5 @@ real bugs:
   playback stream like any other, so anything rerouting "all streams" to a newly
   selected output would drag the processing with it — onto headphones, or into the
   tuning's own sink, which is a cycle. The tuning sets `node.dont-move`, and
-  `helios-audio-output-set-default` moves only streams that carry an
+  `kestrel-audio-output-set-default` moves only streams that carry an
   `application.name`.

@@ -100,7 +100,7 @@ local function ancestor_process_named(name)
 end
 
 local function copy_to_client_clipboard(register, lines)
-  if vim.g.helios_remote_clipboard_osc52 == false then
+  if vim.g.kestrel_remote_clipboard_osc52 == false then
     return
   end
 
@@ -208,7 +208,7 @@ function M.setup()
     end
 
     vim.g.clipboard = {
-      name = "HeliOSWaylandClipboard",
+      name = "KestrelWaylandClipboard",
       copy = {
         ["+"] = copy("+"),
         ["*"] = copy("*"),

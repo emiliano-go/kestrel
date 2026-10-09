@@ -4,7 +4,7 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
-windows_vm_command="$ROOT/bin/helios-windows-vm"
+windows_vm_command="$ROOT/bin/kestrel-windows-vm"
 
 rg -q '^    restart: "no"$' "$windows_vm_command" ||
   fail "Windows VM uses manual startup by default"
@@ -16,6 +16,6 @@ fi
 pass "Windows VM does not restart automatically at boot"
 
 # Tolerate either shell quoting of the argument.
-rg -q 'title:"?Windows VM - HeliOS"' "$windows_vm_command" ||
+rg -q 'title:"?Windows VM - Kestrel"' "$windows_vm_command" ||
   fail "Windows VM launches FreeRDP with its expected title"
 pass "Windows VM launches FreeRDP with its expected title"

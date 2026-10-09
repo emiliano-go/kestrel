@@ -2,15 +2,15 @@
 -- o.bind or replace defaults with o.rebind.
 
 -- See current bindings and descriptions:
---   helios menu keybindings --print
+--   kestrel menu keybindings --print
 
--- To disable every HeliOS default binding, set this in
--- ~/.config/hypr/hyprland.lua before require("default.hypr.helios"), then add
+-- To disable every Kestrel default binding, set this in
+-- ~/.config/hypr/hyprland.lua before require("default.hypr.kestrel"), then add
 -- only the bindings you want below:
---   helios_default_bindings = false
+--   kestrel_default_bindings = false
 
 -- To disable all preinstalled app/webapp bindings, set:
---   helios_preinstalled_bindings = false
+--   kestrel_preinstalled_bindings = false
 
 -- Add a new binding.
 -- o.bind("SUPER + SHIFT + R", "SSH", "alacritty -e ssh your-server")
@@ -23,5 +23,5 @@
 -- hl.unbind("SUPER + SHIFT + B")
 
 -- Logitech MX Keys examples:
--- o.bind("SUPER + SHIFT + S", nil, "helios-capture-screenshot")
--- o.bind("SUPER + PERIOD", nil, { panel = "helios.emojis" })
+-- o.bind("SUPER + SHIFT + S", nil, "kestrel-capture-screenshot")
+-- o.bind("SUPER + PERIOD", nil, { panel = "kestrel.emojis" })

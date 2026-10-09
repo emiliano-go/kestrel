@@ -1,5 +1,5 @@
-cat >/etc/helios/agent.conf <<EOF
+cat >/etc/kestrel/agent.conf <<EOF
 enabled=true
   EOF
-helper=$HOME/.local/share/helios/bin/helios-agent
+helper=$HOME/.local/share/kestrel/bin/kestrel-agent
 EOF
