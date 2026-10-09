@@ -1,7 +1,6 @@
 import QtQuick
 import QtQml.Models
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 
 import qs.Commons

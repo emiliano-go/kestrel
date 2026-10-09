@@ -47,19 +47,24 @@ Item {
   }
 
   function runApply(temp) {
-    applyProcess.command = ["bash", "-lc",
-      "pgrep -x hyprsunset >/dev/null || { setsid uwsm-app -- hyprsunset >/dev/null 2>&1 & sleep 1; }; " +
-      "hyprctl hyprsunset temperature " + Number(temp)]
+    // Kestrel uses wlsunset instead of Hyprland's hyprsunset: night mode runs
+    // wlsunset, day mode stops it.
+    if (NightlightModel.isNightlight(temp)) {
+      applyProcess.command = ["bash", "-lc",
+        "pgrep -x wlsunset >/dev/null || setsid wlsunset -t " + root.nightTemperature + " -T " + root.dayTemperature + " >/dev/null 2>&1 &"]
+    } else {
+      applyProcess.command = ["bash", "-lc", "pkill -x wlsunset 2>/dev/null || true"]
+    }
     applyProcess.running = true
   }
 
   Process {
     id: statusProbe
-    command: ["hyprctl", "hyprsunset", "temperature"]
+    command: ["bash", "-lc", "pgrep -x wlsunset >/dev/null && echo night || echo day"]
     stdout: StdioCollector {
       waitForEnd: true
       onStreamFinished: {
-        root.temperature = NightlightModel.temperatureFromOutput(text)
+        root.temperature = String(text).indexOf("night") !== -1 ? root.nightTemperature : root.dayTemperature
         root.stateLoaded = true
       }
     }
