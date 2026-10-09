@@ -2,11 +2,10 @@
 
 # kestrel:summary=Close all open windows
 
-hyprctl clients -j | \
-  jq -r ".[].address" | \
-  while read -r addr; do
-    hyprctl dispatch "hl.dsp.window.close({ window = \"address:$addr\" })" >/dev/null
-  done
+# Close every client, then return to the first tag on the focused monitor.
+mmsg get all-clients 2>/dev/null | jq -r '.clients[].id' | while read -r id; do
+  [[ -n $id ]] || continue
+  mmsg dispatch killclient "client,$id" >/dev/null 2>&1 || true
+done
 
-# Move to first workspace
-hyprctl dispatch 'hl.dsp.focus({ workspace = "1" })' >/dev/null 2>&1 || hyprctl dispatch workspace 1
+mmsg dispatch view,1 >/dev/null 2>&1 || true

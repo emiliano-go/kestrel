@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# kestrel:summary=Print the detected Hyprland touchpad or trackpad device name
+# kestrel:summary=Print the detected touchpad or trackpad device name
 
-device=$(hyprctl devices -j | jq -r '[.mice[] | .name | select(test("touchpad|trackpad"; "i"))] | first // empty')
-[[ -n $device ]] && echo "$device"
+mmsg get all-devices 2>/dev/null |
+  jq -r '[.devices[] | select(.name | test("touchpad|trackpad"; "i"))][0].name // empty'

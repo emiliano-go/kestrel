@@ -3,21 +3,20 @@
 # kestrel:summary=Print monitor panel state for the shell
 # kestrel:group=monitor
 
-monitors_json=$(hyprctl monitors all -j)
-focused_monitor=$(printf '%s\n' "$monitors_json" | jq -r '[.[] | select(.focused == true)][0].name // ""')
+monitors_json=$(mmsg get all-monitors 2>/dev/null)
+focused_monitor=$(jq -r '[.monitors[] | select(.active == true)][0].name // ""' <<<"$monitors_json")
 
 { kestrel-brightness-display --monitor "$focused_monitor" 2>/dev/null; echo; } | head -n 1
 
-printf '%s\n' "$monitors_json" | jq -r '
+jq -r '
   def internal: test("^(eDP|LVDS|DSI)-");
-  ([.[] | select(.name | internal)][0].name // ""),
-  ([.[] | select((.name | internal) | not)][0].name // ""),
-  ([.[] | select((.name | internal) and .disabled != true)][0].name // ""),
-  ([.[] | select(.mirrorOf != "none") | if (.name | internal) then .mirrorOf else .name end][0] // "")
-'
+  ([.monitors[] | select(.name | internal)][0].name // ""),
+  ([.monitors[] | select((.name | internal) | not)][0].name // ""),
+  ([.monitors[] | select(.name | internal)][0].name // ""),
+  ("")
+' <<<"$monitors_json"
 
 printf '%s\n' "$focused_monitor"
 kestrel-hyprland-monitor-scaling 2>/dev/null || echo
 
-printf '%s\n' "$monitors_json" | jq -c \
-  '[.[] | {name, enabled:(.disabled != true), focused:(.focused == true), width, height}]'
+jq -c '[.monitors[] | {name, enabled:true, focused:(.active == true), width, height}]' <<<"$monitors_json"
