@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Kestrel (Mango, uwsm-managed)
+Comment=Kestrel on the Mango Wayland compositor, managed by uwsm
+Exec=uwsm start -e -D mango mango.desktop
+TryExec=uwsm
+DesktopNames=mango
+Type=Application

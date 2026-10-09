@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Mango
+Comment=Kestrel's Wayland compositor
+Exec=mango
+Type=Application
+DesktopNames=mango
+Keywords=tiling;wayland;compositor;
