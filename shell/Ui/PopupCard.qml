@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
+import Quickshell.Wayland
 import qs.Commons
 import qs.Commons as Commons
 
@@ -18,7 +18,7 @@ PopupWindow {
   property var borderSpec: Border.localOrSurfaceSpec("popups", "border", borderColor, Commons.Color.popups.border, Math.max(1, Style.space(2)))
   property bool open: false
   property bool centerOnBar: false
-  // "click" — uses HyprlandFocusGrab so clicking outside dismisses the popup.
+  // "click" — clicking outside dismisses the popup (see the click catcher below).
   // "hover" — passive overlay; the owning widget controls open via hover.
   property string triggerMode: "click"
 
@@ -76,14 +76,33 @@ PopupWindow {
     else if (bar.activePopout === coordinatorKey) bar.releasePopout(coordinatorKey)
   }
 
-  // Outside-click dismissal via Hyprland's focus grab. While `active`, input
-  // is routed only to the listed windows; clicking anywhere else clears the
-  // grab and we close the popup. Skipped for hover-mode popups so the cursor
-  // can move freely between the trigger and the popup.
-  HyprlandFocusGrab {
-    active: root.open && root.triggerMode === "click"
-    windows: root.anchorWindow ? [root, root.anchorWindow] : [root]
-    onCleared: root.close()
+  // Outside-click dismissal. Quickshell's HyprlandFocusGrab is Hyprland-only,
+  // so on Mango a transparent full-screen layer surface beneath the popup
+  // catches clicks outside it and closes. Skipped for hover-mode popups so the
+  // cursor can move freely between the trigger and the popup.
+  PanelWindow {
+    id: clickCatcher
+    visible: root.open && root.triggerMode === "click" && !!root.popupScreen
+    screen: root.popupScreen
+    anchors {
+      top: true
+      left: true
+      right: true
+      bottom: true
+    }
+    color: "transparent"
+    exclusionMode: ExclusionMode.Ignore
+    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+    MouseArea {
+      anchors.fill: parent
+      acceptedButtons: Qt.AllButtons
+      onPressed: function(mouse) {
+        mouse.accepted = true
+        root.close()
+      }
+    }
   }
 
   anchor {

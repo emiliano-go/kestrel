@@ -301,13 +301,10 @@ Panel {
     if (!name) return
     if (enabled && root.enabledDisplayCount <= 1) return
 
-    // hyprctl keyword is rejected under the Lua config ("non-legacy parsers"),
-    // so drive the monitor through the hl.monitor eval API instead.
-    var output = '"' + name.replace(/[\\"]/g, "\\$&") + '"'
-    var expr = enabled
-      ? 'hl.monitor({ output = ' + output + ', disabled = true })'
-      : 'hl.monitor({ output = ' + output + ', disabled = false, mode = "preferred", position = "auto", scale = "auto" })'
-    actionProc.command = ["hyprctl", "eval", expr]
+    // Mango speaks wlr-output-management, so drive the output with wlr-randr.
+    var safe = String(name).replace(/[^A-Za-z0-9._-]/g, "")
+    if (!safe) return
+    actionProc.command = ["wlr-randr", "--output", safe, enabled ? "--off" : "--on"]
     if (!actionProc.running) actionProc.running = true
   }
 
