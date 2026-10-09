@@ -4,10 +4,10 @@
 
 set -e
 
-WINDOW_ADDRESS=$(hyprctl clients -j | jq -r '.[]|select((.class|test("\\bspotify\\b";"i")) or (.title|test("\\bspotify\\b";"i")))|.address' | head -n1)
+WINDOW_ID=$(mmsg get all-clients 2>/dev/null | jq -r '.clients[]|select(((.appid // "")|test("\\bspotify\\b";"i")) or ((.title // "")|test("\\bspotify\\b";"i")))|.id' | head -n1)
 
-if [[ -n $WINDOW_ADDRESS ]]; then
-  hyprctl dispatch "hl.dsp.focus({ window = \"address:$WINDOW_ADDRESS\" })" >/dev/null 2>&1 || hyprctl dispatch focuswindow "address:$WINDOW_ADDRESS"
+if [[ -n $WINDOW_ID ]]; then
+  mmsg dispatch focusid "client,$WINDOW_ID" >/dev/null 2>&1
 elif [[ -x /usr/bin/spotify ]]; then
   exec setsid uwsm-app -- /usr/bin/spotify
 else

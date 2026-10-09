@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# kestrel:summary=Focus a Hyprland window by application identity
+# kestrel:summary=Focus a Mango window by application identity
 # kestrel:args=<app-name>
 # kestrel:examples=kestrel hyprland focus app Slack
 
@@ -12,20 +12,18 @@ usage() {
 app=${1:-}
 [[ -n $app ]] || usage
 
-# Agent terminals notify as kitty/foot/etc. while their shared window class is
-# org.kestrel.agent, leaving the terminal name only in initialTitle. So match
-# by class first, then fall back to the launch-time title of agent windows.
-address=$(
-  hyprctl clients -j 2>/dev/null |
+# Mango exposes the app id as `appid` and the current title as `title` (there is
+# no initialClass/initialTitle). Match the app id first, then fall back to the
+# title only for agent terminals, whose shared app id is org.kestrel.agent.
+id=$(
+  mmsg get all-clients 2>/dev/null |
     jq -r --arg pattern "$app" \
-      'def matches($value): ($value // "") | test($pattern; "i");
-       first(
-         (.[] | select(matches(.class))),
-         (.[] | select(.initialClass == "org.kestrel.agent" and matches(.initialTitle)))
-       ).address // empty'
+      'first(
+         (.clients[] | select((.appid // "") | test($pattern; "i"))),
+         (.clients[] | select((.appid // "") == "org.kestrel.agent" and ((.title // "") | test($pattern; "i"))))
+       ).id // empty'
 )
 
-[[ -n $address ]] || exit 1
+[[ -n $id ]] || exit 1
 
-hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null 2>&1 || \
-  hyprctl dispatch focuswindow "address:$address" >/dev/null
+mmsg dispatch focusid "client,$id" >/dev/null 2>&1

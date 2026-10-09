@@ -29,12 +29,12 @@ for _ in $(seq 50); do
   sleep 0.05
 done
 
-cat >"$stub_bin/hyprctl" <<'SH'
+cat >"$stub_bin/mmsg" <<'SH'
 #!/bin/bash
-[[ -n ${ACTIVE_PID:-} ]] && printf 'Window 1 -> terminal:\n\tpid: %s\n' "$ACTIVE_PID"
+[[ -n ${ACTIVE_PID:-} ]] && printf '%s\n' "{\"pid\": $ACTIVE_PID}"
 exit 0
 SH
-chmod +x "$stub_bin/hyprctl"
+chmod +x "$stub_bin/mmsg"
 
 cwd=$(ACTIVE_PID="$terminal_pid" PATH="$stub_bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" "$ROOT/bin/kestrel-cmd-terminal-cwd")
 [[ $cwd == "$work_dir" ]] || fail "a new terminal opens in the focused terminal's shell directory" "got: $cwd"
@@ -44,14 +44,14 @@ output=$(PATH="$stub_bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" HOME="$test_tmp" "$R
 [[ $output == "$test_tmp" ]] || fail "with no focused terminal the new one opens in HOME" "got: $output"
 pass "with no focused terminal the new one opens in HOME, quietly"
 
-# The Super+Return binding hands over the focused window's pid, so Hyprland is
-# not asked again; a hyprctl that fails the test proves it goes unasked.
-cat >"$stub_bin/hyprctl" <<'SH'
+# The Super+Return binding hands over the focused window's pid, so Mango is
+# not asked again; a mmsg that fails the test proves it goes unasked.
+cat >"$stub_bin/mmsg" <<'SH'
 #!/bin/bash
-echo "hyprctl was asked for the active window" >&2
+echo "mmsg was asked for the focused client" >&2
 exit 1
 SH
 
 cwd=$(PATH="$stub_bin:$PATH" XDG_RUNTIME_DIR="$test_tmp" "$ROOT/bin/kestrel-cmd-terminal-cwd" "$terminal_pid" 2>&1)
-[[ $cwd == "$work_dir" ]] || fail "a terminal pid passed in finds its shell directory without hyprctl" "got: $cwd"
-pass "a terminal pid passed in finds its shell directory without hyprctl"
+[[ $cwd == "$work_dir" ]] || fail "a terminal pid passed in finds its shell directory without mmsg" "got: $cwd"
+pass "a terminal pid passed in finds its shell directory without mmsg"
