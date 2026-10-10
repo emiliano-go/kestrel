@@ -53,12 +53,14 @@ fi
 step="$1"
 
 if [[ $step == "off" ]]; then
-  mmsg dispatch sleep_monitor,"$monitor" >/dev/null 2>&1
+  hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })' >/dev/null 2>&1
   exit 0
 elif [[ $step == "on" ]]; then
-  # Mango's monitor JSON carries no dpms status, so the redundant-wakeup guard
-  # Hyprland allowed (which avoided a modeset flash right after resume) is gone.
-  mmsg dispatch wakeup_monitor,"$monitor" >/dev/null 2>&1
+  # Skip the dispatch when every active display is already lit: a redundant
+  # DPMS enable right after system resume forces another modeset, which blanks
+  # the panel for a beat (visible flash at the unlock screen).
+  hyprctl monitors -j 2>/dev/null | jq -e '[.[] | select(.disabled == false)] | length > 0 and all(.dpmsStatus)' >/dev/null 2>&1 && exit 0
+  hyprctl dispatch 'hl.dsp.dpms({ action = "enable" })' >/dev/null 2>&1
   exit 0
 fi
 

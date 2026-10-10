@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Wayland
-import qs.Commons
 
 // Map a fresh fullscreen surface on each open. Keep its first frames
 // transparent until Qt receives the output's scale, so it opens sharp without
@@ -16,7 +16,7 @@ PanelWindow {
 
   property var targetScreen: null
   readonly property var targetMonitor: {
-    var monitors = Mango.monitors
+    var monitors = Hyprland.monitors.values
     for (var i = 0; i < monitors.length; i++) {
       if (targetScreen && monitors[i].name === targetScreen.name) return monitors[i]
     }
@@ -41,7 +41,7 @@ PanelWindow {
   }
 
   function focusedScreen() {
-    var monitor = Mango.focusedMonitor
+    var monitor = Hyprland.focusedMonitor
     var name = monitor ? String(monitor.name || "") : ""
     for (var i = 0; i < Quickshell.screens.length; i++) {
       if (Quickshell.screens[i].name === name) return Quickshell.screens[i]
@@ -49,13 +49,13 @@ PanelWindow {
     return Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
   }
 
-  // Live monitor scaling does not emit a Mango monitor event, so its cached
+  // Live monitor scaling does not emit a Hyprland monitor event, so its cached
   // scale can lag behind Qt. Refresh on opening and on scale changes while open.
   onShownChanged: {
     targetScreen = shown ? focusedScreen() : null
-    if (shown) Mango.refreshMonitors()
+    if (shown) Hyprland.refreshMonitors()
   }
-  onDevicePixelRatioChanged: if (shown) Mango.refreshMonitors()
+  onDevicePixelRatioChanged: if (shown) Hyprland.refreshMonitors()
 
   Connections {
     target: Quickshell

@@ -10,43 +10,43 @@ trap 'rm -rf "$test_tmp"' EXIT
 mock_bin="$test_tmp/bin"
 mkdir -p "$mock_bin"
 
-cat >"$mock_bin/mmsg" <<'SH'
+cat >"$mock_bin/hyprctl" <<'SH'
 #!/bin/bash
-if [[ $1 == "get" ]]; then
+if [[ $1 == "clients" ]]; then
   printf '%s\n' "$KESTREL_TEST_CLIENTS_JSON"
 elif [[ $1 == "dispatch" ]]; then
-  printf '%s\n' "$2 $3" >"$KESTREL_TEST_FOCUS_DISPATCH"
+  printf '%s\n' "$2" >"$KESTREL_TEST_FOCUS_DISPATCH"
 fi
 SH
-chmod +x "$mock_bin/mmsg"
+chmod +x "$mock_bin/hyprctl"
 
 dispatch_log="$test_tmp/dispatch"
-clients_json='{"clients":[{"id":7,"appid":"chromium","title":""}]}'
+clients_json='[{"address":"0xabc","class":"chromium"}]'
 PATH="$mock_bin:$PATH" KESTREL_TEST_CLIENTS_JSON="$clients_json" \
   KESTREL_TEST_FOCUS_DISPATCH="$dispatch_log" \
   bash "$ROOT/bin/kestrel-hyprland-focus-app" '^chromium$'
 
-grep -F 'focusid client,7' "$dispatch_log" >/dev/null || \
-  fail "app focus follows windows across tags"
+grep -F 'hl.dsp.focus({ window = "address:0xabc" })' "$dispatch_log" >/dev/null || \
+  fail "app focus uses the workspace-aware Hyprland dispatcher"
 
-pass "app focus follows windows across tags"
+pass "app focus follows windows across workspaces"
 
-clients_json='{"clients":[
-  {"id":10,"appid":"com.viber.Viber","title":"Viber"},
-  {"id":11,"appid":"org.kestrel.agent","title":"kitty"}
-]}'
+clients_json='[
+  {"address":"0xviber","class":"com.viber.Viber","initialClass":"com.viber.Viber","initialTitle":"Viber"},
+  {"address":"0xagent","class":"org.kestrel.agent","initialClass":"org.kestrel.agent","initialTitle":"kitty"}
+]'
 PATH="$mock_bin:$PATH" KESTREL_TEST_CLIENTS_JSON="$clients_json" \
   KESTREL_TEST_FOCUS_DISPATCH="$dispatch_log" \
   bash "$ROOT/bin/kestrel-hyprland-focus-app" kitty
 
-grep -F 'focusid client,11' "$dispatch_log" >/dev/null || \
-  fail "app focus falls back to the window title"
+grep -F 'hl.dsp.focus({ window = "address:0xagent" })' "$dispatch_log" >/dev/null || \
+  fail "app focus falls back to the initial window title"
 
-pass "app focus finds terminals launched under a shared agent app id"
+pass "app focus finds terminals launched under a shared agent class"
 
-clients_json='{"clients":[
-  {"id":12,"appid":"chromium","title":"Mail settings"}
-]}'
+clients_json='[
+  {"address":"0xbrowser","class":"chromium","initialClass":"chromium","initialTitle":"Mail settings"}
+]'
 rm -f "$dispatch_log"
 if PATH="$mock_bin:$PATH" KESTREL_TEST_CLIENTS_JSON="$clients_json" \
   KESTREL_TEST_FOCUS_DISPATCH="$dispatch_log" \

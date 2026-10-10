@@ -708,7 +708,7 @@ Item {
   // answer, so its optimistic state applies until the next poll confirms it.
   Process {
     id: monitorDpmsProcess
-    command: ["mmsg", "get", "all-monitors"]
+    command: ["hyprctl", "monitors", "-j"]
     stdout: StdioCollector {
       onStreamFinished: root.applyMonitorDpms(text)
     }

@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Commons
 import "BrightnessModel.js" as BrightnessModel
@@ -24,7 +25,7 @@ Item {
   // Returns false when the focused display is not one to handle here, so the
   // caller falls back to the script.
   function handle(action) {
-    var monitor = Mango.focusedMonitor
+    var monitor = Hyprland.focusedMonitor
     var name = monitor ? String(monitor.name || "") : ""
     if (!/^(eDP|LVDS|DSI)-/.test(name) || !device) return false
     if (action !== "raise" && action !== "lower") return false

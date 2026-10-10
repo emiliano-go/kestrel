@@ -3,6 +3,7 @@
 # yay and records the resolved version.
 # Format: <package>=<version>
 
+hyprland-preview-share-picker-git=0.2.1.r6.g344394a-1
 intel-ipu7-camera-bin=r31.09ccd02-1
 lib32-nvidia-580xx-utils=580.178.04-1
 limine-mkinitcpio-hook=1.40.0-1

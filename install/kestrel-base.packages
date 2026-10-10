@@ -49,7 +49,10 @@ gum
 gvfs-mtp
 gvfs-nfs
 gvfs-smb
-mangowm
+hyprland
+hyprland-guiutils
+hyprpicker
+hyprsunset
 imagemagick
 imv
 inetutils
@@ -126,7 +129,7 @@ wl-clipboard
 woff2-font-awesome
 wtype
 xdg-desktop-portal-gtk
-xdg-desktop-portal-wlr
+xdg-desktop-portal-hyprland
 xdg-terminal-exec
 xournalpp
 yt-dlp
@@ -138,7 +141,6 @@ qalculate-qt
 diskonaut
 ghostwriter
 satty
-wlsunset
 yazi
 
 # Disk health and mirror maintenance

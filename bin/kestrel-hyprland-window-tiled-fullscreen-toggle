@@ -1,9 +1,16 @@
 #!/bin/bash
 
-# kestrel:summary=Toggle tiled fullscreen for the focused Mango window
+# kestrel:summary=Toggle tiled fullscreen for the focused Hyprland window
 
 set -euo pipefail
 
-# Hyprland's "tiled fullscreen" (fullscreenClient == 2) keeps the bar and is
-# Mango's maximize: fill the work area without covering the bar.
-mmsg dispatch togglemaximizescreen >/dev/null 2>&1
+active=$(hyprctl activewindow -j)
+fullscreen_client=$(jq -r '.fullscreenClient // 0' <<<"$active")
+
+if [[ $fullscreen_client == "2" ]]; then
+  hyprctl dispatch 'hl.dsp.window.fullscreen_state({ internal = 0, client = 0 })' >/dev/null 2>&1 || \
+    hyprctl dispatch fullscreenstate 0 0 >/dev/null
+else
+  hyprctl dispatch 'hl.dsp.window.fullscreen_state({ internal = 0, client = 2 })' >/dev/null 2>&1 || \
+    hyprctl dispatch fullscreenstate 0 2 >/dev/null
+fi

@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import "IdleModel.js" as IdleModel
@@ -158,25 +159,15 @@ Item {
     return IdleModel.eventParts(event, count)
   }
 
-  // Track the screensaver window by polling Mango's client list. The shell has
-  // no Hyprland event stream on Mango, so compare the set of screensaver
-  // clients between polls and report opens and closes.
-  function syncScreensaverWindows(raw) {
-    var present = {}
-    try {
-      var list = JSON.parse(raw || "{}").clients || []
-      for (var i = 0; i < list.length; i++) {
-        if (String(list[i].appid || "") === root.screensaverClass) present[String(list[i].id)] = true
-      }
-    } catch (e) {
-      return
-    }
-
-    for (var id in present) {
-      if (!root.screensaverWindows[id]) root.handleScreensaverWindowOpened(id)
-    }
-    for (var old in root.screensaverWindows) {
-      if (!present[old]) root.handleScreensaverWindowClosed(old)
+  function handleHyprlandEvent(event) {
+    var name = String(event && event.name ? event.name : "")
+    if (name === "openwindow") {
+      var open = eventParts(event, 4)
+      if (String(open[2] || "") === root.screensaverClass) root.handleScreensaverWindowOpened(open[0])
+    } else if (name === "closewindow") {
+      var close = eventParts(event, 1)
+      var address = String(close[0] || "")
+      if (root.screensaverWindows[address]) root.handleScreensaverWindowClosed(address)
     }
   }
 
@@ -307,20 +298,9 @@ Item {
     }
   }
 
-  Process {
-    id: screensaverWindowProbe
-    command: ["mmsg", "get", "all-clients"]
-    stdout: StdioCollector {
-      waitForEnd: true
-      onStreamFinished: root.syncScreensaverWindows(text)
-    }
-  }
-
-  Timer {
-    interval: 500
-    repeat: true
-    running: root.idledThisCycle || root.screensaverWindowCount > 0
-    onTriggered: if (!screensaverWindowProbe.running) screensaverWindowProbe.running = true
+  Connections {
+    target: Hyprland
+    function onRawEvent(event) { root.handleHyprlandEvent(event) }
   }
 
   Process {

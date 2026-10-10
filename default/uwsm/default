@@ -11,7 +11,7 @@ export TERMINAL=xdg-terminal-exec
 export EDITOR="kestrel-launch-editor --inline"
 
 # Use a custom directory for screenshots
-# export KESTREL_SCREENSHOT_DIR="$HOME/Pictures/Screenshots"
+# export OMASNAP_SCREENSHOT_DIR="$HOME/Pictures/Screenshots"
 
 # Use a custom directory for screenrecordings (remember to make the directory!)
 # export KESTREL_SCREENRECORD_DIR="$HOME/Videos/Screencasts"

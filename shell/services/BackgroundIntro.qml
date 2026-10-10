@@ -31,8 +31,7 @@ Item {
   readonly property bool backgroundReady: backgroundActive && backgroundService.ready !== false
 
   function restoreStartupCursor() {
-    // Mango sets the cursor through its environment config at startup; there
-    // is no runtime cursor-restore step to call here.
+    Quickshell.execDetached(["hyprctl", "eval", "if kestrel_startup_cursor_restore then kestrel_startup_cursor_restore() end"])
   }
 
   function finishStartup() {
