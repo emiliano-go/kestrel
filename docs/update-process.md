@@ -63,48 +63,22 @@ For watchers and diagnostics, `kestrel-migrate --pending` prints pending
 migration names and exits `0` when any are pending. When no migrations are
 pending, it prints nothing and exits non-zero.
 
-## Raw pacman guard
+## Updates
 
-The `kestrel` package installs an ALPM pre-transaction hook alongside its guard
-binary:
+Kestrel updates in place from the Arch repositories: run `pacman -Syu` (or an
+AUR helper) directly. A post-transaction ALPM hook records a recovery snapshot
+after every upgrade:
 
 ```text
-/usr/share/libalpm/hooks/00-kestrel-update-guard.hook
-/usr/bin/kestrel-update-pacman-guard
+/usr/share/libalpm/hooks/95-kestrel-snapshot.hook
+/usr/bin/kestrel-snapshot pacman
 ```
 
-It triggers on package upgrades and runs:
-
-```bash
-kestrel-update-pacman-guard
-```
-
-The guard detects direct pacman system-upgrade commands like `pacman -Syu` or
-`pacman --sync --refresh --sysupgrade`. If the upgrade was not launched by an
-Kestrel update command, the hook exits non-zero with `AbortOnFail`, which stops
-the transaction before packages are changed.
-
-`kestrel-update-system-pkgs`, `kestrel-refresh-pacman`, `kestrel-reinstall-pkgs`,
-and `kestrel-channel-set` run pacman through the hidden `kestrel-update-pacman`
-helper (the v4 upgrader sets `KESTREL_UPDATE_PACMAN=1` directly):
-
-```bash
-sudo env KESTREL_UPDATE_PACMAN=1 systemd-run --scope --quiet --collect pacman ...
-```
-
-so the guard allows Kestrel-owned update flows. The `systemd-run --scope`
-wrapper registers the transaction as a PID 1 scope: upgrading systemd reexecs
-the system and user managers mid-transaction, and a pacman left inside a
-user-session scope can be SIGKILLed by that reexec. On unbooted systems (such
-as the installer chroot) the helper runs pacman directly. A user can intentionally bypass
-the guard with:
-
-```bash
-sudo env KESTREL_ALLOW_DIRECT_PACMAN=1 pacman -Syu
-```
-
-The guard does not start `kestrel update` itself because pacman is already in a
-transaction setup path; it only aborts with instructions.
+Snapshots are kept to the two most recent (`default/snapper/root`), so a bad
+upgrade can be rolled back by booting a snapshot from Limine
+(`omarchy-snapshot restore`). The older pre-transaction guard that forced
+`pacman -Syu` through a Kestrel updater was removed, so a plain `pacman -Syu`
+is the supported path.
 
 The `kestrel` package also installs ALPM hooks for `kestrel-settings` /
 `kestrel-settings-dev` installs and upgrades. The pre-transaction hook runs
@@ -299,8 +273,7 @@ scripts.
 | `kestrel-update-pkg-prune` | Trims the pacman cache to two versions per package (`paccache -rk2`) before the snapshot, keeping the offline downgrade path while capping snapshot growth. | **Keep internal/hidden.** |
 | `kestrel-update-requires-free-space` | Aborts the update below a 10 GiB free-space threshold on `/`; silently skipped when free space cannot be determined; `KESTREL_UPDATE_FORCE=1` bypasses. | **Keep internal/hidden.** |
 | `kestrel-migrate` | Public migration command. Waits for pacman, then runs all pending migrations for the current user. Supports `--pending`. | **Keep.** This replaces the discarded `kestrel-update-user-finalize` name and no longer needs `--force`. |
-| `kestrel-update-pacman-guard` | ALPM pre-transaction guard that aborts direct `pacman -Syu` style upgrades unless Kestrel set `KESTREL_UPDATE_PACMAN=1` or the user explicitly set `KESTREL_ALLOW_DIRECT_PACMAN=1`. | **Keep internal/hidden.** This is what nudges users back to `kestrel update`. |
-| `kestrel-update-pacman` | Hidden helper that runs a guard-approved pacman transaction as a PID 1 scope (`systemd-run --scope`) so a mid-transaction systemd reexec cannot kill it; runs pacman directly when not booted under systemd. | **Keep internal/hidden.** Single place that owns how Kestrel invokes pacman for system mutation. |
+| `kestrel-update-pacman` | Hidden helper that runs a pacman transaction as a PID 1 scope (`systemd-run --scope`) so a mid-transaction systemd reexec cannot kill it; runs pacman directly when not booted under systemd. | **Keep internal/hidden.** Single place that owns how Kestrel invokes pacman for system mutation. |
 | `kestrel-migrate-notify` | Internal login-time notification helper. Uses `kestrel-migrate --pending` and shows a notification only when this user has pending migrations. | **Keep internal/hidden.** Clear name now that the public command is `kestrel-migrate`. |
 | `kestrel-update-user-notify` | Hidden compatibility wrapper for `kestrel-migrate-notify`. | **Temporary.** Keep only for old callers. |
 | `kestrel-update-available` | Update checker for shell widget and post-update refresh. | **Keep.** Could eventually be renamed `kestrel-update-check`, but current name matches widget semantics. |

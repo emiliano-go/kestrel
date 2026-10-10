@@ -14,10 +14,25 @@ if [[ -z $COMMAND ]]; then
 fi
 
 if kestrel-cmd-missing snapper; then
+  # The pacman hook must never fail a transaction over a missing snapper.
+  [[ $COMMAND == pacman ]] && exit 0
   exit 127 # kestrel-update can use this to just ignore if snapper is not available
 fi
 
 case "$COMMAND" in
+pacman)
+  # Invoked by the pacman hook after an upgrade (ALPM PostTransaction, already
+  # root), so no sudo. Snapper's `cleanup number` trims to the configured
+  # NUMBER_LIMIT, so only the most recent snapshots are kept.
+  mapfile -t configs < <(snapper --csvout list-configs 2>/dev/null | awk -F, 'NR>1 {print $1}')
+  (( ${#configs[@]} > 0 )) || exit 0
+
+  description="pacman $(date '+%Y-%m-%d %H:%M')"
+  for config in "${configs[@]}"; do
+    snapper -c "$config" create -c number -d "$description" >/dev/null 2>&1 || continue
+    snapper -c "$config" cleanup number >/dev/null 2>&1 || true
+  done
+  ;;
 create)
   # The description is just a label, so never let it abort the snapshot.
   DESC="$(kestrel-version 2>/dev/null || echo unknown)"

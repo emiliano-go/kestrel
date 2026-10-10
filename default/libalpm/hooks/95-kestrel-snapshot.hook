@@ -1,0 +1,9 @@
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = *
+
+[Action]
+Description = Creating a Kestrel snapshot after package upgrade...
+When = PostTransaction
+Exec = /usr/bin/kestrel-snapshot pacman

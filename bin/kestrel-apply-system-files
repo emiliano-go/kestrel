@@ -87,6 +87,9 @@ copy_tree "$src/default/environment.d" /usr/lib/environment.d 644
 copy_tree "$src/default/systemd/user" /usr/lib/systemd/user 644
 copy_tree "$src/default/systemd/system" /usr/lib/systemd/system 644
 copy_tree "$src/default/systemd/zram-generator.conf.d" /usr/lib/systemd/zram-generator.conf.d 644
+# ALPM hooks: post-upgrade snapshot, Hyprland reload pause/resume, and the
+# passwordless-sudo revoke guard.
+copy_tree "$src/default/libalpm/hooks" /usr/share/libalpm/hooks 644
 for hook in "$src"/default/systemd/system-sleep/*; do
   [[ -f $hook ]] || continue
   install_exec "$hook" "/usr/lib/systemd/system-sleep/${hook##*/}"

@@ -184,7 +184,7 @@ if notify_alias not in pkgbuild:
   )
 
 alpm_hooks = [
-  "00-kestrel-update-guard.hook",
+  "95-kestrel-snapshot.hook",
   "10-kestrel-hyprland-reload-pause.hook",
   "90-kestrel-hyprland-reload-resume.hook",
 ]
