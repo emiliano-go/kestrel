@@ -22,8 +22,8 @@ right-click or the hover-revealed close button dismisses.
 
 Every on-screen popup is mirrored to its own file under
 `~/.local/state/kestrel/notifications/` (one JSON line per file, named
-`<timestamp>-<id>.json`), so live toasts survive the shell restart that
-`kestrel-update` performs. When a toast leaves the screen — expiry, dismissal,
+`<timestamp>-<id>.json`), so live toasts survive the shell restart after an
+upgrade. When a toast leaves the screen — expiry, dismissal,
 or click — its file moves into `notifications/history/`, trimmed to the newest
 ten. That directory *is* the history: `showHistory` replays exactly what has
 been moved in there. Referenced avatars/images are copied into

@@ -293,7 +293,7 @@ function parseSettings(raw) {
 //
 // Each on-screen popup is mirrored to its own file under
 // ~/.local/state/kestrel/notifications/ so toasts survive shell restarts
-// (e.g. the restart `kestrel-update` performs). The file exists exactly as
+// (e.g. a shell restart after an upgrade). The file exists exactly as
 // long as the popup is on screen: it is written when the toast appears and
 // moved into the history/ subdirectory when the toast expires, is dismissed,
 // or its action is invoked. History is those moved files, newest last-10.

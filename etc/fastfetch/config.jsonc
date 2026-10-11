@@ -83,7 +83,7 @@
       "type": "command",
       "key": "│ ├󰔫",
       "keyColor": "blue",
-      "text": "channel=$(kestrel-version-channel); echo \"$channel\""
+      "text": "version=$(kestrel-version); echo \"$version\""
     },
     {
       "type": "kernel",

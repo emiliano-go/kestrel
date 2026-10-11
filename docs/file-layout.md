@@ -40,9 +40,8 @@ Three layers populate `$HOME`:
    user`) runs once per user and handles the things `/etc/skel` can't do
    because they need `$HOME` expansion, the live `$KESTREL_PATH`, or runtime
    detection of system state.
-3. **Resync** — `kestrel-reinstall-configs` is the explicit, destructive
-   command for an existing user to clobber their configs back to shipped
-   defaults.
+3. **Resync** — replaying `/etc/skel` over `$HOME` clobbers an existing user's
+   shipped defaults back to the current ones.
 
 `/etc/skel` only fires at user creation. Existing users picking up new
 defaults must use the resync command.
@@ -240,10 +239,9 @@ machine-wide repairs should no-op when another user already applied them.
 
 Each graphical user has `kestrel-migrate-notify.service`, started once per login
 through `WantedBy=graphical-session.target` and ordered after that target so
-notification actions can safely launch through UWSM. The `kestrel-pkgs`
-PKGBUILD has shipped `kestrel-update-user-notify.service` as a symlink onto
-it, so users enabled under the old unit name keep working before they reach
-migration `1785095882`.
+notification actions can safely launch through UWSM. A
+`kestrel-update-user-notify.service` symlink onto it keeps users enabled under
+the old unit name working.
 It runs `kestrel-migrate-notify` as
 that user, which checks `kestrel-migrate --pending`. If this user has missing
 migration state, it shows a notification that opens a terminal for
@@ -321,7 +319,7 @@ The package lists the ISO pacstraps live at `install/kestrel-base.packages`
 and `install/kestrel-other.packages`; the ISO builder also reads them when
 constructing its offline mirror.
 
-## Explicit resync (`kestrel-reinstall-configs`)
+## Resyncing to shipped defaults
 
 When an existing user wants to reset to shipped defaults:
 
@@ -352,7 +350,7 @@ return to the packaged default.
 | Runtime tweak that needs `$HOME` or live system state | extend `kestrel-provision-user`, or add a per-user leaf under `install/user/` and wire into `install/user/all.sh` |
 | One-time root-side setup step | `install/config/*.sh` or `install/hardware/*.sh`, wire into `install/config/all.sh` or `install/hardware/all.sh` |
 | One-time fix for existing installs | `migrations/<unix-timestamp>.sh` |
-| Package-owned path something else may already write | Prefer a path nothing else writes, such as a vendor drop-in under `/usr/lib`. Otherwise the `--overwrite` entry in `bin/kestrel-update-system-pkgs` has to ship a release before the file |
+| Package-owned path something else may already write | Prefer a path nothing else writes, such as a vendor drop-in under `/usr/lib`. Otherwise the overwrite entry in the ISO's apply step has to ship a release before the file |
 | User-facing `kestrel-*` command | `bin/kestrel-<group>-<verb>` — see `GROUP_DESCRIPTIONS` in `bin/kestrel` |
 | New stock theme | `themes/<name>/` (+ matching templates under `default/themed/` if they need theme colors) |
 | User-installed theme | `~/.config/kestrel/themes/<name>/` |

@@ -169,7 +169,7 @@ ShellRoot {
             var verticalId = root.createdIds[k]
             if (verticalId === "kestrel.clock")
               root.assertEqual(verticalItem.implicitHeight, Style.bar.iconSlot * 3, verticalId + " uses one slot per line")
-            else if (verticalId === "kestrel.weather" || verticalId === "kestrel.system-update")
+            else if (verticalId === "kestrel.weather")
               root.assertEqual(verticalItem.implicitHeight, Style.bar.statusSlot, verticalId + " uses one compact status slot")
             if (verticalItem && typeof verticalItem.destroy === "function") verticalItem.destroy()
           }

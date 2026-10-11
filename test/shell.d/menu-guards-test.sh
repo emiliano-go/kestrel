@@ -51,12 +51,12 @@ assert(
 // function shadowing the name would also catch these, and answer them wrong.
 const untouched = menu.guardScript({
   a: { id: 'a', when: 'command -v kestrel-dns' },
-  b: { id: 'b', when: '[[ "$(KESTREL_PATH=/usr/share/kestrel kestrel-channel-current)" == "stable" ]]' },
+  b: { id: 'b', when: '[[ "$(KESTREL_PATH=/usr/share/kestrel kestrel-version)" == "stable" ]]' },
   c: { id: 'c', when: '(( $(kestrel-default-browser | wc -l) == 1 ))' }
 })
 assert(
   untouched.includes('command -v kestrel-dns')
-    && untouched.includes('$(KESTREL_PATH=/usr/share/kestrel kestrel-channel-current)')
+    && untouched.includes('$(KESTREL_PATH=/usr/share/kestrel kestrel-version)')
     && untouched.includes('$(kestrel-default-browser | wc -l)'),
   'guard script leaves every form but the plain substitution to run the real command'
 )
@@ -199,19 +199,14 @@ printf "survived\n"' 2>/dev/null)
   fail "guard batch survives a failing reader under errexit" "got: $errexit_result"
 pass "guard batch survives a reader that exits nonzero under errexit"
 
-# Update > Extra Themes runs kestrel-theme-update, which pulls the themes that
-# came from a git clone and skips everything else, so the guard has to answer
-# for the same set: a row that appears over a symlinked theme or a worktree's
-# `.git` file opens a terminal that prints nothing and closes. Both sides ask
-# kestrel-theme-extras today; the shapes below are what would tell us if one
-# of them stopped.
-themes_guard=$(node -e '
-  const fs = require("fs")
-  const path = require("path")
-  const menu = require(path.join(process.env.ROOT, "shell/plugins/menu/MenuModel.js"))
-  const items = menu.parseMenuJsonc(fs.readFileSync(path.join(process.env.ROOT, "default/kestrel/kestrel-menu.jsonc"), "utf8"))
-  process.stdout.write(items.find(item => item.id === "update.themes").when)
-')
+# Extra Themes runs kestrel-theme-update, which pulls the themes that came from
+# a git clone and skips everything else. Both sides ask kestrel-theme-extras
+# today: a theme that is a symlinked checkout or a worktree's `.git` file is
+# someone's working copy, so a row over it would open a terminal that prints
+# nothing and closes. The shapes below say which ones are meant to show it
+# rather than only that the two agree -- agreement alone would hold even if both
+# went wrong together.
+themes_guard=kestrel-theme-extras
 
 cat >"$stub_dir/git" <<'STUB'
 #!/bin/bash

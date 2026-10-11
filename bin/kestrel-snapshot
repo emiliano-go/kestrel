@@ -16,7 +16,7 @@ fi
 if kestrel-cmd-missing snapper; then
   # The pacman hook must never fail a transaction over a missing snapper.
   [[ $COMMAND == pacman ]] && exit 0
-  exit 127 # kestrel-update can use this to just ignore if snapper is not available
+  exit 127 # callers may ignore a deliberately absent snapper
 fi
 
 case "$COMMAND" in

@@ -90,6 +90,11 @@ run_first_run_step "show welcome notification" \
 run_first_run_step "schedule Wi-Fi/update notifications" \
   bash "$KESTREL_PATH/install/user/first-run/wifi.sh"
 
+# These live as post-update hooks so they also fire after later upgrades, but
+# there is no updater to run them, so run them once here at first login.
+run_first_run_step "run post-update setup hooks" \
+  kestrel-hook post-update
+
 if (( first_run_failed == 0 )); then
   kestrel-done mark "$FIRST_RUN_DONE"
 else

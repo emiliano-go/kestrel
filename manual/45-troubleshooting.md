@@ -2,7 +2,7 @@
 
 ### I broke my system with an update!
 
-First try to [rollback your system](47-system-snapshots.md) the version before your recent update. If that doesn't work, use `kestrel-debug` to share with your problem on #kestrel-help in the Discord. And if all that fails, you can reinstall the defaults configs and packages using `kestrel-reinstall`.
+First try to [rollback your system](47-system-snapshots.md) to the version before your recent update. If that doesn't work, use `kestrel-debug` to share your problem on #kestrel-help in the Discord. And if all that fails, replay the shipped configs with `cp -af /etc/skel/. ~/`.
 
 ### Why are some apps so large on my display?
 

@@ -35,9 +35,6 @@
         },
         {
           "id": "kestrel.weather"
-        },
-        {
-          "id": "kestrel.system-update"
         }
       ],
       "right": [

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# kestrel:summary=Restart system time synchronization
-# kestrel:requires-sudo=true
-
-echo "Updating time..."
-sudo systemctl restart systemd-timesyncd

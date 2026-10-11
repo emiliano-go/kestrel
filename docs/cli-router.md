@@ -14,7 +14,7 @@ actually work.
 The stem after `kestrel-` splits at the first hyphen: `kestrel-theme-set` gets
 group `theme` and name `set`, with remaining hyphens becoming spaces
 (`kestrel-hw-asus-rog` → group `hw`, name `asus rog`). A single-segment stem
-(`kestrel-update`) is the root command of its own group, with an empty name.
+(`kestrel-migrate`) is the root command of its own group, with an empty name.
 
 Every command registers two routes: the canonical route `kestrel <group>
 <name>` after metadata overrides, and the filename route with *all* hyphens

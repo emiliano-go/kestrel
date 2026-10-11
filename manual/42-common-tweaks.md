@@ -2,7 +2,7 @@
 
 This is a collection of common tailorings to the Kestrel setup. Know that it might occasionally be necessary for system updates to restore certain configs to their original condition. If this happens, your changes won't be lost, but put in a `.bak` file in the same directory.
 
-If you screw something up, you can restore individual configs to their original setup via _Update > Config_ in the Kestrel menu. If you _really_ screw everything up, you can reset all configs via `kestrel-reinstall`.
+If you screw something up, you can restore the shipped configs by replaying the defaults: `cp -af /etc/skel/. ~/`.
 
 ### Reveal all tray icons all the time
 

@@ -1,6 +1,6 @@
 notify_update() {
-  kestrel-notification-send -u critical -g  "Update System" "Click to update the system." \
-    --exec kestrel-launch-floating-terminal-with-presentation kestrel-update
+  kestrel-notification-send -u critical -g  "Update System" "Click to update the system." \
+    --exec kestrel-launch-floating-terminal-with-presentation 'sudo pacman -Syu'
 }
 
 notify_wifi() {

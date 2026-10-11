@@ -17,9 +17,8 @@ echo "Removing $USER from the docker group..."
 sudo gpasswd -d "$USER" docker >/dev/null
 
 # Group membership is only re-read by a fresh session, and in practice logging
-# out or newgrp isn't enough — only a reboot reliably applies it. Record it so a
-# later `kestrel update` still prompts (kestrel-update-restart reads this), then
-# offer to do it now.
+# out or newgrp isn't enough — only a reboot reliably applies it. Record it,
+# then offer to do it now.
 kestrel-state set reboot-required
 
 echo ""
@@ -27,8 +26,7 @@ echo "Sudoless Docker DISABLED. Docker access goes through a polkit/sudo prompt"
 echo "again: the Docker TUI (Super + Shift + D) and the Windows VM ask when they"
 echo "need it, and the plain 'docker' CLI runs under sudo. It takes effect after a reboot."
 echo ""
-# The migration reuses this command during 'kestrel update' and defers the
-# reboot to kestrel-update-restart, so it doesn't cut the update short.
+# A caller such as a migration can defer the reboot to itself instead.
 if [[ -z ${KESTREL_DEFER_REBOOT:-} ]] && gum confirm "Reboot now to apply?"; then
   kestrel-system-reboot
 fi

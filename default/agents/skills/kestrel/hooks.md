@@ -14,8 +14,7 @@ file first, if one exists.
 ├── battery-low.d/          # Low battery (percentage in $1)
 ├── font-set.d/             # After font change (font name in $1)
 ├── post-boot.d/            # After the desktop starts
-├── post-update.d/          # At the end of `kestrel update`, after privileged work
-├── pre-refresh-pacman.d/   # After `kestrel refresh pacman` re-syncs the package config, before it updates packages
+├── post-update.d/          # Setup invitations, run at first login and after upgrades
 └── theme-set.d/            # After theme change (theme slug in $1)
 ```
 

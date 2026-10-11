@@ -105,7 +105,7 @@ pass "GeForce NOW remover keeps hyphenated canonical route"
 "$CLI" commands --json | jq -e '.commands[] | select(.binary == "kestrel-install-gaming-gpu-lib32" and .route == "kestrel install gaming gpu-lib32" and .filename_route == "kestrel install gaming gpu lib32" and (.routes | index("kestrel install gaming gpu lib32")))' >/dev/null
 pass "GPU lib32 installer keeps hyphenated canonical route"
 
-"$CLI" commands --json | jq -e '.commands[] | select(.binary == "kestrel-refresh-pacman" and .requires_sudo == true)' >/dev/null
+"$CLI" commands --json | jq -e '.commands[] | select(.binary == "kestrel-snapshot" and .requires_sudo == true)' >/dev/null
 pass "sudo metadata marks sudo commands"
 
 output=$("$CLI" theme --help)
@@ -195,12 +195,9 @@ output=$(timeout 5 "$CLI" theme set --help)
 assert_output_contains "command help renders without executing" "$output" "Binary:"
 assert_output_contains "theme set help names binary" "$output" "kestrel-theme-set"
 
-output=$(timeout 5 "$CLI" update --help)
-assert_output_contains "mutating command help does not execute target" "$output" "kestrel-update"
-if [[ $output == *"kestrel update perform"* ]]; then
-  fail "hidden update perform compatibility wrapper is not shown"
-fi
-pass "hidden update perform compatibility wrapper is not shown"
+output=$(timeout 5 "$CLI" snapshot --help)
+assert_output_contains "mutating command help does not execute target" "$output" "kestrel-snapshot"
+pass "mutating command help shows the binary without executing it"
 
 # These three are install-time plumbing the ISO and install leaves call, so
 # they stay out of the listing a user browses -- while still routing, because
@@ -623,7 +620,7 @@ jq -e '.[] | select(.identifier.id == "local.kestrel-theme" and .relativeLocatio
 pass "vscode generated theme registers local extension"
 
 for binary in \
-  kestrel-update \
+  kestrel-snapshot \
   kestrel-theme-set \
   kestrel-capture-screenshot \
   kestrel-system-reboot \

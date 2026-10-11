@@ -7,7 +7,7 @@ commands and reusable setup leaves:
 
 - `bin/kestrel-apply-system` runs root-owned system setup during ISO finalization.
 - `bin/kestrel-apply-hardware` runs idempotent hardware-specific setup and is called by `kestrel-apply-system`.
-- `bin/kestrel-finalize-user` runs the per-user runtime finalization (skill symlinks, xdg-user-dirs, mime defaults, `install/user/all.sh`). Shipped user defaults are seeded by `/etc/skel` from `kestrel-settings`, not by this command. `bin/kestrel-reinstall-configs` is the explicit destructive resync of those defaults into an existing user's `$HOME`.
+- `bin/kestrel-finalize-user` runs the per-user runtime finalization (skill symlinks, xdg-user-dirs, mime defaults, `install/user/all.sh`). Shipped user defaults are seeded by `/etc/skel`; an existing user resyncs by replaying `/etc/skel` over `$HOME`.
 - leaf scripts under `install/` are sourced by `run_logged $KESTREL_INSTALL/path/to/script.sh` and intentionally do not have shebangs.
 - avoid `exit` in sourced setup scripts unless intentionally aborting setup.
 - use `$KESTREL_INSTALL` and `$KESTREL_PATH` instead of hard-coded Kestrel paths.

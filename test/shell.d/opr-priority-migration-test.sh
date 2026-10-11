@@ -18,7 +18,7 @@ else
   "$@"
 fi
 SH
-cat >"$test_dir/bin/kestrel-update-system-pkgs" <<'SH'
+cat >"$test_dir/bin/pacman" <<'SH'
 #!/bin/bash
 # Snapshot exactly the configuration visible to the package updater.
 cat "$PACMAN_CONFIG" >"$CALL_LOG"

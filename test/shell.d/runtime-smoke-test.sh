@@ -307,13 +307,6 @@ Item {
 }
 QML
 
-cat >"$stub_bin/kestrel-update-available" <<'SH'
-#!/bin/bash
-echo "Kestrel update available (test)"
-exit 0
-SH
-chmod +x "$stub_bin/kestrel-update-available"
-
 cat >"$stub_bin/curl" <<'SH'
 #!/bin/bash
 
@@ -482,16 +475,12 @@ done
   fail_with_log "kept service is dropped when its plugin stops declaring a service"
 pass "kept service is dropped when its plugin stops declaring a service"
 
-shell_ipc_quiet kestrel.system-update refresh >/dev/null 2>&1 || true
-sleep 0.8
-
 default_ids=$(jq -c '(.bar.layout.left + .bar.layout.center + .bar.layout.right) | map(.id // .)' "$ROOT/config/kestrel/shell.json")
 visible_default_ids='[
   "kestrel.menu",
   "kestrel.workspaces",
   "kestrel.clock",
   "kestrel.weather",
-  "kestrel.system-update",
   "kestrel.network",
   "kestrel.audio",
   "kestrel.monitor"
@@ -529,17 +518,15 @@ pass "default bar layout renders expected module slots"
 jq -e '
   map(select(.section == "center")) | map(.id) as $center |
   ($center | index("kestrel.weather")) != null and
-  ($center | index("kestrel.system-update")) != null and
   ($center | index("kestrel.indicators")) != null and
-  (($center | index("kestrel.weather")) < ($center | index("kestrel.system-update"))) and
-  (($center | index("kestrel.system-update")) < ($center | index("kestrel.indicators")))
+  (($center | index("kestrel.weather")) < ($center | index("kestrel.indicators")))
 ' <<<"$geometry" >/dev/null || {
   printf 'Geometry:\n' >&2
   jq . <<<"$geometry" >&2
-  fail_with_log "runtime geometry keeps update before indicators"
+  fail_with_log "runtime geometry keeps weather before indicators"
 }
 
-pass "runtime geometry keeps update before indicators"
+pass "runtime geometry keeps weather before indicators"
 
 for panel_id in kestrel.audio kestrel.bluetooth kestrel.monitor kestrel.network kestrel.power; do
   shell_ipc "$panel_id" open >/dev/null || fail_with_log "direct panel IPC opens $panel_id"

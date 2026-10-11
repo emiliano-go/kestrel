@@ -59,7 +59,6 @@ Example `shell.json` (bar subtree only shown):
 | `kestrel.clock` | Date/time label + popup with a month grid, ISO week numbers, and month stepping | left = popup · right = cycle label format · middle = timezone selector |
 | `kestrel.media` | MPRIS now-playing — scrolling track + artist, cover-art popup | left = play/pause · middle = next · scroll = prev/next · right = popup |
 | `kestrel.indicators` | Manual state indicators | left = indicator action |
-| `kestrel.system-update` | Available update indicator | left = update |
 | `kestrel.tray` | System tray | hover = reveal drawer · right on chevron = manage |
 | `kestrel.weather` | Weather icon + popup with forecast | left = popup · right = full notification |
 | `kestrel.microphone` | Mic icon + scroll volume | left = mute toggle · middle = audio panel · scroll = source volume |

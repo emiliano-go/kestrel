@@ -63,13 +63,6 @@ cp -a "$ROOT/shell" "$test_root/shell"
 ln -s "$ROOT/config" "$test_root/config"
 ln -s "$ROOT/bin" "$test_root/bin"
 
-cat >"$stub_bin/kestrel-update-available" <<'SH'
-#!/bin/bash
-echo "Kestrel update available (test)"
-exit 0
-SH
-chmod +x "$stub_bin/kestrel-update-available"
-
 cat >"$stub_bin/curl" <<'SH'
 #!/bin/bash
 
@@ -105,9 +98,6 @@ for _ in {1..80}; do
   fi
   sleep 0.1
 done
-
-shell_ipc_quiet kestrel.system-update refresh >/dev/null 2>&1 || true
-sleep 0.8
 
 geometry=$(shell_ipc shell debugBarGeometry)
 jq -e '

@@ -25,4 +25,4 @@ fi
 
 # Refresh databases and upgrade against the new repository priority. Run this
 # even when the config is already ordered so a failed upgrade can be retried.
-kestrel-update-system-pkgs
+sudo pacman -Syu --noconfirm

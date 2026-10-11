@@ -4,19 +4,6 @@
 
 set -euo pipefail
 
-update_in_progress() {
-  local lock="${XDG_RUNTIME_DIR:-}/kestrel-update.lock"
-
-  [[ -n ${XDG_RUNTIME_DIR:-} && -f $lock ]] || return 1
-
-  # flock -n only fails here when the lock is held, since the file is ours.
-  ! flock -n "$lock" true 2>/dev/null
-}
-
-if update_in_progress; then
-  exit 0
-fi
-
 pending_migrations=$(kestrel-migrate --pending 2>/dev/null) || exit 0
 pending_count=$(printf '%s\n' "$pending_migrations" | sed '/^[[:space:]]*$/d' | wc -l)
 
@@ -31,12 +18,6 @@ fi
 # org.freedesktop.Notifications. Without the wait the toast is sent into the
 # void and the user never learns about their pending migrations.
 kestrel-notification-wait || true
-
-# That wait is long enough for an update to start underneath us, and the count
-# above is already stale by then, so re-check before spending the toast.
-if update_in_progress; then
-  exit 0
-fi
 
 # The shell keeps the click command with the toast, so this oneshot can hand the
 # invitation over and exit instead of staying activated until it is answered.

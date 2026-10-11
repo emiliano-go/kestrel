@@ -15,8 +15,8 @@ Runs the per-user setup steps that /etc/skel can't seed:
 dev-aware skill symlinks, xdg-user-dirs + gtk bookmarks (need \$HOME),
 default browser/mailto, and install/user/all.sh.
 
-For shipped configs see /etc/skel (new users) and kestrel-reinstall-configs
-(existing users explicitly resyncing).
+For shipped configs see /etc/skel (new users); existing users resync by
+replaying /etc/skel over $HOME.
 
 --first-install is used by the ISO in the target chroot. It marks shipped
 migrations complete for the freshly-created user.
