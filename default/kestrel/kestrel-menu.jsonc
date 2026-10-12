@@ -21,6 +21,8 @@
   //                  installed instead of vanishing from the list.
 
   // Root Menu
+  // Live ISO only: install Kestrel from the bundled offline repo.
+  "live-install": {"icon":"","label":"Install Kestrel","when":"[[ -e /run/archiso ]]","action":"kestrel-launch-floating-terminal-with-presentation 'sudo kestrel-install'"},
   "apps": {"icon":"󰀻","label":"Apps","aliases":["app","applications"],"provider":"apps"},
   "learn": {"icon":"󰧑","label":"Learn"},
   "trigger": {"icon":"󱓞","label":"Trigger"},
