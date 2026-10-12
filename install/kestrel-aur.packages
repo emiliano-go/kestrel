@@ -8,7 +8,6 @@ intel-ipu7-camera-bin=r31.09ccd02-1
 lib32-nvidia-580xx-utils=580.178.04-1
 limine-mkinitcpio-hook=1.40.0-1
 limine-snapper-sync=1.32.1-1
-localsend=1.18.2-2
 mise-bin=2026.10.4-1
 nvidia-580xx-dkms=580.178.04-4
 nvidia-580xx-utils=580.178.04-4

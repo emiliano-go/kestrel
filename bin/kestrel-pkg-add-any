@@ -2,7 +2,7 @@
 
 # kestrel:summary=Install packages from the Arch repositories, falling back to the AUR
 # kestrel:args=<packages...>
-# kestrel:examples=kestrel pkg add-any localsend jq
+# kestrel:examples=kestrel pkg add-any jq yq
 # kestrel:requires-sudo=true
 
 # Kestrel no longer ships its own package repository, so a package that used to

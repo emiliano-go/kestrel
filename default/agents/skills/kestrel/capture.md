@@ -46,10 +46,6 @@ kestrel capture text    # Select a region; extracted text goes to the clipboard
 ## Sharing Files
 
 ```bash
-kestrel share clipboard               # Share the clipboard via LocalSend
-kestrel share file <path...>          # Share files with nearby devices
-kestrel share folder <path>           # Share a folder
-
 kestrel tailscale send <machine> <file...>    # Taildrop to a tailnet machine
 kestrel tailscale receive [directory]         # Save incoming Taildrop files
 ```
