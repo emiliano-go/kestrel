@@ -1,5 +1,9 @@
 # Kestrel
 
+<p align="center">
+  <img src="logo.svg" alt="Kestrel" width="160">
+</p>
+
 Kestrel is a custom Linux distribution built on Arch Linux. It pairs the Hyprland tiling compositor with the Quickshell desktop shell, and it ships a complete, opinionated set of tools you can be productive with the moment it boots. It is maintained by Emiliano Gandini Outeda.
 
 The hard choices are already made: the window manager, the shell, the terminal, the editor, the browser, the themes. You are not handed a pile of packages and a wiki; you are handed a system that someone with taste assembled and keeps sharp. The bet is a simple one: a beautiful system is a motivating system, and productivity tends to follow motivation.
