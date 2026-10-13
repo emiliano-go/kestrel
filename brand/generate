@@ -23,6 +23,9 @@ trap 'rm -rf "$tmp"' EXIT
 # A high-resolution raster of the source, reused for the colorized theme logos.
 rsvg-convert -h 1200 "$src" -o "$tmp/bird.png"
 
+# Every PNG is written with -strip so a regeneration is byte-identical to the
+# last, and the tree stays clean.
+
 # The GitHub logo is the same shape in white, so it reads on the dark theme.
 sed -E \
   -e 's/stop-color="#[0-9a-fA-F]{3,8}"/stop-color="#ffffff"/g' \
@@ -31,7 +34,11 @@ sed -E \
 
 # Repo/app icon.
 rsvg-convert -h 300 "$src" -o "$tmp/bird300.png"
-magick "$tmp/bird300.png" -background none -gravity center -extent 300x300 icon.png
+magick "$tmp/bird300.png" -background none -gravity center -extent 300x300 -strip icon.png
+
+# The bar's menu icon and the fastfetch OS key both draw U+E900 from the icon
+# font, so replace that glyph's outline with the bird.
+KESTREL_PATH="$root" bin/kestrel-dev-font replace kestrel "$src" --codepoint U+E900 >/dev/null
 
 # ASCII: icon.txt is the About screen and the fastfetch logo; logo.txt is the
 # screensaver and the installer's logo.
@@ -39,12 +46,13 @@ bin/kestrel-transcode-ascii "$src" icon.txt --mode block --width 44 --height 22 
 bin/kestrel-transcode-ascii "$src" logo.txt --mode block --width 36 --height 18 --threshold 55 >/dev/null
 
 # Boot and login logos, in the brand color.
-rsvg-convert -h 300 "$src" -o default/plymouth/logo.png
-rsvg-convert -h 300 "$src" -o default/sddm/kestrel/logo.png
-rsvg-convert -h 340 "$src" -o default/plymouth/logos/kestrel.png
+raster() { rsvg-convert -h "$1" "$src" -o "$tmp/p.png"; magick "$tmp/p.png" -strip "$2"; }
+raster 300 default/plymouth/logo.png
+raster 300 default/sddm/kestrel/logo.png
+raster 340 default/plymouth/logos/kestrel.png
 
 # Default Plymouth lock-screen preview.
-KESTREL_PATH="$root" bin/kestrel-plymouth-preview '#1a1b26' '#c0caf5' \
+KESTREL_PATH="$root" KESTREL_PLYMOUTH_PREVIEW_NO_VIEW=1 bin/kestrel-plymouth-preview '#1a1b26' '#c0caf5' \
   "$root/default/plymouth/logo.png" "$root/default/plymouth/preview-unlock.png" >/dev/null 2>&1 || true
 
 # Per-theme lock logo (bird in the theme's foreground color) and its preview.
@@ -66,8 +74,8 @@ for d in themes/*/; do
   bg=$(theme_color background "$colors")
   [[ -n $bg ]] || bg="#1a1b26"
 
-  magick "$tmp/bird.png" -fill "$text" -colorize 100 -resize x300 "${d}unlock.png"
-  KESTREL_PATH="$root" bin/kestrel-plymouth-preview "$bg" "$text" "${d}unlock.png" "${d}preview-unlock.png" >/dev/null 2>&1 || true
+  magick "$tmp/bird.png" -fill "$text" -colorize 100 -resize x300 -strip "${d}unlock.png"
+  KESTREL_PATH="$root" KESTREL_PLYMOUTH_PREVIEW_NO_VIEW=1 bin/kestrel-plymouth-preview "$bg" "$text" "${d}unlock.png" "${d}preview-unlock.png" >/dev/null 2>&1 || true
 done
 
 echo "Brand assets regenerated from $src"

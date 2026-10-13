@@ -2,6 +2,10 @@
 
 set -e
 
+# On the live ISO the install invitation is the one that matters, so skip the
+# agent invitation there.
+[[ -e /run/archiso ]] && exit 0
+
 # Kestrel ships no default agent, so invite once rather than picking one. An
 # agent already chosen means the invitation has nothing to offer.
 if [[ -z $(kestrel-default-agent) ]] && kestrel-done ensure agent-setup-invitation; then

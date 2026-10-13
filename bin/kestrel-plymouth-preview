@@ -71,6 +71,8 @@ magick -size ${canvas_w}x${canvas_h} "xc:#$bg_hex" \
   "$staging_dir/entry.png" -geometry +${entry_x}+${entry_y} -composite \
   \( "$staging_dir/lock.png" -resize ${lock_w}x${lock_h} \) -geometry +${lock_x}+${lock_y} -composite \
   "${bullet_args[@]}" \
-  "$output_path"
+  -strip "$output_path"
 
-imv -f "$output_path"
+# brand/generate and other scripted callers set this so the preview is written
+# without opening a viewer.
+[[ -z ${KESTREL_PLYMOUTH_PREVIEW_NO_VIEW:-} ]] && imv -f "$output_path"

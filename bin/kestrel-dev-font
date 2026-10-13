@@ -509,8 +509,44 @@ def add_glyph(font_path, codepoint, name, contours):
     lsb.append(min(xs) if xs else 0)
     names.append(name)
     cmap[codepoint] = gid
-    ng = len(glyphs)
+    write_font(font_path, d, t, glyphs, adv, lsb, names, cmap, contours)
 
+
+def set_glyph(font_path, codepoint, contours, name=None):
+    """Replace the outline of an existing codepoint's glyph."""
+    d, t, ng = load_font(font_path)
+    loca = read_loca(d, t, ng)
+    gs = t['glyf'][0]
+    glyphs = [d[gs + loca[i]:gs + loca[i + 1]] for i in range(ng)]
+
+    nhm = struct.unpack('>H', d[t['hhea'][0] + 34:t['hhea'][0] + 36])[0]
+    hm = t['hmtx'][0]
+    adv, lsb = [], []
+    for i in range(ng):
+        if i < nhm:
+            a, b = struct.unpack('>Hh', d[hm + i * 4:hm + i * 4 + 4])
+        else:
+            a = adv[-1]
+            b = struct.unpack('>h', d[hm + nhm * 4 + (i - nhm) * 2:][:2])[0]
+        adv.append(a)
+        lsb.append(b)
+
+    names = read_names(d, t['post'][0], ng)
+    cmap = read_cmap(d, t['cmap'][0])
+    if codepoint not in cmap:
+        sys.exit('U+%04X is not in the font' % codepoint)
+
+    gid = cmap[codepoint]
+    glyphs[gid] = encode_glyph(contours)
+    xs = [p[0] for c in contours for p in c]
+    lsb[gid] = min(xs) if xs else 0
+    if name:
+        names[gid] = name
+    write_font(font_path, d, t, glyphs, adv, lsb, names, cmap, contours)
+
+
+def write_font(font_path, d, t, glyphs, adv, lsb, names, cmap, contours):
+    ng = len(glyphs)
     offs, o = [0], 0
     for g in glyphs:
         o += len(g)
@@ -614,6 +650,12 @@ def main():
     add.add_argument('svg', help='SVG file or URL')
     add.add_argument('--codepoint', help='private-use codepoint (default: next free)')
     add.add_argument('--label', help='README label (default: the glyph name)')
+    rep = sub.add_parser('replace', parents=[common],
+                         help="replace an existing glyph's mark from a monochrome SVG")
+    rep.add_argument('name', help='glyph name')
+    rep.add_argument('svg', help='SVG file or URL')
+    rep.add_argument('--codepoint', required=True,
+                     help='private-use codepoint to replace, e.g. U+E900')
     args = p.parse_args()
 
     font = args.font or default_font()
@@ -623,6 +665,13 @@ def main():
     if args.command in (None, 'list'):
         for cp, name, box in glyph_list(font):
             print('U+%04X  %s  %-12s %s' % (cp, chr(cp), name, box))
+        return
+
+    if args.command == 'replace':
+        cp = int(args.codepoint.upper().replace('U+', ''), 16)
+        contours = svg_contours(read_svg(args.svg), args.svg)
+        set_glyph(font, cp, contours, args.name)
+        print('Replaced U+%04X (%s) in %s' % (cp, args.name, os.path.relpath(font)))
         return
 
     taken = {cp for cp, _, _ in glyph_list(font)}

@@ -4,10 +4,10 @@ mkdir -p ~/.config/kestrel/themes
 if [[ ! -s $HOME/.local/state/kestrel/current/theme.name ]]; then
   # iso-chroot and provision-owner both run without a live session to notify.
   if [[ ${KESTREL_SETUP_CONTEXT:-runtime} != "runtime" ]]; then
-    KESTREL_THEME_HEADLESS=1 kestrel-theme-set "Tokyo Night"
+    KESTREL_THEME_HEADLESS=1 kestrel-theme-set "Titan Light"
     rm -f ~/.config/chromium/SingletonLock # otherwise archiso owns the Chromium singleton
   else
-    kestrel-theme-set "Tokyo Night"
+    kestrel-theme-set "Titan Light"
   fi
 fi
 kestrel-theme-set-pi --activate
