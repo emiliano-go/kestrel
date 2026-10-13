@@ -55,8 +55,17 @@ src="$KESTREL_PATH"
   exit 1
 }
 
-install_file() { install -Dm644 -- "$1" "$2"; }
-install_exec() { install -Dm755 -- "$1" "$2"; }
+# The deploy runs with the payload already at its installed path, so a few
+# destinations are the source file itself; copying a file onto itself makes
+# `install` error, so skip those.
+install_file() {
+  [[ $1 -ef $2 ]] && return 0
+  install -Dm644 -- "$1" "$2"
+}
+install_exec() {
+  [[ $1 -ef $2 ]] && return 0
+  install -Dm755 -- "$1" "$2"
+}
 
 # Copy every file under a tree, preserving the relative layout, at one mode.
 copy_tree() {

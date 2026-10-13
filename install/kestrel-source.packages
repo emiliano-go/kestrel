@@ -1,0 +1,7 @@
+# Packages built from source at ISO build time from their git repository,
+# instead of the AUR. Format: name=git-url
+#
+# The repository's local PKGBUILD (packaging/local/PKGBUILD) builds the
+# checked-out tree; the result is published to the build-time repository and
+# installed into the live rootfs like any other package.
+trustsight=https://github.com/emiliano-go/trustsight
