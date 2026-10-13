@@ -18,7 +18,7 @@ if lspci | grep -qi 'nvidia'; then
   # Configure modprobe for early KMS
   mkdir -p /etc/modprobe.d
   cat > /etc/modprobe.d/nvidia.conf <<'EOF'
-options nvidia_drm modeset=1
+options nvidia_drm modeset=1 fbdev=1
 EOF
 
   # Configure mkinitcpio for early loading

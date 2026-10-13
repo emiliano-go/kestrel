@@ -5,3 +5,4 @@
 # checked-out tree; the result is published to the build-time repository and
 # installed into the live rootfs like any other package.
 trustsight=https://github.com/emiliano-go/trustsight
+linux-kestrel=https://github.com/kestrel-distro/kernel
