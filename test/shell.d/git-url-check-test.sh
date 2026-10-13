@@ -4,7 +4,7 @@ set -euo pipefail
 
 # kestrel-git-url-check decides which URLs kestrel-theme-install and
 # kestrel-plugin-add are willing to hand to `git clone`. git resolves a remote
-# helper -- a program it runs at clone time -- from exactly two URL shapes,
+# helper, a program it runs at clone time, from exactly two URL shapes,
 # `<helper>::<address>` and `<scheme>://<address>`, so those are the two shapes
 # asserted here, alongside every legitimate form a user is likely to paste.
 
@@ -54,7 +54,7 @@ pass "an empty URL is refused"
 # which git never reads as a helper, and the IPv6 host carries `::` inside
 # brackets rather than at the start.
 for url in \
-  "https://github.com/acme/omarchy-weather.git" \
+  "https://github.com/acme/kestrel-weather.git" \
   "http://example.com/a/b.git" \
   "https://user:token@github.com/acme/repo.git" \
   "ssh://git@github.com/acme/repo.git" \

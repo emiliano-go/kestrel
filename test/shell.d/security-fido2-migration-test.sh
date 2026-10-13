@@ -148,7 +148,7 @@ case "$1" in
   test)
     # Looking behind an untraversable directory, never a write. This stub is not
     # really root, so open the directory just long enough to answer the way root
-    # would and put its mode straight back -- the suite then still sees whether
+    # would and put its mode straight back, the suite then still sees whether
     # production left the mode alone.
     if (( $# != 3 )) || [[ $2 != "-e" && $2 != "-L" ]] || [[ $3 != "$TEST_AUTHFILE" ]]; then
       reject "$@"
@@ -299,7 +299,7 @@ pass "migration preserves the credential with its PAM-readable mode"
 
 # The whole point of replacing rather than chowning. Permission is checked at
 # open(2), so a descriptor the registering user opened before the update stays
-# writable on the old inode through any chmod or chown -- and pam_u2f resolving
+# writable on the old inode through any chmod or chown, and pam_u2f resolving
 # the authfile path would keep reading exactly that inode.
 [[ $(stat -c %i "$authfile") != "$before_inode" ]] ||
   fail "the repair lands on a new inode, orphaning any descriptor already open on the old one"

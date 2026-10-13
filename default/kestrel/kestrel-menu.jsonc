@@ -6,7 +6,7 @@
   // Kind is inferred: action -> action, target -> link, otherwise submenu.
   // Dotted IDs define the tree. provider:"name" points a submenu at one of
   // the shell's providers (the providers map in shell/plugins/menu/Menu.qml);
-  // new provider names cannot be declared here. See docs/menu.md.
+  // new provider names cannot be declared here.
   // Optional fields:
   //   aliases        alternate `kestrel menu summon <name>` routes; also searchable.
   //                  Reserved for established names users already type; new entries
@@ -45,7 +45,7 @@
 
   // Learn
   "learn.keybindings": {"icon":"","label":"Keybindings","action":"kestrel-menu-keybindings"},
-  "learn.omarchy": {"icon":"","label":"Kestrel","action":"kestrel-launch-webapp 'https://omarchy.org/manual/'"},
+  "learn.kestrel": {"icon":"","label":"Kestrel","action":"kestrel-launch-webapp 'https://github.com/emiliano-go/kestrel/tree/master/manual'"},
   "learn.hyprland": {"icon":"","label":"Hyprland","action":"kestrel-launch-webapp 'https://wiki.hypr.land/'"},
   "learn.arch": {"icon":"󰣇","label":"Arch","action":"kestrel-launch-webapp 'https://wiki.archlinux.org/title/Main_page'"},
   "learn.neovim": {"icon":"","label":"Neovim","action":"kestrel-launch-webapp 'https://www.lazyvim.org/keymaps'"},

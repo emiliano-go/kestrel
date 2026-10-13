@@ -6,7 +6,7 @@ echo "Rebuild the boot image when it predates the Limine kernel command line"
 # in the same update, the guard matched the config the package had just
 # written, skipped the rebuild, and left a boot image baked before the config
 # landed. Such a machine boots without any of kestrel-defaults.conf's command
-# line — including initramfs_async=0, so Plymouth still loses the LUKS prompt.
+# line, including initramfs_async=0, so Plymouth still loses the LUKS prompt.
 
 defaults_conf="${KESTREL_LIMINE_DEFAULTS_CONF:-/etc/limine-entry-tool.d/kestrel-defaults.conf}"
 running_cmdline="${KESTREL_RUNNING_CMDLINE:-/proc/cmdline}"

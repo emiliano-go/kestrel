@@ -20,7 +20,7 @@ import qs.Commons as Commons
 // (0.4 vs 0.25 by default), which is right for controls that are borderless at
 // rest but would make a bordered track go *fainter* under the cursor. On the
 // panel background the ring reads immediately. `cursorRing` follows
-// `interactive` — a switch whose surrounding row owns the click owns the
+// `interactive`, a switch whose surrounding row owns the click owns the
 // cursor too.
 //
 // `rounded` auto-detects from Style.cornerRadius so the switch follows the
@@ -50,8 +50,8 @@ Item {
   readonly property alias containsMouse: mouse.containsMouse
   readonly property bool hot: hasCursor || mouse.containsMouse
 
-  // `trackHeight` is settable so a compact placement — a switch riding a panel
-  // section header, say — can ask for a genuinely smaller control instead of
+  // `trackHeight` is settable so a compact placement, a switch riding a panel
+  // section header, say, can ask for a genuinely smaller control instead of
   // scaling a big one down, which lands the track and knob on fractional pixels
   // and blurs their edges. The derived sizes only carry floors low enough to
   // stay out of an override's way; at the default track height each one is

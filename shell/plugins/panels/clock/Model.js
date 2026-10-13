@@ -35,8 +35,8 @@ var CLOCK_FORMATS = [
 // ring stays short. AM/PM costs a fourth line, which is why only the plain
 // time carries it here.
 var VERTICAL_CLOCK_FORMATS = [
-  "HH\n—\nmm",
-  "h\n—\nmm\nAP",
+  "HH\n, \nmm",
+  "h\n, \nmm\nAP",
   "dd\nMMM\n'W'ww\n''yy",
   "HH\nmm"
 ]
@@ -79,7 +79,7 @@ function nextClockFormat(ring, current) {
 }
 
 // Two-digit ISO week, substituted into a format's 'ww' token before Qt
-// formats it -- Qt has no ISO week specifier of its own.
+// formats it, Qt has no ISO week specifier of its own.
 function isoWeekLiteral(year, month, day) {
   return pad2(isoWeek(year, month, day))
 }
@@ -198,7 +198,7 @@ function ageFromBirthYear(birthYear, currentYear) {
 }
 
 // 0 means "not set", which is also what a blank, negative, fractional, or
-// absurd entry means — the life bar simply stays hidden.
+// absurd entry means, the life bar simply stays hidden.
 function parseAge(value) {
   var text = String(value === undefined || value === null ? "" : value).replace(/^\s+|\s+$/g, "")
   if (!/^\d+$/.test(text)) return 0

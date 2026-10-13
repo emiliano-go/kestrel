@@ -164,8 +164,8 @@ KESTREL_TEST_MISE_BUILT=1 run_migration || fail "the migration finishes once the
 pass "a removal that cannot finish leaves the wrapper and the migration pending"
 
 # `mise rm -g` exits 0 whether or not it removed anything, so an environment
-# uninstalled but still requested in the global config -- where `mise up` would
-# build it again -- is judged by the listing, not the exit code.
+# uninstalled but still requested in the global config, where `mise up` would
+# build it again, is judged by the listing, not the exit code.
 write_stub
 KESTREL_TEST_MISE_BUILT=1 KESTREL_TEST_MISE_RM_STUCK=1 run_migration && fail "an environment still requested counts as removed"
 [[ -x $hermes ]] || fail "a still-requested environment takes the wrapper anyway"

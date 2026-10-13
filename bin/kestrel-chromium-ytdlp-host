@@ -8,7 +8,7 @@ set -euo pipefail
 SCRIPT_PATH="${BASH_SOURCE[0]}"
 
 # The browser launches us without Kestrel's environment, so locate the repo from
-# our own path when KESTREL_PATH isn't already set. Export it — kestrel-shell (used
+# our own path when KESTREL_PATH isn't already set. Export it, kestrel-shell (used
 # by kestrel-osd) needs it to find the running shell, and silently no-ops without it.
 export KESTREL_PATH="${KESTREL_PATH:-$(cd -- "$(dirname -- "$SCRIPT_PATH")/.." && pwd)}"
 
@@ -70,7 +70,7 @@ title_from_file() {
   fi
 }
 
-# Drive the Quickshell OSD — a single overlay that updates in place (like the
+# Drive the Quickshell OSD, a single overlay that updates in place (like the
 # volume/brightness bar), so download progress never stacks like notifications.
 osd_progress() {
   kestrel-osd -i 󰇚 -p "$1" -d 8000 >/dev/null 2>&1 || true

@@ -50,7 +50,7 @@ open_and_capture_panel() {
 
 # Give weather deterministic coordinates so this test exercises the real
 # Open-Meteo forecast instead of IP geolocation through wttr.in.
-omarchy-weather-location --set "San Francisco" "37.7749,-122.4194"
+kestrel-weather-location --set "San Francisco" "37.7749,-122.4194"
 kestrel-shell shell summon kestrel.weather >/dev/null
 wait_until "weather panel opens" 15 layer_present "kestrel-keyboard-panel"
 wait_until "weather location is visible" 30 screen_contains "SAN FRANCISCO"

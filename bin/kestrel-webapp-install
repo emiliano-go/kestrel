@@ -17,7 +17,7 @@ require_plain_name() {
   # The name becomes a filename. A slash would turn it into directory levels, so
   # the launcher lands somewhere kestrel-webapp-remove cannot address and the app
   # is stuck in the launcher; a leading ../ leaves the applications directory
-  # altogether. Refuse rather than silently renaming what the user typed -- most
+  # altogether. Refuse rather than silently renaming what the user typed, most
   # often it is a URL entered in the name field.
   if [[ $1 == */* ]]; then
     echo "App name cannot contain '/': $1"

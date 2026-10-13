@@ -301,8 +301,8 @@ grep -F 'move = { "(monitor_w-monitor_h*3/10-40)", "(monitor_h-monitor_h*27/80-4
 pass "webcam size rules place the initial window in its final corner"
 
 # The stop path reads the recording state file back and uses its contents as a
-# path -- ffmpeg writes beside it, `mv` replaces it, `rm -f` deletes its
-# preview -- so it has to live in the per-user runtime directory rather than
+# path, ffmpeg writes beside it, `mv` replaces it, `rm -f` deletes its
+# preview, so it has to live in the per-user runtime directory rather than
 # under a name in world-writable /tmp that another account can create first.
 recording_dir="$tmp_dir/recordings"
 mkdir -p "$recording_dir"

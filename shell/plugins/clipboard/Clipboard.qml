@@ -20,7 +20,7 @@ Item {
 
   property string historyPath: Quickshell.env("HOME") + "/.local/state/kestrel/clipboard-history.json"
   property string captureScript: root.kestrelPath + "/shell/plugins/clipboard/capture.sh"
-  // Shares the [menu] surface tokens — themes that style the menu also
+  // Shares the [menu] surface tokens, themes that style the menu also
   // style the clipboard. Selected-row colors composed in the
   // singleton so consumers drop them straight into Rectangle bindings.
   property color background: Commons.Color.menu.background

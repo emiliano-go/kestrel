@@ -3,8 +3,8 @@ echo "Restore polkit brute-force protection on machines that enabled fingerprint
 polkit=/etc/pam.d/polkit-1
 
 # When fingerprint or FIDO2 auth was set up while /etc/pam.d/polkit-1 did not yet
-# exist -- the normal case on Arch, where the polkit package ships its stack in
-# /usr/lib/pam.d/polkit-1 -- the setup commands hand-rolled an /etc/pam.d/polkit-1
+# exist, the normal case on Arch, where the polkit package ships its stack in
+# /usr/lib/pam.d/polkit-1, the setup commands hand-rolled an /etc/pam.d/polkit-1
 # that lists pam_unix directly instead of `include system-auth`. That override
 # dropped pam_faillock, so polkit prompts had no brute-force lockout and their
 # failures never counted toward the shared tally. The setup commands now defer to

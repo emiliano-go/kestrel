@@ -45,7 +45,7 @@ grep -F 'flock -w 1 9 || exit 0' "$monitor_watch" >/dev/null
 pass "modeless monitor recovery runs one backing-off loop while a monitor has no mode"
 
 # Nothing fires an event for this state, so an unanswered query must not end
-# recovery -- but a compositor that never answers has gone with the session.
+# recovery, but a compositor that never answers has gone with the session.
 grep -F '(( state == 2 )) && (( ++unanswered > 20 )) && break' "$monitor_watch" >/dev/null
 pass "modeless recovery retries unanswered queries without waiting on a dead compositor"
 

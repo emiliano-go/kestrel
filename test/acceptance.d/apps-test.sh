@@ -8,7 +8,7 @@ launch_and_verify() {
   local name="$1" command="$2" class="$3" timeout="${4:-45}"
 
   # A pre-existing window makes the test ambiguous (and closing it would be
-  # hostile on a dev machine) — acceptance runs expect a fresh session.
+  # hostile on a dev machine), acceptance runs expect a fresh session.
   if window_present "$class" >/dev/null 2>&1; then
     fail "$name starts with no pre-existing window" "a window matching $class is already open"
   fi

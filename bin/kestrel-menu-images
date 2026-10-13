@@ -224,7 +224,7 @@ thumbnail_for() {
     fi
 
     # A lazy row stands in with the media file itself, which the picker draws
-    # with an Image -- fine for a picture, blank for a video. Videos take the
+    # with an Image, fine for a picture, blank for a video. Videos take the
     # queue instead, which also keeps them under its narrower fan out.
     if [[ $lazy_thumbnails == true && $cache_only != true ]] && ! is_video_path "$image"; then
       rows_cacheable=false

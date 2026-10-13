@@ -19,7 +19,7 @@ After you select an area, Omasnap saves the capture, copies it to the clipboard,
 
 The annotation editor can draw arrows, lines, shapes, highlights, numbered markers, text, and secure redactions; crop or cut out part of the image; OCR its text; and add a backdrop. In the editor, press `Enter` to copy and save the finished PNG, `Ctrl + C` to copy it without saving, or `Ctrl + S` to save it without copying.
 
-Saved screenshots land in `~/Pictures/Screenshots` by default, with a name such as `screenshot-2026-08-13_14-22-05-firefox.png`. Set `OMASNAP_SCREENSHOT_DIR` to use another directory — see [the FAQ](46-faq.md) for where to put session environment variables. Omasnap creates the directory when it saves the first shot. Set `[output] autosave = false` in `~/.config/omasnap/omasnap.conf` to disable automatic saving.
+Saved screenshots land in `~/Pictures/Screenshots` by default, with a name such as `screenshot-2026-08-13_14-22-05-firefox.png`. Set `OMASNAP_SCREENSHOT_DIR` to use another directory, see [the FAQ](46-faq.md) for where to put session environment variables. Omasnap creates the directory when it saves the first shot. Set `[output] autosave = false` in `~/.config/omasnap/omasnap.conf` to disable automatic saving.
 
 From the terminal, `kestrel screenshot` opens the same overlay, and you can choose its starting mode: `kestrel capture screenshot region`, `windows`, `fullscreen`, or `scroll`. A second argument of `copy` or `save` skips the preview and sends the shot straight to that destination. To edit before output, use `kestrel screenshot --editor=overlay` for a fullscreen editor or `kestrel screenshot --editor=window` for a separate window.
 
@@ -42,7 +42,7 @@ These bindings only exist while Omasnap is open, so they can't collide with anyt
 
 `Alt + Print Screen` opens _Trigger > Capture > Screenrecord_, which asks what you want on the soundtrack: no audio, desktop audio, desktop plus microphone, or desktop plus microphone plus webcam. That last one only shows up if you actually have a camera plugged in. Pick one and Kestrel's recording picker lets you drag a region or click a window or monitor.
 
-Recording runs on gpu-screen-recorder, which encodes on the GPU at 60fps and falls back to the CPU if it has to. The result is an MP4 in `~/Videos`, named `screenrecording-2026-08-13_14-22-05.mp4`. Set `KESTREL_SCREENRECORD_DIR` to change that — but note that unlike the screenshot directory, this one has to exist already, or the recording refuses to start.
+Recording runs on gpu-screen-recorder, which encodes on the GPU at 60fps and falls back to the CPU if it has to. The result is an MP4 in `~/Videos`, named `screenrecording-2026-08-13_14-22-05.mp4`. Set `KESTREL_SCREENRECORD_DIR` to change that, but note that unlike the screenshot directory, this one has to exist already, or the recording refuses to start.
 
 While you're recording, a little indicator shows up in the bar. Click it to stop. You can also stop with `Alt + Print Screen` again, or with the _Stop Screenrecording_ entry under _Trigger > Capture > Screenrecord_, which only appears while something is actually recording.
 
@@ -57,7 +57,7 @@ When you record with a webcam, the camera appears as a pinned, cropped portrait 
 | `Super + Alt + [` | Make the webcam overlay smaller |
 | `Super + Alt + ]` | Make the webcam overlay larger |
 
-There are three sizes — small, medium, and large — and the hotkeys step between them. Medium is the default. They're proportional to the recording, so the camera takes up the same share of the frame whether you're recording a 1080p monitor or a 6K one. And if you recorded a region rather than a whole display, the overlay anchors to that region's corner rather than the monitor's, so it stays inside the shot.
+There are three sizes, small, medium, and large, and the hotkeys step between them. Medium is the default. They're proportional to the recording, so the camera takes up the same share of the frame whether you're recording a 1080p monitor or a 6K one. And if you recorded a region rather than a whole display, the overlay anchors to that region's corner rather than the monitor's, so it stays inside the shot.
 
 You can also call it directly with `kestrel-capture-webcam-resize small`, or `reset` to go back to medium.
 
@@ -65,7 +65,7 @@ You can also call it directly with `kestrel-capture-webcam-resize small`, or `re
 
 `Super + Ctrl + Print Screen` selects a region and OCRs it to the clipboard. That's covered properly in [Text Extraction & Dictation](11-text-extraction-dictation.md).
 
-_Trigger > Capture > QR Code_ does the same trick for QR codes. Select the region with the code in it, and the decoded value goes to the clipboard. It only looks for QR codes — dense screen content has a habit of false-positiving as a barcode otherwise. Worth knowing: the decoded value goes to the clipboard and nowhere else. It isn't printed, it isn't in the notification, and it's marked sensitive so it doesn't stick around in [clipboard history](08-unified-clipboard-history.md). QR codes routinely carry secrets — the `otpauth://` URI behind a 2FA setup code, for one — and you don't want that in a log. Pasting still works fine.
+_Trigger > Capture > QR Code_ does the same trick for QR codes. Select the region with the code in it, and the decoded value goes to the clipboard. It only looks for QR codes, dense screen content has a habit of false-positiving as a barcode otherwise. Worth knowing: the decoded value goes to the clipboard and nowhere else. It isn't printed, it isn't in the notification, and it's marked sensitive so it doesn't stick around in [clipboard history](08-unified-clipboard-history.md). QR codes routinely carry secrets, the `otpauth://` URI behind a 2FA setup code, for one, and you don't want that in a log. Pasting still works fine.
 
 `Super + Print Screen` (or _Trigger > Capture > Color_) turns the cursor into an eyedropper. Click anything on screen and the colour lands on the clipboard. Press the hotkey again to back out without picking.
 
@@ -73,9 +73,9 @@ _Trigger > Capture > QR Code_ does the same trick for QR codes. Select the regio
 
 A 4K screen recording or a raw HEIC off your phone is often too big to just send. `Super + Ctrl + .` (or _Trigger > Transcode_) fixes that. It offers you a fuzzy file picker over `~/Pictures` and `~/Videos`, then asks for a format and a size.
 
-Pictures go to jpg or png at high, medium, or low, which cap the width at 3160, 2160, and 1080 pixels. Videos go to mp4 or an animated gif at 4k, 1080p, or 720p. The converted file is written next to the original with the resolution in the name — `demo-1080p.mp4` — and the path is copied to the clipboard as a file URI, so you can paste it directly into an app that takes file drops.
+Pictures go to jpg or png at high, medium, or low, which cap the width at 3160, 2160, and 1080 pixels. Videos go to mp4 or an animated gif at 4k, 1080p, or 720p. The converted file is written next to the original with the resolution in the name, `demo-1080p.mp4`, and the path is copied to the clipboard as a file URI, so you can paste it directly into an app that takes file drops.
 
-It works from the terminal too, if you already know what you want: `kestrel transcode ~/Videos/demo.mov mp4 1080p`. There's also `kestrel transcode ascii`, which turns an image into ASCII art — that one's mostly for [branding](41-branding.md).
+It works from the terminal too, if you already know what you want: `kestrel transcode ~/Videos/demo.mov mp4 1080p`. There's also `kestrel transcode ascii`, which turns an image into ASCII art, that one's mostly for [branding](41-branding.md).
 
 ## Sending it somewhere
 

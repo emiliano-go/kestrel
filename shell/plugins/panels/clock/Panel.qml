@@ -6,11 +6,11 @@ import qs.Ui
 import "Model.js" as Model
 
 // The clock's calendar popup: a month grid with ISO week numbers, built to
-// sit beside the weather panel — same hero-over-detail composition, same
+// sit beside the weather panel, same hero-over-detail composition, same
 // spacing scale, same small-caps labels.
 //
 // The grid is a read-out rather than a picker: today is the only marked
-// day, and the only thing that moves is which month is on screen —
+// day, and the only thing that moves is which month is on screen, 
 // chevrons, the scroll wheel, and the arrow keys all step it.
 //
 // BarWidget.qml owns the bar label and hands this panel the button to
@@ -23,7 +23,7 @@ Panel {
 
   property var anchorItem: null
 
-  // The bar tracks the widget mounted in its slot — BarWidget.qml — not this
+  // The bar tracks the widget mounted in its slot, BarWidget.qml, not this
   // nested panel. Everything the bar identifies a panel by has to be that
   // widget: the popout coordinator (and with it the open-panel dot under the
   // pill) compares against `slot.activeItem`, and switchPanelFrom looks the
@@ -44,7 +44,7 @@ Panel {
   readonly property date viewDate: new Date(viewYear, viewMonth, 1)
   readonly property bool viewingCurrentMonth: viewYear === today.getFullYear() && viewMonth === today.getMonth()
 
-  // Pinned to today, not to the month being browsed — stepping through the
+  // Pinned to today, not to the month being browsed, stepping through the
   // calendar does not change how much of the year is gone.
   readonly property real yearDone: Model.yearProgress(today.getFullYear(), today.getMonth(), today.getDate())
   readonly property int yearDonePercent: Model.yearProgressPercent(today.getFullYear(), today.getMonth(), today.getDate())
@@ -285,7 +285,7 @@ Panel {
           spacing: Style.space(8)
 
           // ---- Hero: today, centered. Once the view has stepped back
-          //      it is also the way home — clicking the date you are
+          //      it is also the way home, clicking the date you are
           //      looking for beats hunting for a reset button.
           Item {
             width: parent.width

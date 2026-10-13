@@ -77,7 +77,7 @@ read_link() {
 }
 
 # Every band the SSID is reachable on, low to high, always including the one
-# already in use -- a weak radio gets missed by plenty of scans, and the band we
+# already in use, a weak radio gets missed by plenty of scans, and the band we
 # are sitting on must never be absent from its own list of options. A band the
 # AP does not answer on is never offered: pinning to it would drop the
 # connection with nothing to reassociate to.

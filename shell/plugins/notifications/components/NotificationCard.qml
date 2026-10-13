@@ -1,4 +1,4 @@
-// Notification card. Pure presentational — no service, Notification, or
+// Notification card. Pure presentational, no service, Notification, or
 // ListModel references. The popup container drives lifetime; the history
 // panel drives static rendering. Both use the same component.
 
@@ -116,7 +116,7 @@ BorderSurface {
         Layout.alignment: Qt.AlignVCenter
         // Hide the slot when the icon failed to resolve (themed-icon name
         // not in the user's icon theme) AND we don't have a glyph fallback
-        // — prevents rendering Qt's pink broken-image placeholder.
+        //, prevents rendering Qt's pink broken-image placeholder.
         visible: !root.collapseRedundantIcon && !root.compactGlyph && (root.hasSmallIcon || root.hasGlyph) && (root.hasGlyph || smallIconImage.status !== Image.Error)
 
         Image {
@@ -164,8 +164,8 @@ BorderSurface {
         Text {
           // The spec defines the summary as a single line of plain text, so
           // AutoText could only ever promote a hostile string to rich text.
-          // The body below is StyledText on purpose — see Service.qml's
-          // bodyMarkupSupported — and is stripped in NotificationLogic.
+          // The body below is StyledText on purpose, see Service.qml's
+          // bodyMarkupSupported, and is stripped in NotificationLogic.
           textFormat: Text.PlainText
           Layout.fillWidth: true
           visible: root.summary.length > 0

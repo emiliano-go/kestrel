@@ -817,7 +817,7 @@ show_group_help() {
   local title="${GROUP_DESCRIPTIONS[$group]}"
 
   if [[ -n $title ]]; then
-    echo "${group^} commands — $title:"
+    echo "${group^} commands, $title:"
   else
     echo "${group^} commands:"
   fi

@@ -1,7 +1,7 @@
 echo "Only check for pending migrations at login, not on every package update"
 
 # kestrel-update-user-notify.path watched /usr/share/kestrel/migrations, but
-# pacman writes that directory during every update -- including the blessed
+# pacman writes that directory during every update, including the blessed
 # `kestrel update`, which runs kestrel-migrate a step later. The watcher fired a
 # critical notification for migrations that were already being applied in the
 # visible update terminal. Retire the watcher and keep only the once-per-login
@@ -18,7 +18,7 @@ systemctl --user stop kestrel-update-user-notify.path >/dev/null 2>&1 || true
 # Enable the replacement before dropping the old enablement, so a failure here
 # can never leave a user with no notifier at all. Enable without --now: this
 # usually runs from inside `kestrel update`, and starting the notifier here would
-# pop a toast for the migrations running right after it -- the exact behavior
+# pop a toast for the migrations running right after it, the exact behavior
 # being removed. `systemctl enable` also needs a live user manager, which
 # `kestrel update` over SSH does not have, so fall back to writing precisely the
 # symlink it would have written rather than silently doing nothing.

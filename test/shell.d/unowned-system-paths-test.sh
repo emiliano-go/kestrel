@@ -47,13 +47,13 @@ allowed = {
 
 # One-time 3.x upgrade. It runs before this rule existed and cannot be made to
 # retroactively matter for machines that already ran it.
-skip_scripts = {"bin/kestrel-upgrade-to-quattro"}
+skip_scripts = set()
 
 pkgs_candidates = [
   root.parent / "kestrel-pkgs/pkgbuilds",
   root.parent.parent / "kestrel-pkgs/pkgbuilds",
-  root.parent / "omacom/omarchy-pkgs/pkgbuilds",
-  Path.home() / "Work/omacom/omarchy-pkgs/pkgbuilds",
+  root.parent / "emiliano-go/kestrel-pkgs/pkgbuilds",
+  Path.home() / "Work/emiliano-go/kestrel-pkgs/pkgbuilds",
 ]
 override = os.environ.get("KESTREL_PKGS_PATH")
 if override:

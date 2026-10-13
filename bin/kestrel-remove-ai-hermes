@@ -18,7 +18,7 @@ unit_stopped() {
 }
 
 # Hermes is closed here rather than asked to be: the agent in its terminal,
-# the desktop app and its helpers, a gateway run by hand -- every process
+# the desktop app and its helpers, a gateway run by hand, every process
 # whose program, by its executable or by what it was started as, lives in the
 # runtime about to be deleted or in the package; for an interpreter that is
 # the script it runs, or Hermes's own package named with -m, so a gateway
@@ -170,7 +170,7 @@ kestrel-pkg-drop hermes-desktop
 # Upstream's installer writes this when the runtime under ~/.hermes has landed,
 # whether Kestrel ran it for the app or the app's own first launch did, and it
 # is the only thing that tells that runtime apart from one the user installed
-# themselves -- the paths are the same either way. Without it the install never
+# themselves, the paths are the same either way. Without it the install never
 # got that far: a machine where the package landed but nothing set Hermes up
 # still has whatever was there before, and none of it is ours to delete unasked.
 if [[ -f $HOME/.hermes/hermes-agent/.hermes-bootstrap-complete ]]; then
@@ -209,14 +209,14 @@ fi
 
 # What survives to here is the user's: the chats, memories and skills in
 # ~/.hermes, the connections and their encrypted tokens in ~/.config/Hermes.
-# Keeping them stays the default -- they are small, and finding them intact
-# after a reinstall is the better surprise -- but a removal meant to be
+# Keeping them stays the default, they are small, and finding them intact
+# after a reinstall is the better surprise, but a removal meant to be
 # complete should not leave credentials behind either, so the choice is put in
 # front of the user with the size, default no. Asked whenever the directories
 # exist, marker or no marker: on a machine where the marker never appeared the
 # data came from the terminal CLI or an install the app never finished, and it
 # is still what removal is asked to clean up. Naming the paths keeps the
-# question honest there too -- ~/.hermes may still carry a runtime the app
+# question honest there too, ~/.hermes may still carry a runtime the app
 # never owned, a yes takes that with it, and saying so is the prompt's job.
 # Without a terminal to ask in, keeping everything is the answer.
 data_removed=false

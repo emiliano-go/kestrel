@@ -14,7 +14,7 @@ the shell for its whole session.
 
 ## Customizing
 
-The bar config lives under the `bar:` key of [`~/.config/kestrel/shell.json`](../../../docs/kestrel-shell.md#shelljson). Out of the box the shell uses [`config/kestrel/shell.json`](../../../config/kestrel/shell.json). Once you customize anything via the bar gestures, `kestrel bar ...`, or by editing shell.json directly, your file is canonical — there is no deep-merge.
+The bar config lives under the `bar:` key of `~/.config/kestrel/shell.json`. Out of the box the shell uses [`config/kestrel/shell.json`](../../../config/kestrel/shell.json). Once you customize anything via the bar gestures, `kestrel bar ...`, or by editing shell.json directly, your file is canonical, there is no deep-merge.
 
 The bar is configured directly on the bar itself: drag empty bar space (or click-and-hold) to move the bar to another screen edge, double-left-click empty center-bar space to toggle transparency, and drag widgets to reorder them. The `kestrel bar position`, `kestrel bar transparent`, `kestrel bar move`, and `kestrel bar set` commands do the same from scripts. Enable or disable widgets with `kestrel plugin enable` and `kestrel plugin disable` (widget ids come from `kestrel plugin list`).
 
@@ -57,7 +57,7 @@ Example `shell.json` (bar subtree only shown):
 | `kestrel.menu` | Kestrel menu launcher | left = menu · right = terminal |
 | `kestrel.workspaces` | Hyprland workspace switcher | left = focus workspace |
 | `kestrel.clock` | Date/time label + popup with a month grid, ISO week numbers, and month stepping | left = popup · right = cycle label format · middle = timezone selector |
-| `kestrel.media` | MPRIS now-playing — scrolling track + artist, cover-art popup | left = play/pause · middle = next · scroll = prev/next · right = popup |
+| `kestrel.media` | MPRIS now-playing, scrolling track + artist, cover-art popup | left = play/pause · middle = next · scroll = prev/next · right = popup |
 | `kestrel.indicators` | Manual state indicators | left = indicator action |
 | `kestrel.tray` | System tray | hover = reveal drawer · right on chevron = manage |
 | `kestrel.weather` | Weather icon + popup with forecast | left = popup · right = full notification |
@@ -154,14 +154,14 @@ Item {
 
 Widgets receive `bar` (the shell root), `moduleName` (string), and `settings` (object) injected at load time. The bar exposes:
 
-- `bar.foreground`, `bar.background`, `bar.urgent` — theme colors (live-updated)
-- `bar.fontFamily` — current monospace family
-- `bar.position` — `"top" | "bottom" | "left" | "right"`
-- `bar.vertical` — boolean shortcut
-- `bar.barSize` — 26 horizontal / 28 vertical
-- `bar.run(command)` — fire-and-forget bash exec (quote arguments with `Util.shellQuote` from `qs.Commons`)
-- `bar.showTooltip(target, text)` / `bar.hideTooltip(target)` — shared tooltip popup
-- `bar.requestPopout(owner)` / `bar.releasePopout(owner)` — one-popup-at-a-time coordinator
+- `bar.foreground`, `bar.background`, `bar.urgent`, theme colors (live-updated)
+- `bar.fontFamily`, current monospace family
+- `bar.position`, `"top" | "bottom" | "left" | "right"`
+- `bar.vertical`, boolean shortcut
+- `bar.barSize`, 26 horizontal / 28 vertical
+- `bar.run(command)`, fire-and-forget bash exec (quote arguments with `Util.shellQuote` from `qs.Commons`)
+- `bar.showTooltip(target, text)` / `bar.hideTooltip(target)`, shared tooltip popup
+- `bar.requestPopout(owner)` / `bar.releasePopout(owner)`, one-popup-at-a-time coordinator
 
 First-party bar widgets are manifest-backed just like third-party widgets.
 Simple widgets carry sibling manifests such as `widgets/Workspaces.manifest.json`;
@@ -171,4 +171,4 @@ richer popup plugins live in feature directories such as `../panels/audio/`,
 `manifest.json`. Bar layout ids are namespaced, e.g. `kestrel.audio`,
 `kestrel.network`, and `kestrel.clock`.
 
-Third-party widgets ship as separate plugins under `~/.config/kestrel/plugins/<plugin-id>/` with their own `manifest.json` declaring `kinds: ["bar-widget"]` and a `barWidget` entry point. See the [shell reference](../../../docs/kestrel-shell.md#plugin-manifest) for the manifest schema. Rescan, enable, and place third-party plugins with `kestrel-shell shell rescanPlugins`, `kestrel plugin enable`, and `kestrel bar move`.
+Third-party widgets ship as separate plugins under `~/.config/kestrel/plugins/<plugin-id>/` with their own `manifest.json` declaring `kinds: ["bar-widget"]` and a `barWidget` entry point. Rescan, enable, and place third-party plugins with `kestrel-shell shell rescanPlugins`, `kestrel plugin enable`, and `kestrel bar move`.

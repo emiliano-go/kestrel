@@ -94,7 +94,7 @@ assert(
   'bar builds only the module list it is showing'
 )
 
-// A center module is mounted twice — drawn copy plus zero-size placeholder —
+// A center module is mounted twice, drawn copy plus zero-size placeholder, 
 // and the order they register in is not stable across a live reconfiguration,
 // so panel routing has to pick the one that is actually on screen.
 const drawn = { moduleName: 'kestrel.clock', visible: true, width: 28, height: 81 }

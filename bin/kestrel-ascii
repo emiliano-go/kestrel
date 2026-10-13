@@ -193,7 +193,7 @@ function draw(source,   chars, total, i, r, ch, code, piece, glyph_width, out, t
     # Every row gives up the same number of columns, taken from its own trailing
     # blanks first and from the glyph leading ones once those run out. A row is
     # held without its trailing blanks, counted in trail[] instead, so placing a
-    # glyph costs its own width rather than the width of the art so far -- which
+    # glyph costs its own width rather than the width of the art so far, which
     # is what keeps a long line from taking time in the square of its length.
     for (r = 0; r < height; r++) {
       cut = (amount < trail[r]) ? amount : trail[r]

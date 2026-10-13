@@ -25,7 +25,7 @@ if [[ -f /etc/kestrel.conf ]]; then
 fi
 
 # /etc/sudoers.d is root-only, so report what sudo resolves rather than reading
-# the drop-in — and say so plainly instead of guessing when there is no cached
+# the drop-in, and say so plainly instead of guessing when there is no cached
 # credential to ask with. A missing entry here is what makes `sudo kestrel-*`
 # run the packaged copy of a command the checkout has changed.
 sudo_bin_dir() {

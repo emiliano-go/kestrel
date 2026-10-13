@@ -10,7 +10,7 @@ echo "Gate sudo and polkit fingerprint auth behind the lid state (password when 
 # The gate points at the fixed /usr/bin path the kestrel package always
 # provides, so it keeps working across package installs and dev-link (which
 # overlays $KESTREL_PATH but leaves /usr/bin untouched). pam_exec needs a
-# literal absolute path — it does not expand env vars.
+# literal absolute path, it does not expand env vars.
 
 gate="auth      [success=1 default=ignore] pam_exec.so quiet /usr/bin/kestrel-hw-laptop-closed"
 

@@ -7,7 +7,7 @@
 # Python rather than bash, alone among the commands here, because the portal
 # answers a request with a Response signal addressed to the connection that
 # asked, and D-Bus delivers a directed signal only to that connection. Every
-# shell-callable client — gdbus call, busctl call, dbus-send — opens its own
+# shell-callable client, gdbus call, busctl call, dbus-send, opens its own
 # connection and exits before the answer arrives, and gdbus monitor registers
 # with AddMatch rather than BecomeMonitor, so it never sees one either. Holding
 # a single connection across both the call and the wait is the whole job, and

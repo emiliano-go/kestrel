@@ -1,7 +1,7 @@
 echo "Add the agents widget to the bar"
 
 # The widget is now in the default layout. It draws nothing until a provider
-# reports usage — Panel.qml is `visible: providers.length > 0`, and Main.qml
+# reports usage, Panel.qml is `visible: providers.length > 0`, and Main.qml
 # only counts a provider that is enabled *and* has recorded prompts, sessions,
 # active days, or a rate limit. So adding it to every existing bar is free:
 # machines without Claude Code or Codex never see it.

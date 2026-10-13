@@ -8,11 +8,11 @@ You can also use the included Aether application to create a new theme using a l
 
 ### What an installed theme can contain
 
-A theme you write yourself in `~/.config/kestrel/themes` can contain whatever you like — it's your machine and your file, and Kestrel applies all of it.
+A theme you write yourself in `~/.config/kestrel/themes` can contain whatever you like, it's your machine and your file, and Kestrel applies all of it.
 
 A theme you install from someone else's repo with `kestrel theme install` keeps everything that's colour, and loses the handful of files that would run code on your machine: any `.lua` file, the terminal configs (`alacritty.toml`, `foot.ini`, `ghostty.conf`, `kitty.conf`), and `vscode.json`. A theme's `hyprland.lua` is Lua your compositor runs at login, a terminal config names the program your terminal starts, and `vscode.json` names a VSCode extension to install. Installing someone's theme should change what your desktop looks like, never what it runs.
 
-Everything else still works exactly as the theme author wrote it — `btop.theme`, `chromium.theme`, `helix.toml`, `icons.theme`, `shell.toml`, the backgrounds and the previews are all kept. Only what was dropped gets regenerated from `colors.toml` on your machine.
+Everything else still works exactly as the theme author wrote it, `btop.theme`, `chromium.theme`, `helix.toml`, `icons.theme`, `shell.toml`, the backgrounds and the previews are all kept. Only what was dropped gets regenerated from `colors.toml` on your machine.
 
 Kestrel tells the two apart by whether the theme has its own git repo inside it, which is what `kestrel theme install` leaves behind when it clones. So a theme you wrote stays yours, and one you pulled off the internet stays colours.
 
@@ -32,14 +32,14 @@ Themes supplied with `unlock.png` and `preview-unlock.png` images will be listed
 
 If you use an app that isn't in that list, you can teach Kestrel to theme it yourself with a template. Drop a file in `~/.config/kestrel/themed/` named after the config it generates plus a `.tpl` extension, and write the config with `{{ background }}`, `{{ foreground }}`, `{{ accent }}`, `{{ red }}`, `{{ color0 }}` through `{{ color15 }}`, and the rest of the palette as placeholders. Every time you switch themes, the file is regenerated with that theme's colors.
 
-There's a fully commented `alacritty.toml.tpl.sample` in that folder to copy from — it lists every variable you can use, plus the `_strip` and `_rgb` modifiers for apps that want their colors without the `#` or as decimal RGB. Your templates take priority over Kestrel's own, so you can also use this to override how a built-in app gets themed.
+There's a fully commented `alacritty.toml.tpl.sample` in that folder to copy from, it lists every variable you can use, plus the `_strip` and `_rgb` modifiers for apps that want their colors without the `#` or as decimal RGB. Your templates take priority over Kestrel's own, so you can also use this to override how a built-in app gets themed.
 
 ### Distributing your theme
 
 If you want to distribute your theme so others can use it, you need to put it on a public git server, like GitHub. Then people can install it using _Install > Style > Theme_ in the Kestrel menu using that URL. It's recommended that you follow the naming convention of `kestrel-[themename]-theme`, as the theme will show correctly as just `[themename]` in the theme selection menu after installation.
 
-That leftover `[themename]` becomes the theme's directory name, so it has to be one Kestrel can hand around safely: it must start with a letter, a digit, or an underscore, and the rest may hold letters, digits, `.`, `_`, `+`, and `-`. Capitals are lowercased for you, but anything else — a space, a quote, a non-English character — is refused at install time rather than turned into a directory name. So `kestrel-tokyo-night-theme`, `kestrel-flexoki_light-theme`, and `kestrel-c++-theme` all install fine.
+That leftover `[themename]` becomes the theme's directory name, so it has to be one Kestrel can hand around safely: it must start with a letter, a digit, or an underscore, and the rest may hold letters, digits, `.`, `_`, `+`, and `-`. Capitals are lowercased for you, but anything else, a space, a quote, a non-English character, is refused at install time rather than turned into a directory name. So `kestrel-tokyo-night-theme`, `kestrel-flexoki_light-theme`, and `kestrel-c++-theme` all install fine.
 
 Remember that once it's installed from a repo, any `.lua`, terminal config or `vscode.json` it ships is dropped, so don't build the theme around those.
 
-You can have your theme added to [the extra themes page](https://omarchy.org/themes/) by sending a pull request to [the kestrel-site repo](https://github.com/omacom-io/kestrel-site).
+You can have your theme added to [the extra themes page](https://github.com/emiliano-go/kestrel) by sending a pull request to [the kestrel-site repo](https://github.com/omacom-io/kestrel-site).

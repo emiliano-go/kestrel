@@ -96,9 +96,9 @@ find_kestrel_pks_root() {
     "$ROOT/../kestrel-pkgs/pkgbuilds" \
     "$ROOT/../kestrel/kestrel-pkgs/pkgbuilds" \
     "$ROOT/../../kestrel-pkgs/pkgbuilds" \
-    "$ROOT/../omacom/omarchy-pkgs/pkgbuilds" \
-    "$ROOT/../../omacom/omarchy-pkgs/pkgbuilds" \
-    "$HOME/Work/omacom/omarchy-pkgs/pkgbuilds"; do
+    "$ROOT/../emiliano-go/kestrel-pkgs/pkgbuilds" \
+    "$ROOT/../../emiliano-go/kestrel-pkgs/pkgbuilds" \
+    "$HOME/Work/emiliano-go/kestrel-pkgs/pkgbuilds"; do
     if [[ -d $candidate ]]; then
       cd "$candidate" && pwd
       return 0
@@ -128,9 +128,9 @@ find_kestrel_iso_root() {
     "$ROOT/../kestrel-iso" \
     "$ROOT/../kestrel/kestrel-iso" \
     "$ROOT/../../kestrel-iso" \
-    "$ROOT/../omacom/omarchy-iso" \
-    "$ROOT/../../omacom/omarchy-iso" \
-    "$HOME/Work/omacom/omarchy-iso"; do
+    "$ROOT/../emiliano-go/kestrel-iso" \
+    "$ROOT/../../emiliano-go/kestrel-iso" \
+    "$HOME/Work/emiliano-go/kestrel-iso"; do
     if [[ -d $candidate ]]; then
       cd "$candidate" && pwd
       return 0

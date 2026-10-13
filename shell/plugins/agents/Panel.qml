@@ -558,7 +558,7 @@ Panel {
     return out
   }
 
-  // The window that decides how much room is left — the fullest one, since
+  // The window that decides how much room is left, the fullest one, since
   // that is what stops the next prompt.
   function bindingWindow(p) {
     var windows = limitWindows(p)
@@ -1242,7 +1242,7 @@ Panel {
     }
   }
 
-  // One provider: its mark, name, and plan, then its limits — or, with
+  // One provider: its mark, name, and plan, then its limits, or, with
   // several accounts, each account's name, state, and limits in turn. A
   // prepaid provider shows its balance instead.
   component ProviderSection: Column {

@@ -67,8 +67,8 @@ function entriesAfter(entries, name) {
 
 // A shell.json write that only changes inline widget settings (the battery
 // percentage toggle, a clock format change) must not rebuild the bar.
-// Compare two normalized layouts: when the structure is unchanged — same
-// entry ids in the same order per region — return the settings-only changes
+// Compare two normalized layouts: when the structure is unchanged, same
+// entry ids in the same order per region, return the settings-only changes
 // as {region, index, entry}. Return null when the change is structural, or
 // touches an entry a live settings push cannot safely reach: custom modules
 // read their entry directly rather than an injected settings property, and
@@ -134,9 +134,9 @@ function customModulePath(entry, home, configDir) {
 
 // A center module is mounted twice once an anchor is set: the copy that is
 // actually drawn, and a zero-size placeholder holding its place in the flow
-// beside the anchor. Panel routing has to pick the drawn one — it is the only
+// beside the anchor. Panel routing has to pick the drawn one, it is the only
 // one that can anchor a popup, carry the open-panel mark, or be found again
-// by switchPanelFrom — and fall back to the placeholder only when nothing is
+// by switchPanelFrom, and fall back to the placeholder only when nothing is
 // on screen. The order the two are registered in is not stable across a live
 // bar reconfiguration, so picking the first match is not good enough.
 function isDrawnSlot(slot) {

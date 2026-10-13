@@ -75,7 +75,7 @@ BarWidget {
 
     onPressed: function(b) {
       if (!root.bar) return
-      if (b === Qt.RightButton) root.bar.run("kestrel-notification-send \"$(omarchy-weather-status)\"")
+      if (b === Qt.RightButton) root.bar.run("kestrel-notification-send \"$(kestrel-weather-status)\"")
       else if (b === Qt.MiddleButton) root.refresh()
       else root.togglePanel()
     }

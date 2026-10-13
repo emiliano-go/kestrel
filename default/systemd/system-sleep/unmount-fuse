@@ -15,7 +15,7 @@ if [[ $1 == "pre" ]]; then
 fi
 
 if [[ $1 == "post" ]]; then
-  # Run in background — user.slice is still frozen at this point, so a
+  # Run in background, user.slice is still frozen at this point, so a
   # synchronous restart would block the thaw for up to 90 seconds.
   (
     sleep 5

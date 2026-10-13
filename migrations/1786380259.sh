@@ -16,7 +16,7 @@ fi
 # living with.
 #
 # sudo because this runs machine-wide and /dev/rfkill is only writable without it
-# from an active graphical seat — an update over SSH would otherwise abort here,
+# from an active graphical seat, an update over SSH would otherwise abort here,
 # before the marker, and abort again on every retry.
 if kestrel-bluetooth-power is-on; then
   sudo kestrel-bluetooth-power on

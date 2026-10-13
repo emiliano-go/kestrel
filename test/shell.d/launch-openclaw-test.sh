@@ -143,7 +143,7 @@ webapp_calls_after=$(grep -c '^kestrel-launch-webapp:' "$TEST_LOG" || true)
 pass "OpenClaw launch fails cleanly when the gateway never comes up"
 
 # --tui runs onboarding in the terminal it is already in, then attaches to the
-# gateway with `openclaw tui` -- never the embedded chat, which the running
+# gateway with `openclaw tui`, never the embedded chat, which the running
 # gateway's state-directory lock would refuse.
 rm -f "$HOME/.openclaw/openclaw.json"
 cat >"$tmp_dir/bin/kestrel-openclaw-onboard" <<SCRIPT

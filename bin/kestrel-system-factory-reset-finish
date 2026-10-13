@@ -43,7 +43,7 @@ root_device() {
 abort() {
   # Keep wipe-pending so the wipe retries next boot, and so provisioning stays
   # gated (it refuses to create a user on a half-wiped system).
-  log "$1 — aborting; the wipe will retry on the next boot"
+  log "$1, aborting; the wipe will retry on the next boot"
   umount "$TOP_MNT" 2>/dev/null || true
   rmdir "$TOP_MNT" 2>/dev/null || true
   exit 1
@@ -78,7 +78,7 @@ recreate_subvolume() {
 # current system was kept, so accounts and identity are scrubbed in place here
 # instead of arriving pre-scrubbed in the factory clone. Reachable when a
 # degraded reset was staged, the reboot deferred, and this worker updated in
-# between — the reset must still finish, or provisioning hands the machine over
+# between, the reset must still finish, or provisioning hands the machine over
 # with the seller's accounts intact.
 scrub_legacy_degraded_state() {
   log "degraded reset: scrubbing user accounts and machine identity in place"
@@ -144,7 +144,7 @@ main() {
     delete_subvolume "$old" || abort "could not delete $(basename "$old")"
   done
 
-  # A wipe that cannot recreate @home has not wiped anything — the seller's
+  # A wipe that cannot recreate @home has not wiped anything, the seller's
   # data would survive a "successful" factory reset.
   log "recreating @home and @log"
   recreate_subvolume @home || abort "could not recreate @home"

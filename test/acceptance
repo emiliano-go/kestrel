@@ -20,7 +20,7 @@ mkdir -p "$KESTREL_ACCEPTANCE_DIR"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
 # The suite verifies the installed product the session is running, so default
-# KESTREL_PATH to the installed tree — never this checkout, which may hold
+# KESTREL_PATH to the installed tree, never this checkout, which may hold
 # only test/ (kestrel-iso-test's --sync-kestrel). qs matches shell instances
 # by config path, so a suite pointed at any other tree reads the session
 # shell as "not running". Callers testing a different tree pass it explicitly.

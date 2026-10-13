@@ -41,7 +41,7 @@ exec {events}< <(socat -U - "UNIX-CONNECT:$SOCKET")
 
 # hypr_exec is async and a new window maps on whatever monitor is focused at that
 # moment. Block until this monitor's screensaver actually opens before moving
-# focus on -- otherwise slow-starting terminals all pile onto the last monitor.
+# focus on, otherwise slow-starting terminals all pile onto the last monitor.
 # The deadline is a safety net in case the window never appears.
 wait_for_screensaver_window() {
   local line deadline=$((SECONDS + 5))

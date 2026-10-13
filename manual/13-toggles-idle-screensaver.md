@@ -1,6 +1,6 @@
 # Toggles, Idle & the Screensaver
 
-A lot of what you change day to day isn't really a setting. It's a mode you flip on for an hour and off again: night light while you're working late, do not disturb while you're presenting, stay awake while you're watching something. Kestrel calls those toggles, and they all work the same way — a hotkey, a menu entry, and a command, all hitting the same switch.
+A lot of what you change day to day isn't really a setting. It's a mode you flip on for an hour and off again: night light while you're working late, do not disturb while you're presenting, stay awake while you're watching something. Kestrel calls those toggles, and they all work the same way, a hotkey, a menu entry, and a command, all hitting the same switch.
 
 ### The toggle menu
 
@@ -13,16 +13,16 @@ From the terminal, the same switches are `kestrel toggle <thing>`. Run `kestrel 
 | Night light | `Super + Ctrl + N` | `kestrel toggle nightlight` |
 | Silence notifications | `Super + Ctrl + ,` | `kestrel toggle notification silencing` |
 | Stay awake (no idle lock) | `Super + Ctrl + I` | `kestrel toggle idle` |
-| Crash capture | — | `kestrel toggle crash-capture` |
-| Screensaver | — | `kestrel toggle screensaver` |
-| [Herdr](https://herdr.dev) theme sync | — | `kestrel toggle theme sync` |
+| Crash capture |, | `kestrel toggle crash-capture` |
+| Screensaver |, | `kestrel toggle screensaver` |
+| [Herdr](https://herdr.dev) theme sync |, | `kestrel toggle theme sync` |
 | Menu bar | `Super + Shift + Space` | `kestrel toggle bar` |
 | Touchpad | `XF86TouchpadToggle` | `kestrel toggle touchpad` |
-| Touchscreen | — | `kestrel toggle touchscreen` |
-| Suspend | — | `kestrel toggle suspend` |
-| Hybrid GPU | — | `kestrel toggle hybrid gpu` |
+| Touchscreen |, | `kestrel toggle touchscreen` |
+| Suspend |, | `kestrel toggle suspend` |
+| Hybrid GPU |, | `kestrel toggle hybrid gpu` |
 
-The touchpad, touchscreen, and hybrid GPU switches live under _Trigger > Hardware_ (`Super + Ctrl + H`) rather than under Toggle, since they only show up when you actually have that hardware. The touchpad and touchscreen ones survive a Hyprland reload — the disabled device's name is saved to a small state file that Hyprland reads on startup to disable it again.
+The touchpad, touchscreen, and hybrid GPU switches live under _Trigger > Hardware_ (`Super + Ctrl + H`) rather than under Toggle, since they only show up when you actually have that hardware. The touchpad and touchscreen ones survive a Hyprland reload, the disabled device's name is saved to a small state file that Hyprland reads on startup to disable it again.
 
 The Toggle menu also carries a few things that aren't `kestrel toggle` commands but behave the same: battery percentage in the bar, workspace layout (`Super + L`), window gaps (`Super + Shift + Backspace`), and the 1-window square aspect (`Super + Ctrl + Backspace`).
 
@@ -32,13 +32,13 @@ Most of these are just a flag file under `~/.local/state/kestrel/toggles/`. If y
 kestrel-toggle-enabled screensaver-off && echo "screensaver is off"
 ```
 
-The flags are named for the off state — `screensaver-off`, `suspend-off`, `bar-off` — so their presence means the feature is disabled.
+The flags are named for the off state, `screensaver-off`, `suspend-off`, `bar-off`, so their presence means the feature is disabled.
 
 ### Indicators in the bar
 
 When a mode is on, you get a small glyph in the middle of the top bar next to the clock. That's the indicators widget, and it carries dictation, screen recording, pending reminders, night light, do not disturb, and stay awake.
 
-Inactive indicators are hidden. Hover the area around them and they fade in dimmed, so you can click one to turn it on without knowing its hotkey. Clicking an active one turns it back off. If you'd rather see all of them all the time, set `alwaysShow` to `true` on the `kestrel.indicators` entry in `~/.config/kestrel/shell.json` — see [the top bar](05-the-top-bar.md) for how bar widgets are configured.
+Inactive indicators are hidden. Hover the area around them and they fade in dimmed, so you can click one to turn it on without knowing its hotkey. Clicking an active one turns it back off. If you'd rather see all of them all the time, set `alwaysShow` to `true` on the `kestrel.indicators` entry in `~/.config/kestrel/shell.json`, see [the top bar](05-the-top-bar.md) for how bar widgets are configured.
 
 ### Night light
 
@@ -77,11 +77,11 @@ The Kestrel shell owns idle behavior, and the timings are a top-level `idle` blo
 }
 ```
 
-Both numbers are seconds counted from the moment you went idle — not from each other. So with the defaults, the screensaver comes up after two and a half minutes and the lock screen takes over at five minutes, whether or not the screensaver ran. Save the file and the shell picks up the new timings right away.
+Both numbers are seconds counted from the moment you went idle, not from each other. So with the defaults, the screensaver comes up after two and a half minutes and the lock screen takes over at five minutes, whether or not the screensaver ran. Save the file and the shell picks up the new timings right away.
 
 If you dismiss the screensaver before the lock deadline, that counts as activity and the pending lock is cancelled. You don't get locked out for glancing at your machine.
 
-To stop locking on idle entirely, `Super + Ctrl + I` — or `kestrel toggle idle` — flips stay awake on, and the coffee cup indicator appears in the bar. That's the one to hit before a long presentation or a build you want to watch. Hit it again to go back to normal. `kestrel toggle idle status` prints the current state as JSON if you need it from a script.
+To stop locking on idle entirely, `Super + Ctrl + I`, or `kestrel toggle idle`, flips stay awake on, and the coffee cup indicator appears in the bar. That's the one to hit before a long presentation or a build you want to watch. Hit it again to go back to normal. `kestrel toggle idle status` prints the current state as JSON if you need it from a script.
 
 This is about locking and the screensaver, not power. Suspend and hibernation have their own setup in [system sleep](36-system-sleep.md).
 
@@ -91,12 +91,12 @@ Kestrel's screensaver is ASCII art running through random text effects, one inst
 
 You can start it on demand from _System > Screensaver_ (`Super + Esc`), which forces it up even if you've turned the idle screensaver off. There's no hotkey bound to it by default.
 
-`kestrel toggle screensaver` is what turns the idle one off, if you'd rather go straight from working to locked. It needs a terminal it knows how to configure — Alacritty, Foot, Ghostty, or Kitty — and will tell you so if your default terminal is something else.
+`kestrel toggle screensaver` is what turns the idle one off, if you'd rather go straight from working to locked. It needs a terminal it knows how to configure, Alacritty, Foot, Ghostty, or Kitty, and will tell you so if your default terminal is something else.
 
 The logo it draws is yours to change, under _Style > Screensaver_. Upload a png or svg and Kestrel converts it to ASCII. See [branding](41-branding.md).
 
 ### The lock screen
 
-`Super + Ctrl + L` locks the machine. That runs the lock screen from the Kestrel shell, blanks the display, resets your keyboard layout to the first one so you're not typing your password in the wrong alphabet, and — if you have it running — locks 1Password on the way out.
+`Super + Ctrl + L` locks the machine. That runs the lock screen from the Kestrel shell, blanks the display, resets your keyboard layout to the first one so you're not typing your password in the wrong alphabet, and, if you have it running, locks 1Password on the way out.
 
 The lock screen takes a password, and it'll take a fingerprint too once you've set one up. That, and the other ways to authenticate, are covered in [hardware authentication](37-hardware-authentication.md).

@@ -31,7 +31,7 @@ run_failure_case() {
   pass "$description"
 }
 
-# The password comes back raw -- no QR escaping -- because it is shown to a
+# The password comes back raw, no QR escaping, because it is shown to a
 # human, not embedded in a WIFI: payload.
 export PW_NMCLI_FIELDS=$'wpa-psk\np,a:ss;word\\42\n'
 output=$(PATH="$tmp/bin:$PATH" "$ROOT/bin/kestrel-network-password" wlan0)

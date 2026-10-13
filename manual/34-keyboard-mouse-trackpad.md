@@ -7,25 +7,25 @@ Here's an example:
 ```lua
 hl.config({
   input = {
-    -- Use multiple keyboard layouts and switch between them with Left Alt + Right Alt
+   , Use multiple keyboard layouts and switch between them with Left Alt + Right Alt
     kb_layout = "us,dk",
     kb_options = "compose:caps,shift:both_capslock_cancel,grp:alts_toggle",
 
-    -- Change speed of keyboard repeat
+   , Change speed of keyboard repeat
     repeat_rate = 40,
     repeat_delay = 600,
 
-    -- Increase sensitivity for mouse/trackpad (default: 0)
+   , Increase sensitivity for mouse/trackpad (default: 0)
     sensitivity = 0.35,
 
     touchpad = {
-      -- Use natural (inverse) scrolling
+     , Use natural (inverse) scrolling
       natural_scroll = true,
 
-      -- Use two-finger clicks for right-click instead of lower-right corner
+     , Use two-finger clicks for right-click instead of lower-right corner
       clickfinger_behavior = true,
 
-      -- Control the speed of your scrolling
+     , Control the speed of your scrolling
       scroll_factor = 0.3,
     },
   },
@@ -59,7 +59,7 @@ On Dell XPS laptops with a haptic touchpad, you can also set the click strength 
 
 ### Typing in Chinese, Japanese, and other languages
 
-Kestrel runs the [fcitx5](https://fcitx-im.org/) input method framework as part of every session — it's what powers the CapsLock compose sequences. That means the plumbing for non-Latin input is already in place: install an input engine like `fcitx5-mozc` (Japanese) or `fcitx5-chinese-addons` (Chinese) with `kestrel pkg add`, plus `fcitx5-configtool` to add the engine to your input methods and set the key that switches between them.
+Kestrel runs the [fcitx5](https://fcitx-im.org/) input method framework as part of every session, it's what powers the CapsLock compose sequences. That means the plumbing for non-Latin input is already in place: install an input engine like `fcitx5-mozc` (Japanese) or `fcitx5-chinese-addons` (Chinese) with `kestrel pkg add`, plus `fcitx5-configtool` to add the engine to your input methods and set the key that switches between them.
 
 ### Use ALT as SUPER
 

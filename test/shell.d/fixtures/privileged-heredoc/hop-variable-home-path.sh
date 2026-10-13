@@ -6,7 +6,7 @@
 # /etc/systemd/system.
 helper="$HOME/.local/share/kestrel/bin/kestrel-agent"
 
-# kestrel:heredoc-expands paths=none -- helper is just the agent command name
+# kestrel:heredoc-expands paths=none, helper is just the agent command name
 cat <<EOF | sudo tee /etc/systemd/system/kestrel-agent.service >/dev/null
 [Service]
 ExecStart=$helper

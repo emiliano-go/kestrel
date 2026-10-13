@@ -68,7 +68,7 @@ set_cfg menu_driver "xmb"
 
 # Default to crt-royale shader for that classic CRT look. The global preset is
 # auto-loaded by RetroArch when auto_shaders_enable is true and no per-core/per-game
-# preset takes precedence — setting video_shader alone in retroarch.cfg is not enough.
+# preset takes precedence, setting video_shader alone in retroarch.cfg is not enough.
 set_cfg video_shader_enable "true"
 set_cfg auto_shaders_enable "true"
 mkdir -p ~/.config/retroarch/config

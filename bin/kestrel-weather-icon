@@ -7,7 +7,7 @@
 # auto-detects by IP.
 query=""
 if [[ -s "$HOME/.local/state/kestrel/settings/weather.json" ]]; then
-  location=$(omarchy-weather-location 2>/dev/null)
+  location=$(kestrel-weather-location 2>/dev/null)
   [[ -n $location ]] && query=$(jq -rn --arg location "$location" '$location | @uri')
 fi
 

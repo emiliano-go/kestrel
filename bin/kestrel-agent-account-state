@@ -13,7 +13,7 @@ account's credentials and links everything else back to the primary home, so
 conversation history, settings and skills stay one set across accounts.
 
 Each provider's registry is one JSON file beside those homes. It records which
-account is active — the one new sessions start as — how switching happens, and
+account is active, the one new sessions start as, how switching happens, and
 display-safe identity. Tokens never enter it and never leave this process.
 """
 

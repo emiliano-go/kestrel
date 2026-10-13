@@ -91,7 +91,7 @@ verify_runtime_tools() {
   # a polkit/sudo prompt; opting into sudoless Docker is a separate, warned step.
   command -v docker >/dev/null 2>&1 || fail "Docker CLI is installed"
   ! id -nG | grep -qw docker || fail "desktop user must not be in the docker group"
-  # The group name being absent is not sufficient — a world-writable socket or an
+  # The group name being absent is not sufficient, a world-writable socket or an
   # ACL would still hand the user the root daemon. Prove it is actually
   # unreachable without elevation.
   if timeout 10 docker info >/dev/null 2>&1; then

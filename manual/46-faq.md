@@ -7,7 +7,7 @@ Edit your `~/.config/hypr/input.lua` file and add this to switch between layouts
 ```
 hl.config({
   input = {
-    -- Use multiple keyboard layouts and switch between them with Left Alt + Right Alt
+   , Use multiple keyboard layouts and switch between them with Left Alt + Right Alt
     kb_layout = "us,fr",
     kb_options = "compose:caps,shift:both_capslock_cancel,grp:alts_toggle",
   },
@@ -46,7 +46,7 @@ The plain open source Chromium build doesn't ship with the OAuth credentials tha
 
 Printing is set up and running out of the box, and you add each printer yourself from _Print Settings_ in the app launcher (`Super + Space`).
 
-Choose _Add_, and give it a moment to look: a printer plugged in over USB, and most network printers, are found for you. If yours isn't in the list, pick _Network Printer > Internet Printing Protocol (ipp)_ and enter its address — the printer's own display or its web page will tell you what that is, usually something like `192.168.1.50` with a queue of `ipp/print`. _Forward_ then offers a driver, where a modern printer works best on the driverless _IPP Everywhere_ profile and an older one wants the model's own driver.
+Choose _Add_, and give it a moment to look: a printer plugged in over USB, and most network printers, are found for you. If yours isn't in the list, pick _Network Printer > Internet Printing Protocol (ipp)_ and enter its address, the printer's own display or its web page will tell you what that is, usually something like `192.168.1.50` with a queue of `ipp/print`. _Forward_ then offers a driver, where a modern printer works best on the driverless _IPP Everywhere_ profile and an older one wants the model's own driver.
 
 Right-click a printer and choose _Set as Default_ to pick which one your apps reach for first, and _Properties_ to set paper size, duplex and quality.
 
@@ -78,7 +78,7 @@ Run _Remove > Package_ to see every package that's installed. Then you can selec
 
 And you can use _Remove > Web App_ from the Kestrel menu to remove any of the preinstalled web apps you don't want.
 
-Or run _Remove > Preinstalls_ to sweep out all the preinstalled extras — web apps, TUIs, and optional applications — in one go. The hotkeys that launched them go away with them, so you're left with a clean slate of bindings to fill with your own in `~/.config/hypr/bindings.lua`.
+Or run _Remove > Preinstalls_ to sweep out all the preinstalled extras, web apps, TUIs, and optional applications, in one go. The hotkeys that launched them go away with them, so you're left with a clean slate of bindings to fill with your own in `~/.config/hypr/bindings.lua`.
 
 ---
 

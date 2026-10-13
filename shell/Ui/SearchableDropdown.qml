@@ -9,7 +9,7 @@ import qs.Commons as Commons
 // is friction.
 //
 // Filtering is case-insensitive substring against each option's label.
-// Options can be string[] or [{ value, label, description? }] — the same
+// Options can be string[] or [{ value, label, description? }], the same
 // shape Dropdown accepts. The filter clears whenever the popup closes.
 //
 // Keyboard: Tab to focus the trigger, Enter/Space opens (search focused

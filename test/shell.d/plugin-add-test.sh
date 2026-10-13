@@ -125,7 +125,7 @@ for bad in "ext://sh -c id" "gcrypt://example.com/x"; do
 done
 pass "plugin add rejects transport-scheme URLs before cloning"
 
-# Option-shaped URLs on argv are refused before clone — by the option parser
+# Option-shaped URLs on argv are refused before clone, by the option parser
 # (`-*` falls to "unknown add option"), not the guard. The guard's own
 # leading-dash arm is only reachable through the interactive gum prompt and is
 # exercised separately below.
@@ -163,7 +163,7 @@ fi
 
 # Legitimate URL forms pass the guard and reach git clone (stubbed, no network).
 for good in \
-  "https://github.com/acme/omarchy-weather.git" \
+  "https://github.com/acme/kestrel-weather.git" \
   "git@github.com:acme/repo.git" \
   "ssh://git@github.com/acme/repo.git" \
   "git@[2001:db8::1]:org/repo.git"; do

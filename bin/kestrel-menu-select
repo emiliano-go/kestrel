@@ -4,7 +4,7 @@
 # kestrel:group=menu
 # kestrel:name=select
 # kestrel:args=prompt [option...] [-- menu args...]
-# kestrel:examples=kestrel menu select Format jpg png|kestrel-menu-select Resolution 4k 1080p 720p -- --width 400
+# kestrel:examples=kestrel menu select Format jpg png|kestrel-menu-select Resolution 4k 1080p 720p, --width 400
 
 # An option may lead with an icon, as "<glyph><TAB><label>", and may trail a
 # subtext shown under the label, as "<glyph><TAB><label><TAB><subtext>". The

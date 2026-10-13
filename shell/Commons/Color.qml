@@ -6,7 +6,7 @@ import "BorderGeometry.js" as Geometry
 
 // Color surfaces for the shell. Foundational palette (foreground, background,
 // accent, urgent) comes from theme/colors.toml. Per-surface roles come from
-// theme/shell.toml — generated per theme from default/themed/shell.toml.tpl,
+// theme/shell.toml, generated per theme from default/themed/shell.toml.tpl,
 // or shipped directly by a theme to replace the generated file. Surfaces that
 // don't appear in shell.toml fall back to the foundational palette.
 QtObject {
@@ -172,14 +172,14 @@ QtObject {
 
   // Last theme-supplied and user-supplied shell.toml dicts, kept separate so
   // either can be reloaded without re-reading the other. `shellValues` is
-  // always the merge of theme (base) and user (override) — see mergeShell.
+  // always the merge of theme (base) and user (override), see mergeShell.
   property var themeShellValues: ({})
   property var userShellValues: ({})
 
   // Single TOML walker for shell.toml. Both Color (surface roles) and Style
   // (typography, spacing, bar, control states) consume the resulting dict.
   // Accepts quoted strings, bare numeric values, bare width lists, and bare
-  // role names; tolerates inline comments. Numbers are kept as strings here —
+  // role names; tolerates inline comments. Numbers are kept as strings here, 
   // readers coerce when they pull a value.
   function parseShell(raw) {
     var parsed = {}
@@ -251,7 +251,7 @@ QtObject {
     watchChanges: true
     printErrors: false
     onLoaded: root.loadUserShell(text())
-    // Re-read on change (including first creation) before loading — `text()`
+    // Re-read on change (including first creation) before loading, `text()`
     // is stale in the change signal itself, so route both paths through reload
     // → onLoaded to always parse fresh content.
     onFileChanged: reload()

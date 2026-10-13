@@ -14,7 +14,7 @@ Panel {
   moduleName: "kestrel.bluetooth"
   ipcTarget: "kestrel.bluetooth"
   // manageIpc: false so this panel can own the single IpcHandler the target
-  // permits — needed for the toggleBluetooth method below.
+  // permits, needed for the toggleBluetooth method below.
   manageIpc: false
 
   // Address -> "connecting" | "disconnecting" | "forgetting".
@@ -26,7 +26,7 @@ Panel {
 
   // True while this instance owes BlueZ a StopDiscovery: set when it starts
   // discovery (or opens onto a session already running) and cleared once
-  // discovery is confirmed down after close. Ownership, not state — BlueZ's
+  // discovery is confirmed down after close. Ownership, not state, BlueZ's
   // Discovering property also reflects sessions other clients hold, which are
   // never this panel's to stop.
   property bool owesDiscoveryStop: false
@@ -82,9 +82,9 @@ Panel {
   }
 
   // Single cursor model shared by keyboard and mouse. Sections:
-  //   "connected"  — currently connected devices; Enter disconnects.
-  //   "known"      — remembered devices; Enter connects.
-  //   "discovered" — unremembered devices visible while scanning; Enter connects.
+  //   "connected", currently connected devices; Enter disconnects.
+  //   "known", remembered devices; Enter connects.
+  //   "discovered", unremembered devices visible while scanning; Enter connects.
   // Visuals always come from CursorSurface (hasCursor / current),
   // never from containsMouse. Mouse hover updates root cursor state too,
   // guaranteeing one highlight on screen.
@@ -133,8 +133,8 @@ Panel {
     return Model.sectionDevices(deviceGroups, section)
   }
 
-  // The scrollable half of the panel — remembered devices, then whatever the
-  // scan turned up — flattened into one model so a ListView can own the
+  // The scrollable half of the panel, remembered devices, then whatever the
+  // scan turned up, flattened into one model so a ListView can own the
   // viewport. Each entry carries the section it came from, which is what lets
   // the delegate and the cursor keep working in section-relative terms.
   readonly property var scrollRows: {
@@ -408,9 +408,9 @@ Panel {
 
   onOpenedChanged: {
     if (opened) {
-      // Adopt a discovery session that is already running — a popout handoff
+      // Adopt a discovery session that is already running, a popout handoff
       // from another monitor, or one leaked by an instance that could not
-      // finish its own stop — so this close settles it either way.
+      // finish its own stop, so this close settles it either way.
       if (adapter !== null && adapter.discovering) owesDiscoveryStop = true
       if (connectedDevices.length > 0) { focusSection = "connected"; selectedIndex = 0 }
       else if (knownDevices.length > 0) { focusSection = "known"; selectedIndex = 0 }
@@ -488,7 +488,7 @@ Panel {
     }
     var count = sectionCount(focusSection)
     if (count === 0) {
-      // Section emptied out — bounce to the previous visible one.
+      // Section emptied out, bounce to the previous visible one.
       var sIdx = sections.indexOf(focusSection)
       focusSection = sIdx > 0 ? sections[sIdx - 1] : sections[0]
       selectedIndex = Math.max(0, sectionCount(focusSection) - 1)
@@ -539,7 +539,7 @@ Panel {
     running: !root.opened && root.owesDiscoveryStop && root.adapter !== null && root.adapter.discovering === true
     onRunningChanged: if (running) attempts = 0
     onTriggered: {
-      // The scan now serves the open panel, so the debt moves with it — B may
+      // The scan now serves the open panel, so the debt moves with it, B may
       // have opened before BlueZ confirmed A's start, in which case B's own
       // open-time adoption saw nothing to adopt.
       var sibling = root.openSibling()
@@ -554,8 +554,8 @@ Panel {
     }
   }
 
-  // The debt is settled the moment BlueZ reports discovery down — whether
-  // because the stop above landed or the session ended some other way — so a
+  // The debt is settled the moment BlueZ reports discovery down, whether
+  // because the stop above landed or the session ended some other way, so a
   // stale claim never touches a scan another client starts later. While the
   // panel is open, discoveryRetry re-incurs it as it restarts the scan.
   Connections {
@@ -566,8 +566,8 @@ Panel {
   }
 
   // A destroyed instance cannot wait for BlueZ confirmations, so it hands any
-  // debt to a surviving sibling — whose declarative stop catches even a start
-  // confirmed after this object is gone — and only writes the stop directly
+  // debt to a surviving sibling, whose declarative stop catches even a start
+  // confirmed after this object is gone, and only writes the stop directly
   // when it is the last one standing.
   Component.onDestruction: {
     if (!owesDiscoveryStop) return
@@ -696,7 +696,7 @@ Panel {
           width: parent.width
           implicitHeight: Math.max(heroIcon.implicitHeight, heroLabels.implicitHeight, powerSwitch.implicitHeight)
 
-          // Status only — the switch owns toggling, mouse and keyboard alike.
+          // Status only, the switch owns toggling, mouse and keyboard alike.
           Text {
             id: heroIcon
             textFormat: Text.PlainText
@@ -763,7 +763,7 @@ Panel {
           }
         }
 
-        // Scrollable device list — capped so a noisy neighborhood doesn't
+        // Scrollable device list, capped so a noisy neighborhood doesn't
         // grow the popup past the screen.
         PanelSeparator {
           foreground: root.bar.foreground
@@ -802,8 +802,8 @@ Panel {
 
         // ListView, not a Flickable: it owns the scroll position, so it keeps
         // the current row visible on j/k, re-clamps itself when discovery
-        // shortens the list, and — because Contain only moves when a row is
-        // actually clipped — never lurches under a hovering mouse.
+        // shortens the list, and, because Contain only moves when a row is
+        // actually clipped, never lurches under a hovering mouse.
         ListView {
           id: deviceListView
           width: parent.width
@@ -818,8 +818,8 @@ Panel {
           model: root.scrollRows
           currentIndex: root.scrollRowIndex
           // Deferred by a turn. Called straight out of the signal the position
-          // does not take — verified with the cursor six rows down and
-          // contentY still 0 — because scrollRows is rebuilt every time
+          // does not take, verified with the cursor six rows down and
+          // contentY still 0, because scrollRows is rebuilt every time
           // discovery reports, and swapping the model resets the view out from
           // under the call. Network's list is stable enough not to need this.
           onCurrentIndexChanged: if (currentIndex >= 0) Qt.callLater(keepCurrentVisible)

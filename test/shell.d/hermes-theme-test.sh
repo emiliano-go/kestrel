@@ -124,7 +124,7 @@ run_hook() {
     "$ROOT/bin/kestrel-theme-set-hermes" "$@"
 }
 
-# -- publishing ---------------------------------------------------------------
+#, publishing ---------------------------------------------------------------
 
 reset_home
 run_hook
@@ -198,7 +198,7 @@ run_hook 2>/dev/null
 [[ -f $skin ]] || fail "comments and blank lines are allowed around the palette"
 pass "a well-formed skin with comments and blank lines is published"
 
-# -- a theme switch finishes a missed hand-over ---------------------------------
+#, a theme switch finishes a missed hand-over ---------------------------------
 
 reset_home --set-up
 KESTREL_TEST_HERMES_READY=1 run_hook 2>"$test_tmp/stderr"
@@ -282,7 +282,7 @@ grep -Fxq 'config set display.skin kestrel' "$hermes_calls" ||
   fail "activation still happens beside a broken profile" "$(cat "$hermes_calls")"
 pass "a profile that cannot take the skin costs nobody else"
 
-# -- activation ---------------------------------------------------------------
+#, activation ---------------------------------------------------------------
 
 reset_home
 run_hook --activate 2>"$test_tmp/stderr"
@@ -340,7 +340,7 @@ grep -q 'refused' "$test_tmp/stderr" || fail "a refused write is reported"
 ! grep -q 'sleep 60' "$hermes_calls" || fail "nothing is announced for a write that did not happen" "$(cat "$hermes_calls")"
 pass "--activate reports a Hermes that refused the skin and moves on"
 
-# -- a skin the current theme has not rendered yet -------------------------------
+#, a skin the current theme has not rendered yet -------------------------------
 
 reset_home --set-up
 rm "$test_home/.local/state/kestrel/current/theme/hermes.yaml"
@@ -366,7 +366,7 @@ KESTREL_TEST_HERMES_READY=1 run_hook --activate 2>/dev/null
 grep -Fxq 'config set display.skin kestrel' "$hermes_calls" || fail "the freshly rendered skin is activated" "$(cat "$hermes_calls")"
 pass "--activate renders the skin for a theme that predates it"
 
-# -- waiting for the desktop app's first launch ----------------------------------
+#, waiting for the desktop app's first launch ----------------------------------
 
 reset_home --set-up
 mkdir -p "$hermes_home/hermes-agent"

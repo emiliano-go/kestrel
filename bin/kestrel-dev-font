@@ -568,7 +568,7 @@ def svg_contours(svg, location):
     view = tuple(float(x) for x in vb.group(1).replace(',', ' ').split())
     paths = re.findall(r'<path[^>]*\bd="([^"]+)"', svg)
     if len(paths) != 1:
-        sys.exit('%s: expected a single <path>, found %d — flatten the mark to '
+        sys.exit('%s: expected a single <path>, found %d, flatten the mark to '
                  'one monochrome path first' % (location, len(paths)))
     return contours_from_svg(paths[0], view)
 
@@ -591,7 +591,7 @@ def record_source(font_path, codepoint, label, location):
         return None
     lines = open(readme, encoding='utf-8').read().split('\n')
     last = max(i for i, l in enumerate(lines) if l.startswith('- `U+'))
-    entry = '- `U+%04X` — %s' % (codepoint, label)
+    entry = '- `U+%04X`, %s' % (codepoint, label)
     if location.startswith(('http://', 'https://')):
         entry += ', from <%s>' % location
     lines.insert(last + 1, entry)

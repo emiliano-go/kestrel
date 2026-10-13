@@ -3,12 +3,12 @@
 Usage: qml-text-format-scan.py ROOT   (scans ROOT/shell, prints one line per
 violation, exits 1 on an unreadable tree). Lives in its own file rather than a
 heredoc so the test can run it over fixtures and prove it still fails when it
-should — a guard nothing can fail is a guard nobody should trust.
+should, a guard nothing can fail is a guard nobody should trust.
 
 Two limits are deliberate, because a line scanner cannot close them. It reads
-each Text element's own declaration, so text assigned from somewhere else —
+each Text element's own declaration, so text assigned from somewhere else, 
 `Binding { target: label; property: "text" }`, `PropertyChanges`, a
-`Component.onCompleted` assignment, a `property alias` onto a child's text —
+`Component.onCompleted` assignment, a `property alias` onto a child's text, 
 is invisible to it. And a regex literal containing a brace throws off the brace
 depth. Neither shape exists in this tree; both would need a QML parser.
 """
@@ -25,7 +25,7 @@ def strip_block_comments(text):
     """Blank out /* */ comments, keeping every newline so line numbers hold.
 
     strip_noise() only knows `//`, so before this a block comment between a
-    type name and its brace — `Text /* why */ {` — hid the element from
+    type name and its brace, `Text /* why */ {`, hid the element from
     OPEN_ELEMENT and from the unscannable-form check alike, and the block
     passed with no textFormat at all.
     """
@@ -67,7 +67,7 @@ def strip_block_comments(text):
     return ''.join(out)
 
 
-# A Text under a namespaced import — `import QtQuick as QQ` then `QQ.Text` — is
+# A Text under a namespaced import, `import QtQuick as QQ` then `QQ.Text`, is
 # the same element and was skipped, because the name compared unequal to `Text`.
 TEXT_NAME = r'(?:[A-Za-z_][A-Za-z0-9_]*\.)?Text'
 
@@ -143,7 +143,7 @@ def binding_expression(lines, start):
         # comment or a blank line dropped into a wrapped expression does not
         # end it, and stopping there would read `text: "prefix"` as the whole
         # binding and exempt it as a literal while `+ externalValue` waits
-        # below — the exact misreading this function exists to prevent.
+        # below, the exact misreading this function exists to prevent.
         following = ''
         for ahead in range(i + 1, len(lines)):
             candidate = strip_noise(lines[ahead])
@@ -276,7 +276,7 @@ def unscannable_violations(lines, rel):
                 continue
 
         for match in UNSCANNABLE_TEXT.finditer(code):
-            # A complete one-line block with no nested braces is fine —
+            # A complete one-line block with no nested braces is fine, 
             # inline_violations reads those. Count rather than looking for a
             # `}`, because `Text { text: ({ a: external }).a }` closes on this
             # line yet INLINE_TEXT's brace-free body pattern cannot match it,
@@ -350,7 +350,7 @@ for path in sorted(qml):
         # without this the root rule is very nearly dead code.
         # `component Info:` may also put its `Text {` on the following line,
         # which INLINE_COMPONENT cannot match and which then reads as an
-        # ordinary nested block with no binding of its own — a caller's dynamic
+        # ordinary nested block with no binding of its own, a caller's dynamic
         # text passing in silence.
         if INLINE_COMPONENT.match(lines[b['start']]) or opens_component(lines, b['start']):
             found.append(f'{rel}:{b["start"] + 1}: inline component root Text declares no textFormat')

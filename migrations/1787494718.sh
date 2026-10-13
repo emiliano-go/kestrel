@@ -22,7 +22,7 @@ if [[ ! -L $authfile && ! -e $authfile ]]; then
   # setup created /etc/fido2 with `sudo mkdir -p`, which took the union of the
   # caller's umask and sudoers' 0022, so anyone registering under `umask 077`
   # left it mode 0700 with the user-owned authfile still inside. Escalate for
-  # that case alone -- a machine that never set FIDO2 up has no directory here
+  # that case alone, a machine that never set FIDO2 up has no directory here
   # and still reaches exit 0 without a password prompt. Not through a symlink:
   # chmod would act on whatever it points at.
   authdir=${authfile%/*}

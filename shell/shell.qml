@@ -15,7 +15,7 @@ ShellRoot {
   id: shell
 
   // Shared service instances. Plugins receive these via property injection
-  // rather than re-importing them as singletons — relative-path imports do
+  // rather than re-importing them as singletons, relative-path imports do
   // not share singleton state, which silently leaves consumers with their
   // own empty copies.
   property PluginRegistry pluginRegistry: PluginRegistry { }
@@ -1420,7 +1420,7 @@ ShellRoot {
       var registryKey = String(manifest.id)
       seen[registryKey] = true
 
-      // Already loaded with matching source — leave it alone.
+      // Already loaded with matching source, leave it alone.
       var existing = pluginWidgetComponents[registryKey]
       var url = shell.pluginRegistry.entryPointUrl(manifest, "barWidget")
       if (!url) {
@@ -1444,7 +1444,7 @@ ShellRoot {
 
       // A load already in flight for this URL registers itself when it
       // finishes. Starting a second one produces a second Component for the
-      // same widget, and swapping a slot's component rebuilds its item —
+      // same widget, and swapping a slot's component rebuilds its item, 
       // briefly running two of the widget, each registering its IPC handler.
       if (existing && existing.url === url && !existing.component) continue
 

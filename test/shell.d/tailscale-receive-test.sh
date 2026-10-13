@@ -66,7 +66,7 @@ grep -q "^Received notes with space.pdf .* -g " <<<"$notifications" ||
 pass "taildrop receive announces other files with a glyph"
 
 # The shell keeps the click command with the toast, so receiving does not have
-# to sit blocked on an answer -- and the toast still opens the file after a shell
+# to sit blocked on an answer, and the toast still opens the file after a shell
 # restart. The path rides as its own discrete --exec argument, so the shell runs
 # it as literal data with no quoting for a name with spaces to get wrong.
 grep -qF -- "--exec xdg-open $downloads/photo.png" <<<"$notifications" ||

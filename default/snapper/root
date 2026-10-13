@@ -1,4 +1,4 @@
-# Kestrel snapshots root after each package upgrade for recovery — kept to 2,
+# Kestrel snapshots root after each package upgrade for recovery, kept to 2,
 # no timeline.
 SUBVOLUME="/"
 FSTYPE="btrfs"

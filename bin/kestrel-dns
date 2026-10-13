@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-# Whenever this runs as root — invoked directly through the passwordless
-# sudoers rule, or re-execed by require_root below — sudo's secure_path decides
+# Whenever this runs as root, invoked directly through the passwordless
+# sudoers rule, or re-execed by require_root below, sudo's secure_path decides
 # where a bare helper resolves, and a dev link (etc/sudoers.d/kestrel-dev-path)
 # prepends a user-writable checkout bin/ to it. Every helper this script calls
 # by bare name (dirname, install, tee, rm, nmcli, systemctl, awk) is a system
@@ -149,7 +149,7 @@ write_networkmanager_dns() {
   local servers="$1"
 
   install -d -m 0755 "$(dirname "$NM_DNS_CONF")"
-  # kestrel:heredoc-expands paths=none -- $servers is a normalized, single-line
+  # kestrel:heredoc-expands paths=none, $servers is a normalized, single-line
   # DNS server list written as data, not a path or command; nothing user-writable
   # is resolved or executed from the root-owned drop-in.
   cat >"$NM_DNS_CONF" <<EOF
@@ -305,7 +305,7 @@ Custom)
   split_dns_servers "$dns_servers"
   write_networkmanager_dns "$dns_servers"
   set_connection_dns "$ipv4_dns" "$ipv6_dns"
-  # kestrel:heredoc-expands paths=none -- $dns_servers is a normalized,
+  # kestrel:heredoc-expands paths=none, $dns_servers is a normalized,
   # single-line DNS server list; the //,/ turns its comma separators into the
   # spaces resolved.conf wants. It is written as data, not a path or command.
   tee /etc/systemd/resolved.conf >/dev/null <<EOF

@@ -4,7 +4,7 @@
 
 # A fcitx5 running outside the unit owns org.fcitx.Fcitx5, so the unit's
 # instance would exit on arrival and the stale process would keep serving the
-# old ~/.XCompose -- a restart that reports success and changes nothing.
+# old ~/.XCompose, a restart that reports success and changes nothing.
 systemctl --user stop kestrel-fcitx5.service
 pkill -x fcitx5 >/dev/null 2>&1 || true
 systemctl --user start kestrel-fcitx5.service

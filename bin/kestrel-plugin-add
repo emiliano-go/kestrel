@@ -3,7 +3,7 @@
 # kestrel:summary=Add a shell plugin from git
 # kestrel:group=plugin
 # kestrel:args=[git-url] [--enable] [--yes]
-# kestrel:examples=kestrel plugin add https://github.com/acme/omarchy-weather.git --enable
+# kestrel:examples=kestrel plugin add https://github.com/acme/kestrel-weather.git --enable
 # kestrel:alias=kestrel plugin install
 
 set -euo pipefail
@@ -88,7 +88,7 @@ done
 
 if [[ -z $url ]]; then
   interactive ||
-    fail "a git URL is required (e.g. kestrel plugin add https://github.com/acme/omarchy-weather.git)"
+    fail "a git URL is required (e.g. kestrel plugin add https://github.com/acme/kestrel-weather.git)"
   url=$(gum input --prompt "Git URL of the plugin repo: ") || fail "cancelled"
   [[ -n $url ]] || fail "a git URL is required"
 fi

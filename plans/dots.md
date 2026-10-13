@@ -1,4 +1,4 @@
-# Plan: Dots — preserve and sync user configs out of the box
+# Plan: Dots, preserve and sync user configs out of the box
 
 Revision 3. Rev 2 incorporated adversarial review by codex (xhigh) and grok;
 rev 3 names the feature **dots** (`kestrel dots ...`) and adds the
@@ -20,7 +20,7 @@ desktop."
 
 ## Rejected approaches
 
-- **`git init ~/.config`**: dumping ground — Chromium profile, fcitx5 state,
+- **`git init ~/.config`**: dumping ground, Chromium profile, fcitx5 state,
   app tokens, machine churn. A `.git` there gets discovered by editors and
   prompts. Can't cover `~/.bashrc` or `~/.XCompose`.
 - **`~/.config/kestrel` only**: too narrow; misses hypr, terminals, `.bashrc`.
@@ -59,7 +59,7 @@ access goes through one internal helper that runs git **hermetically**:
 ### Audited manifest, not a derived whitelist
 
 Tracking is `git add -f --pathspec-from-file=<manifest>` only. The manifest is
-a hand-audited file shipped with Kestrel — explicitly **not** derived from
+a hand-audited file shipped with Kestrel, explicitly **not** derived from
 `$KESTREL_PATH/config` (which ships Chromium Preferences, fcitx5,
 `opencode/opencode.json` where users put API keys, etc.):
 
@@ -73,18 +73,18 @@ a hand-audited file shipped with Kestrel — explicitly **not** derived from
   binaries), `.config/btop/themes/` (symlink into `~/.local/state`), anything
   Chromium/fcitx5/opencode/xournalpp.
 - **Two tiers**: every manifest path is history-tracked, but some are marked
-  `local` — machine-specific files that sync must never touch. At minimum
+  `local`, machine-specific files that sync must never touch. At minimum
   `monitors.lua`; likely hardware quirks like `dell-haptic.conf`. This is the
   lightweight answer to chezmoi's hostname templates: exclude, no DSL.
 - Once committed, a secret lives in the object store forever; "no remote" is
-  not a secrets story. The manifest is the deny line — nothing outside it is
+  not a secrets story. The manifest is the deny line, nothing outside it is
   ever staged, and there is no command that stages more.
 
 ### Dotfile-manager detection: stand down, don't fight
 
 `manual/31-dotfiles.md` sends users to Stow today, and migrations deliberately
 write *through* symlinks. For those users git records an unchanged symlink, so
-snapshots would be silent no-ops — and `restore` could stomp a symlink with a
+snapshots would be silent no-ops, and `restore` could stomp a symlink with a
 regular file. Therefore:
 
 - At seed time and before each snapshot: if manifest paths are symlinks or a
@@ -104,16 +104,16 @@ internal `kestrel-dots-snapshot "<label>"`:
    and `.XCompose` are in place. Idempotent; `--force` must not re-init.
 2. **`kestrel-migrate`**: before/after pair labeled with version. Covers both
    `kestrel-update` *and* the login-time migration path, and separates
-   migration changes from prior user dirt — the "before" commit captures user
+   migration changes from prior user dirt, the "before" commit captures user
    edits, the "after" commit is purely what migrations did.
 3. **Batch refresh commands** (`kestrel-refresh-hyprland` etc.): one pair per
    command, not one commit per `kestrel-refresh-config` call (hyprland calls
    it seven times).
-4. **`kestrel-reinstall-configs`**: a "before" snapshot — honestly labeled.
+4. **`kestrel-reinstall-configs`**: a "before" snapshot, honestly labeled.
    This operation replays all of `/etc/skel`; a manifest repo does **not**
    make it reversible and we don't claim it does.
 5. **Timer**: an hourly-ish systemd user timer committing only if dirty, so
-   hand edits are captured — without it, "restore my bindings from last week"
+   hand edits are captured, without it, "restore my bindings from last week"
    fails for any edit not followed by an Kestrel operation.
 
 `.bak` files **stay** in v1. They serve symlink users, they're documented
@@ -127,19 +127,19 @@ The local snapshot history is machine-generated noise (timer commits,
 before/after pairs) and stays private. Sync happens on a shared `sync` branch
 in the same repo that only two operations touch:
 
-- **`kestrel dots push`** — *squash-publishes* the current manifest state
+- **`kestrel dots push`**, *squash-publishes* the current manifest state
   (minus `local`-tier files) as one commit: "Published from <hostname>". Only
-  present-state files leave the machine — a token the timer captured last
+  present-state files leave the machine, a token the timer captured last
   month and you since deleted is not in any published commit.
-- **`kestrel dots pull [url]`** — fetches `sync`, takes a local pre-pull
+- **`kestrel dots pull [url]`**, fetches `sync`, takes a local pre-pull
   snapshot (so pull is undoable via `restore`), then applies the files.
   Never touches `local`-tier files. With a URL argument on a fresh machine,
-  it configures the remote first — the second-machine straight shot is one
+  it configures the remote first, the second-machine straight shot is one
   command.
 
 Conflict story stays simple because publishes are whole-state: push refuses
 when the remote moved since your last pull ("pull first"); pull attempts a
-per-file three-way merge and falls back to taking remote — your version is
+per-file three-way merge and falls back to taking remote, your version is
 one `kestrel dots restore` away.
 
 Remote setup UX:
@@ -147,30 +147,30 @@ Remote setup UX:
 - `kestrel dots push` with no remote runs setup inline: paste a git URL, or
   create a **private** GitHub repo via `gh` when authenticated. Verify the
   repo is private; warn loudly if not.
-- Manual by default. Push is an intentional "my setup is good" moment — no
+- Manual by default. Push is an intentional "my setup is good" moment, no
   auto-push ever (publishing half-finished experiments is an anti-feature).
   Opt-in *pull on login* later for people with one canonical machine; safe
   because every pull is snapshot-guarded.
-- Dormant mode (dotfile-manager users) disables sync too — they have their
+- Dormant mode (dotfile-manager users) disables sync too, they have their
   own.
 - v2 candidate: `kestrel-provision-first-run` asks "Got a dots repo?" so a
-  new machine is yours before first login completes. Held back from v1 —
+  new machine is yours before first login completes. Held back from v1, 
   drags SSH/auth bootstrapping into first-run.
 
 ## User-facing surface (v1)
 
-Constrained commands only — a new `dots` group in `GROUP_DESCRIPTIONS`,
+Constrained commands only, a new `dots` group in `GROUP_DESCRIPTIONS`,
 invoked as `kestrel dots <verb>`:
 
-- `kestrel dots snapshot [label]` — take a snapshot now
-- `kestrel dots log` — history with labels
-- `kestrel dots diff [ref]` — default range: the last before/after pair
-- `kestrel dots restore <file> [--at <ref>]` — accepts `~/.config/...`,
+- `kestrel dots snapshot [label]`, take a snapshot now
+- `kestrel dots log`, history with labels
+- `kestrel dots diff [ref]`, default range: the last before/after pair
+- `kestrel dots restore <file> [--at <ref>]`, accepts `~/.config/...`,
   `.config/...`, or manifest-relative paths; takes a pre-restore snapshot
   first so restore is itself undoable; refuses untracked paths and type
   changes; confirms over dirty files
-- `kestrel dots push` / `kestrel dots pull [url]` — sync (above)
-- `kestrel dots status` — repo state, dormant/active, remote, last
+- `kestrel dots push` / `kestrel dots pull [url]`, sync (above)
+- `kestrel dots status`, repo state, dormant/active, remote, last
   snapshot/publish
 
 No raw git surface. No lazygit integration.
@@ -178,13 +178,13 @@ No raw git surface. No lazygit integration.
 ## Rollout
 
 - New users: seeded by `kestrel-provision-user`.
-- Existing users: migration inits the repo + initial commit — **skippable and
+- Existing users: migration inits the repo + initial commit, **skippable and
   bounded**: no-op if repo path exists, another manager is detected, or
   identity can't be synthesized; never adds beyond the manifest; never fails
   `kestrel update`.
 - Docs/tests alignment: manual `31-dotfiles.md` gets the built-in story
   (honest framing: local event history + sync of published states, *not* a
-  backup — the local repo dies with the disk); a `docs/dots.md` reference doc
+  backup, the local repo dies with the disk); a `docs/dots.md` reference doc
   per the documentation layout; `default/agents/skills/kestrel/SKILL.md`
   updated; CLI routing/metadata tests extended; new tests for identity-less
   commit, batch snapshot pairing, restore round-trip, dormant-mode detection,

@@ -1,6 +1,6 @@
 # Gaming
 
-Kestrel isn't just for _pRoDUcTiVItY_, it's also for having fun, and what's more fun than gaming? Kestrel ships with a whole suite of gaming options — Steam and RetroArch for native and retro play, Battle.net, Lutris, and Heroic for non-Steam stores, Moonlight for PC streaming, Xbox Cloud Gaming + NVIDIA GeForce NOW for cloud, plus the evergreen Minecraft.
+Kestrel isn't just for _pRoDUcTiVItY_, it's also for having fun, and what's more fun than gaming? Kestrel ships with a whole suite of gaming options, Steam and RetroArch for native and retro play, Battle.net, Lutris, and Heroic for non-Steam stores, Moonlight for PC streaming, Xbox Cloud Gaming + NVIDIA GeForce NOW for cloud, plus the evergreen Minecraft.
 
 Thanks to Valve's incredible work on [the proton compatibility layer](https://en.wikipedia.org/wiki/Proton_(software)), there are now tens of thousands of playable modern games on Linux. Oh, and did you know that the [Steam Deck](https://store.steampowered.com/steamdeck/) actually runs Arch!
 
@@ -62,13 +62,13 @@ Install support for Bluetooth Xbox controllers by selecting _Install > Gaming > 
 
 The [Moonlight client](https://github.com/moonlight-stream/moonlight-qt) comes preinstalled with Kestrel, so you can stream games from a Windows PC running [Sunshine](https://app.lizardbyte.dev/Sunshine/) right away. Launch Moonlight via `Super + Space`.
 
-If both your Kestrel machine and the remote gaming PC are hardwired, the experience is indistinguishable from playing locally. Crank the resolution up to native, set the refresh to 120Hz, and max the bitrate — this is the best way to play competitive shooters like Fortnite on Linux.
+If both your Kestrel machine and the remote gaming PC are hardwired, the experience is indistinguishable from playing locally. Crank the resolution up to native, set the refresh to 120Hz, and max the bitrate, this is the best way to play competitive shooters like Fortnite on Linux.
 
 You can also turn an Kestrel machine into the host by running `kestrel install service sunshine`, which installs Sunshine and opens the Moonlight streaming ports for your LAN and Tailscale.
 
 ## Battle.net
 
-Install [Battle.net](https://eu.shop.battle.net/en-us) by selecting _Install > Gaming > Battle.net_ from the Kestrel menu (`Super + Space`). This gives you titles like Diablo, Starcraft, and World of Warcraft as a standalone install running under GE-Proton — no Steam, Lutris, or Heroic needed.
+Install [Battle.net](https://eu.shop.battle.net/en-us) by selecting _Install > Gaming > Battle.net_ from the Kestrel menu (`Super + Space`). This gives you titles like Diablo, Starcraft, and World of Warcraft as a standalone install running under GE-Proton, no Steam, Lutris, or Heroic needed.
 
  ![gaming-starcraft](images/gaming-starcraft.webp)
 
@@ -76,10 +76,10 @@ Install [Battle.net](https://eu.shop.battle.net/en-us) by selecting _Install > G
 
 Install [Lutris](https://lutris.net/) by selecting _Install > Gaming > Lutris_ from the Kestrel menu (`Super + Space`). Lutris is the way to play Windows games from stores like EA and Ubisoft Connect that don't have their own installer above.
 
-Installation is a little janky and looks like nothing is happening at times — just be patient, it's working in the background.
+Installation is a little janky and looks like nothing is happening at times, just be patient, it's working in the background.
 
 ## Heroic Launcher (Epic Games)
 
-Install the [Heroic Launcher](https://heroicgameslauncher.com/) by selecting _Install > Gaming > Heroic (Epic Games)_ from the Kestrel menu (`Super + Space`). Heroic lets you run Epic Games titles, like OddSparks, that don't rely on anti-cheat — plus games from GOG and Amazon Prime Gaming. Sadly, that means no Fortnite and no Rocket League — until Tim Sweeney comes to Linux, this is as close as it gets.
+Install the [Heroic Launcher](https://heroicgameslauncher.com/) by selecting _Install > Gaming > Heroic (Epic Games)_ from the Kestrel menu (`Super + Space`). Heroic lets you run Epic Games titles, like OddSparks, that don't rely on anti-cheat, plus games from GOG and Amazon Prime Gaming. Sadly, that means no Fortnite and no Rocket League, until Tim Sweeney comes to Linux, this is as close as it gets.
 
 Like Lutris, it can feel slow and janky while installing games. Give it time.

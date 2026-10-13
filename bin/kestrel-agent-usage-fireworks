@@ -65,7 +65,7 @@ def model_id(row: dict[str, Any]) -> str:
 def row_date(row: dict[str, Any]) -> str:
   # The query asks for day buckets in the local timezone, but the API reports
   # each bucket's boundary in UTC: local Aug 7 starts at Aug 6 22:00Z east of
-  # Greenwich. Convert back to local time to recover the day the bucket names —
+  # Greenwich. Convert back to local time to recover the day the bucket names, 
   # taking the raw date prefix would file every day under its predecessor.
   raw = str(row.get("startTime") or "")
   if not raw:
@@ -309,7 +309,7 @@ def timezone_name() -> str:
 
 def local_midnight_utc(day: date) -> str:
   # The API buckets by the requested timezone, so the window must run between
-  # local midnights — expressed in UTC, since a bare date with a Z suffix
+  # local midnights, expressed in UTC, since a bare date with a Z suffix
   # shifts the window by the UTC offset and clips today's tail west of
   # Greenwich.
   return datetime.combine(day, time.min).astimezone(timezone.utc).isoformat().replace("+00:00", "Z")

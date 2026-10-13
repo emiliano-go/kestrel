@@ -131,7 +131,7 @@ unset NO_COLOR
 pass "a build that failed leaves no frames to replay"
 
 # fastfetch drops the logo's colour for a terminal that asked for none, but not
-# for the measurement, so the colour to restore would be measured wrong — and a
+# for the measurement, so the colour to restore would be measured wrong, and a
 # glint is colour besides.
 NO_COLOR=1
 refuses "a session that asked for no colour leaves the logo still"
@@ -187,7 +187,7 @@ refuses "a layout fastfetch cannot be measured from leaves it still"
 
 # Once the logo is taller than the module column, fastfetch writes a row more
 # than logo-plus-padding, so a window sized by that arithmetic scrolls its top
-# padding away — and a scrolled layout is one the sheen then refuses. The fit
+# padding away, and a scrolled layout is one the sheen then refuses. The fit
 # asks fastfetch how tall the layout came out instead.
 rm -rf "${HOME:?}/.local"
 printf '%s\n' $(for i in $(seq 40); do echo '██████████'; done) >"$HOME/.config/kestrel/branding/about.txt"
@@ -257,7 +257,7 @@ done
 pass "the logo is found wherever fastfetch drew it"
 
 # A render that does not contain the file's own text is not this logo, whatever
-# the reason — a config that restyled it, a placeholder fastfetch substituted.
+# the reason, a config that restyled it, a placeholder fastfetch substituted.
 fastfetch() { printf 'something else entirely\n'; }
 LAYOUT_ROWS=""
 if measure_layout; then

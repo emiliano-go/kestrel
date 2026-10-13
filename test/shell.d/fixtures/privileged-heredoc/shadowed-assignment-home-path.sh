@@ -6,7 +6,7 @@
 target=/usr/share/kestrel/bin/agent
 target="$HOME/.local/share/kestrel/bin/agent"
 
-# kestrel:heredoc-expands paths=none -- target is the packaged agent path under /usr
+# kestrel:heredoc-expands paths=none, target is the packaged agent path under /usr
 cat <<EOF | sudo tee /etc/systemd/system/kestrel-agent.service >/dev/null
 [Service]
 ExecStart=$target

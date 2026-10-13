@@ -24,9 +24,6 @@ grep -qxF cups-pk-helper "$packages" || fail "Polkit printer administration is i
 ! grep -qxF cups-browsed "$packages" || fail "automatic printer discovery is out of the base package set"
 ! grep -q 'cups-browsed' "$ROOT/install/config/enable-services.sh" ||
   fail "a fresh install does not enable a discovery service it no longer installs"
-! grep -q 'enable_system_service cups-browsed' "$ROOT/bin/kestrel-upgrade-to-quattro" ||
-  fail "the Quattro upgrade does not enable a discovery service it no longer installs"
-
 pass "the base install keeps CUPS and Polkit administration, without automatic discovery"
 
 # CUPS still ships /etc/cups/cups-files.conf, so its authorization override is

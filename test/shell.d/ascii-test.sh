@@ -63,7 +63,7 @@ output=$(printf 'Kestrel' | kestrel-ascii)
 pass "text can arrive on stdin"
 
 # The route is the way a user reaches this, and it dispatches on whether the
-# metadata says an argument is required -- so a piped run has to be exercised
+# metadata says an argument is required, so a piped run has to be exercised
 # through `kestrel` itself, not just through the binary.
 output=$(printf 'Kestrel' | kestrel ascii)
 [[ $output == "$expected" ]] || fail "piped text renders through the kestrel route" "got:
@@ -81,7 +81,7 @@ blanks=$(kestrel-ascii Kestrel | grep -c ' $' || true)
 pass "no line is padded with trailing blanks"
 
 # The space is a glyph of five hardblank columns, so it is worth exactly five
-# columns of art -- not merely more than none.
+# columns of art, not merely more than none.
 tight=$(kestrel-ascii "Hi" | columns)
 spaced=$(kestrel-ascii "H i" | columns)
 (( tight == 18 )) || fail "Hi is 18 columns wide" "got $tight"

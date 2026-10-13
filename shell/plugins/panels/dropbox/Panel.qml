@@ -40,7 +40,7 @@ Panel {
   readonly property color iconColor: dropbox.authenticated && dropbox.active ? foreground : dim
   readonly property string toggleHint: dropbox.active ? "Pause syncing" : "Resume syncing"
   readonly property color barIconColor: dropbox.authenticated && dropbox.active ? barForeground : Qt.darker(barForeground, 1.55)
-  // Only claim the header cursor when the switch is actually on screen —
+  // Only claim the header cursor when the switch is actually on screen, 
   // "header" stays navigable, but an absent CLI leaves nothing to highlight.
   readonly property bool headerHasCursor: cursorActive && focusSection === "header" && dropbox.installed
 
@@ -237,7 +237,7 @@ Panel {
             width: parent.width
             implicitHeight: hero.implicitHeight
             // Exposed for the hero's trailingControl, whose `root` resolves to
-            // PanelHero (not this Panel) — reach panel state via `header`.
+            // PanelHero (not this Panel), reach panel state via `header`.
             readonly property bool ringVisible: root.headerHasCursor
             function focusHero() { root.setHeaderCursor() }
 
@@ -249,7 +249,7 @@ Panel {
               foreground: root.foreground
               fontFamily: root.fontFamily
               iconOpacity: dropbox.active ? 1.0 : 0.5
-              // Status only — the switch owns toggling, mouse and keyboard alike.
+              // Status only, the switch owns toggling, mouse and keyboard alike.
               iconComponent: Component {
                 DropboxIcon {
                   iconSize: Style.font.display

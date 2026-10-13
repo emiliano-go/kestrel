@@ -22,7 +22,7 @@ function isAudioSource(node) {
 // holding the PwNode itself is a QObject that Qt dereferences without a null
 // check while it builds the delegate, and PipeWire deletes nodes outright, so a
 // graph teardown segfaults the shell. Primitives cannot dangle, which is what
-// closes that race -- not the check below, since the node usually dies after the
+// closes that race, not the check below, since the node usually dies after the
 // snapshot is taken. That is also why filtering the list here never worked.
 //
 // The name rides along because PipeWire reuses object ids: without it a row

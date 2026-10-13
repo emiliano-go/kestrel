@@ -9,7 +9,7 @@ import qs.Ui
 
 // Centered speed test overlay shared by the network and disk speed tests. No
 // card: like the Tucson's floating cluster, the two dials sit directly on a
-// darkened scrim -- open 270° arcs, faint tick rings, hubless gradient
+// darkened scrim, open 270° arcs, faint tick rings, hubless gradient
 // needles, and a digital readout in the middle. Esc, the scrim, or the corner
 // dismiss close it; the needles sweep to full scale and back on open, then
 // track the live readings. Callers name the dials, the unit, and the scale.
@@ -226,7 +226,7 @@ PanelWindow {
 
     property real shown: 0
     // The digital readout stays on the real figure while the ignition sweep
-    // drives the needle -- a cluster sweeps its gauges, not its numerals.
+    // drives the needle, a cluster sweeps its gauges, not its numerals.
     readonly property real reading: ignition.running ? value : shown
     readonly property real fullScale: root.fullScale
     readonly property real fraction: fullScale > 0 ? Math.max(0, Math.min(1, shown / fullScale)) : 0

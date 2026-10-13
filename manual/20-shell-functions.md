@@ -10,7 +10,7 @@ Kestrel comes with a set of shell functions to simplify common tasks and encapsu
 ## Drives
 
 - `iso2sd [image.iso]`: Create a bootable drive on an SD card using the referenced iso file and picking the drive interactively.
-- `format-drive [device] [name]`: Format an entire disk with a single exFAT partition (which works on Windows and macOS too). Run it without arguments to see the available drives. Be careful!
+- `format-drive [device] [name]`: Format an entire disk with a single exFAT partition (which works on Windows too). Run it without arguments to see the available drives. Be careful!
 
 ## Dev layouts
 

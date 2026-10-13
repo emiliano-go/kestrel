@@ -31,14 +31,6 @@ grep -Fx 'systemctl --user daemon-reload' "$first_run_units" >/dev/null
 grep -F 'kestrel-sleep-lock.service' "$first_run_units" >/dev/null
 pass "first-run reloads and enables the sleep lock service"
 
-upgrade_to_quattro="$ROOT/bin/kestrel-upgrade-to-quattro"
-grep -F '6870b232a6c0474b59187882e6d25ae771bba735098bcbedef8a2b73b97e2b6a' "$upgrade_to_quattro" >/dev/null
-grep -F 'bcd1a76cb5c63514922bc5e11af22ae480fc6d06a99863364e02bdf3c7bdceaf' "$upgrade_to_quattro" >/dev/null
-grep -F 'ExecStart=%h/.local/share/kestrel/bin/kestrel-system-sleep-monitor' "$upgrade_to_quattro" >/dev/null
-grep -F 'ExecStart=/usr/bin/kestrel-system-sleep-monitor' "$upgrade_to_quattro" >/dev/null
-grep -F 'reset-failed kestrel-sleep-lock.service' "$upgrade_to_quattro" >/dev/null
-pass "Kestrel 4 upgrade repairs the legacy sleep lock unit path"
-
 [[ -e $ROOT/default/systemd/user/kestrel-update-user-notify.path ]] &&
   fail "the retired migration watcher is back; pacman writing the migration directory during kestrel update would notify about migrations that update is already applying"
 grep -rlE '^(Path[A-Za-z]+|DirectoryNotEmpty)=.*/usr/share/kestrel/migrations' "$ROOT/default/systemd/user" >/dev/null 2>&1 &&

@@ -23,7 +23,7 @@ LOGO_PAD_RIGHT=6
 # minutes into hours and hours into days, a version string that grows, a module
 # that shows up on the next boot. A window fitted to exactly what was measured
 # has nowhere to put any of it, and the layout clips or scrolls the moment it
-# grows — which is also the moment the logo stops being where it was drawn. Keep
+# grows, which is also the moment the logo stops being where it was drawn. Keep
 # a little in hand rather than measure again every time something ticks over.
 FIT_SPARE_COLUMNS=2
 FIT_SPARE_ROWS=1
@@ -86,7 +86,7 @@ remember_fit() {
 
 # Replaces the rule from the last launch so a remembered size never outlives the
 # fit it came from. Called without one it only clears, leaving the float rule's
-# starting size — where a Hyprland without the Lua API stays too.
+# starting size, where a Hyprland without the Lua API stays too.
 apply_size_rule() {
   local rule=""
   (( $# == 2 )) && rule="kestrel_about_size_rule = hl.window_rule({ match = { class = \"org.kestrel.about\" }, size = { $1, $2 } })"
@@ -194,7 +194,7 @@ fit_window() {
 # One run answers both questions the sheen has to ask first. How tall the layout
 # is, because a window too small for it scrolls, which moves the logo off the rows
 # the frames address. And what colour fastfetch drew the logo in, because the
-# glint has to hand every cell back in the colour it arrived in — assume it, and
+# glint has to hand every cell back in the colour it arrived in, assume it, and
 # a logo fastfetch colours differently comes out of the first glint a new one.
 measure_layout() {
   [[ -n ${LAYOUT_ROWS:-} ]] && return 0
@@ -210,7 +210,7 @@ measure_layout() {
 
   # Find the logo in what fastfetch drew rather than working it out from the
   # padding this file was written against. The config that runs is the one in
-  # /etc, which a checkout does not replace, so the two can disagree — and a logo
+  # /etc, which a checkout does not replace, so the two can disagree, and a logo
   # measured two rows above where it was drawn is a logo the sheen moves. Not
   # finding it at all is the same answer as finding it somewhere unexpected:
   # whatever is on screen is not the text in the file, so leave it alone.
@@ -233,7 +233,7 @@ measure_layout() {
   return 0
 }
 
-# The longest line of the logo, and how far down the logo it sits — the most
+# The longest line of the logo, and how far down the logo it sits, the most
 # distinctive thing to look for in the render, and the offset that turns where it
 # was found back into where the logo starts.
 # Tab-separated, and the offset first, because the line may hold spaces of its
@@ -249,7 +249,7 @@ logo_landmark() {
 # draw it. Whether the logo itself can be animated is the sheen's own question.
 build_sheen() {
   # Whatever the last build left is not this window's, and the loop below plays
-  # whatever is here — so a build that fails has to leave nothing to play.
+  # whatever is here, so a build that fails has to leave nothing to play.
   SHEEN_FRAMES=()
 
   custom_fastfetch_config && return 1
@@ -298,7 +298,7 @@ play_sheen() {
     # Stop before painting a frame rather than after: a resize has already moved
     # the cells these address, and the rest of a sweep would land across them.
     # The grid costs a process, so it stays on the poll interval. The trap costs
-    # nothing, so it is read last — a signal that arrived while the grid was being
+    # nothing, so it is read last, a signal that arrived while the grid was being
     # read would otherwise be seen only after another frame had gone out.
     (( index % SHEEN_POLL_FRAMES == 0 )) && content_changed && return 1
     [[ $resized == true ]] && return 1

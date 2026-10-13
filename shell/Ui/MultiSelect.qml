@@ -18,7 +18,7 @@ import qs.Commons as Commons
 //     one option per non-empty newline. Re-runs whenever the popup opens
 //     and via the refresh button.
 //
-// `values` is the persisted selection — always an array of strings.
+// `values` is the persisted selection, always an array of strings.
 // Emits `changed(values)` whenever the selection mutates.
 Item {
   id: root
@@ -152,7 +152,7 @@ Item {
   }
 
   // Parse stdout from a dynamic optionsCommand into `{ options, error }`.
-  // Output starting with `[` is parsed strictly as JSON — a malformed array
+  // Output starting with `[` is parsed strictly as JSON, a malformed array
   // surfaces as an error rather than silently falling back to newline
   // parsing, which would render the broken text as a literal option label.
   // Output not starting with `[` is treated as one value per non-empty line.

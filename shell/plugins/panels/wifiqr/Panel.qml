@@ -12,7 +12,7 @@ import "Model.js" as Model
 //
 // Standalone panel plugin: each summon regenerates the code via
 // kestrel-network-qr, which emits the interface, security, and SSID it
-// shared ahead of the module matrix — so a bare summon self-detects the
+// shared ahead of the module matrix, so a bare summon self-detects the
 // connection. The payload may pin the interface and pre-title the card:
 // {"iface": "wlan0", "ssid": "MyWifi"}.
 Item {
@@ -148,7 +148,7 @@ Item {
     if (pwProc.running || !iface) return
     passwordError = ""
     // Only a deliberate new lookup lowers the canceled-fetch guard, right as
-    // it launches -- see the pwProc comment.
+    // it launches, see the pwProc comment.
     pwExpectedStop = false
     pwProc.command = ["kestrel-network-password", iface]
     pwProc.running = true
@@ -158,7 +158,7 @@ Item {
     id: qrProc
     // Both collectors check expectedStop: a dismissal mid-generation kills
     // the process, but buffered output still arrives afterwards and would
-    // repopulate qrSize -- reopening the card the user just closed. The flag
+    // repopulate qrSize, reopening the card the user just closed. The flag
     // stays set through onExited (generate resets it) because the exit and
     // stream-finished signals have no guaranteed order.
     stdout: StdioCollector {

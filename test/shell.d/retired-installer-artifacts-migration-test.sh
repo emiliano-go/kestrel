@@ -261,7 +261,7 @@ pass "migration keeps a same-named file that never cleaned itself up"
 # A spec continued onto the next line is one logical line, and a comment's own
 # trailing backslash swallows nothing: `visudo -cf` on "# note \" plus a bogus
 # token reports the error on line 2, so the spec below a commented line is live.
-# The hand-written spec sits under the comment on purpose -- above it, the file
+# The hand-written spec sits under the comment on purpose, above it, the file
 # is kept under either reading and the assertion cannot fail.
 reset_machine
 cat >"$first_run" <<'EOF'
@@ -415,7 +415,7 @@ pass "migration is a no-op on a second run"
 # sudo does not treat every '#' as a comment. plugins/sudoers/toke.l matches
 # ^#include and ^#includedir as directives in the INITIAL state, and its comment
 # rule excludes '#' followed by a digit or -digit so those reach the ID token as a
-# numeric uid user spec -- sudoers(5) says the same. Dropping such a line as a
+# numeric uid user spec, sudoers(5) says the same. Dropping such a line as a
 # comment would let a file that still carries an active directive read as though
 # it held only generated lines, and be deleted.
 for directive in \

@@ -18,7 +18,7 @@ if ! systemctl --user enable kestrel-fcitx5.service >/dev/null 2>&1; then
     "$wants_dir/kestrel-fcitx5.service"
 fi
 
-# Outside a graphical session -- an update over SSH -- there is nothing to hand
+# Outside a graphical session, an update over SSH, there is nothing to hand
 # over: no autostart-launched fcitx5 to kill, and the unit's own
 # ConditionEnvironment would skip the start anyway. The enablement above is the
 # whole job; the next graphical login starts it.

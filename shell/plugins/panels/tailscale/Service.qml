@@ -237,7 +237,7 @@ Item {
 
     backendState = parsed.backendState
     running = parsed.running
-    // Reality caught up to the pending toggle — stop overriding.
+    // Reality caught up to the pending toggle, stop overriding.
     if (_desired !== -1 && running === (_desired === 1)) _desired = -1
     needsLogin = parsed.needsLogin
     authUrl = parsed.authUrl
@@ -287,7 +287,7 @@ Item {
   }
 
   function down() {
-    // No progress status here — the greyed icon and hero line already convey
+    // No progress status here, the greyed icon and hero line already convey
     // the optimistic off; only surface a message if the command fails.
     _desired = 0
     runAction(["tailscale", "down"])
@@ -368,7 +368,7 @@ Item {
     var match = String(text || "").match(/https?:\/\/\S+/)
     var url = match && match[0] ? match[0] : (allowFallback === true ? authUrl : "")
     if (url !== "") {
-      // Turning on ended up needing browser auth — stop pretending we're up.
+      // Turning on ended up needing browser auth, stop pretending we're up.
       _desired = -1
       _loginUrlOpened = true
       _loginInProgress = false
@@ -420,7 +420,7 @@ Item {
 
   Timer {
     // Every poll is skipped while its own process is still running, so one that
-    // never exits — tailscale can hang on a network that is coming and going —
+    // never exits, tailscale can hang on a network that is coming and going, 
     // silently stops the panel refreshing at all, and it stays stopped. Reap
     // anything still running well inside the refresh interval so the next tick
     // starts clean.

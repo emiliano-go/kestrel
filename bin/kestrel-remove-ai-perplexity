@@ -19,11 +19,11 @@ rm -rf \
 
 # What is left is the user's: the logins and session in ~/.config/Perplexity,
 # the secret vault and device identity in ~/.local/state/perplexity, and the
-# launcher flags. Keeping them stays the default -- they are small, and being
-# signed in after a reinstall is the better surprise -- but a removal meant to
+# launcher flags. Keeping them stays the default, they are small, and being
+# signed in after a reinstall is the better surprise, but a removal meant to
 # be complete should not leave credentials behind either, so the choice is put
 # in front of the user, default no. Without a terminal to ask in, keeping it
-# is the answer -- and gum draws the prompt on stderr, so a redirected stderr
+# is the answer, and gum draws the prompt on stderr, so a redirected stderr
 # would block on a question nobody can see.
 data_removed=false
 if [[ -t 0 && -t 2 ]]; then

@@ -21,7 +21,7 @@ Item {
   property var emojis: []
   property var filteredEmojis: []
 
-  // Shares the [menu] surface tokens — themes that style the menu also
+  // Shares the [menu] surface tokens, themes that style the menu also
   // style emojis. Selected-cell colors composed in the
   // singleton so consumers drop them straight into Rectangle bindings.
   property color background: Commons.Color.menu.background

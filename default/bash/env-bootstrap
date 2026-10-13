@@ -16,7 +16,7 @@ fi
 export KESTREL_PATH
 
 # Only prepend in dev-link mode. On a production install, the binaries are
-# already on PATH as /usr/bin/kestrel-* via the kestrel package — prepending
+# already on PATH as /usr/bin/kestrel-* via the kestrel package, prepending
 # /usr/share/kestrel/bin would just be noise.
 if [ "$KESTREL_PATH" != /usr/share/kestrel ]; then
   case ":$PATH:" in

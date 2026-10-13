@@ -76,7 +76,7 @@ pass "the logo descriptor can only be opened by an unprivileged caller"
 # Style > Unlock picks a theme by name and hands the answer to
 # kestrel-launch-floating-terminal-with-presentation, which joins its arguments
 # into a script and runs that with `bash -c`. So the name is shell source
-# unless the action quotes it -- and the name is a directory name under
+# unless the action quotes it, and the name is a directory name under
 # ~/.config/kestrel/themes, which a theme installed from a git repo gets from
 # the repo URL. `a';id;'b` is a legal directory name.
 require_command node
@@ -160,7 +160,7 @@ run_unlock_action() {
 }
 
 # A directory name cannot hold a slash or a NUL, and everything else is fair
-# game -- these are the shapes that would run on the way to the picker.
+# game, these are the shapes that would run on the way to the picker.
 for name in "a';kestrel-test-canary;'b" 'a$(kestrel-test-canary)b' 'a`kestrel-test-canary`b' 'a b' '-a'; do
   run_unlock_action "$name"
 
@@ -659,7 +659,7 @@ status=$?
 # The refusal has to name the authorization. Validating /etc/kestrel.conf walks
 # its parents and leaves that walk's subject in failure_context, so without
 # restoring ours this refuses with "directory / must be root-owned and not
-# group- or world-writable" -- accusing a directory that passed and pointing the
+# group- or world-writable", accusing a directory that passed and pointing the
 # reader at a filesystem problem that does not exist.
 [[ $output == *"$kestrel_conf"* ]] || fail "a stale dev-link refusal names the authorization it rejected" "$output"
 [[ $output != *"directory / "* ]] || fail "a stale dev-link refusal does not blame the root directory" "$output"

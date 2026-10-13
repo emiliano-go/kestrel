@@ -29,7 +29,7 @@ TextField {
   // Panel-cursor flag. When true (and the field isn't already focused),
   // the background paints the shared hover/cursor state.
   // For mouse-enter/leave the consumer reads QQC TextField's inherited
-  // `hovered` property (via onHoveredChanged) — we don't add a sibling
+  // `hovered` property (via onHoveredChanged), we don't add a sibling
   // signal because the inherited property would shadow it.
   property bool hasCursor: false
 

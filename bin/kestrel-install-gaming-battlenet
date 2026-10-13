@@ -51,7 +51,7 @@ else
 
   cat <<'EOF'
 
-Launching the Battle.net setup wizard. Click through it normally — the
+Launching the Battle.net setup wizard. Click through it normally, the
 default install path is fine. When it finishes, Battle.net will be in your
 app launcher.
 

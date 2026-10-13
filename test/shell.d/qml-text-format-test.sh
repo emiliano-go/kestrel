@@ -4,8 +4,8 @@
 # mightBeRichText() over the string and promotes it to Text.RichText when it
 # looks like markup, and RichText fetches <img src="http://..."> through
 # QQuickPixmap. Any string that reaches such an element from outside the shell
-# — a notification summary, an MPRIS track title, a window title, an SSID, a
-# Bluetooth device name, clipboard content, a weather API response — can
+#, a notification summary, an MPRIS track title, a window title, an SSID, a
+# Bluetooth device name, clipboard content, a weather API response, can
 # therefore make the shell issue an unauthenticated outbound GET with no user
 # interaction.
 #

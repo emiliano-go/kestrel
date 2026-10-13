@@ -21,9 +21,6 @@ fi
 if lspci | grep -iE '(VGA|Display).*AMD' >/dev/null && kestrel-pkg-missing vulkan-radeon; then
   hardware_packages+=(vulkan-radeon)
 fi
-if lspci | grep -iE '(VGA|Display).*Apple' >/dev/null && kestrel-pkg-missing vulkan-asahi; then
-  hardware_packages+=(vulkan-asahi)
-fi
 
 if (( ${#hardware_packages[@]} > 0 )); then
   kestrel-pkg-add "${hardware_packages[@]}"

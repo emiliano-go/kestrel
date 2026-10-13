@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-# Whenever this runs as root — invoked directly through the passwordless
-# sudoers rule, or re-execed by require_root below — sudo's secure_path decides
+# Whenever this runs as root, invoked directly through the passwordless
+# sudoers rule, or re-execed by require_root below, sudo's secure_path decides
 # where a bare helper resolves, and a dev link (etc/sudoers.d/kestrel-dev-path)
 # prepends a user-writable checkout bin/ to it. Every helper this script calls
 # by bare name (printf's builtin aside: install, mktemp, rm) is a system tool,

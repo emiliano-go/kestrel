@@ -12,7 +12,7 @@ if [[ -f /etc/pacman.conf ]] &&
   # Requiring signatures with an untrusted packaging key would fail every
   # kestrel transaction, including the one that could repair it.
   if kestrel-pkg-missing kestrel-keyring ||
-    ! sudo pacman-key --list-keys 40DFB630FF42BCFFB047046CF0134EE680CAC571 &>/dev/null; then
+    ! sudo pacman-key --list-keys F759D6D49B0A395AB922414A5CC3B4C50D37E793 &>/dev/null; then
     kestrel-update-keyring
   fi
 

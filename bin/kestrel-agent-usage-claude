@@ -917,8 +917,8 @@ def usage_bucket(payload: dict[str, Any], key: str) -> dict[str, Any] | None:
 
 # An entry's `kind` names its window the way the flat buckets' keys do
 # ("weekly_scoped", "five_hour_scoped"). The panel reads a window out of free
-# text, which cannot survive a model name like "Opus 5 (1M context)" — the
-# "1M" reads as a one-minute window — so the window is settled here instead
+# text, which cannot survive a model name like "Opus 5 (1M context)", the
+# "1M" reads as a one-minute window, so the window is settled here instead
 # and travels as an explicit title. It is capitalized the way the flat windows
 # title themselves, so "Fable Weekly" sits beside "Weekly" rather than under it.
 def scoped_window(kind: str) -> str:
@@ -933,7 +933,7 @@ def scoped_window(kind: str) -> str:
 
 
 # Alongside the flat buckets, the payload carries a `limits` array, and that
-# array is the only place a model-scoped allowance shows up — a weekly window
+# array is the only place a model-scoped allowance shows up, a weekly window
 # that only Fable draws from, say. The matching legacy keys
 # (`seven_day_opus`, `seven_day_sonnet`, …) stayed behind at null, so a
 # collector that reads buckets alone silently drops a limit the account is
@@ -996,7 +996,7 @@ def probe_limits(access_token: str) -> dict[str, Any]:
       help_text = f"Anthropic's usage endpoint returned status {error.code}. Local Claude Code stats are still shown."
     return {"ok": False, "helpText": help_text}
   except Exception:
-    # A transport failure reached no server at all — no route, no DNS. Any
+    # A transport failure reached no server at all, no route, no DNS. Any
     # real answer, including an error status, is a server we should stop
     # pestering; this is not.
     return {
@@ -1067,7 +1067,7 @@ def collect_limits(access_token: str, expires_at_ms: int, refresh_expires_at_ms:
   result["fetchedAtMs"] = 0
 
   # A panel that is opened and shut repeatedly must not turn into a request
-  # per flick, so recent probe results are reused for a short window — and
+  # per flick, so recent probe results are reused for a short window, and
   # kept as the answer of record when a later probe fails. Every account
   # keeps its own, so one account's allowance never stands in for another's.
   probe_cache = cache_root() / cache_name
@@ -1077,8 +1077,8 @@ def collect_limits(access_token: str, expires_at_ms: int, refresh_expires_at_ms:
 
   # Probing needs a live token and only the Claude Code CLI can mint one: it
   # refreshes the credential file when it runs, so a machine left alone long
-  # enough finds the saved token lapsed. Say so — an empty limits list with
-  # nothing else set hides the whole section and explains nothing — and keep
+  # enough finds the saved token lapsed. Say so, an empty limits list with
+  # nothing else set hides the whole section and explains nothing, and keep
   # showing the last numbers, resetting elapsed windows to zero.
   if access_token == "":
     result["limits"] = fallback
@@ -1095,14 +1095,14 @@ def collect_limits(access_token: str, expires_at_ms: int, refresh_expires_at_ms:
       result["usageStatusText"] = "Limits paused"
       result["authHelpText"] = (
         "Claude Code's access token has lapsed"
-        + (" — showing the last known limits." if fallback else ".")
+        + (", showing the last known limits." if fallback else ".")
         + " Start Claude Code to refresh it; signing in again is not needed."
       )
       return result
     result["usageStatusText"] = "Sign-in expired"
     result["authHelpText"] = (
       "Claude Code's saved sign-in expired"
-      + (" — showing the last known limits." if fallback else ".")
+      + (", showing the last known limits." if fallback else ".")
       + " Start Claude Code, or run `claude auth login`, to refresh it."
     )
     return result

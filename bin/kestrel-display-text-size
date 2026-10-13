@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# kestrel:summary=Scale text everywhere — kestrel shell, GTK apps, and terminals
+# kestrel:summary=Scale text everywhere, kestrel shell, GTK apps, and terminals
 # kestrel:args=[size|reset]
 # kestrel:examples=kestrel display text size | kestrel display text size 16 | kestrel display text size reset
 
@@ -131,7 +131,7 @@ term_pt_for() {
 
 # Set the font point size in terminal configs, creating Kitty overrides when
 # it inherits its size from the system config. Family is left
-# untouched — that is kestrel-font-set's job. Live-reload signals mirror
+# untouched, that is kestrel-font-set's job. Live-reload signals mirror
 # kestrel-font-set; foot has no reload signal, so running instances are nudged.
 set_terminal_size() {
   local pt="$1"
@@ -158,7 +158,7 @@ set_terminal_size() {
   if [[ -f ~/.config/foot/foot.ini ]]; then
     sed -i -E "s/(:size=)[0-9.]+/\1$pt/" ~/.config/foot/foot.ini
     # Foot has no config-reload signal, so a running instance keeps its startup
-    # size until relaunched (new windows pick up the change). Nudge the user —
+    # size until relaunched (new windows pick up the change). Nudge the user, 
     # but reuse the same notification id (freedesktop replaces_id) so dragging
     # through several sizes refreshes one toast instead of stacking a pile.
     if pgrep -x foot >/dev/null 2>&1; then

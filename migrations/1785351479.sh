@@ -1,6 +1,6 @@
 echo "Drop Kvantum now that Qt apps follow the theme through the GTK platform theme"
 
-# QT_STYLE_OVERRIDE is gone, so Kvantum is no longer painting anything -- Qt
+# QT_STYLE_OVERRIDE is gone, so Kvantum is no longer painting anything, Qt
 # falls back to built-in Fusion and takes its palette from
 # QT_QPA_PLATFORMTHEME=gtk3, which actually tracks the Kestrel theme. Kvantum
 # never did; we have never shipped a .kvconfig for it to read.
@@ -22,7 +22,7 @@ done
 
 if ((${#targets[@]})); then
   # Preflight so a surprise reverse dependency prints our sentence rather than a
-  # wall of pacman errors, and so neither outcome exits non-zero -- a failing
+  # wall of pacman errors, and so neither outcome exits non-zero, a failing
   # migration aborts every migration queued behind it.
   if pacman -Rs --print "${targets[@]}" >/dev/null 2>&1; then
     sudo pacman -Rns --noconfirm "${targets[@]}" ||

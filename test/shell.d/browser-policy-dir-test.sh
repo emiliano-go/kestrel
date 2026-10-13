@@ -303,7 +303,6 @@ policy_files=(
   "$ROOT/bin/kestrel-provision-owner"
   "$ROOT/bin/kestrel-theme-set-browser"
   "$ROOT/bin/kestrel-theme-set-browser-policy"
-  "$ROOT/bin/kestrel-upgrade-to-quattro"
   "$ROOT/install/config/theme-system.sh"
   "$ROOT/install/config/browser-policy.sh"
   "$ROOT/install/helpers/browser-policy.sh"

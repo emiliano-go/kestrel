@@ -3,8 +3,8 @@
 set -euo pipefail
 
 # A theme installed with `kestrel theme install` is a stranger's git repo, so
-# kestrel-theme-set drops the files that would run its code -- Lua, terminal
-# configs, vscode.json -- and keeps the colour. A theme the user wrote themselves
+# kestrel-theme-set drops the files that would run its code, Lua, terminal
+# configs, vscode.json, and keeps the colour. A theme the user wrote themselves
 # is not filtered at all.
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"

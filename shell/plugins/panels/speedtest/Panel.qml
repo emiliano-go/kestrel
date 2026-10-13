@@ -10,7 +10,7 @@ import qs.Ui
 // Standalone panel plugin: summoning it starts a fresh run, dismissing it
 // stops the traffic, so the download workers never keep saturating the link
 // behind a closed overlay. The payload may carry the connection's display
-// name -- {"connection": "MyWifi"} -- and the panel looks it up itself via
+// name, {"connection": "MyWifi"}, and the panel looks it up itself via
 // kestrel-network-status when the caller doesn't know it.
 Item {
   id: root

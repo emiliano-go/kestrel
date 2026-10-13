@@ -49,7 +49,7 @@ Panel {
   readonly property var exitNodes: displayExitNodes()
   readonly property bool showExitNodes: tailscale.active && (exitNodes.length > 0 || tailscale.mullvadRegions.length > 0)
   readonly property var filteredMullvadRegions: filteredMullvadRegionNodes()
-  // Only claim the header cursor when the switch is actually on screen —
+  // Only claim the header cursor when the switch is actually on screen, 
   // "header" stays navigable, but an absent CLI leaves nothing to highlight.
   readonly property bool headerHasCursor: cursorActive && focusSection === "header" && tailscale.installed
   readonly property color iconColor: tailscale.active ? foreground : dim
@@ -451,7 +451,7 @@ Panel {
             width: parent.width
             implicitHeight: hero.implicitHeight
             // Exposed for the hero's trailingControl, whose `root` resolves to
-            // PanelHero (not this Panel) — reach panel state via `header`.
+            // PanelHero (not this Panel), reach panel state via `header`.
             readonly property bool ringVisible: root.headerHasCursor
             function focusHero() { root.setHeaderCursor() }
 
@@ -463,7 +463,7 @@ Panel {
               foreground: root.foreground
               fontFamily: root.fontFamily
               iconOpacity: tailscale.active ? 1.0 : 0.5
-              // Status only — the switch owns toggling, mouse and keyboard alike.
+              // Status only, the switch owns toggling, mouse and keyboard alike.
               iconComponent: Component {
                 TailscaleIcon {
                   iconSize: Style.font.display

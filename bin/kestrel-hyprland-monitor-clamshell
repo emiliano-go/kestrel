@@ -182,8 +182,8 @@ sync_internal_scale() {
   configured_scale=$(configured_monitor_scale)
   active_scale=$(current_internal_scale)
 
-  # A config without a usable number -- the default "auto", or an expression
-  # only Hyprland's Lua can evaluate -- delegates the scale to the compositor,
+  # A config without a usable number, the default "auto", or an expression
+  # only Hyprland's Lua can evaluate, delegates the scale to the compositor,
   # so whatever it resolved for the enabled panel IS the configured scale.
   # There is no number to correct it toward: substituting one makes the scale
   # flap between that number and the compositor's own value on every idle-wake.

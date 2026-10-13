@@ -79,7 +79,7 @@ if [[ -f $REGION_FILE ]] && region=$(<"$REGION_FILE"); then
 fi
 
 # A tall, narrow region can't fit presets scaled from its own height, so cap the
-# height they scale from to what the width allows — the large preset is the
+# height they scale from to what the width allows, the large preset is the
 # widest at 3/10 of it. Scaling the ladder as a whole leaves small, medium and
 # large distinct sizes for smaller and larger to step between.
 scale_height=$anchor_height

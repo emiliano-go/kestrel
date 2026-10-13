@@ -27,7 +27,7 @@ Item {
     // ui-preview <section>` open the gallery with the cursor already on
     // a specific component, so iterating on one widget doesn't require
     // scrolling from the top each time. Unknown section names are
-    // ignored — the gallery opens at its default position.
+    // ignored, the gallery opens at its default position.
     var requested = ""
     if (payloadJson) {
       try {
@@ -49,7 +49,7 @@ Item {
   }
 
   // Host-initiated close (`shell hide`). Visibility flips without
-  // notifying the host back — it already knows.
+  // notifying the host back, it already knows.
   function close() {
     closingFromHost = true
     window.visible = false
@@ -138,7 +138,7 @@ Item {
   }
 
   // True for sections whose primitives lay out horizontally (a row of
-  // buttons) — j/k jumps to the next/prev section, h/l walks within the row.
+  // buttons), j/k jumps to the next/prev section, h/l walks within the row.
   function sectionIsHorizontal(section) {
     return section === "button"
       || section === "button-group"
@@ -318,7 +318,7 @@ Item {
         }
       }
 
-      // Panel-style key dispatch — the gallery demonstrates the standard,
+      // Panel-style key dispatch, the gallery demonstrates the standard,
       // so it USES the standard. j/k walks cursor targets across sections,
       // h/l acts locally (rows + slider adjust), Enter activates the
       // current target, Esc closes. The catcher suspends itself while a
@@ -432,7 +432,7 @@ Item {
                   color: Qt.darker(root.foreground, 1.4)
                   font.family: root.fontFamily
                   font.pixelSize: Style.font.bodySmall
-                  text: "Adding a component. Drop the QML in Ui/, add a line to Ui/qmldir, then add a section here using the real type (not a copy). The gallery doubles as a smoke test — if a component starts misbehaving this is the fastest place to see it."
+                  text: "Adding a component. Drop the QML in Ui/, add a line to Ui/qmldir, then add a section here using the real type (not a copy). The gallery doubles as a smoke test, if a component starts misbehaving this is the fastest place to see it."
                 }
               }
             }
@@ -1125,7 +1125,7 @@ Item {
 
                 PanelActionButton {
                   iconText: "󰄬"
-                  tooltipText: "Disabled — type a passphrase first"
+                  tooltipText: "Disabled, type a passphrase first"
                   foreground: root.foreground
                   fontFamily: root.fontFamily
                   enabled: false
@@ -1210,7 +1210,7 @@ Item {
 
               PanelToolTip {
                 visible: tipMouse.containsMouse || tipSwatch.focused
-                text: "Styled tooltip — drop into any panel"
+                text: "Styled tooltip, drop into any panel"
                 panelForeground: root.foreground
                 fontFamily: root.fontFamily
               }
@@ -1505,7 +1505,7 @@ Item {
               font.bold: true
             }
             Text {
-              text: "The bare switch Toggle puts at the end of its row, for places with no room for a labeled row — a panel hero's trailingControl, for instance. Caller owns `checked` and flips it on `toggled()`. Set `busy` while an operation is in flight to swallow further clicks without disturbing hover or tooltips; services that track a desired state optimistically get an instant knob throw because `checked` is already the optimistic value."
+              text: "The bare switch Toggle puts at the end of its row, for places with no room for a labeled row, a panel hero's trailingControl, for instance. Caller owns `checked` and flips it on `toggled()`. Set `busy` while an operation is in flight to swallow further clicks without disturbing hover or tooltips; services that track a desired state optimistically get an instant knob throw because `checked` is already the optimistic value."
               color: Qt.darker(root.foreground, 1.5)
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
@@ -1546,7 +1546,7 @@ Item {
             }
 
             Text {
-              text: "The second switch is `busy: true` — hover still responds, clicks do not."
+              text: "The second switch is `busy: true`, hover still responds, clicks do not."
               color: Qt.darker(root.foreground, 1.5)
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
@@ -1694,7 +1694,7 @@ Item {
               font.bold: true
             }
             Text {
-              text: "A miniature wifi-style row built from CursorSurface + PanelActionButton + PanelToolTip. This is what new panel rows should look like — no inline Rectangle/Text/MouseArea reimplementation."
+              text: "A miniature wifi-style row built from CursorSurface + PanelActionButton + PanelToolTip. This is what new panel rows should look like, no inline Rectangle/Text/MouseArea reimplementation."
               color: Qt.darker(root.foreground, 1.5)
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption

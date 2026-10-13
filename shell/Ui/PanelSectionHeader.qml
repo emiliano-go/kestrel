@@ -24,8 +24,8 @@ Text {
   // Glyphs can paint above the box Text reserves for them: JetBrainsMono Nerd
   // Font's outlines run 10% of the em past its own ascent, and a patched or
   // user-chosen family can be worse. That sliver is invisible in normal flow,
-  // but a header sitting at the top of a clipping list — bluetooth's device
-  // list, network's station list — loses it to the clip and renders beheaded.
+  // but a header sitting at the top of a clipping list, bluetooth's device
+  // list, network's station list, loses it to the clip and renders beheaded.
   // Reserve the overshoot here so every panel is covered at once.
   topPadding: Math.ceil(fontSize * 0.15)
 }

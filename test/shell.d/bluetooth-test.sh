@@ -40,7 +40,7 @@ assert(/discovering = false/.test(stopTimer[0]), 'bluetooth stops discovery afte
 
 // One widget instance exists per monitor and they share the default adapter,
 // so a closing instance hands the scan to a panel still open on another
-// monitor instead of stopping it — that is the popout handoff between
+// monitor instead of stopping it, that is the popout handoff between
 // monitors.
 assert(/function openSibling\(\)/.test(panelSource), 'bluetooth can see panel instances on other monitors')
 assert(/sibling\.owesDiscoveryStop = true/.test(stopTimer[0]), 'bluetooth moves the stop it owes to an open panel on another monitor instead of stopping its scan')
@@ -252,7 +252,7 @@ grep -qx "connect AA:BB:CC:DD:EE:FF" "$powered_log" ||
   fail "bluetooth still connects when the adapter is already powered"
 pass "bluetooth still connects when the adapter is already powered"
 
-# Connecting to a device while Bluetooth is off has to lift the block first —
+# Connecting to a device while Bluetooth is off has to lift the block first, 
 # BlueZ refuses to power an adapter up while one is set.
 unpowered_log=$(bluetooth_device_log no)
 grep -qx "rfkill unblock bluetooth" "$unpowered_log" ||

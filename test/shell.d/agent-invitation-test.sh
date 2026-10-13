@@ -46,7 +46,7 @@ run_invitation_hook
 pass "agent invitation only runs once"
 
 # Someone who already chose an agent has nothing to be invited to, and must not
-# burn the marker either -- otherwise clearing the choice later leaves them with
+# burn the marker either, otherwise clearing the choice later leaves them with
 # no invitation and no default.
 fresh_home=$(mktemp -d)
 mkdir -p "$fresh_home/.config/kestrel/defaults"

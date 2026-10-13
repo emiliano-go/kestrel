@@ -845,7 +845,7 @@ def codex_rpc_help(proc, stderr_file, exc):
   if lines:
     # The fatal error comes last, after whatever the CLI logged on the way up.
     return f"codex app-server exited: {' '.join(lines)[-275:]}"
-  # Exited cleanly with empty stderr — typical "not logged in" shape.
+  # Exited cleanly with empty stderr, typical "not logged in" shape.
   return AUTH_HELP
 
 
@@ -889,7 +889,7 @@ def fetch_codex_rpc(home=None):
     return result
 
   # No auth.json under the file store and no CODEX_ACCESS_TOKEN means
-  # account/read can only fail — and starting the app-server is not free: it
+  # account/read can only fail, and starting the app-server is not free: it
   # syncs the plugin list, a git fetch per refresh that also leaves
   # .tmp/git-* folders behind. The home is the one being probed, so a
   # signed-out secondary account reads as signed out even while ~/.codex
@@ -1011,7 +1011,7 @@ def registered_accounts():
 # login and refreshes that login's tokens there.
 def account_limits(account):
   # The primary is ~/.codex by definition, not whatever CODEX_HOME this run
-  # happened to inherit — that would report another account's limits as Main's.
+  # happened to inherit, that would report another account's limits as Main's.
   rpc = fetch_codex_rpc(account.get("home") or (Path.home() / ".codex"))
   return {
     "id": account["id"],

@@ -78,7 +78,7 @@ legacy_owned() {
 # Gone means neither installed nor still asked for in the global config, where
 # `mise up` would build it again. `mise rm -g` exits 0 whether or not it removed
 # anything, so the listing is read instead, and a listing that cannot be read
-# -- mise broken, or not there to read it -- is not an answer. The key carries
+#, mise broken, or not there to read it, is not an answer. The key carries
 # the backend and name, with or without the options.
 mise_retired() {
   local requested
@@ -126,7 +126,7 @@ forget_legacy() {
 }
 
 # A hermes at that path is usable when it is a command that runs: a regular
-# executable whose --version answers. The executable bit alone proves little -- a
+# executable whose --version answers. The executable bit alone proves little, a
 # directory passes -x on search permission, and a wrapper whose interpreter or
 # target is gone passes it too. The desktop app applies the same probe with the
 # same 15 second budget, so what passes here is what it will use.
@@ -144,8 +144,8 @@ help_defines_flag() {
   grep -qE -- "$1(]|[[:space:]][[:upper:]]|[[:space:]]{2}|$)" <<<"$2"
 }
 
-# Probed for the flags kestrel-agent actually passes -- --query to seed the
-# session and --tui to keep it interactive -- rather than a marker standing in
+# Probed for the flags kestrel-agent actually passes, --query to seed the
+# session and --tui to keep it interactive, rather than a marker standing in
 # for them.
 hermes_prompt_ready() {
   local help
@@ -156,8 +156,8 @@ hermes_prompt_ready() {
 }
 
 # The command upstream's installer writes execs into the runtime. Anything else
-# at that path -- an official install elsewhere, a hand-rolled wrapper, even a
-# dangling link -- is the user's. Matched as a plain string with its trailing
+# at that path, an official install elsewhere, a hand-rolled wrapper, even a
+# dangling link, is the user's. Matched as a plain string with its trailing
 # slash, because the path carries a dot and a bare prefix would also claim a
 # wrapper pointing at ~/.hermes-old.
 ours() {
@@ -193,10 +193,10 @@ native_app_complete() {
 }
 
 # What --check answers, and what --now has nothing left to do about: the app
-# is installed and the Hermes on the machine is its own -- the command
+# is installed and the Hermes on the machine is its own, the command
 # upstream's installer wrote, the runtime's completion marker and the seeded
 # packaged app, because the app only runs against a runtime it prepared and
-# the terminal has to be on the same one -- and that command is the one PATH
+# the terminal has to be on the same one, and that command is the one PATH
 # finds, with nothing of the retired wrapper's left to remove. The two agree
 # on purpose: choosing Hermes from the menu asks first and opens a terminal
 # only on a no, so a yes here has to mean --now would take no minutes-long

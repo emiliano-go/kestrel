@@ -1,5 +1,5 @@
 # The setup form: every question Kestrel asks a human to describe their machine
-# — keyboard, account, hostname, timezone — plus the rules those answers are
+#, keyboard, account, hostname, timezone, plus the rules those answers are
 # checked against. Shared by the two places that ask them: the ISO
 # configurator's user step and this package's first-boot owner setup
 # (kestrel-provision-owner). Sourced by both, so the copies cannot drift the way
@@ -9,8 +9,8 @@
 # same way:
 #
 #   0    field is set, move on
-#   1    Esc — unwind to the start of the form
-#   130  Ctrl+C — a per-caller side channel (the installer arms deferred
+#   1    Esc, unwind to the start of the form
+#   130  Ctrl+C, a per-caller side channel (the installer arms deferred
 #        provisioning or toggles encryption; first-boot setup offers a reboot)
 #
 # gum is the reason those two are the whole vocabulary: Esc and Ctrl+C are the

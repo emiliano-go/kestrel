@@ -66,8 +66,8 @@ trap 'exit 143' TERM INT
 #
 # The files are marked NOCOW where the filesystem supports it (btrfs), which
 # turns off copy-on-write, checksums, and compression for them. That is what
-# makes O_DIRECT truly direct on btrfs -- with checksums on it silently falls
-# back to the page cache -- and it makes every rewrite land in place instead
+# makes O_DIRECT truly direct on btrfs, with checksums on it silently falls
+# back to the page cache, and it makes every rewrite land in place instead
 # of churning the extent allocator, which run-to-run reproducibility depends
 # on.
 chunk_file=$(mktemp /dev/shm/kestrel-disk-speedtest-XXXXXX.src)
@@ -126,7 +126,7 @@ echo "disk ${model:-$disk}"
 
 # The stress data must be incompressible so nothing between the write call
 # and the flash can shrink it. Staging a urandom chunk in RAM also keeps the
-# source out of the measurement -- reading tmpfs is a memcpy.
+# source out of the measurement, reading tmpfs is a memcpy.
 dd if=/dev/urandom of="$chunk_file" bs=${chunk_mb}M count=$((file_mb / chunk_mb)) status=none
 
 # Workers loop only while the main script lives: if cleanup ever loses the
@@ -179,8 +179,8 @@ run_phase() {
     }')
     echo "$phase $(format_rate "$rate")"
     samples=$((samples + 1))
-    # The first second is warm-up -- governor ramp, crypt workers spinning
-    # up -- so the steady-state average starts after it.
+    # The first second is warm-up, governor ramp, crypt workers spinning
+    # up, so the steady-state average starts after it.
     if (( samples == 1 )); then
       baseline_sectors=$after
       baseline_time=$end_time

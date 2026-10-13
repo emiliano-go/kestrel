@@ -130,7 +130,7 @@ pass "sleep lock reports failure when the session never secures"
 # for logind, so that overshoot is always well inside the reserve.
 #
 # 1500ms budget + a 100ms interval is 1600ms of script time, and this measures a
-# whole process around it, so the bound carries another interval for startup —
+# whole process around it, so the bound carries another interval for startup, 
 # without it the assertion sits exactly on the worst case and flakes. Two
 # intervals of overshoot, the regression worth catching, is still 1800ms.
 (( elapsed_us <= 1700000 )) ||

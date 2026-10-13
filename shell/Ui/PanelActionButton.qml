@@ -3,7 +3,7 @@ import qs.Commons
 import qs.Commons as Commons
 
 // Small (22×22 by default) icon button used at the right edge of panel rows
-// for inline actions — forget network, confirm passphrase, unpair device,
+// for inline actions, forget network, confirm passphrase, unpair device,
 // etc. Two visual modes are supported via `hoverColor`:
 //   - default: hoverColor === foreground → subtle foreground-tint hover
 //   - urgent:  hoverColor === bar.urgent → red-tint hover for destructive
@@ -11,7 +11,7 @@ import qs.Commons as Commons
 //
 // `enabled` gates clicks and dims the icon. The component owns its own
 // hover state visuals; mouse hover does NOT update any panel cursor state
-// here because action buttons are not cursor targets — the row they live
+// here because action buttons are not cursor targets, the row they live
 // in is.
 //
 // Set `focusable: true` to make the button keyboard-tabbable with the
@@ -21,7 +21,7 @@ import qs.Commons as Commons
 // where the row's CursorSurface owns the keyboard cursor.
 //
 // Set `hasCursor: true` to have the button render the same hover state as
-// mouse hover — so a panel's keyboard cursor lands on it identically.
+// mouse hover, so a panel's keyboard cursor lands on it identically.
 // Use this when a PanelActionButton is itself the cursor target (rather
 // than living inside a CursorSurface row). Emits `hovered(bool)` on
 // pointer enter/leave so the panel can update its cursor state to match.

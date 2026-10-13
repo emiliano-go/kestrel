@@ -119,4 +119,4 @@ keybind → IPC → visible path costs ~30ms cold.
 
 ## Coming soon
 
-- `kestrel.theme-switcher` — folds theme switching into the shell.
+- `kestrel.theme-switcher`, folds theme switching into the shell.

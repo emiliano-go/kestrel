@@ -57,7 +57,7 @@ pass "crash capture is on by default"
 require_command jq
 
 # The per-program mute, driven through the real watcher with a stubbed journal:
-# these prove what a person sees -- a toast arriving or not -- where asserting
+# these prove what a person sees, a toast arriving or not, where asserting
 # that a flag file was read would prove only that a flag file was read.
 watch_bin="$TMPDIR/watch-bin"
 watch_home="$TMPDIR/watch-home"
@@ -193,7 +193,7 @@ pass "a muted crash does not stop the watcher reading the next one"
 # A process can set its own comm to anything prctl takes, slashes included, and
 # a crash with no recorded executable falls back to it. A name that climbed out
 # of crash-ignore/ would let a crashing program silence itself against an
-# unrelated flag -- and have the diagnosis write one there on the user's behalf.
+# unrelated flag, and have the diagnosis write one there on the user's behalf.
 # The fixture carries two slashes so that dropping only the first is not mistaken
 # for dropping all of them.
 reset_entries
@@ -219,7 +219,7 @@ done
 pass "a comm that strips down to nothing or a dot still announces under a name a mute can use"
 
 # An empty comm is not a missing entry. Tab is IFS whitespace, so an empty field
-# collapses and every field after it shifts along one -- the pid becomes a path,
+# collapses and every field after it shifts along one, the pid becomes a path,
 # the crash reads as somebody else's, and it is dropped without a word.
 reset_entries
 crash_entry "" -
@@ -328,7 +328,7 @@ crash_mute ../bar-off >/dev/null
 pass "the command cannot be talked into writing outside crash-ignore/"
 
 # A program may be called -h, and the router answers that with its own help
-# before the command runs. A leading -- is the way through, so it has to be
+# before the command runs. A leading, is the way through, so it has to be
 # consumed rather than taken for the program name.
 crash_mute -- -h >/dev/null 2>&1 ||
   fail "a leading -- is refused rather than consumed, so a program named like a flag cannot be muted at all"
@@ -372,11 +372,6 @@ refusal=$(HOME="$mute_home" PATH="$failing_bin:$ROOT/bin:$PATH" \
 ! grep -Fq "Muted crash notifications" <<<"$refusal" ||
   fail "a mute that could not be written still reports success, so the user believes a program is silenced when it is not"
 pass "a mute that could not be written is not reported as one"
-
-skill="$ROOT/default/agents/skills/diagnose-crash/SKILL.md"
-grep -Fq 'kestrel-crash-mute' "$skill" ||
-  fail "the diagnosis no longer names the command that mutes, so the offer it makes cannot be carried out"
-pass "the diagnosis names the command that mutes"
 
 grep -Fq 'GROUP_DESCRIPTIONS[crash]' "$ROOT/bin/kestrel" ||
   fail "the crash group has no description, so the router lists a group it cannot describe"

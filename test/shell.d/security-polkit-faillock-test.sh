@@ -5,7 +5,7 @@ set -euo pipefail
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
 # The fingerprint and FIDO2 setup commands each create /etc/pam.d/polkit-1 from
-# scratch when the file does not already exist -- which is the normal case on
+# scratch when the file does not already exist, which is the normal case on
 # Arch, where the polkit package ships its PAM stack in /usr/lib/pam.d/polkit-1
 # and /etc/pam.d/polkit-1 is absent. A hand-rolled stack that lists pam_unix
 # directly instead of `include system-auth` silently drops pam_faillock, so

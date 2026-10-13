@@ -1,5 +1,5 @@
 if kestrel-battery-present; then
-  # kestrel:heredoc-expands paths=none -- only interpolates the kestrel bin path
+  # kestrel:heredoc-expands paths=none, only interpolates the kestrel bin path
   cat <<EOF | sudo tee "/etc/udev/rules.d/99-power-profile.rules"
 SUBSYSTEM=="power_supply", ATTR{type}=="Mains", RUN+="/usr/bin/systemd-run --no-block --collect --unit=kestrel-power-profile --property=After=power-profiles-daemon.service $HOME/.local/share/kestrel/bin/kestrel-powerprofiles-set"
 SUBSYSTEM=="power_supply", ATTR{type}=="USB", RUN+="/usr/bin/systemd-run --no-block --collect --unit=kestrel-power-profile --property=After=power-profiles-daemon.service $HOME/.local/share/kestrel/bin/kestrel-powerprofiles-set"

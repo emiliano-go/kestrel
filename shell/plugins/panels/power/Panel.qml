@@ -12,7 +12,7 @@ Panel {
   moduleName: "kestrel.power"
   ipcTarget: "kestrel.power"
   // manageIpc: false so this panel can own the single IpcHandler the target
-  // permits — needed for the togglePercentage method below.
+  // permits, needed for the togglePercentage method below.
   manageIpc: false
   property var batteryInfo: ({})
   property var systemInfo: ({})
@@ -143,7 +143,7 @@ Panel {
 
   function updateKeyValue(raw, targetName) {
     var next = Model.parseKeyValue(raw)
-    // Keep last known good data if a refresh briefly returns nothing — happens
+    // Keep last known good data if a refresh briefly returns nothing, happens
     // around AC plug/unplug events. Avoids the section collapsing mid-transition.
     if (Object.keys(next).length === 0) return
     if (targetName === "battery") batteryInfo = next
@@ -373,7 +373,7 @@ Panel {
           Text {
             id: heroPercent
             textFormat: Text.PlainText
-            text: root.batteryInfo.percentage || "—"
+            text: root.batteryInfo.percentage || ", "
             color: root.bar.foreground
             font.family: root.bar.fontFamily
             font.pixelSize: Style.font.displayLarge
@@ -409,7 +409,7 @@ Panel {
             Behavior on width { NumberAnimation { duration: Style.duration(320); easing.type: Easing.OutCubic } }
             Behavior on color { ColorAnimation { duration: Style.duration(220) } }
 
-            // Subtle pulse while charging — visible signal that energy is flowing in.
+            // Subtle pulse while charging, visible signal that energy is flowing in.
             SequentialAnimation on opacity {
               running: root.charging && !root.fullyCharged && root.opened && !Style.reduceMotion
               loops: Animation.Infinite
@@ -435,7 +435,7 @@ Panel {
             width: (parent.width - parent.spacing) / 2
             spacing: Style.spacing.labelGap
             InfoPair { label: "Battery size"; value: root.batteryInfo.size || "" }
-            InfoPair { label: "Charge cycles"; value: root.batteryInfo.cycles || "—" }
+            InfoPair { label: "Charge cycles"; value: root.batteryInfo.cycles || ", " }
           }
 
           Column {
@@ -443,7 +443,7 @@ Panel {
             spacing: Style.spacing.labelGap
             InfoPair {
               label: root.chargeThresholdActive ? "Charge limit" : (root.discharging ? "Time left" : "Time to full")
-              value: root.chargeThresholdActive ? (root.batteryInfo.threshold || "-") : (root.batteryFlowIdle ? "-" : (root.batteryInfo.time || "—"))
+              value: root.chargeThresholdActive ? (root.batteryInfo.threshold || "-") : (root.batteryFlowIdle ? "-" : (root.batteryInfo.time || ", "))
             }
             InfoPair {
               label: root.chargeThresholdActive ? "Battery state" : (root.discharging ? "Discharging" : "Charging")

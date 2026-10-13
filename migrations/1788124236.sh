@@ -36,7 +36,7 @@ if ! systemctl is-enabled --quiet sshd.service 2>/dev/null &&
 fi
 
 # sshd reads authorized_keys one entry per line, while ssh-keygen -lf
-# fingerprints whole files in formats sshd does not accept there — a private
+# fingerprints whole files in formats sshd does not accept there, a private
 # key copied in by mistake passes the file-level check even though sshd finds
 # no usable entry in it. Ask sshd's question instead: does any single line
 # parse as a public key?
@@ -100,7 +100,7 @@ then
 fi
 
 # The drop-in itself is always valid, so a rejection means the configuration
-# was already broken before it arrived — the administrator's to repair.
+# was already broken before it arrived, the administrator's to repair.
 if ! as_root sshd -t; then
   as_root rm -f -- "$config" || true
   skip "sshd rejected its configuration."

@@ -12,7 +12,7 @@ export BAT_THEME=ansi
 export MANROFFOPT="-c"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
-# Idempotent — already sourced by /etc/skel/.bashrc; re-source here so SSH and
+# Idempotent, already sourced by /etc/skel/.bashrc; re-source here so SSH and
 # other non-interactive non-login bash sessions still get KESTREL_PATH.
 [ -r /usr/share/kestrel/default/bash/env-bootstrap ] && . /usr/share/kestrel/default/bash/env-bootstrap
 

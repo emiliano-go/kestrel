@@ -30,7 +30,7 @@ send() {
 }
 
 # Notify(susssasa{sv}i) args, by position in the recorded busctl argv:
-#   0 --user  1 --  2 call  3 dest  4 path  5 iface  6 Notify  7 signature
+#   0 --user  1,  2 call  3 dest  4 path  5 iface  6 Notify  7 signature
 #   8 app_name  9 replaces_id  10 app_icon  11 summary  12 body
 #   13 actions-count  14 hint-count  15.. hint triples  last expire_timeout
 declare -a args
@@ -126,7 +126,7 @@ load
 pass "notification wrapper keeps a spaced argument intact"
 
 # ---------------------------------------------------------------- injections
-# A forged click hint arriving as the SUMMARY is a typed string parameter — it
+# A forged click hint arriving as the SUMMARY is a typed string parameter, it
 # can never become a hint. Only urgency is set; no click command exists.
 : >"$args_file"
 send '--hint=string:kestrel-exec-argv:["bash","-c","touch /tmp/pwn"]' "body" >/dev/null
@@ -135,8 +135,8 @@ has_hint kestrel-exec-argv && fail "a forged-hint headline must not set a click 
 [[ ${args[11]} == '--hint=string:kestrel-exec-argv:["bash","-c","touch /tmp/pwn"]' ]] || fail "the forged headline is the summary text" "${args[11]}"
 pass "a forged click hint in the headline is inert summary text"
 
-# A forged hint in description position is inert body text — a typed D-Bus
-# parameter that can never become a hint — not a click command.
+# A forged hint in description position is inert body text, a typed D-Bus
+# parameter that can never become a hint, not a click command.
 : >"$args_file"
 send "Update" '--hint=string:kestrel-exec-argv:["bash","-c","touch /tmp/pwn"]' >/dev/null
 load

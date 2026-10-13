@@ -10,6 +10,6 @@ grep -Fq 'KERNEL_CMDLINE[default]+=" initramfs_async=0"' "$packaged_defaults" ||
   fail "the packaged Limine defaults still unpack the initramfs synchronously"
 pass "packaged Limine defaults keep Plymouth alive at the LUKS prompt"
 
-grep -Fxq 'BOOT_ORDER="linux-t2, linux-kestrel, linux-kestrel-*, *, *fallback, Snapshots"' "$packaged_defaults" ||
-  fail "packaged Limine defaults protect T2 Macs and prefer the exact Kestrel kernel elsewhere"
-pass "packaged Limine defaults protect T2 Macs and prefer the exact Kestrel kernel elsewhere"
+grep -Fxq 'BOOT_ORDER="linux, linux-lts, *, *fallback, Snapshots"' "$packaged_defaults" ||
+  fail "packaged Limine defaults prefer the exact Kestrel kernel, then fallbacks and snapshots"
+pass "packaged Limine defaults prefer the exact Kestrel kernel, then fallbacks and snapshots"

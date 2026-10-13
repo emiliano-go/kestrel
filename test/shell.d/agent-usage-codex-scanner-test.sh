@@ -840,7 +840,7 @@ result=$(HOME="$LINK_HOME" CODEX_HOME="$LINK_HOME/.codex" CODEX_ARGS_FILE="$LINK
 pass "Codex collector probes a user-owned symlink at the launcher path"
 
 # A mise shim is a symlink to the mise binary itself, so it resolves to mise,
-# not to an installed codex — running it would exec `mise x` and install the
+# not to an installed codex, running it would exec `mise x` and install the
 # tool. It must be treated as lazy despite being a symlink.
 SHIM_HOME=$(mktemp -d "$SCRATCH/home.XXXXXX")
 mkdir -p "$SHIM_HOME/bin" "$SHIM_HOME/.local/share/mise/shims"
@@ -861,7 +861,7 @@ result=$(HOME="$SHIM_HOME" CODEX_HOME="$SHIM_HOME/.codex" MISE_CALLS_FILE="$SHIM
   fail "Codex collector must not execute a mise shim" "$(cat "$SHIM_HOME/mise-calls" 2>/dev/null)"
 pass "Codex collector treats a shim symlink to mise as lazy"
 
-# Without Codex credentials, account/read can only fail — and starting the
+# Without Codex credentials, account/read can only fail, and starting the
 # app-server is not free: it syncs the plugin list, a git fetch per refresh
 # that leaves ~/.codex/.tmp/git-* folders behind. The collector must not
 # spawn codex at all.

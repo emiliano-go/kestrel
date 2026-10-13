@@ -10,7 +10,7 @@ sudo systemctl reload systemd-logind >/dev/null 2>&1 || true
 # Check the property logind actually enforces, not the reload's exit status: a
 # reload that returns success while the drop-in is missing or unparsed leaves
 # the old five second window in place. kestrel-system-sleep-lock reads this same
-# property at runtime, so it stays correct either way -- the reboot flag is only
+# property at runtime, so it stays correct either way, the reboot flag is only
 # about getting the wider window to take effect.
 #
 # Both reads have to survive failing: a missing drop-in or an unreachable logind

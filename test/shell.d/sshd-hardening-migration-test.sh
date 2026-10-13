@@ -110,7 +110,7 @@ grep -qxF "PasswordAuthentication no" "$test_dir/hardened/root/etc/ssh/sshd_conf
   fail "the existing hardening config is left alone"
 pass "SSH migration no-ops when the hardening config already exists"
 
-# Without a usable key, sshd only accepts password logins — the hole the old
+# Without a usable key, sshd only accepts password logins, the hole the old
 # setup command could leave open. The migration closes it by disabling sshd.
 AUTHORIZED_KEY_STATE=missing SSHD_ENABLED=1 run_migration no-key >/dev/null
 [[ ! -e $test_dir/no-key/root/etc/ssh/sshd_config.d/10-kestrel-hardening.conf ]] ||
@@ -174,8 +174,8 @@ SSHD_ENABLED=1 SSHD_ACTIVE=0 run_migration stopped >/dev/null
 ! grep -qF 'reload sshd.service' "$test_dir/stopped.calls" || fail "SSH migration must not start or reload a stopped daemon"
 pass "SSH migration hardens an enabled daemon without starting it"
 
-# Conditions the migration cannot repair complete with a notice — leaving the
-# machine as it was — so they never block the migrations queued behind this one.
+# Conditions the migration cannot repair complete with a notice, leaving the
+# machine as it was, so they never block the migrations queued behind this one.
 SSHD_ENABLED=1 SSHD_ACTIVE=1 SSHD_PASSWORD_AUTH=yes run_migration ineffective >"$test_dir/ineffective.output" 2>&1 ||
   fail "an ineffective drop-in must complete without blocking later migrations"
 [[ ! -e $test_dir/ineffective/root/etc/ssh/sshd_config.d/10-kestrel-hardening.conf ]] ||

@@ -17,7 +17,7 @@ fi
 
 # No enable needed: NetworkManager D-Bus-activates the supplicant on demand.
 # But it stops retrying after five failures, so restart it when a wifi device
-# sits unavailable — except during the live Quattro upgrade, where iwd may
+# sits unavailable, except during the live Quattro upgrade, where iwd may
 # still carry the connection until the reboot.
 if [[ ${KESTREL_UPGRADE_TO_QUATTRO_LIVE:-0} != "1" ]] &&
   systemctl is-active --quiet NetworkManager.service 2>/dev/null &&

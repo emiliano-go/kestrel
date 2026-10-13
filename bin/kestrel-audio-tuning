@@ -11,7 +11,7 @@ tunings_dir="$KESTREL_PATH/default/audio/tunings"
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 # The tuning is hosted by its own PipeWire client, under its own config name, so
-# switching it needs no audio restart -- a restart drops every PulseAudio client's
+# switching it needs no audio restart, a restart drops every PulseAudio client's
 # connection, and applications that do not reconnect (Spotify) then have to be
 # restarted by hand. The name is deliberately not PipeWire's stock
 # filter-chain.conf, which merges every fragment in filter-chain.conf.d/ and would
@@ -42,7 +42,7 @@ sink_matching() {
 }
 
 # Dell keys its Cirrus speaker firmware on the DMI product SKU, which makes it the
-# most precise identifier available for these machines -- narrower than a product
+# most precise identifier available for these machines, narrower than a product
 # name, and it distinguishes models whose names differ only by marketing. Compared
 # case-insensitively against an exact SKU, never a substring, so a tuning cannot
 # accidentally widen to a whole product line.
@@ -79,7 +79,7 @@ tuning_match() {
 
     # Deliberately does not look at the live audio graph. The install hooks run in
     # the ISO chroot with no audio server, and a match that depended on a present
-    # sink would come back empty there -- so the machine would get neither the LV2
+    # sink would come back empty there, so the machine would get neither the LV2
     # dependency nor the tuning, and nothing would retry.
     # A tuning may list several models it has been validated on. match_dmi and
     # match_sku are arrays, so a plain string still works as a single entry.
@@ -178,7 +178,7 @@ case "$action" in
     # The tuning is a virtual sink in front of the real speakers, so both exist in
     # the graph. Selecting the physical one would only bypass the tuning, so
     # callers keep it out of the output list while the tuning is up. This answers
-    # "is a tuning in place", not "where should volume go" -- for the latter see
+    # "is a tuning in place", not "where should volume go", for the latter see
     # kestrel-audio-output-sink, which follows the current default output.
     tuning_present || exit 1
     tuned_hardware_sink

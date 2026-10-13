@@ -32,7 +32,7 @@ list() {
 }
 
 # A program may be named -h, and the router answers that with its own help
-# before this ever runs. `kestrel crash mute -- -h` is the way through.
+# before this ever runs. `kestrel crash mute, -h` is the way through.
 [[ ${1:-} == "--" ]] && shift
 
 if (($# == 0)); then

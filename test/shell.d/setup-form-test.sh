@@ -38,7 +38,7 @@ cat >"$tmp_dir/timedatectl" <<'EOF'
 printf '%s\n' UTC Europe/Copenhagen America/Chicago
 EOF
 
-# Calls one prompt bare under `set -euo pipefail` — the shape that makes the
+# Calls one prompt bare under `set -euo pipefail`, the shape that makes the
 # status capture load-bearing. A cancelled prompt is a failing assignment, so a
 # regression to a plain `status=$?` kills the shell before the function can
 # return; both cases exit with the same status, and this marker is the only
@@ -79,7 +79,7 @@ export NOTICES="$tmp_dir/notices" MARKER="$tmp_dir/marker"
 
 status=0
 
-# run_prompt <function> <status:output>... — each response answers one gum screen
+# run_prompt <function> <status:output>..., each response answers one gum screen
 run_prompt() {
   local prompt=$1
   shift
@@ -180,7 +180,7 @@ assert_status "$KESTREL_FORM_SIGNAL" "password prompt reports Ctrl+C on the conf
 assert_returned "password confirmation survives Ctrl+C under set -e"
 pass "password confirmation propagates Esc and Ctrl+C without dying under set -e"
 
-# Identity — both fields are skippable, so empty is an answer and not a cancel
+# Identity, both fields are skippable, so empty is an answer and not a cancel
 
 run_prompt kestrel_prompt_identity "0:" "0:"
 assert_status 0 "identity prompt treats empty fields as answers"

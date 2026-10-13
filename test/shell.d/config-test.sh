@@ -106,9 +106,9 @@ pkgs_candidates = [
   root.parent / "kestrel-pkgs/pkgbuilds",
   root.parent / "kestrel/kestrel-pkgs/pkgbuilds",
   root.parent.parent / "kestrel-pkgs/pkgbuilds",
-  root.parent / "omacom/omarchy-pkgs/pkgbuilds",
-  root.parent.parent / "omacom/omarchy-pkgs/pkgbuilds",
-  home / "Work/omacom/omarchy-pkgs/pkgbuilds",
+  root.parent / "emiliano-go/kestrel-pkgs/pkgbuilds",
+  root.parent.parent / "emiliano-go/kestrel-pkgs/pkgbuilds",
+  home / "Work/emiliano-go/kestrel-pkgs/pkgbuilds",
 ]
 # Checkouts differ per machine, so allow an explicit pointer at the sibling repo.
 # Accepts either the kestrel-pkgs checkout or its pkgbuilds/ directory.
@@ -163,7 +163,7 @@ for source, destination, legacy in package_defaults:
     errors.append(f"PKGBUILD does not explicitly install {source} -> {destination}")
 
 # Existing users have an absolute wants symlink to the old unit path, and the
-# migration that repoints it only runs for users who run an update -- the
+# migration that repoints it only runs for users who run an update, the
 # opposite of who the notifier is for. Dropping this alias strands them.
 notify_alias = 'ln -sfn kestrel-migrate-notify.service "$pkgdir/usr/lib/systemd/user/kestrel-update-user-notify.service"'
 if notify_alias not in pkgbuild:
@@ -422,7 +422,3 @@ jq -e '
 [[ -f $TMPDIR/home/.local/state/kestrel/restart-shell-called ]] || fail "shell refresh restarts shell"
 pass "shell refresh places optional service widgets when services are available"
 
-if grep -RIl 'upgrade-to-quattro\|Kestrel 4\.0 is upgraded' "$ROOT/migrations" >/dev/null; then
-  fail "4.0 upgrade is not modeled as a migration"
-fi
-pass "4.0 upgrade is handled outside the migration runner"

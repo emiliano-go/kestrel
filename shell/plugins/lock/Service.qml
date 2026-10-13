@@ -812,7 +812,7 @@ Item {
   }
 
   // No lock before PAM is known good. An answer from before then may be stale --
-  // the failsafe can be cleared from a TTY -- so re-ask rather than act on it.
+  // the failsafe can be cleared from a TTY, so re-ask rather than act on it.
   onPasswordPamConfiguredChanged: {
     if (!passwordPamConfigured) return
 

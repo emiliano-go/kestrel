@@ -26,8 +26,8 @@ write_pci_devices() {
   done
 }
 
-# Sources the hook config the way mkinitcpio does — with earlier drop-ins
-# already applied — and prints the resulting HOOKS. mkinitcpio does not run
+# Sources the hook config the way mkinitcpio does, with earlier drop-ins
+# already applied, and prints the resulting HOOKS. mkinitcpio does not run
 # under set -u, but the config must survive it, so source under it anyway.
 # "unset" leaves MODULES undeclared entirely.
 resolved_hooks() {
@@ -96,7 +96,7 @@ mkdir -p "$tmp_dir/devices/0000:00:00.0"
 assert_hooks "unreadable PCI device keeps kms" \
   "$nvidia_modules" "$with_kms"
 
-# Even next to a readable NVIDIA GPU — the unreadable device may be the iGPU.
+# Even next to a readable NVIDIA GPU, the unreadable device may be the iGPU.
 write_pci_devices 0x10de:0x030000
 mkdir -p "$tmp_dir/devices/0000:01:00.0"
 assert_hooks "unreadable device beside an NVIDIA GPU keeps kms" \

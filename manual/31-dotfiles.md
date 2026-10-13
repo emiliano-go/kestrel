@@ -2,7 +2,7 @@
 
 Kestrel is primarily configured through the so-called dotfiles that live in `~/.config`. Those are considered your files for your changes. The files that live in `/usr/share/kestrel` belong to Kestrel itself, and you shouldn't be messing with those. If you need to change anything in `/usr/share/kestrel`, you should be overwriting the value in `~/.config` instead.
 
-The key configs can be edited straight from the Kestrel menu (`Super + Space`), like _Setup > Monitors_, _Setup > Keybindings_, _Setup > Input_, and _Setup > Config > [file]_. When you do it this way, any process that needs restarting after config edits automatically will be after you quit the editor (Neovim by default — `:wq`, remember! — but you can change that via _Setup > Defaults > Editor_).
+The key configs can be edited straight from the Kestrel menu (`Super + Space`), like _Setup > Monitors_, _Setup > Keybindings_, _Setup > Input_, and _Setup > Config > [file]_. When you do it this way, any process that needs restarting after config edits automatically will be after you quit the editor (Neovim by default, `:wq`, remember!, but you can change that via _Setup > Defaults > Editor_).
 
 Here's a list of the key files in `~/.config` and what they control:
 
@@ -22,7 +22,7 @@ If you end up making a lot of changes to tweak your own setup, it's a good idea 
 
 ### Starting your own apps with the session
 
-If you want something to run every time you log in — a sync daemon, a chat app, your own script — put it in `~/.config/hypr/autostart.lua`:
+If you want something to run every time you log in, a sync daemon, a chat app, your own script, put it in `~/.config/hypr/autostart.lua`:
 
 ```lua
 o.launch_on_start("my-service")
@@ -45,7 +45,7 @@ Kestrel fires hooks at a handful of moments, and you can hang your own scripts o
 
 The `pre-refresh-pacman` hook is where custom repositories or `IgnorePkg` lines belong, since it runs before the package transaction. Both update-related hooks run as your user after Kestrel clears its cached sudo authorization, so a hook that uses `sudo` needs its own authorization and may ask for your password.
 
-Each of those directories already holds a `.sample` file showing the shape of a hook — drop the `.sample` from the name to put it to work. To install a script you've written elsewhere, use `kestrel hook install post-boot ~/my-hook`, which copies it in and makes it executable.
+Each of those directories already holds a `.sample` file showing the shape of a hook, drop the `.sample` from the name to put it to work. To install a script you've written elsewhere, use `kestrel hook install post-boot ~/my-hook`, which copies it in and makes it executable.
 
 ### Adding your own menu entries
 

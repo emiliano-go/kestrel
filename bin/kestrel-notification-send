@@ -99,7 +99,7 @@ headline=$1
 shift
 
 # The description is the next positional, taken as text even when it begins with
-# a dash — a body like "-50% off" or a negative number is content, not options.
+# a dash, a body like "-50% off" or a negative number is content, not options.
 # Only a recognized option flag or --exec in that slot is not the description.
 known_flag() {
   case $1 in
@@ -165,7 +165,7 @@ if ((exec_present)); then
     exit 1
   fi
   # A single word with a space is almost always a whole command passed as one
-  # quoted string — which would run a program literally named that. Splitting it
+  # quoted string, which would run a program literally named that. Splitting it
   # ourselves is exactly the injection we avoid, so reject it and point at the
   # unquoted form instead.
   if ((${#exec_args[@]} == 1)) && [[ ${exec_args[0]} == *[[:space:]]* ]]; then
@@ -181,7 +181,7 @@ fi
 
 hint_count=$((${#hints[@]} / 3))
 
-# Call org.freedesktop.Notifications.Notify directly — never notify-send. Its
+# Call org.freedesktop.Notifications.Notify directly, never notify-send. Its
 # argv parsing is the surface that reinterprets a relayed headline like
 # `--hint=…` or `-rf` as options or hints; busctl takes each value as one typed
 # D-Bus parameter instead, and the leading `--` keeps a dash-leading value

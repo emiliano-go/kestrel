@@ -102,16 +102,16 @@ sudoers_hash_is_active() {
 
 # install/preflight/first-run-mode.sh (2025-08-25 to 2026-05-25) granted the
 # installing account passwordless sudo for the rest of the first boot, including
-# an unrestricted /usr/bin/systemctl from 2025-10-14 on -- enough to link and
+# an unrestricted /usr/bin/systemctl from 2025-10-14 on, enough to link and
 # start a unit of the user's own, which is root. bin/kestrel-first-run was meant
 # to delete the grant, but it clears its first-run.mode guard as the very first
 # statement and only reaches the removal after eight set -e steps, two of which
 # touch the network. Any failure in between leaves the grant on the machine with
 # nothing left to retry it.
 #
-# The installer rewrote this file nine times across two locations -- the last two
+# The installer rewrote this file nine times across two locations, the last two
 # bodies came from install/post-install/first-run-mode.sh, whose cleanup alias
-# names /usr/bin/rm as well as /bin/rm -- and only the later ones carry both
+# names /usr/bin/rm as well as /bin/rm, and only the later ones carry both
 # Cmnd_Alias lines, so keying on those would walk past the earlier ones. Instead
 # require every active line to be one the installer itself emitted, plus at least
 # one line that is unmistakably this grant: its own self-cleanup. One

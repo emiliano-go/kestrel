@@ -152,7 +152,7 @@ pass "removal leaves a hermes it does not own"
 
 # Installed but never launched. The app provisions its runtime on first launch
 # and marks it complete when it lands, so without that marker everything under
-# ~/.hermes predates the app -- an official install, or one built by hand -- and
+# ~/.hermes predates the app, an official install, or one built by hand, and
 # the paths are identical either way. Dropping the package is the whole job.
 seed_install
 rm -f "$test_home/.hermes/hermes-agent/.hermes-bootstrap-complete"
@@ -203,7 +203,7 @@ pass "removal deletes the user's data only on an explicit yes"
 
 # Without the bootstrap marker the runtime is not the app's to take unasked,
 # but the data question is still the user's to answer: declining keeps the
-# whole tree -- runtime included -- untouched.
+# whole tree, runtime included, untouched.
 seed_install
 rm -f "$test_home/.hermes/hermes-agent/.hermes-bootstrap-complete"
 remove_tty || fail "remove succeeds when the app never installed Hermes"
@@ -214,7 +214,7 @@ tr '\0' '\n' <"$test_tmp/gum-log" | grep -qx 'confirm' ||
 pass "removal asks without the marker and declining keeps everything"
 
 # The prompt names ~/.hermes itself, so a yes takes the whole tree there too,
-# unowned runtime and all -- that is what was asked and answered.
+# unowned runtime and all, that is what was asked and answered.
 seed_install
 rm -f "$test_home/.hermes/hermes-agent/.hermes-bootstrap-complete"
 KESTREL_TEST_GUM_STATUS=0 remove_tty ||

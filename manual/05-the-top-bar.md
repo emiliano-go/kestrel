@@ -12,26 +12,26 @@ A few of those only show up when they have something to say. The keyboard layout
 
 ## Clicking around
 
-Nearly every widget does something on left, right, and middle click, and several respond to scrolling. This is the part people miss — the right and middle buttons are where a lot of the good stuff hides.
+Nearly every widget does something on left, right, and middle click, and several respond to scrolling. This is the part people miss, the right and middle buttons are where a lot of the good stuff hides.
 
 | Widget | Left | Right | Middle / scroll |
 | --- | --- | --- | --- |
-| Menu | Kestrel menu | New terminal | — |
-| Workspaces | Focus that workspace | — | — |
+| Menu | Kestrel menu | New terminal |, |
+| Workspaces | Focus that workspace |, |, |
 | Clock | Calendar popup | Cycle the label format | Middle: timezone picker |
 | Weather | Forecast popup | Full weather as a notification | Middle: refresh |
 | Audio | Audio panel | Mute | Middle: panel · scroll: volume |
-| Microphone | Mute the mic | — | Middle: audio panel · scroll: input volume |
-| Network | Network panel | — | — |
-| Bluetooth | Bluetooth panel | Toggle the radio | — |
-| Display | Display panel | — | Scroll: brightness |
-| Power | Power panel | Toggle the battery percentage | — |
+| Microphone | Mute the mic |, | Middle: audio panel · scroll: input volume |
+| Network | Network panel |, |, |
+| Bluetooth | Bluetooth panel | Toggle the radio |, |
+| Display | Display panel |, | Scroll: brightness |
+| Power | Power panel | Toggle the battery percentage |, |
 | Media | Play/pause | Cover-art popup | Middle: next · scroll: prev/next |
 | Agents | Agents panel | Launch your agent | Middle: next subscription |
-| Tray | Hover to reveal the drawer | Right on the chevron to manage | — |
-| Kestrel update | Run the update | — | — |
+| Tray | Hover to reveal the drawer | Right on the chevron to manage |, |
+| Kestrel update | Run the update |, |, |
 
-Not everything in that table is on your bar out of the box. The media widget (MPRIS now-playing, with a scrolling track and artist) and the microphone widget are both built in but off by default — add them if you want them, as described below.
+Not everything in that table is on your bar out of the box. The media widget (MPRIS now-playing, with a scrolling track and artist) and the microphone widget are both built in but off by default, add them if you want them, as described below.
 
 ## The panels
 
@@ -54,7 +54,7 @@ The panels aren't read-outs. They're where you actually do the thing:
 - **Network** scans for Wi-Fi, shows signal strength, connects, and lets you pick a DNS provider.
 - **Bluetooth** lists your devices with connect/disconnect and battery levels.
 - **Power** shows battery stats, switches power profiles (it remembers a separate choice for battery and AC), and prints some system info.
-- **Display** carries a brightness slider, text size, monitor scaling presets, and — when you have more than one screen — per-monitor controls. See [monitors](33-monitors.md) for the deeper story.
+- **Display** carries a brightness slider, text size, monitor scaling presets, and, when you have more than one screen, per-monitor controls. See [monitors](33-monitors.md) for the deeper story.
 - **Clock** opens a month grid with ISO week numbers and month stepping.
 
 Every panel takes the keyboard as well as the mouse: arrows move, Return activates, Tab steps to the neighbouring panel, and Escape closes.
@@ -65,7 +65,7 @@ Every panel takes the keyboard as well as the mouse: arrows move, Return activat
 
 Two more widgets appear on the bar only once you install the matching service from **Install → Service**, and both are worth knowing about because they do more than report status.
 
-The **Tailscale** panel connects and disconnects the tailnet, switches between accounts, and picks an exit node (your own machines and Mullvad regions both show up in that list). It also browses your machines — and with one selected, `s` sends files to it over Taildrop, which is the fastest way to move a file to your phone or another laptop. `c` copies the machine's IP, `n` its name, and `d` its full DNS name. There's a send button on each machine row too, if you'd rather click. The same thing from the terminal is `kestrel tailscale send <machine> [file...]`.
+The **Tailscale** panel connects and disconnects the tailnet, switches between accounts, and picks an exit node (your own machines and Mullvad regions both show up in that list). It also browses your machines, and with one selected, `s` sends files to it over Taildrop, which is the fastest way to move a file to your phone or another laptop. `c` copies the machine's IP, `n` its name, and `d` its full DNS name. There's a send button on each machine row too, if you'd rather click. The same thing from the terminal is `kestrel tailscale send <machine> [file...]`.
 
 The **Dropbox** panel handles login, shows how much storage you've used, and lists recently synced files.
 
@@ -73,7 +73,7 @@ Removing either service takes its widget back off the bar.
 
 ## Indicators
 
-The little cluster in the center is the indicators widget. These are status glyphs for modes you've turned on: do not disturb, night light, a queued [reminder](09-reminders.md), an active screen recording, stay awake, and [dictation](11-text-extraction-dictation.md). They light up when the mode is active and otherwise stay out of the way — hover to the left of the clock (above it on a vertical bar) to peek at the inactive ones. Clicking an indicator toggles that mode.
+The little cluster in the center is the indicators widget. These are status glyphs for modes you've turned on: do not disturb, night light, a queued [reminder](09-reminders.md), an active screen recording, stay awake, and [dictation](11-text-extraction-dictation.md). They light up when the mode is active and otherwise stay out of the way, hover to the left of the clock (above it on a vertical bar) to peek at the inactive ones. Clicking an indicator toggles that mode.
 
 If you'd rather they were always visible, set `alwaysShow` to `true` on the widget. And if you only care about some of them, list the ones you want in `items`: `["Dnd", "Reminder", "NightLight"]`. You can have more than one indicators widget, so different sections can show different subsets.
 
@@ -81,7 +81,7 @@ If you'd rather they were always visible, set `alwaysShow` to `true` on the widg
 
 The bar configures itself. You don't have to open a config file to move things.
 
-Grab an empty patch of the bar around the center and drag it toward another screen edge, and the bar moves there — left, right, top, or bottom all work, and every widget adapts (vertical bars fall back to compact icon-only forms). A click-and-hold starts the same drag. Double-left-click that same empty space to toggle transparency. And drag any widget to reorder it or throw it into another section.
+Grab an empty patch of the bar around the center and drag it toward another screen edge, and the bar moves there, left, right, top, or bottom all work, and every widget adapts (vertical bars fall back to compact icon-only forms). A click-and-hold starts the same drag. Double-left-click that same empty space to toggle transparency. And drag any widget to reorder it or throw it into another section.
 
 If you'd rather pick from a menu, **Style → Menu Bar** has both position and transparency.
 
@@ -104,7 +104,7 @@ kestrel plugin disable kestrel.weather
 
 ## Hiding the bar
 
-`Super + Shift + Space` toggles the bar off and back on without killing the shell — panels and hotkeys keep working, you just get the pixels back. It's also in the menu under **Trigger → Toggle → Menu Bar**.
+`Super + Shift + Space` toggles the bar off and back on without killing the shell, panels and hotkeys keep working, you just get the pixels back. It's also in the menu under **Trigger → Toggle → Menu Bar**.
 
 ## The config file
 
@@ -126,10 +126,10 @@ All of it is stored in `~/.config/kestrel/shell.json`, under the `bar` key. Here
 }
 ```
 
-Every widget is one entry in one of the three layout arrays, and its settings sit inline on that entry — there's no separate settings file and no `config` sub-object. The clock's `format`, `formatAlt` (what right-click cycles to), and `verticalFormat` all live right there on `{ "id": "kestrel.clock" }`.
+Every widget is one entry in one of the three layout arrays, and its settings sit inline on that entry, there's no separate settings file and no `config` sub-object. The clock's `format`, `formatAlt` (what right-click cycles to), and `verticalFormat` all live right there on `{ "id": "kestrel.clock" }`.
 
 `centerAnchor` names the one center widget that gets pinned to the exact center of the screen, with the others flanking it. That's how the clock stays dead center even as the weather and update badge come and go. Set it to an empty string and the center list is just centered as a group instead.
 
-One rule worth internalizing: **once you have your own `shell.json`, it's canonical**. Until you customize anything, the shell reads Kestrel's default file. The moment you drag a widget, run `kestrel bar`, or edit the file yourself, you own it — there's no deep merge, so new default widgets in future Kestrel releases won't appear on your bar automatically. `kestrel bar defaults` puts the shipped layout back whenever you want a clean slate.
+One rule worth internalizing: **once you have your own `shell.json`, it's canonical**. Until you customize anything, the shell reads Kestrel's default file. The moment you drag a widget, run `kestrel bar`, or edit the file yourself, you own it, there's no deep merge, so new default widgets in future Kestrel releases won't appear on your bar automatically. `kestrel bar defaults` puts the shipped layout back whenever you want a clean slate.
 
 The same file also holds your idle timings at the top level, outside the `bar` key: `idle.screensaver` and `idle.lock`, both in seconds since you went idle. So the default screensaver kicks in at 150 seconds and the lock at 300.

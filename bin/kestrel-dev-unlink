@@ -53,7 +53,7 @@ printf 'export KESTREL_PATH="%s"\n' "$default_target" | sudo tee /etc/kestrel.co
 
 # kestrel-dev-link prepended the checkout to sudo's secure_path. Drop it in the
 # same step that drops the checkout, or sudo keeps running a tree nothing else
-# points at — and keeps trusting a user-writable directory for root's commands.
+# points at, and keeps trusting a user-writable directory for root's commands.
 sudo rm -f "$sudoers_file"
 
 echo "Pointed Kestrel at $default_target"

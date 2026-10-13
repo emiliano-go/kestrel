@@ -7,7 +7,7 @@
 #
 # The real kestrel-remove-security-sudoless-docker and kestrel-state run here
 # (from the repo bin); only the privileged/system calls are stubbed, so the whole
-# chain — including the reboot flag — is exercised.
+# chain, including the reboot flag, is exercised.
 
 set -euo pipefail
 

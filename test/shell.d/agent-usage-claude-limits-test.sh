@@ -25,7 +25,7 @@ PY
 
 # The two flat buckets, then every scoped shape that matters: a model's weekly
 # window, a second window for that same model, a model that names only an id,
-# and — dropped — a repeat of a window already read, a blank name, and a
+# and, dropped, a repeat of a window already read, a blank name, and a
 # percent that will not parse.
 limits=$(read_limits '{
   "five_hour": { "utilization": 78.0 },
@@ -94,7 +94,7 @@ PY
 }
 
 # A Team premium seat runs on the Max 5x rate-limit tier, and the tier alone
-# used to label it "Max 5x" — the plan the seat is not on.
+# used to label it "Max 5x", the plan the seat is not on.
 [[ $(plan_label default_claude_max_5x team) == "Team 5x" ]] ||
   fail "Claude collector labels a Team seat by its subscription, not its rate-limit tier" "$(plan_label default_claude_max_5x team)"
 pass "Claude collector labels a Team seat by its subscription, not its rate-limit tier"
@@ -302,7 +302,7 @@ corrected=$(probe_with_cache false "$future" "$payload" 3600)
 pass "Claude collector re-probes after a backwards clock correction"
 
 # --force is someone pressing refresh, and its help text promises the caches are
-# ignored — so the reuse window must not outrank it.
+# ignored, so the reuse window must not outrank it.
 forced=$(probe_with_cache true "$fresh" "$payload")
 [[ $(jq -r '.probes' <<<"$forced") == "1" ]] ||
   fail "Claude collector re-probes on --force despite a fresh cache" "$forced"
@@ -318,7 +318,7 @@ pass "Claude collector re-probes on --force despite a fresh cache"
 pass "Claude collector caches a successful probe"
 
 # The panel reads a window out of a label, and that guess cannot survive a
-# model name — "Opus 5 (1M context)" parses as a one-minute window. A collector
+# model name, "Opus 5 (1M context)" parses as a one-minute window. A collector
 # that states the title outright is taken at its word.
 run_node_test <<'JS'
 const fs = require('fs')

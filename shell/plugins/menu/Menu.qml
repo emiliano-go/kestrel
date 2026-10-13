@@ -102,7 +102,7 @@ Item {
   property int contentSpacing: Style.spacing.md
   property int baseRowHeight: Math.max(Style.space(50), Style.font.body + Style.spacing.rowPaddingX * 2)
   property int detailRowHeight: Math.max(Style.space(58), Style.font.body + Style.font.caption + Style.spacing.rowPaddingX * 2)
-  // How much of the first hidden row stays visible at the fold — enough to
+  // How much of the first hidden row stays visible at the fold, enough to
   // read as a cut-off row rather than a bottom border.
   property int rowPeek: Math.round(baseRowHeight * 0.55)
   property int rowSpacing: Style.spacing.xs
@@ -151,7 +151,7 @@ Item {
     return (root.filterText || root.dmenuActive) && detail ? root.detailRowHeight : root.baseRowHeight
   }
 
-  // Height the card can devote to rows before running off the screen — or
+  // Height the card can devote to rows before running off the screen, or
   // past the frozen top edge once a search has pinned the card in place.
   // Uses panel.cardTop rather than effectiveCardTop: the centered top is
   // derived from the card height, which this value feeds.
@@ -366,8 +366,8 @@ Item {
       var value = parts[1] || parts[0] || ""
       var current = parts[2] || ""
       if (!label) continue
-      // Distinct values can slugify alike — Fira Code and Fira-Code both give
-      // fira-code — and a repeated id is dropped, which would silently lose a
+      // Distinct values can slugify alike, Fira Code and Fira-Code both give
+      // fira-code, and a repeated id is dropped, which would silently lose a
       // row from the list. Nudge it until it is the row's own.
       var rowId = menuId + "." + root.slugify(value)
       while (takenIds[rowId]) rowId += "-"
@@ -546,8 +546,8 @@ Item {
   }
 
   // Park the cursor on a selectable row after the rows underneath it changed.
-  // A menu with nothing selectable in it -- every app in it already installed
-  // -- shows no cursor at all, and grows one the moment a row can take it.
+  // A menu with nothing selectable in it, every app in it already installed
+  //, shows no cursor at all, and grows one the moment a row can take it.
   function settleCursor() {
     var target = root.nextSelectable(root.selectedIndex, 1)
     root.selectedIndex = target >= 0 ? target : 0
@@ -1072,7 +1072,7 @@ Item {
     WlrLayershell.namespace: "kestrel-menu"
 
     // The card opens centered exactly as always. The first search keystroke
-    // or submenu move freezes the top line where it currently sits — from
+    // or submenu move freezes the top line where it currently sits, from
     // then on the card grows and shrinks downward instead of re-centering
     // on every resize, which made the menu jump around. The rows height is
     // frozen at the same moment, so the starting menu also caps how tall the
@@ -1308,7 +1308,7 @@ Item {
                 width: Style.font.iconLarge
                 height: Style.font.iconLarge
                 fillMode: Image.PreserveAspectFit
-                // Decode at physical pixels — a logical-size decode leaves
+                // Decode at physical pixels, a logical-size decode leaves
                 // PNG icons upscaled and blurry on HiDPI displays.
                 sourceSize.width: width * Screen.devicePixelRatio
                 sourceSize.height: height * Screen.devicePixelRatio
@@ -1410,8 +1410,8 @@ Item {
           // these keep both edges honest once the list has been scrolled,
           // when content hides above the card top as well as below. Strength
           // tracks the distance still hidden past each edge rather than
-          // animating on a clock, so a programmatic jump — wrapping from the
-          // last row back to the first — lands with the fade already applied.
+          // animating on a clock, so a programmatic jump, wrapping from the
+          // last row back to the first, lands with the fade already applied.
           Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right

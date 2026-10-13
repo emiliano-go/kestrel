@@ -110,7 +110,7 @@ assert(weather.iconForOpenMeteoCode(45, true) !== weather.iconForOpenMeteoCode(4
 assertEqual(weather.provisionalCurrentIcon({ weatherCode: 113 }, ''), weather.iconForCode(113, false), 'weather uses wttr to fill an empty initial icon')
 assertEqual(weather.provisionalCurrentIcon({ weatherCode: 113 }, 'night'), 'night', 'weather refresh preserves a resolved day-night icon')
 // The bar identifies a panel by the widget in its slot, so the nested panel
-// has to present the host widget rather than itself — otherwise the
+// has to present the host widget rather than itself, otherwise the
 // open-panel dot never lights and Tab cannot leave the panel.
 assert(
   panelSource.includes('owner: root.barIdentity'),
@@ -134,7 +134,7 @@ assert(
 )
 
 assert(
-  panelSource.includes('text: root.label || "—"'),
+  panelSource.includes('text: root.label || ", "'),
   'weather hero and bar use the same resolved icon'
 )
 assert(
@@ -159,7 +159,7 @@ test_tmp=$(mktemp -d)
 trap 'rm -rf "$test_tmp"' EXIT
 
 weather_location() {
-  HOME="$test_tmp" "$ROOT/bin/omarchy-weather-location" "$@"
+  HOME="$test_tmp" "$ROOT/bin/kestrel-weather-location" "$@"
 }
 
 weather_location --set "Malibu" "34.02577,-118.7804"

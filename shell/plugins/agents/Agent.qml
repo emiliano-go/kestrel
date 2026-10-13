@@ -3,7 +3,7 @@ import Quickshell.Io
 
 // One agent's usage record, read straight off the data file that
 // kestrel-agent-usage-update maintains. The panel never learns how the
-// numbers were made — a record that appears in the usage directory is an
+// numbers were made, a record that appears in the usage directory is an
 // agent, whoever wrote it.
 Item {
   id: root

@@ -14,7 +14,7 @@ mkdir -p "$STUB_DIR"
 
 # The picker reads the plugin list from kestrel-plugin-list and hands what it
 # decided to a verb-specific command, so stubbing both ends shows which plugin
-# a pick actually resolved to -- the thing a source-level check cannot see.
+# a pick actually resolved to, the thing a source-level check cannot see.
 cat >"$STUB_DIR/kestrel-plugin-list" <<'STUB'
 #!/bin/bash
 cat "$FAKE_PLUGINS"
@@ -142,7 +142,7 @@ pick enable "$(printf 'Fancy\tacme.fancy')"
   || fail "picker delegates kind-specific enablement" "$CALLS"
 pass "picker delegates kind-specific enablement"
 
-# A bar has no off, so it is never offered under disable -- including this one,
+# A bar has no off, so it is never offered under disable, including this one,
 # which is a widget too.
 cat >"$TMPDIR/plugins.json" <<'JSON'
 [

@@ -46,7 +46,7 @@ And you can dive deeper on every group:
 
 ```
 ~ ❯ kestrel capture
-Capture commands — Screenshots and screen recording:
+Capture commands, Screenshots and screen recording:
   kestrel capture qr                                                                                                                                                                                                       Decode a QR code from a screenshot region
   kestrel capture screenrecording [--fullscreen] [--with-desktop-audio] [--with-microphone-audio] [--with-webcam] [--webcam-device=<device>] [--webcam-size=<small|medium|large>] [--resolution=<size>] [--stop-recording]  Start or stop screen recording
   kestrel capture screenrecording with webcam                                                                                                                                                                              Pick a webcam and start a screen recording with it

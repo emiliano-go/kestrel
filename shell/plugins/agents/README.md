@@ -11,11 +11,11 @@ cross-device aggregation); `Agent.qml` is the per-record file watcher.
 
 Every subscription on one page, limits first.
 
-- **Hero** — the agents robot, and a line that rotates through what the
+- **Hero**, the agents robot, and a line that rotates through what the
   token counts add up to across every agent: tokens this week and today, the
   most used model, the busiest day, and today's prompts and sessions. Its
   corner has + to add a subscription and >_ to start the default agent.
-- **One section per agent** — its mark, name, and plan, then a compact line
+- **One section per agent**, its mark, name, and plan, then a compact line
   per limit window: its meter and the time until it resets (the exact percentage
   on hover). A model-scoped allowance on the same clock (Claude's Fable weekly
   limit) is a tick on that window's meter rather than a line of its own; the
@@ -23,7 +23,7 @@ Every subscription on one page, limits first.
   that account in again from the panel; other endpoint trouble shows under the
   name in the urgent color. Limits kept from an earlier check after a failed one dim, and their
   tooltip says how old they are.
-- **Accounts** — an agent with more than one subscription account (see
+- **Accounts**, an agent with more than one subscription account (see
   `kestrel agent account`) lists each: name and plan on one line (the email on hover), and its own limit
   lines. An _ACTIVE_ label marks the account new sessions start as; the
   others get a _Use_ link. Hovering the line also reveals Autoswitch, which
@@ -31,12 +31,12 @@ Every subscription on one page, limits first.
   threshold; while it's on it stands in for Use, which shows only when you're
   on the line, and clicking it again goes back to notifying. Click a name to
   rename the account in place.
-- **Balance** — prepaid agents show a credit ledger instead of limits: a
+- **Balance**, prepaid agents show a credit ledger instead of limits: a
   fuel-gauge meter that drains toward empty, the remaining credit, and
   funded-versus-spent detail.
-- **Make something cool** — starter prompts (a new theme, plugin, or app) that
+- **Make something cool**, starter prompts (a new theme, plugin, or app) that
   start the default agent on the task through `kestrel agent prompt`.
-- **Adding a subscription** — the + in the hero's corner swaps the page for
+- **Adding a subscription**, the + in the hero's corner swaps the page for
   Claude Code, Codex, and Grok as large marks, three across, with the first
   one focused, and the hero's line reads Add an account. The + becomes the
   X that goes back. An agent that can't be added is dimmed and says why on
@@ -65,9 +65,9 @@ record that lands in the directory regardless of who wrote it.
 
 Adding an agent therefore never touches this plugin: ship a collector that
 prints the record contract (see the `claude` and `codex` collectors in
-`bin/`), and the panel gains a tab. An `assets/<id>.svg` mark is optional —
+`bin/`), and the panel gains a tab. An `assets/<id>.svg` mark is optional, 
 with an `assets/<id>-light.svg` twin if the mark needs a dark variant for
-light surfaces — and the bar glyph stands in when there is none.
+light surfaces, and the bar glyph stands in when there is none.
 
 | Collector | Limits | Local stats |
 |---|---|---|
@@ -90,7 +90,7 @@ since every account shares the primary home's history. After each run,
 active account crosses its threshold, and re-collects the record if the active
 account changed.
 
-Codex CLI will front any OpenAI-compatible backend — `--oss`, or a custom `model_provider` in `config.toml` aimed at Ollama, LM Studio, or a gateway — and those rollouts sit in the same sessions directory as OpenAI-backed ones. The Codex collector skips a rollout whose first `session_meta.model_provider` names anything but the built-in `openai` provider. Rollouts written before Codex recorded that field carry no provider and still count.
+Codex CLI will front any OpenAI-compatible backend, `--oss`, or a custom `model_provider` in `config.toml` aimed at Ollama, LM Studio, or a gateway, and those rollouts sit in the same sessions directory as OpenAI-backed ones. The Codex collector skips a rollout whose first `session_meta.model_provider` names anything but the built-in `openai` provider. Rollouts written before Codex recorded that field carry no provider and still count.
 
 Claude limits need a signed-in CLI; without credentials the panel says so and
 falls back to local stats only. A non-default Claude directory is honored via
@@ -109,7 +109,7 @@ and finally the key opencode stores in `~/.local/share/opencode/auth.json`.
 
 The collector first asks the account's `:getBalance` endpoint for the real
 prepaid ledger. That endpoint exists but is permission-gated, and as of
-August 2026 no console-issued API key passes it — Fireworks appears to
+August 2026 no console-issued API key passes it, Fireworks appears to
 reserve it for the dashboard session. The probe stays because it is cheap
 and the live figure lights up automatically if Fireworks ever opens it to
 keys. Until then the collector falls back to estimating the balance from
@@ -176,7 +176,7 @@ kestrel bar set kestrel.agents syncDir '~/Sync/agent-usage'
 ```
 
 Per-agent enablement is nested, and `set` writes its key literally rather
-than walking a dotted path — so pass the whole `providers` object as JSON (or
+than walking a dotted path, so pass the whole `providers` object as JSON (or
 edit `shell.json` directly):
 
 ```bash
@@ -192,7 +192,7 @@ hide a subscription that is installed. Disabled agents are also skipped when
 the records regenerate.
 
 With `syncMode` on, every `*.json` snapshot in `syncDir` is merged, so today,
-the last 7 days, and the all-time totals cover every machine you code on —
+the last 7 days, and the all-time totals cover every machine you code on, 
 active days are unioned by date rather than summed. Rate limits stay
 per-account and are never merged. A record may declare `"scope": "account"`
 when its stats are account-global rather than machine-local (Fireworks'

@@ -5,8 +5,8 @@
 # kestrel:requires-sudo=true
 # kestrel:examples=sudo kestrel-system-factory-reset
 
-# Returns the machine to provisioning state — fully installed, no user, first-boot
-# setup pending — the state you want before selling or handing the machine on.
+# Returns the machine to provisioning state, fully installed, no user, first-boot
+# setup pending, the state you want before selling or handing the machine on.
 #
 # The running root (@) is swapped for a fresh writable clone of the @factory
 # snapshot, so user-installed packages and /etc drift are gone too. That
@@ -185,7 +185,7 @@ install_provisioning_units() {
 # machine-id, so after a reset gives the machine a fresh identity, the
 # previous system's entry (with the now-stale UKI hash) would survive, sort
 # first, and make Limine refuse the rebuilt UKI with a hash-mismatch warning.
-# Only machine-ids the old limine.conf referenced are removed — a shared ESP
+# Only machine-ids the old limine.conf referenced are removed, a shared ESP
 # may hold other installations' machine-id directories.
 reset_limine_config() {
   local root="$1" esp="$2" template found=""
@@ -362,7 +362,7 @@ stage_full_reset() {
 
   # @factory itself survives the wipe as the baseline for future resets. If it
   # came from a normal install it still holds the seller's account and
-  # /etc/shadow, which the new wheel user could mount and read — and a second
+  # /etc/shadow, which the new wheel user could mount and read, and a second
   # reset would restore that account. Scrub it once, in place.
   sanitize_factory_baseline "$top/@factory"
 
@@ -445,7 +445,7 @@ main() {
   if gum confirm --affirmative "Reboot now" --negative "Reboot later" "Reboot to complete the reset?"; then
     systemctl reboot
   else
-    gum style --foreground 3 "Do not keep using this machine — changes made now will be lost."
+    gum style --foreground 3 "Do not keep using this machine, changes made now will be lost."
   fi
 }
 

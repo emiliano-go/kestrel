@@ -15,7 +15,7 @@ Panel {
   property var anchorItem: null
   property bool openedFromHotkey: false
 
-  // The bar tracks the widget mounted in its slot — BarWidget.qml — not this
+  // The bar tracks the widget mounted in its slot, BarWidget.qml, not this
   // nested panel. Everything the bar identifies a panel by has to be that
   // widget: the popout coordinator (and with it the open-panel dot under the
   // pill) compares against `slot.activeItem`, and switchPanelFrom looks the
@@ -76,7 +76,7 @@ Panel {
   property string wttrLocation: ""
 
   // Configured location, read from the weather.json state file (owned by
-  // omarchy-weather-location). The query is the wttr.in path segment
+  // kestrel-weather-location). The query is the wttr.in path segment
   // (coordinates when stored, else the encoded name); empty means IP
   // auto-detect. The watch makes hand edits take effect live.
   property var configuredLocationState: ({ name: "", latitude: null, longitude: null })
@@ -158,7 +158,7 @@ Panel {
     dailyForecastRetries = 0
     if (!forecastProc.running) forecastProc.running = true
     if (root.locationQuery === "" && !locationProc.running) locationProc.running = true
-    // With stored coordinates this fetches open-meteo right away — no need
+    // With stored coordinates this fetches open-meteo right away, no need
     // to wait for the slow wttr response. Without them it's a no-op until
     // wttr reports the detected area.
     refreshDailyForecast(null)
@@ -253,11 +253,11 @@ Panel {
 
   function persistLocation(name, latitude, longitude) {
     if (name && latitude !== null && longitude !== null)
-      locationSaveProc.command = ["omarchy-weather-location", "--set", name, latitude + "," + longitude]
+      locationSaveProc.command = ["kestrel-weather-location", "--set", name, latitude + "," + longitude]
     else if (name)
-      locationSaveProc.command = ["omarchy-weather-location", "--set", name]
+      locationSaveProc.command = ["kestrel-weather-location", "--set", name]
     else
-      locationSaveProc.command = ["omarchy-weather-location", "--clear"]
+      locationSaveProc.command = ["kestrel-weather-location", "--clear"]
     locationSaveProc.running = true
   }
 
@@ -326,7 +326,7 @@ Panel {
     return Model.iconForOpenMeteoCode(code)
   }
 
-  // Mirrors omarchy-weather-icon's wttr.in code → nerd-font glyph mapping.
+  // Mirrors kestrel-weather-icon's wttr.in code → nerd-font glyph mapping.
   function iconForCode(code, night) {
     return Model.iconForCode(code, night)
   }
@@ -537,7 +537,7 @@ Panel {
             textFormat: Text.PlainText
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 5
-            text: root.label || "—"
+            text: root.label || ", "
             color: root.bar.foreground
             font.family: root.bar.fontFamily
             // Decorative condition emoji; intentionally larger than the
@@ -552,7 +552,7 @@ Panel {
             Text {
               id: tempBig
               textFormat: Text.PlainText
-              text: root.reportTempNum || "—"
+              text: root.reportTempNum || ", "
               color: root.bar.foreground
               font.family: root.bar.fontFamily
               // Hero temperature read-out; deliberately oversized, outside

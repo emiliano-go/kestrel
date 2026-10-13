@@ -4,7 +4,7 @@
 
 Files (Nautilus) is the graphical file manager. `Super + Shift + F` opens it, and `Super + Shift + Alt + F` opens it in the directory your terminal is sitting in, which saves a lot of clicking. `Ctrl + L` lets you type a path, and hitting `Space` on any file gives you a quick preview without opening anything.
 
-Plug in a USB stick or an SD card and it's mounted automatically, so it just shows up in the sidebar. For anything more involved — formatting a drive, checking SMART health, creating partitions — launch _Disks_ from the app launcher (`Super + Space`).
+Plug in a USB stick or an SD card and it's mounted automatically, so it just shows up in the sidebar. For anything more involved, formatting a drive, checking SMART health, creating partitions, launch _Disks_ from the app launcher (`Super + Space`).
 
 Double-clicking follows sensible defaults: images open in imv, video in mpv, PDFs in Document Viewer, and plain text in Neovim.
 
@@ -42,7 +42,7 @@ You start Aether via the application launcher (`Super + Space`).
 
 ## LocalSend
 
-[LocalSend](https://localsend.org/) lets you send files to other devices on the same network running the app, like Apple's AirDrop. It's cross-platform, though, so you can send files to and from Windows, macOS, Android, iOS, and of course Linux.
+[LocalSend](https://localsend.org/) lets you send files to other devices on the same network running the app. It's cross-platform, though, so you can send files to and from Windows, Android, iOS, and of course Linux.
 
 You can open the Share menu on `Super + Ctrl + S` or under _Trigger > Share_ in the Kestrel menu. It gives you four options:
 

@@ -79,7 +79,7 @@ fi
 if [[ $tui == "true" ]]; then
   # Attach to the gateway rather than `openclaw chat`: chat is the embedded
   # local runtime, which refuses to start while the gateway owns ~/.openclaw's
-  # state directory -- and on any machine set up through Install > AI, the
+  # state directory, and on any machine set up through Install > AI, the
   # gateway service is running whenever the desktop session is.
   exec openclaw tui "${message[@]}"
 fi

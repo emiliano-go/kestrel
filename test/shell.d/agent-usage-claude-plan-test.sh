@@ -78,8 +78,8 @@ plan=$(read_plan "$credentials" '{"oauthAccount":{"organizationRateLimitTier":"d
   fail "Claude collector prefers the seat's own tier over the organization's" "$plan"
 pass "Claude collector prefers the seat's own tier over the organization's"
 
-# Without a profile — or with one that states no tier, or a tier the label
-# cannot read — the credentials are all there is, and they still answer.
+# Without a profile, or with one that states no tier, or a tier the label
+# cannot read, the credentials are all there is, and they still answer.
 for profile in '' '{}' '{"oauthAccount":{"organizationRateLimitTier":null}}' '{"oauthAccount":{"organizationRateLimitTier":"default_claude_unknown"}}'; do
   plan=$(read_plan "$credentials" "$profile")
   [[ $plan == "Max 5x" ]] ||

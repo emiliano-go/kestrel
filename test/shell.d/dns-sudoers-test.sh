@@ -8,8 +8,8 @@ dns="$ROOT/bin/kestrel-dns"
 sudoers_file="$ROOT/etc/sudoers.d/kestrel-dns"
 rule='%wheel ALL=(root) NOPASSWD: /usr/bin/kestrel-dns Cloudflare, /usr/bin/kestrel-dns Google, /usr/bin/kestrel-dns DHCP'
 
-# Exactly one rule, matched whole. A second line -- or the same command with its
-# arguments dropped, which sudoers reads as "any arguments" -- would widen the
+# Exactly one rule, matched whole. A second line, or the same command with its
+# arguments dropped, which sudoers reads as "any arguments", would widen the
 # grant while leaving this line in place.
 rules=$(grep -vE '^[[:space:]]*(#|$)' "$sudoers_file")
 [[ $rules == "$rule" ]] ||
@@ -32,8 +32,8 @@ pass "dns sudoers rule is scoped to the stock providers"
 
 # The privileged half runs as root under sudo's secure_path, and a dev link
 # (etc/sudoers.d/kestrel-dev-path) prepends a user-writable checkout bin/ to it.
-# Every helper the script calls by bare name -- dirname, install, tee, nmcli,
-# systemctl, awk -- is a system tool, so once it holds root the script pins PATH
+# Every helper the script calls by bare name, dirname, install, tee, nmcli,
+# systemctl, awk, is a system tool, so once it holds root the script pins PATH
 # to trusted system directories and never resolves one of them out of the
 # checkout. The unprivileged wrapper phase keeps the caller's PATH, which is why
 # the pin is gated on EUID rather than set unconditionally.
@@ -55,7 +55,7 @@ if (( EUID != 0 )); then
 fi
 
 # A sandbox or a hardened kernel can refuse unprivileged user namespaces, and
-# the non-graphical suites have to stay green on any machine -- a skip is a
+# the non-graphical suites have to stay green on any machine, a skip is a
 # passing test. Only the runtime probe needs the namespace; the static checks
 # above and the elevation checks below run either way.
 if (( EUID == 0 )) || unshare --user --map-root-user true 2>/dev/null; then
@@ -150,9 +150,9 @@ custom=$(elevation_for Custom)
 [[ $custom == "pkexec /usr/bin/kestrel-dns Custom" ]] ||
   fail "kestrel-dns leaves Custom on the polkit path, since no sudoers rule covers it" "got: $custom"
 
-# The grant is what makes sudo passwordless, so its absence -- an install still
+# The grant is what makes sudo passwordless, so its absence, an install still
 # on an older kestrel-settings, or a user outside %wheel the rule cannot match
-# -- has to route to polkit. Betting on sudo here leaves the panel's one-click
+#, has to route to polkit. Betting on sudo here leaves the panel's one-click
 # toggle execing into a password prompt it has no terminal to show.
 ungranted=$(STUB_GRANTED="" elevation_for Cloudflare)
 [[ $ungranted == "pkexec /usr/bin/kestrel-dns Cloudflare" ]] ||

@@ -338,7 +338,7 @@ Ghostty terminal is installed using _Install > Terminal_ via the Kestrel menu.
 You can use `Super + Ctrl + E` to show a complete emoji picker that'll put the selection on the clipboard or you can use these quick access options.
 
 | Hotkey       | EM | Clue       |
-| ------------ | -- | ---------- |
+| ------------ |, | ---------- |
 | `CapsLock M S` | 😄 | smile      |
 | `CapsLock M C` | 😂 | cry        |
 | `CapsLock M L` | 😍 | love       |
@@ -367,7 +367,7 @@ You can use `Super + Ctrl + E` to show a complete emoji picker that'll put the s
 
 | Hotkey       | Completion       |
 | ------------ |  ---------- |
-| `CapsLock Space Space` | — (mdash)   |
+| `CapsLock Space Space` |, (mdash)   |
 | `CapsLock Space N` | Your name (as entered on setup)  |
 | `CapsLock Space E` | Your email (as entered on setup)  |
 

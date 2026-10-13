@@ -15,7 +15,7 @@ Item {
   property real iconOpacity: 1.0
   property alias metaOpacity: metaText.opacity
 
-  // Optional control pinned to the trailing edge of the hero — a ToggleSwitch,
+  // Optional control pinned to the trailing edge of the hero, a ToggleSwitch,
   // a small button. The hero centers it against the labels and reserves the
   // space itself, so callers never do the geometry.
   property Component trailingControl: null

@@ -200,7 +200,7 @@ assert_output_contains "mutating command help does not execute target" "$output"
 pass "mutating command help shows the binary without executing it"
 
 # These three are install-time plumbing the ISO and install leaves call, so
-# they stay out of the listing a user browses -- while still routing, because
+# they stay out of the listing a user browses, while still routing, because
 # those callers use the CLI. A GROUP_DESCRIPTIONS entry would put the group
 # back in the top-level listing even with every command in it hidden, which is
 # why apply has none.

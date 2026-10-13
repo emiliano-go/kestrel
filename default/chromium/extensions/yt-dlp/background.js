@@ -12,7 +12,7 @@ function triggerDownload(tab) {
   if (!tab) return;
 
   // The activeTab permission exposes tab.url whenever the user invokes the
-  // extension — both via the toolbar click and the keyboard shortcut.
+  // extension, both via the toolbar click and the keyboard shortcut.
   if (tab.url) {
     sendUrl(tab.url);
     return;

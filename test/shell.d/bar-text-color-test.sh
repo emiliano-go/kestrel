@@ -31,7 +31,7 @@ result=$(HOME="$TMPDIR" kestrel-bar-text-color top 20 '#ffffff' '#101010' --back
 pass "transparent bar text falls back to text color when sampling fails"
 
 # A video background must be sampled one frame at a time. Reading the whole file
-# emits a value per frame, which parses as nothing and silently falls back —
+# emits a value per frame, which parses as nothing and silently falls back, 
 # and decodes the entire wallpaper to find that out.
 light_top_video="$TMPDIR/light-top.mp4"
 ffmpeg -y -f lavfi -i "testsrc=size=640x360:rate=10:duration=2" \

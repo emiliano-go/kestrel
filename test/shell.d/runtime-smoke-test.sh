@@ -536,7 +536,7 @@ pass "direct panel IPC opens and closes default panels"
 
 # Each widget registers its IPC handler once per bar, and the bar is
 # instantiated once per screen, so Quickshell reports one collision per screen
-# past the first. Anything beyond that is two instances on the same screen —
+# past the first. Anything beyond that is two instances on the same screen, 
 # the shape duplicate component loads produced, where a sync pass that ran
 # while a widget's asynchronous load was still in flight started a second one.
 # Checked before the reload below, which rebuilds widgets by design.

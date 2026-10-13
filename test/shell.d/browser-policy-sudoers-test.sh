@@ -9,8 +9,8 @@ setter="$ROOT/bin/kestrel-theme-set-browser"
 sudoers_file="$ROOT/etc/sudoers.d/kestrel-theme-browser"
 rule='%wheel ALL=(root) NOPASSWD: /usr/bin/kestrel-theme-set-browser-policy [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]'
 
-# Exactly one rule, matched whole. Dropping the argument -- which sudoers reads
-# as "any arguments" -- or widening the glob to `*` would let the grant carry
+# Exactly one rule, matched whole. Dropping the argument, which sudoers reads
+# as "any arguments", or widening the glob to `*` would let the grant carry
 # something other than a color while leaving this line looking right.
 rules=$(grep -vE '^[[:space:]]*(#|$)' "$sudoers_file")
 [[ $rules == "$rule" ]] ||

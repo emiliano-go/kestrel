@@ -13,7 +13,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 # the file root later reads or executes carries a value an unprivileged user
 # chose.
 #
-# Worked example -- an installer emitting a udev rule:
+# Worked example, an installer emitting a udev rule:
 #
 #   sudo tee /etc/udev/rules.d/99-power-profile.rules <<EOF
 #   ACTION=="change", SUBSYSTEM=="power_supply", RUN+="$HOME/.local/share/kestrel/bin/kestrel-power-profile"
@@ -38,7 +38,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 # input no unprivileged user should be able to influence.
 PRIVILEGED_PREFIXES=(/etc /usr /opt /srv /boot /var/lib)
 
-# Path roots the installing user can replace outright -- by editing the
+# Path roots the installing user can replace outright, by editing the
 # directory, or by swapping a symlink like ~/.local/share/kestrel. An expansion
 # anchored in one of these is the shape this check exists to catch.
 USER_WRITABLE_VARS=(HOME PWD OLDPWD TMPDIR KESTREL_PATH KESTREL_INSTALL
@@ -65,8 +65,8 @@ COMMAND_SUBSTITUTION="command-substitution"
 # Sites that legitimately need install-time expansion declare it in a comment
 # immediately above the heredoc:
 #
-#   # kestrel:heredoc-expands paths=none -- $servers is a validated IP list
-#   # kestrel:heredoc-expands paths=storage,shared -- checked by valid_path
+#   # kestrel:heredoc-expands paths=none, $servers is a validated IP list
+#   # kestrel:heredoc-expands paths=storage,shared, checked by valid_path
 #
 # `paths=` is the machine-checked half, and is what keeps this from being a
 # rubber stamp: it must name exactly the expansions that are path-shaped, so
@@ -192,7 +192,7 @@ declare -A VARS_TAINTED=()
 # boot_params+=(...) is not an assignment this reads at all.
 #
 # VARS_TAINTED records, separately, any name that is assigned a value naming a
-# root the user can replace -- at any point in the file, not just the assignment
+# root the user can replace, at any point in the file, not just the assignment
 # that won. That is what stops a name being introduced with a harmless packaged
 # value and then reassigned under $HOME, which judging one assignment in
 # isolation would miss in whichever direction it picked.
@@ -217,8 +217,8 @@ collect_vars() {
 
     mentions_user_writable_root "$value" && VARS_TAINTED["$name"]=1
 
-    # An append never wins the value -- an array grown across a file resolves to
-    # nothing useful -- but it does carry the taint, or a name could reach a user
+    # An append never wins the value, an array grown across a file resolves to
+    # nothing useful, but it does carry the taint, or a name could reach a user
     # root through += and never be judged on it.
     [[ -n $append ]] && continue
     [[ -v VARS[$name] ]] || VARS["$name"]=$value
@@ -315,7 +315,7 @@ mentions_user_writable_root() {
 # ("$HOME/.local/...", "$storage:/storage"), or the variable names a
 # user-writable root, or it is assigned a literal value containing a slash.
 # Anchored means the literal text *before* the expansion is itself a privileged
-# path, as in "/etc/systemd/system/$unit" -- still a path, but one root owns end
+# path, as in "/etc/systemd/system/$unit", still a path, but one root owns end
 # to end. Scoping the anchor test to the containing token is what keeps a udev
 # RUN+= line honest: it can name /usr/bin/systemd-run earlier on the same line
 # while the $HOME token stands alone.
@@ -349,8 +349,8 @@ classify_expansion() {
   # to hide the shape: helper="$HOME/.local/share/kestrel/bin/agent" followed by
   # ExecStart=$helper puts no slash in the token and no literal path in the value,
   # so rescuing it would exempt exactly the write this check exists to catch. A
-  # value that merely fails to resolve -- a kernel parameter list, an escaped
-  # password -- is left to the rescue, since nothing in it names a user root.
+  # value that merely fails to resolve, a kernel parameter list, an escaped
+  # password, is left to the rescue, since nothing in it names a user root.
   # A name assigned a user root anywhere in the file is never rescued: the
   # assignment that won may be the packaged path it was later reassigned away
   # from, and the rescue would then clear it on evidence it no longer holds.
@@ -762,7 +762,7 @@ scan_file() {
       1. quote the delimiter (<<'$delim') so nothing expands at install time;
       2. hardcode an absolute root-owned path instead of expanding one;
       3. if the expansion is genuinely required, declare it above the heredoc:
-           # kestrel:heredoc-expands paths=<expansions used as paths, or none> -- <why this is safe>
+           # kestrel:heredoc-expands paths=<expansions used as paths, or none>, <why this is safe>
          Decide that list yourself. The scan's own reading of it is above, and
          where the scan is most likely wrong is exactly here -- a path it could
          not follow reads as an ordinary value -- so pasting its verdict back
@@ -787,8 +787,8 @@ scan_file() {
 # bin/, install/ and migrations/ are where privileged writes live: bin/ holds
 # the setup and upgrade commands, install/ runs during install, migrations/
 # during update. default/ is scanned too even though the pattern is not
-# reachable there today -- it ships bash functions and completions whose only
-# "<<" uses are herestrings, with no privileged writes at all -- because the
+# reachable there today, it ships bash functions and completions whose only
+# "<<" uses are herestrings, with no privileged writes at all, because the
 # scan is cheap and default/ is sourced into every login shell, so a privileged
 # write arriving there later should not arrive unchecked.
 shell_sources() {

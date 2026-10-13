@@ -74,7 +74,7 @@ Item {
     installed = parsed.installed === true
     running = parsed.running === true
     authenticated = parsed.authenticated === true
-    // Reality caught up to the pending pause/resume — stop overriding.
+    // Reality caught up to the pending pause/resume, stop overriding.
     if (_desired !== -1 && running === (_desired === 1)) _desired = -1
     statusText = String(parsed.statusText || (installed ? "Stopped" : "Not installed"))
     accountPath = String(parsed.accountPath || "")
@@ -116,7 +116,7 @@ Item {
   }
 
   function runControl(command, desired) {
-    // No progress status here — the greyed icon and hero phrase already convey
+    // No progress status here, the greyed icon and hero phrase already convey
     // the pause/resume; only surface a message if the command fails.
     if (!installed || controlProcess.running) return
     _desired = desired

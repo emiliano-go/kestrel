@@ -5,9 +5,8 @@
 # kestrel:examples=kestrel agent crash 1516893
 
 # Clicked from a "Process crashed:" notification, or run by hand against any PID
-# in `coredumpctl list`. The method lives in the diagnose-crash skill so it is
-# edited in one place and works with whichever agent is default; this only
-# gathers the facts and points at it.
+# in `coredumpctl list`. This gathers the facts about the crash and hands them to
+# whichever agent is the default.
 
 set -euo pipefail
 
@@ -22,8 +21,6 @@ fi
 comm=${2:-unknown}
 exe=${3:-unknown}
 signal=${4:-unknown}
-
-skill="$KESTREL_PATH/default/agents/skills/diagnose-crash/SKILL.md"
 
 # Looked up live so a hand-run PID still gets a timestamp. A rotated-away core
 # only costs the timestamp, so failure is tolerated.
@@ -41,11 +38,9 @@ What systemd-coredump recorded:
   signal:   $signal
   time:     $when
 
-Use the diagnose-crash skill: it covers how to investigate, what to report, and
-when a crash is worth reporting upstream to Kestrel. If your harness has no skill
-mechanism, read the skill files directly and follow them instead:
-
-  $skill
+Investigate with coredumpctl, the core dump, the binary's symbols, and the
+journal for the unit. Establish the facts, explain the cause, and tell me whether
+the crash is worth reporting upstream.
 PROMPT
 )
 

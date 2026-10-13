@@ -1,6 +1,5 @@
 [Unit]
 Description=Kestrel speaker tuning filter-chain
-Documentation=https://github.com/omacom/omarchy/blob/master/docs/audio-tuning.md
 # WirePlumber does the linking, so starting before it is up risks the output being
 # linked before the speaker device has been discovered.
 After=pipewire.service wireplumber.service
@@ -14,7 +13,7 @@ PartOf=pipewire.service
 Type=simple
 # Hosts the tuning as a PipeWire *client* rather than loading it into the daemon
 # from pipewire.conf.d, which is only read at daemon startup. That is what lets
-# the tuning be switched on and off without restarting pipewire-pulse -- a
+# the tuning be switched on and off without restarting pipewire-pulse, a
 # restart drops every PulseAudio client's connection, and applications that do
 # not reconnect (Spotify) have to be restarted by hand.
 #

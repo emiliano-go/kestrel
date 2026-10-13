@@ -188,8 +188,8 @@ Item {
   }
 
   // Both scans must run in non-login shells. A login shell sources the user's
-  // profile, and tools like mise touch ~/.local/share on activation — a
-  // directory the desktop-entry watcher monitors — so every scan would
+  // profile, and tools like mise touch ~/.local/share on activation, a
+  // directory the desktop-entry watcher monitors, so every scan would
   // trigger the next one, pinning a core at idle.
   Process {
     id: hiddenEntryScan

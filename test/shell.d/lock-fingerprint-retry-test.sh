@@ -86,7 +86,7 @@ for (let t = 0; t <= 4 * capped; t += 8) {
 assertEqual(collapses, 5, 'continuous input at the cap collapses once per tier')
 
 // At the cap a fresh settle holds the nudge until fprintd has had its idle
-// stretch, then lets it through -- before the cap's own timer would fire.
+// stretch, then lets it through, before the cap's own timer would fire.
 assert(!model.shouldNudge(model.IDLE_CLEAR_MS - 1, longAgo, 0, capped), 'a nudge before the idle stretch is refused at the cap')
 assert(model.shouldNudge(model.IDLE_CLEAR_MS, longAgo, 0, capped), 'a nudge after the idle stretch is allowed at the cap')
 // A clock stepped back past the settle says nothing about how long fprintd

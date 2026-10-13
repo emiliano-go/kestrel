@@ -93,7 +93,7 @@ function bandLabel(band) {
 }
 
 // Under Automatic the pills are hidden, so the header carries the live band
-// instead -- "WI-FI BAND: 2.4GHZ". Once a band is pinned the pills are on
+// instead, "WI-FI BAND: 2.4GHZ". Once a band is pinned the pills are on
 // screen and say it themselves, so the header drops back to a plain label.
 function bandSectionTitle(selected, current) {
   if (selected !== "auto") return "WI-FI BAND"
@@ -351,7 +351,7 @@ function canForgetNetwork(network) {
 }
 
 // The password arrives on stdin and reaches nmcli through the scriptable
-// `connection edit` editor -- argv is world-readable in /proc, so the secret
+// `connection edit` editor, argv is world-readable in /proc, so the secret
 // must never be an argument (printf is a bash builtin, so no process spawns
 // with it either).
 var enterpriseConnectScript =
@@ -377,7 +377,7 @@ function networkFailureReason(reason, needsCredentials, reasons) {
 // means credentials are missing only for a network that actually uses them.
 // An auth timeout on such a network means the saved passphrase is wrong (the
 // same profile a first failed attempt leaves behind as "known"), so the user
-// needs a chance to re-enter it -- connectWithPsk overwrites the stored PSK on
+// needs a chance to re-enter it, connectWithPsk overwrites the stored PSK on
 // submit.
 function shouldRepromptPassphrase(reason, needsCredentials, reasons) {
   var r = reasons || {}

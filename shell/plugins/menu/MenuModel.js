@@ -98,7 +98,7 @@ function mergeMenuSources(defaultItems, userItems) {
 // Both merges below return fresh items/itemOrder objects for the caller to
 // assign in one go. They must never write into the maps they are handed: those
 // live in QML `var` properties, and an in-place write into such an object is
-// occasionally dropped by the engine — the key lands with an undefined value.
+// occasionally dropped by the engine, the key lands with an undefined value.
 // A lost write used to leave an id in itemOrder with no item behind it, and
 // the next merge then kept that orphan and appended a second row for the same
 // app, so the launcher listed it twice (and again on every later rescan).
@@ -135,8 +135,8 @@ function mergeAppRows(items, itemOrder, appRows) {
 
 // Swaps the rows one provider contributed, leaving every other item untouched.
 // Rows carry the id of the submenu that produced them, so a provider that runs
-// again drops its previous batch — a plugin that was just enabled disappears
-// from the Enable list — without disturbing static children declared in JSONC.
+// again drops its previous batch, a plugin that was just enabled disappears
+// from the Enable list, without disturbing static children declared in JSONC.
 function swapProviderRows(items, itemOrder, menuId, rows) {
   var source = items || ({})
   var order = Array.isArray(itemOrder) ? itemOrder : []
@@ -385,8 +385,8 @@ function displayRow(items, itemOrder, checkedResults, disabledResults, entry, de
 }
 
 // Commands a `checked:` expression reads a value out of. Every sibling row
-// asks the same one -- Defaults > Browser has seven rows all comparing
-// against `kestrel-default-browser` -- so the batch runs it once and the rows
+// asks the same one, Defaults > Browser has seven rows all comparing
+// against `kestrel-default-browser`, so the batch runs it once and the rows
 // read the captured answer.
 //
 // The capture has to be eager. These are read inside `$(...)`, and a value
@@ -408,8 +408,8 @@ var GUARD_READERS = [
 // nothing, missing is not).
 //
 // `pacman -Q` resolves a name through what installed packages provide, not
-// just what they are called -- with gvim installed it reports `vim` as
-// present -- so the set has to carry provides too, or `install.editor.vim`
+// just what they are called, with gvim installed it reports `vim` as
+// present, so the set has to carry provides too, or `install.editor.vim`
 // comes back and offers to install what is already there. A version
 // constraint (`bash>=1`) is not a name any set can answer, so it goes to
 // pacman itself; no shipped guard writes one.
@@ -435,8 +435,8 @@ function guardHelpers() {
 
 // Substitute the captured answer into the expression rather than shadowing
 // the reader with a function. `$(reader)` and the variable holding what it
-// printed are interchangeable -- both strip trailing newlines, both split the
-// same way unquoted -- while a function would also catch `command -v reader`,
+// printed are interchangeable, both strip trailing newlines, both split the
+// same way unquoted, while a function would also catch `command -v reader`,
 // `VAR=x reader`, and every other form, and answer those wrong. Anything but
 // the plain substitution is left alone to run the real command.
 function guardPrelude(guards) {

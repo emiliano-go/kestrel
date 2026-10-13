@@ -314,7 +314,7 @@ stage_installed_dir() {
 # `kestrel theme install` clones into ~/.config/kestrel/themes, so a .git
 # directory there means the contents came from a stranger and are held to the
 # list above. A directory the user wrote themselves, and a symlink to their own
-# working copy, are theirs to fill however they like -- the same distinction
+# working copy, are theirs to fill however they like, the same distinction
 # kestrel-theme-extras draws when it decides which themes it may pull.
 theme_came_from_a_repo() {
   local source="$1"

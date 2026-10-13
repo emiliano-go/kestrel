@@ -96,7 +96,7 @@ if [[ -S $socket && $request != *$'\x1e'* && $request != *$'\x1f'* ]]; then
   fi
 fi
 
-# The -- keeps function names that shadow qs subcommands (e.g. show) as
+# The, keeps function names that shadow qs subcommands (e.g. show) as
 # positionals. qs reports connection failures with a nonzero exit, but IPC-level
 # failures (unknown target/function, bad arguments) go to stdout with exit 0.
 ipc_timeout=${KESTREL_SHELL_IPC_TIMEOUT:-2s}

@@ -7,7 +7,7 @@
 
 set -uo pipefail
 
-# A DSP sink -- a speaker tuning filter-chain, or EasyEffects -- can be the
+# A DSP sink, a speaker tuning filter-chain, or EasyEffects, can be the
 # selected output without being where loudness lives. Changing its volume alters
 # the level going *into* the processing: the display moves while the speakers do
 # not, and on a chain with a compressor or limiter the tone changes too. Resolve
@@ -15,8 +15,8 @@ set -uo pipefail
 #
 # With no argument this resolves the current default output, so when headphones or
 # HDMI are selected it returns those, not the speakers a tuning happens to front.
-# Callers that need to describe some *other* output -- an output switcher naming
-# the next one in the rotation -- pass that sink explicitly.
+# Callers that need to describe some *other* output, an output switcher naming
+# the next one in the rotation, pass that sink explicitly.
 
 sink="${1:-$(pactl get-default-sink 2>/dev/null)}"
 
@@ -62,7 +62,7 @@ fi
 # EasyEffects 8 does not play into the physical sink through a stream of its
 # own: its output node links its ports straight to the sink's playback ports,
 # so the sink-input search above finds nothing and the keys would move the
-# EasyEffects sink -- whose volume its monitor, the input of the processing,
+# EasyEffects sink, whose volume its monitor, the input of the processing,
 # does not follow. Follow the port links instead: the first ALSA or Bluetooth
 # sink any EasyEffects output port is linked to.
 if [[ $sink == "easyeffects_sink" ]]; then
@@ -91,6 +91,6 @@ if [[ $sink == "easyeffects_sink" ]]; then
   fi
 fi
 
-# Nothing resolvable downstream -- the DSP sink may simply be idle and unlinked.
+# Nothing resolvable downstream, the DSP sink may simply be idle and unlinked.
 # Fall back to the sink itself so callers still have something to act on.
 printf '%s\n' "$sink"

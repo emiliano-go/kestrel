@@ -16,7 +16,7 @@
 # point: a root-invoked `docker compose up` must never consume a file that a
 # process running as the user could have rewritten to bind-mount / into the
 # container. Earlier versions kept it under ~/.config/windows, which a rogue
-# process could edit and then trigger a privileged bring-up of — a file-swap
+# process could edit and then trigger a privileged bring-up of, a file-swap
 # path to root. Do not move it back under $HOME.
 
 RUNTIME_DIR="${KESTREL_WINDOWS_DIR:-/var/lib/kestrel/windows}"
@@ -56,7 +56,7 @@ docker_needs_sudo() { kestrel-sudo-docker; }
 
 # The command to hand pkexec for the privileged re-exec. pkexec runs whatever
 # executable it is given (after authorization) and only shows the path in the
-# prompt — it does NOT require the target to be root-owned. So resolve to the
+# prompt, it does NOT require the target to be root-owned. So resolve to the
 # packaged command and refuse to elevate anything a non-root user could have
 # written: a PATH-injected shim, or a user-owned dev checkout. Without this, a
 # prompt the user grants for the trusted helper could run an attacker's binary
@@ -141,8 +141,8 @@ valid_tz() { [[ $1 =~ ^[A-Za-z0-9_/.+-]{1,64}$ ]]; }
 valid_password() { [[ $1 =~ ^[[:print:]]{1,64}$ ]]; }
 
 # The only privileged sub-actions __priv may dispatch. A bash command name
-# containing a slash is executed as a path, so validating the action here — not
-# just interpolating it into "__priv_${action}" — is what stops an action like
+# containing a slash is executed as a path, so validating the action here, not
+# just interpolating it into "__priv_${action}", is what stops an action like
 # ../tmp/evil from running an arbitrary file as root.
 valid_priv_action() {
   case "$1" in
@@ -694,7 +694,7 @@ write_compose_atomically() (
   esc_password=${esc_password//\$/\$\$}
 
   tmp=$(mktemp "$RUNTIME_DIR/.compose.XXXXXX") || exit 1
-  # kestrel:heredoc-expands paths=EXPECTED_STORAGE,EXPECTED_SHARED -- both are
+  # kestrel:heredoc-expands paths=EXPECTED_STORAGE,EXPECTED_SHARED, both are
   # root-protected anchors derived from the authenticated caller uid and bound
   # to source inodes that were opened and validated before this compose is
   # written. The remaining expansions are revalidated scalar settings.
@@ -1482,7 +1482,7 @@ To stop: kestrel-windows-vm stop"
   # in over stdin rather than on the command line: /proc/<pid>/cmdline is
   # world-readable, so passing the VM password as /p:"$WIN_PASS" would show it
   # to every other user on the machine for as long as the session is open.
-  # /args-from must stay the only argument here — FreeRDP rejects it outright
+  # /args-from must stay the only argument here, FreeRDP rejects it outright
   # when it is combined with any other, so new flags belong in RDP_ARGS above.
   printf '%s\n' "${RDP_ARGS[@]}" | xfreerdp3 /args-from:stdin
 

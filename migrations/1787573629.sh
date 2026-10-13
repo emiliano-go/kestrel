@@ -4,7 +4,7 @@ echo "Regenerate mise wrappers that still print mise's own output to stdout"
 # stops printing mise's "tools: pkg@version" ahead of the tool's own output.
 # That only changes wrappers written from then on, and the migration that
 # installed the current ones is already marked complete, so every wrapper on
-# disk keeps polluting stdout -- `claude --version` still answers with two
+# disk keeps polluting stdout, `claude --version` still answers with two
 # lines, and a wrapper for a protocol-speaking command answers with a line its
 # caller cannot parse. Rewrite them through kestrel-mise-install so the
 # template stays in one place.
@@ -36,7 +36,7 @@ for wrapper in "$bin_dir"/*; do
   [[ -f $wrapper && ! -L $wrapper && -r $wrapper ]] || continue
 
   # A generated wrapper is four short lines. ~/.local/bin also holds real
-  # binaries -- uv and uvx land here from the Python dev env -- so check the
+  # binaries, uv and uvx land here from the Python dev env, so check the
   # size before reading rather than pulling a 30MB executable into memory to
   # discover it is not a wrapper.
   (($(stat -c%s "$wrapper") <= 1024)) || continue

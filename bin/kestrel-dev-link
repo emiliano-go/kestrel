@@ -18,7 +18,7 @@ prompt_reboot=1
 # PATH, so a dev-linked checkout is invisible to `sudo kestrel-*`: a command the
 # package does not ship yet fails outright, and one it does ship silently runs
 # the packaged copy while every unprivileged call runs the checkout. Prepending
-# the checkout's bin keeps root on the code being edited — the same trust the
+# the checkout's bin keeps root on the code being edited, the same trust the
 # link already extends to every system script Kestrel runs out of $KESTREL_PATH.
 sudoers_file="/etc/sudoers.d/kestrel-dev-path"
 system_secure_path="/usr/local/sbin:/usr/local/bin:/usr/bin"
@@ -34,7 +34,7 @@ systemd, shell, or app-launcher environment; reboot to make every layer agree.
 Affects only \$KESTREL_PATH-resolved trees: bin/, default/, shell/,
 themes/, applications/, config/. Files installed at fixed system paths
 (/etc/, /usr/lib/systemd/, udev rule bodies, /etc/skel after user
-creation) are NOT covered — for those, use kestrel-dev-pkg-test to build
+creation) are NOT covered, for those, use kestrel-dev-pkg-test to build
 and install the package from the checkout.
 
 The Plymouth and SDDM themes under /usr/share are the exception: kestrel
@@ -69,7 +69,7 @@ kestrel_conf_quote() {
 }
 
 # A double-quoted sudoers string takes a backslash escape for a literal
-# backslash or quote, and nothing else — a checkout path with a space in it is
+# backslash or quote, and nothing else, a checkout path with a space in it is
 # already covered by the quotes.
 sudoers_quote() {
   local value="$1"
@@ -85,7 +85,7 @@ target=$(realpath -e "$1" 2>/dev/null) || {
 
 for required in bin default shell; do
   if [[ ! -d $target/$required ]]; then
-    echo "Warning: $target/$required not found — does this look like an Kestrel source checkout?" >&2
+    echo "Warning: $target/$required not found, does this look like an Kestrel source checkout?" >&2
   fi
 done
 

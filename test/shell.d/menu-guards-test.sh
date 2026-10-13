@@ -89,7 +89,7 @@ prelude() {
 }
 
 # The prelude shadows the real commands for the length of the batch, so it has
-# to answer exactly as they do -- including for arguments no shipped guard
+# to answer exactly as they do, including for arguments no shipped guard
 # passes today, which an extension is free to write tomorrow.
 stub_dir=$(mktemp -d)
 trap 'rm -rf "$stub_dir"' EXIT
@@ -171,7 +171,7 @@ done
 pass "guard prelude resolves commands as kestrel-cmd-present and kestrel-cmd-missing do"
 
 # A reader is replaced by what it printed, which has to compare identically to
-# the substitution it stood in for -- including the trailing newline $() drops.
+# the substitution it stood in for, including the trailing newline $() drops.
 reader_script=$(node -e '
   const path = require("path")
   const menu = require(path.join(process.env.ROOT, "shell/plugins/menu/MenuModel.js"))
@@ -204,7 +204,7 @@ pass "guard batch survives a reader that exits nonzero under errexit"
 # today: a theme that is a symlinked checkout or a worktree's `.git` file is
 # someone's working copy, so a row over it would open a terminal that prints
 # nothing and closes. The shapes below say which ones are meant to show it
-# rather than only that the two agree -- agreement alone would hold even if both
+# rather than only that the two agree, agreement alone would hold even if both
 # went wrong together.
 themes_guard=kestrel-theme-extras
 

@@ -86,8 +86,8 @@ function hasFileSharing(self) {
   return false
 }
 
-// Tailscale grades every peer itself — offline, wrong owner, an OS without
-// Taildrop, no peer API — so take its word when the status carries one, and
+// Tailscale grades every peer itself, offline, wrong owner, an OS without
+// Taildrop, no peer API, so take its word when the status carries one, and
 // fall back to same-owner for daemons too old to say.
 function isTaildropTarget(peer, selfUserId) {
   var target = peer && peer.TaildropTarget
