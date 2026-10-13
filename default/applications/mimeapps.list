@@ -12,7 +12,6 @@ application/pdf=org.gnome.Evince.desktop
 
 x-scheme-handler/http=chromium.desktop
 x-scheme-handler/https=chromium.desktop
-x-scheme-handler/mailto=HEY.desktop
 
 video/mp4=mpv.desktop
 video/x-msvideo=mpv.desktop
