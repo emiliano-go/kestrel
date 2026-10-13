@@ -21,7 +21,7 @@ plymouth_theme_assets=(
   progress_bar.png
   progress_box.png
 )
-plymouth_default_assets=("${plymouth_theme_assets[@]}" logos/oma.png)
+plymouth_default_assets=("${plymouth_theme_assets[@]}" logos/kestrel.png)
 sddm_theme_assets=(Main.qml bullet.png entry-failed.png entry.png lock-failed.png lock.png logo.png)
 sddm_default_assets=("${sddm_theme_assets[@]}" metadata.desktop theme.conf)
 
@@ -456,7 +456,7 @@ for requested_umask in 022 027 077; do
   grep -Fq '#1d2021' "$sddm/Main.qml" || fail "SDDM Main.qml receives the selected background under umask $requested_umask"
   grep -Fq 'Window.SetBackgroundTopColor(0.114, 0.125, 0.129);' "$theme/kestrel.script" || fail "Plymouth script receives the selected background under umask $requested_umask"
 
-  cmp -s "$ROOT/default/plymouth/logos/oma.png" "$theme/logos/oma.png" || fail "theme set leaves the packaged nested logo unchanged"
+  cmp -s "$ROOT/default/plymouth/logos/kestrel.png" "$theme/logos/kestrel.png" || fail "theme set leaves the packaged nested logo unchanged"
   cmp -s "$ROOT/default/sddm/kestrel/metadata.desktop" "$sddm/metadata.desktop" || fail "theme set leaves packaged SDDM metadata unchanged"
   cmp -s "$ROOT/default/sddm/kestrel/theme.conf" "$sddm/theme.conf" || fail "theme set leaves packaged SDDM configuration unchanged"
   [[ ! -s $leak_log ]] || fail "no privileged command receives a user-writable staged pathname" "$(cat "$leak_log")"
@@ -848,7 +848,7 @@ assert_no_temporary_files "$fake_root"
 pass "a logo larger than the publication bound cannot be published"
 
 # Refresh uses the same publisher but its explicit contract includes the
-# packaged nested logos/oma.png asset. It must not touch the SDDM theme.
+# packaged nested logos/kestrel.png asset. It must not touch the SDDM theme.
 setup_run
 output=$(run_refresh_plymouth 2>&1)
 status=$?
@@ -861,7 +861,7 @@ assert_packaged_assets "Plymouth refresh" "$ROOT/default/plymouth" "$theme" "${p
 grep -Fq 'command plymouth-set-default-theme kestrel' "$sudo_log" || fail "Plymouth refresh activates the restored theme"
 grep -Fq 'command mkinitcpio -P' "$sudo_log" || fail "Plymouth refresh rebuilds the initramfs"
 
-pass "refresh safely publishes its complete fixed asset set, including logos/oma.png"
+pass "refresh safely publishes its complete fixed asset set, including logos/kestrel.png"
 
 # SDDM refresh has the same fixed-file contract but must leave Plymouth and the
 # boot image alone. It also replaces legacy destination symlinks without

@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# Regenerate every Kestrel brand asset from the single source of truth,
+# brand/kestrel.svg. Edit that SVG, then run this.
+#
+# Requires rsvg-convert (librsvg), ImageMagick (magick), and the repo's own
+# bin/kestrel-transcode-ascii and bin/kestrel-plymouth-preview.
+
+set -euo pipefail
+
+root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$root"
+
+src=brand/kestrel.svg
+[[ -f $src ]] || { echo "Missing brand source: $src" >&2; exit 1; }
+for tool in rsvg-convert magick; do
+  command -v "$tool" >/dev/null || { echo "Missing required tool: $tool" >&2; exit 1; }
+done
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+# A high-resolution raster of the source, reused for the colorized theme logos.
+rsvg-convert -h 1200 "$src" -o "$tmp/bird.png"
+
+# The GitHub logo is the same shape in white, so it reads on the dark theme.
+sed -E \
+  -e 's/stop-color="#[0-9a-fA-F]{3,8}"/stop-color="#ffffff"/g' \
+  -e 's/fill="#[0-9a-fA-F]{3,8}"/fill="#ffffff"/g' \
+  "$src" >logo.svg
+
+# Repo/app icon.
+rsvg-convert -h 300 "$src" -o "$tmp/bird300.png"
+magick "$tmp/bird300.png" -background none -gravity center -extent 300x300 icon.png
+
+# ASCII: icon.txt is the About screen and the fastfetch logo; logo.txt is the
+# screensaver and the installer's logo.
+bin/kestrel-transcode-ascii "$src" icon.txt --mode block --width 44 --height 22 --threshold 55 >/dev/null
+bin/kestrel-transcode-ascii "$src" logo.txt --mode block --width 36 --height 18 --threshold 55 >/dev/null
+
+# Boot and login logos, in the brand color.
+rsvg-convert -h 300 "$src" -o default/plymouth/logo.png
+rsvg-convert -h 300 "$src" -o default/sddm/kestrel/logo.png
+rsvg-convert -h 340 "$src" -o default/plymouth/logos/kestrel.png
+
+# Default Plymouth lock-screen preview.
+KESTREL_PATH="$root" bin/kestrel-plymouth-preview '#1a1b26' '#c0caf5' \
+  "$root/default/plymouth/logo.png" "$root/default/plymouth/preview-unlock.png" >/dev/null 2>&1 || true
+
+# Per-theme lock logo (bird in the theme's foreground color) and its preview.
+theme_color() {
+  awk -F= -v key="$1" '
+    function clean(raw) {
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", raw)
+      if (raw ~ /^"/) { sub(/^"/, "", raw); sub(/".*$/, "", raw) }
+      return raw
+    }
+    { f=$1; gsub(/^[[:space:]]+|[[:space:]]+$/, "", f); if (f == key) { print clean($2); exit } }
+  ' "$2"
+}
+for d in themes/*/; do
+  colors="${d}colors.toml"
+  [[ -f $colors ]] || continue
+  text=$(theme_color foreground "$colors")
+  [[ -n $text ]] || text=$(theme_color bright_foreground "$colors")
+  bg=$(theme_color background "$colors")
+  [[ -n $bg ]] || bg="#1a1b26"
+
+  magick "$tmp/bird.png" -fill "$text" -colorize 100 -resize x300 "${d}unlock.png"
+  KESTREL_PATH="$root" bin/kestrel-plymouth-preview "$bg" "$text" "${d}unlock.png" "${d}preview-unlock.png" >/dev/null 2>&1 || true
+done
+
+echo "Brand assets regenerated from $src"
