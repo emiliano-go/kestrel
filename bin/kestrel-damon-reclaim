@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# kestrel:summary=Enable DAMON proactive memory reclaim
+# kestrel:group=performance
+# kestrel:hidden=true
+
+# DAMON_RECLAIM is built into Arch's linux (CONFIG_DAMON_RECLAIM=y), so there is
+# nothing to modprobe; it is configured and toggled through its module
+# parameters. Reclaim is watermark-gated: it only acts when free memory drops
+# below wmarks_mid and stops again below wmarks_low, so idle systems pay
+# nothing. Best-effort: systems without DAMON report and exit cleanly so the
+# oneshot unit does not fail.
+
+set -euo pipefail
+
+params=/sys/module/damon_reclaim/parameters
+if [[ ! -d $params ]]; then
+  # Some kernels build it as a module instead of in.
+  modprobe damon_reclaim 2>/dev/null || true
+fi
+
+if [[ ! -w $params/enabled ]]; then
+  echo "DAMON reclaim is unavailable on this kernel" >&2
+  exit 0
+fi
+
+# Cold threshold: reclaim regions untouched for 30s (default is 120s).
+echo 30000000 >"$params/min_age"
+# Cap work at ~1 GiB per second so reclaim never competes with the CPU.
+echo 1073741824 >"$params/quota_sz"
+echo 1000 >"$params/quota_reset_interval_ms"
+# Free-memory watermarks, per thousand: active below 40%, idle above 50%, and
+# back off to the kernel's LRU reclaimer below 20%.
+echo 500 >"$params/wmarks_high"
+echo 400 >"$params/wmarks_mid"
+echo 200 >"$params/wmarks_low"
+# Let DAMON tune its own sampling/aggregation intervals.
+echo Y >"$params/autotune_monitoring_intervals"
+echo Y >"$params/enabled"

@@ -1,0 +1,18 @@
+# Kestrel process niceness. Direct nice/ioclass values rather than type presets
+# so the rules do not depend on an ananicy ruleset package.
+
+# Keep the interactive stack ahead of background work. The compositor matters
+# most; the shell drives the bar, so it comes next.
+{"name": "Hyprland", "nice": -10}
+{"name": "quickshell", "nice": -5}
+{"name": "ghostty", "nice": -2}
+
+{"name": "baloo_file", "nice": 19}
+{"name": "tracker-miner-fs-3", "nice": 19}
+{"name": "updatedb", "ioclass": "idle"}
+{"name": "plocate-updatedb", "ioclass": "idle"}
+{"name": "btrfs-scrub", "ioclass": "idle"}
+{"name": "btrfs-defrag", "ioclass": "idle"}
+{"name": "snapper", "nice": 19}
+{"name": "cc1", "nice": 10}
+{"name": "cc1plus", "nice": 10}

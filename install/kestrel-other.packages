@@ -2,6 +2,7 @@
 # hardware packages. All resolve from the upstream Arch repositories.
 # Utilized by the ISO builder to ensure package availability in the ISO.
 
+ananicy-cpp
 asusctl
 autoconf-archive
 base
@@ -30,6 +31,8 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+scx-scheds
+scx-tools
 snapper
 sof-firmware
 thermald

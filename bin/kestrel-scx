@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# kestrel:summary=Switch the sched_ext CPU scheduler
+# kestrel:args=[status|list|start SCHED [MODE]|switch SCHED [MODE]|stop|restore|restart]
+# kestrel:group=performance
+# kestrel:examples=kestrel scx | kestrel scx list | kestrel scx switch scx_lavd Gaming
+
+# Thin wrapper over scxctl, the D-Bus client for scx_loader. The loader starts
+# the configured default (scx_bpfland, see /etc/scx_loader/config.toml) on boot
+# and does the actual scheduler loading; this command only drives it. Mutating
+# actions need root (or a polkit agent); scxctl talks to org.scx.Loader.
+
+set -euo pipefail
+
+export KESTREL_PATH="${KESTREL_PATH:-/usr/share/kestrel}"
+
+usage() {
+  cat <<USAGE
+Usage: kestrel scx [status]
+       kestrel scx list
+       kestrel scx start SCHED [MODE]
+       kestrel scx switch SCHED [MODE]
+       kestrel scx stop | restore | restart
+
+MODE: auto | gaming | lowlatency | powersave | server
+SCHED: any scx_* scheduler from the scx-scheds package (kestrel scx list)
+USAGE
+}
+
+command -v scxctl >/dev/null || {
+  echo "scxctl not found; install scx-tools" >&2
+  exit 1
+}
+
+as_root() {
+  if (( EUID == 0 )); then
+    "$@"
+  else
+    exec sudo "$@"
+  fi
+}
+
+mode_arg() {
+  [[ -n ${1:-} ]] && printf '%s\n' --mode "${1,,}"
+}
+
+case "${1:-status}" in
+  status | get)
+    scxctl get
+    ;;
+  list)
+    scxctl list
+    ;;
+  start | switch)
+    action="$1"
+    scheduler="${2:-}"
+    [[ -n $scheduler ]] || {
+      usage >&2
+      exit 1
+    }
+    shift 2 || true
+    mapfile -t mode < <(mode_arg "${1:-}")
+    as_root scxctl "$action" --sched "$scheduler" "${mode[@]}"
+    ;;
+  stop | restore | restart)
+    as_root scxctl "$1"
+    ;;
+  -h | --help)
+    usage
+    ;;
+  *)
+    usage >&2
+    exit 1
+    ;;
+esac

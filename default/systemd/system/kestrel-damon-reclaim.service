@@ -1,0 +1,13 @@
+[Unit]
+Description=Kestrel DAMON proactive memory reclaim
+# DAMON only exists on kernels built with DAMON; skip where it is absent.
+ConditionPathExists=/sys/kernel/mm/damon
+After=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/kestrel-damon-reclaim
+
+[Install]
+WantedBy=multi-user.target

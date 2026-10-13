@@ -18,6 +18,13 @@ systemctl enable sddm.service
 systemctl enable systemd-oomd.service
 systemctl enable systemd-timesyncd.service
 
+# Performance: sched_ext scheduler (scx_loader starts scx_bpfland; switch with
+# `kestrel scx`), DAMON proactive reclaim, and ananicy-cpp niceness rules.
+# Each unit is inert on kernels or hardware that can't support it.
+systemctl enable scx_loader.service
+systemctl enable kestrel-damon-reclaim.service
+systemctl enable ananicy-cpp.service
+
 # Default optimizations: keep the SSD trimmed, watch disk health, refresh the
 # Arch mirror list, and scrub Btrfs where the root filesystem is Btrfs.
 systemctl enable fstrim.timer
