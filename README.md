@@ -4,31 +4,29 @@
   <img src="logo.svg" alt="Kestrel" width="160">
 </p>
 
-Kestrel is a custom Linux distribution built on Arch Linux. It pairs the Hyprland tiling compositor with the Quickshell desktop shell, and it ships a complete, opinionated set of tools you can be productive with the moment it boots. It is maintained by Emiliano Gandini Outeda.
+Kestrel is a Linux distribution built on Arch Linux. It provides a complete, preconfigured desktop: the Hyprland tiling compositor, the Quickshell desktop shell, and a curated set of applications and command-line tools. It is maintained by Emiliano Gandini Outeda.
 
-The hard choices are already made: the window manager, the shell, the terminal, the editor, the browser, the themes. You are not handed a pile of packages and a wiki; you are handed a system that someone with taste assembled and keeps sharp. The bet is a simple one: a beautiful system is a motivating system, and productivity tends to follow motivation.
-
-Kestrel is not a beginner's Linux, and it does not pretend to be. It leans terminal-heavy, config-file-forward, and keyboard-driven. If that reads as an invitation rather than a warning, you are in the right place.
+Kestrel makes the default choices for you. The compositor, the shell, the terminal, the editor, the browser, and the themes are selected and configured so that the system is usable immediately after installation. It is intended for users who work primarily from the keyboard and are comfortable editing configuration files.
 
 ## What is in the box
 
-- **Hyprland** for windows and **Quickshell** for the desktop: a top bar, an app launcher, notifications, an on-screen display, a screensaver, and the rest of the shell, all theme-aware and all scriptable.
-- A full toolchain for modern work: **Neovim**, Chromium, Obsidian, LibreOffice, Kdenlive, OBS Studio, and a retro Winamp-style music player for good measure.
-- The **`kestrel` CLI**: a single entry point (`kestrel <group> <command>`) over the commands in `bin/`, from theming and screenshots to package and hardware helpers.
-- **Rolling updates on Arch**, with an automatic Btrfs snapshot before every upgrade and a one-line rollback from the boot menu.
-- **Agentic tooling** wired in through `mise`, so the AI coding agents you use are installed, versioned, and on PATH like any other tool.
+- **Hyprland** for window management and **Quickshell** for the desktop: a top bar, an application launcher, notifications, an on-screen display, a screensaver, and the rest of the shell, theme-aware and scriptable throughout.
+- **Desktop applications**: Neovim, Chromium, Obsidian, LibreOffice, Kdenlive, OBS Studio, and a Winamp-style music player.
+- **The `kestrel` CLI**: a single entry point (`kestrel <group> <command>`) over the commands in `bin/`, covering theming, screenshots, packaging, hardware, and system configuration.
+- **Rolling updates on Arch**, with an automatic Btrfs snapshot before every upgrade and rollback from the boot menu.
+- **Agentic tooling** installed through `mise`, so AI coding agents are versioned and on `PATH` like any other tool.
 
 ## Installing
 
-Install Kestrel from the [Kestrel live ISO](https://github.com/emiliano-go/kestrel-iso). The ISO boots straight into a full Kestrel desktop, not a text installer, so you can try the real thing before you commit to it. When you are ready, the "Install Kestrel" entry in the Super + D menu writes the running system to disk by copying it.
+Install Kestrel from the [Kestrel live ISO](https://github.com/emiliano-go/kestrel-iso). The image boots into a full Kestrel desktop rather than a text installer. From the Super + D menu, **Install Kestrel** writes the running system to the selected disk.
 
-That copy is the whole idea: the machine you install is the machine you were just using, byte for byte. There is no second, parallel definition of the system to drift from what you tested, and no package repository to fetch from at install time. Encryption is on by default; the same wizard can install without encryption, or prepare the machine for a different owner and defer the account setup to first boot.
+The installer copies the live system, so the installed machine matches the one you tested. There is no separate installation path to diverge from the running image, and no package repository is contacted during the install. Disk encryption is enabled by default; the same installer can install without encryption, install into free space alongside another operating system, or prepare the machine for a different owner and defer account creation to first boot.
 
 ## Updating
 
-Kestrel is a rolling release and tracks Arch directly. Run `pacman -Syu` for the system and an AUR helper such as `yay -Sua` for AUR packages. There is no `kestrel update` command and no channel switching: the system is the Arch base Kestrel was installed from plus whatever Arch and the AUR ship.
+Kestrel is a rolling release and tracks Arch directly. Update with `pacman -Syu`, and an AUR helper such as `yay -Sua` for AUR packages. There is no `kestrel update` command and no release channels: the system is the Arch base it was installed from, plus what Arch and the AUR provide.
 
-A post-transaction hook records a recovery snapshot after every upgrade (`default/snapper/root`, which keeps the two most recent). To roll back, boot a snapshot from Limine and run `kestrel-snapshot restore`.
+A post-transaction hook records a recovery snapshot after every upgrade (`default/snapper/root` keeps the two most recent). To roll back, select a snapshot in Limine and run `kestrel-snapshot restore`.
 
 ## Documentation
 
@@ -36,13 +34,14 @@ A post-transaction hook records a recovery snapshot after every upgrade (`defaul
 
 ## Repository layout
 
-- `bin/` the `kestrel-*` commands that end up on `PATH`.
+- `bin/` the `kestrel-*` commands that are placed on `PATH`.
 - `config/` defaults copied into `~/.config/` for new users.
-- `default/` system integration: systemd units, libalpm hooks, Limine, snapper, Plymouth, SDDM, and friends.
+- `default/` system integration: systemd units, libalpm hooks, Limine, snapper, Plymouth, SDDM, and related files.
 - `etc/` the `/etc` drop-ins Kestrel owns outright.
 - `install/` the install and finalize scripts the ISO runs against a target.
 - `shell/` the Quickshell desktop.
-- `themes/` themes.
+- `themes/` the themes.
+- `brand/` the logo source and the generator for the derived brand assets.
 - `migrations/` in-place fixes applied to existing installs when a default changes in a way a file copy cannot express.
 - `manual/`, `test/` as described above.
 
