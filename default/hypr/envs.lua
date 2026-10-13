@@ -4,9 +4,11 @@ local require_optional = require("default.hypr.require_optional")
 -- GUM environment variables for styling purposes.
 require_optional.module("kestrel.current.theme.gum_env")
 
--- Cursor size.
+-- Cursor size and theme. Kestrel ships the Adwaita Xcursor theme; without a
+-- resolvable theme Hyprland draws no pointer at all.
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
+hl.env("XCURSOR_THEME", "Adwaita")
 
 -- Force all apps to use Wayland.
 hl.env("GDK_BACKEND", "wayland,x11,*")

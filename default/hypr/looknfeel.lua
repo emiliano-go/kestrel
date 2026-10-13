@@ -101,6 +101,15 @@ hl.config({
     new_status = "master",
   },
 
+  -- GPU efficiency: direct scanout skips the compositor's copy for a single
+  -- fullscreen game/video; new render scheduling triple-buffers only when the
+  -- GPU can't keep up. VRR is left to fullscreen only so the desktop doesn't
+  -- flicker on mixed-refresh multi-monitor setups.
+  render = {
+    direct_scanout = 2,
+    new_render_scheduling = true,
+  },
+
   misc = {
     disable_hyprland_logo = true,
     disable_splash_rendering = true,
@@ -110,6 +119,7 @@ hl.config({
     anr_missed_pings = 3,
     on_focus_under_fullscreen = 1,
     initial_workspace_tracking = 0,
+    vrr = 2,
     -- Let a fresh shell re-acquire the session lock after the lock client
     -- died, so kestrel-restart-shell can recover the LOCK failsafe.
     allow_session_lock_restore = true,
@@ -118,6 +128,9 @@ hl.config({
   cursor = {
     hide_on_key_press = true,
     warp_on_change_workspace = 1,
+    -- Use the Xcursor theme Kestrel ships (Adwaita). Hyprcursor is off because
+    -- no .hlc theme is installed, which would otherwise leave no pointer.
+    enable_hyprcursor = false,
   },
 
   binds = {

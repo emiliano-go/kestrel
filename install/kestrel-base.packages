@@ -2,6 +2,7 @@
 # Linux repositories (core/extra/multilib).
 # The ISO builder also reads this file when constructing the offline mirror.
 
+adwaita-cursors
 alsa-utils
 avahi
 base-devel
