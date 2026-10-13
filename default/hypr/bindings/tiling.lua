@@ -1,10 +1,10 @@
-o.bind("SUPER + W", "Close window", hl.dsp.window.close())
+o.bind("SUPER + W", "Toggle window floating/tiling", hl.dsp.window.float({ action = "toggle" }))
 o.bind("SUPER + Q", "Close window", hl.dsp.window.close())
+o.bind("SUPER + SHIFT + Q", "Close window", hl.dsp.window.close())
 o.bind("CTRL + ALT + DELETE", "Close all windows", "kestrel-hyprland-window-close-all")
 
 o.bind("SUPER + J", "Toggle window split", hl.dsp.layout("togglesplit"))
 o.bind("SUPER + P", "Pseudo window", hl.dsp.window.pseudo())
-o.bind("SUPER + T", "Toggle window floating/tiling", hl.dsp.window.float({ action = "toggle" }))
 o.bind("SUPER + F", "Full screen", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 o.bind("SUPER + CTRL + F", "Tiled full screen", "kestrel-hyprland-window-tiled-fullscreen-toggle")
 o.bind("SUPER + ALT + F", "Full width", hl.dsp.window.fullscreen({ mode = "maximized" }))
@@ -25,10 +25,17 @@ for workspace = 1, 10 do
   o.bind("SUPER + SHIFT + ALT + " .. key, "Move window silently to workspace " .. workspace, hl.dsp.window.move({ workspace = tostring(workspace), follow = false }))
 end
 
-o.bind("SUPER + S", "Toggle scratchpad", hl.dsp.workspace.toggle_special("scratchpad"))
-o.bind("SUPER + ALT + S", "Move window to scratchpad", hl.dsp.window.move({ workspace = "special:scratchpad", follow = false }))
-o.bind("SUPER + grave", "Toggle scratchpad", hl.dsp.workspace.toggle_special("scratchpad"))
-o.bind("SUPER + SHIFT + grave", "Move window to scratchpad", hl.dsp.window.move({ workspace = "special:scratchpad", follow = false }))
+o.bind("SUPER + S", "Toggle myspace workspace", hl.dsp.workspace.toggle_special("myspace"))
+o.bind("SUPER + SHIFT + S", "Move window to myspace", hl.dsp.window.move({ workspace = "special:myspace", follow = false }))
+o.bind("SUPER + M", "Toggle music workspace", hl.dsp.workspace.toggle_special("music"))
+o.bind("SUPER + SHIFT + M", "Move window to music", hl.dsp.window.move({ workspace = "special:music", follow = false }))
+o.bind("SUPER + A", "Toggle random workspace", hl.dsp.workspace.toggle_special("random"))
+o.bind("SUPER + SHIFT + A", "Move window to random", hl.dsp.window.move({ workspace = "special:random", follow = false }))
+o.bind("SUPER + R", "Toggle devdocs workspace", hl.dsp.workspace.toggle_special("devdocs"))
+o.bind("SUPER + SHIFT + R", "Devdocs webapp", o.launch_webapp("https://devdocs.io/"))
+
+o.bind("SUPER + Y", "Toggle scratchpad", hl.dsp.workspace.toggle_special("scratchpad"))
+o.bind("SUPER + SHIFT + Y", "Move window to scratchpad", hl.dsp.window.move({ workspace = "special:scratchpad", follow = false }))
 
 o.bind("SUPER + TAB", "Next workspace", hl.dsp.focus({ workspace = "e+1" }))
 o.bind("SUPER + SHIFT + TAB", "Previous workspace", hl.dsp.focus({ workspace = "e-1" }))
