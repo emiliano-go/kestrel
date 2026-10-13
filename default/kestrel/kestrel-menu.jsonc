@@ -45,7 +45,7 @@
 
   // Learn
   "learn.keybindings": {"icon":"","label":"Keybindings","action":"kestrel-menu-keybindings"},
-  "learn.kestrel": {"icon":"","label":"Kestrel","action":"kestrel-launch-webapp 'https://github.com/emiliano-go/kestrel/tree/master/manual'"},
+  "learn.kestrel": {"icon":"","label":"Kestrel","action":"kestrel-launch-webapp 'https://github.com/kestrel-distro/kestrel/tree/master/manual'"},
   "learn.hyprland": {"icon":"","label":"Hyprland","action":"kestrel-launch-webapp 'https://wiki.hypr.land/'"},
   "learn.arch": {"icon":"󰣇","label":"Arch","action":"kestrel-launch-webapp 'https://wiki.archlinux.org/title/Main_page'"},
   "learn.neovim": {"icon":"","label":"Neovim","action":"kestrel-launch-webapp 'https://www.lazyvim.org/keymaps'"},

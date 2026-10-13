@@ -2,11 +2,11 @@
 
 ### VirtualBox
 
-VirtualBox is a popular VM runner. [You can run Kestrel inside that too](https://github.com/emiliano-go/kestrel/discussions/176). But performance probably won't be great.
+VirtualBox is a popular VM runner. [You can run Kestrel inside that too](https://github.com/kestrel-distro/kestrel/discussions/176). But performance probably won't be great.
 
 ### VMware Workstation on Windows 11
 
-Another popular VM runner for Windows. [Kestrel has been setup inside of that as well](https://github.com/emiliano-go/kestrel/discussions/572).
+Another popular VM runner for Windows. [Kestrel has been setup inside of that as well](https://github.com/kestrel-distro/kestrel/discussions/572).
 
 ### Steam Deck
 

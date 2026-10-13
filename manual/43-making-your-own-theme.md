@@ -42,4 +42,4 @@ That leftover `[themename]` becomes the theme's directory name, so it has to be 
 
 Remember that once it's installed from a repo, any `.lua`, terminal config or `vscode.json` it ships is dropped, so don't build the theme around those.
 
-You can have your theme added to [the extra themes page](https://github.com/emiliano-go/kestrel) by sending a pull request to [the kestrel-site repo](https://github.com/omacom-io/kestrel-site).
+You can have your theme added to [the extra themes page](https://github.com/kestrel-distro/kestrel) by sending a pull request to [the kestrel-site repo](https://github.com/omacom-io/kestrel-site).

@@ -2,7 +2,7 @@
 
 Kestrel is installed using an ISO. You can choose between a full-disk install, which takes over the entire drive, or a free-space install, which puts Kestrel in the unallocated space on a drive, that's how you dual boot alongside Windows or another OS (see [dual-boot install](50-dual-boot-install.md), note that you'll need to turn off BitLocker in Windows first). Either way, the installation defaults to full encryption, and the full-disk option will wipe the selected drive, so be sure to take a backup before using an existing one!
 
-[Download the Kestrel ISO](https://github.com/emiliano-go/kestrel/) first, put it on a USB stick (use [balenaEtcher](https://etcher.balena.io/) on Windows or [caligula](https://github.com/ifd3f/caligula) on Linux), and boot off the stick.
+[Download the Kestrel ISO](https://github.com/kestrel-distro/kestrel/) first, put it on a USB stick (use [balenaEtcher](https://etcher.balena.io/) on Windows or [caligula](https://github.com/ifd3f/caligula) on Linux), and boot off the stick.
 
 _You must turn off Secure Boot and/or TPM in the BIOS. You have to turn these off to be able to install Kestrel. They're Microsoft security schemes meant for Windows and Microsoft-affiliated Linux distributions._
 
@@ -36,4 +36,4 @@ But in special circumstances, like remote Kestrel installs on protected computer
 
 ### Help if you're stuck
 
-If you get stuck, you can usually find someone willing to help in the _#kestrel-help_ channel on [the community Discord](https://github.com/emiliano-go/kestrel).
+If you get stuck, you can usually find someone willing to help in the _#kestrel-help_ channel on [the community Discord](https://github.com/kestrel-distro/kestrel).

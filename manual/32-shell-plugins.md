@@ -95,7 +95,7 @@ kestrel plugin validate ./my-plugin
 
 That runs the same checks the shell does at load time: the schema version, the required fields, an id that isn't reserved, entry points that are safe relative paths and actually exist, an entry point for every kind you claimed, and no symlinks anywhere inside the folder.
 
-For plugin development, see the [first-party plugin catalog](https://github.com/emiliano-go/kestrel/blob/quattro/shell/plugins/README.md).
+For plugin development, see the [first-party plugin catalog](https://github.com/kestrel-distro/kestrel/blob/quattro/shell/plugins/README.md).
 
 ## Sharing yours with the world
 

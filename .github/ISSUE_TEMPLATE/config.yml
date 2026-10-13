@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Suggestion
-    url: https://github.com/emiliano-go/kestrel/discussions/categories/suggestions
+    url: https://github.com/kestrel-distro/kestrel/discussions/categories/suggestions
     about: Suggest a new feature, change to existing feature, or other ideas in Discussions.
   - name: Support
-    url: https://github.com/emiliano-go/kestrel/discussions
+    url: https://github.com/kestrel-distro/kestrel/discussions
     about: Need help? Ask in Discussions. GitHub issues should be used for verified bugs only.
