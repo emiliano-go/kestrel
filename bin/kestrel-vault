@@ -1,0 +1,213 @@
+#!/bin/bash
+
+# kestrel:summary=Unlock the portable encrypted vault
+# kestrel:args=[unlock|lock|status|help]
+# kestrel:group=security
+# kestrel:requires-sudo=true
+# kestrel:examples=kestrel vault unlock | kestrel vault status | kestrel vault lock
+
+# Unlock and mount the Kestrel portable vault, a LUKS2 container baked into the
+# ISO (or carried on a partition). The container is read-only: this mounts a
+# device-mapper snapshot of it whose copy-on-write store lives in compressed RAM
+# (zram) or on a writable partition. Everything written during the session goes
+# to the COW and is discarded on `lock`, reboot or removal, so the encrypted
+# container itself never changes.
+
+set -euo pipefail
+
+KESTREL_PATH="${KESTREL_PATH:-/usr/share/kestrel}"
+CONF="${KESTREL_VAULT_CONF:-/etc/kestrel/vault.conf}"
+[[ -r $CONF ]] && . "$CONF"
+
+container="${KESTREL_VAULT_CONTAINER:-}"
+cow_backend="${KESTREL_VAULT_COW_BACKEND:-zram}"
+cow_fraction="${KESTREL_VAULT_COW_FRACTION:-0.25}"
+cow_factor="${KESTREL_VAULT_COW_DISKSIZE_FACTOR:-2}"
+disk_part="${KESTREL_VAULT_DISK_COW_PART:-/dev/disk/by-partlabel/KESTREL_VAULT_COW}"
+mountpoint="${KESTREL_VAULT_MOUNTPOINT:-/run/kestrel/vault}"
+# The command re-execs as root, so $HOME is root's. Link into the invoking
+# user's home instead.
+_owner_home="$HOME"
+if [[ -n ${SUDO_USER:-} ]]; then
+  _owner_home="$(getent passwd "$SUDO_USER" | cut -d: -f6)"
+  [[ -n $_owner_home ]] || _owner_home="$HOME"
+fi
+user_link="${KESTREL_VAULT_USER_LINK:-${_owner_home%/}/Vault}"
+
+state=/run/kestrel/vault.state
+lower=/run/kestrel/vault-lower
+mapper=KESTREL_VAULT
+snap=kestrel-vault-cow
+
+die() { echo "kestrel-vault: $*" >&2; exit 1; }
+
+ORIG_ARGS=("$@")
+
+require_root() {
+  (( EUID == 0 )) || exec sudo -- "$0" "${ORIG_ARGS[@]}"
+}
+
+find_container() {
+  [[ -n $container && -e $container ]] && { printf '%s' "$container"; return; }
+  local live=/run/archiso/bootmnt/kestrel/vault.img
+  [[ -e $live ]] && { printf '%s' "$live"; return; }
+  local by_label
+  by_label="$(blkid -t LABEL=KESTREL_VAULT -o device 2>/dev/null | head -1 || true)"
+  [[ -n $by_label ]] && { printf '%s' "$by_label"; return; }
+  return 1
+}
+
+# Emit the passphrase on stdout. Piped stdin (from the shell prompt) wins;
+# otherwise use the session's ask-password agent, then a TTY prompt.
+get_pass() {
+  if [[ -n ${KESTREL_VAULT_PASS_FILE:-} ]]; then
+    cat "$KESTREL_VAULT_PASS_FILE"
+  elif [[ ! -t 0 ]]; then
+    # Piped (from the shell prompt): one line, no trailing newline.
+    local line=""
+    IFS= read -r line || true
+    printf '%s' "$line"
+  elif command -v systemd-ask-password >/dev/null 2>&1; then
+    systemd-ask-password --icon=security-high "Vault passphrase"
+  else
+    local p
+    read -r -s -p "Vault passphrase: " p >&2
+    echo >&2
+    printf '%s' "$p"
+  fi
+}
+
+mem_bytes() { awk '/MemTotal/{print $2*1024; exit}' /proc/meminfo; }
+
+setup_cow() {
+  local origin="/dev/mapper/$mapper" sectors
+  sectors="$(blockdev --getsz "$origin")"
+
+  case "$cow_backend" in
+    zram)
+      modprobe zram 2>/dev/null || die "cannot load zram"
+      local mem disksize memlimit
+      mem="$(mem_bytes)"
+      disksize="$(awk -v m="$mem" -v f="$cow_fraction" -v k="$cow_factor" 'BEGIN{printf "%.0f", m*f*k}')"
+      memlimit="$(awk -v m="$mem" -v f="$cow_fraction" 'BEGIN{printf "%.0f", m*f}')"
+      cow_dev="$(zramctl --find --size "$disksize" --algorithm zstd)"
+      echo "$memlimit" >"/sys/block/$(basename "$cow_dev")/mem_limit"
+      ;;
+    disk)
+      [[ -e $disk_part ]] || die "disk COW partition not found: $disk_part"
+      # Ephemeral key from /dev/urandom, held only in RAM: removal or power loss
+      # makes the leftover ciphertext unreadable.
+      cryptsetup open --type plain --key-file <(head -c 64 /dev/urandom) \
+        "$disk_part" "${snap}-raw" --batch-mode
+      cow_dev="/dev/mapper/${snap}-raw"
+      ;;
+    *) die "unknown cow_backend: $cow_backend" ;;
+  esac
+
+  dmsetup create "$snap" --table "0 $sectors snapshot $origin $cow_dev P 8"
+  printf '%s\n' "$cow_dev" >"$state.cowdev"
+}
+
+teardown_cow() {
+  local cow_dev=""
+  [[ -f $state.cowdev ]] && cow_dev="$(<"$state.cowdev")"
+  dmsetup remove "$snap" 2>/dev/null || true
+  case "$cow_backend" in
+    zram) [[ -n $cow_dev ]] && zramctl --reset "$cow_dev" 2>/dev/null || true ;;
+    disk)
+      cryptsetup close "${snap}-raw" 2>/dev/null || true
+      # Scrub the first MiB so no header survives a clean lock.
+      if [[ -e $disk_part ]]; then
+        dd if=/dev/zero of="$disk_part" bs=1M count=1 conv=fsync status=none 2>/dev/null || true
+      fi
+      ;;
+  esac
+  rm -f "$state.cowdev"
+}
+
+unlock() {
+  require_root
+  local img
+  img="$(find_container)" || die "no vault found (looked for $container, then the live medium)"
+
+  [[ -e /dev/mapper/$mapper ]] && die "vault already unlocked"
+
+  mkdir -p /run/kestrel "$(dirname "$mountpoint")"
+  get_pass | cryptsetup open --readonly --type luks2 --key-file - "$img" "$mapper"
+
+  mkdir -p "$lower"
+  mount -o ro "/dev/mapper/$mapper" "$lower"
+
+  setup_cow
+  mkdir -p "$mountpoint"
+  mount "/dev/mapper/$snap" "$mountpoint"
+
+  [[ -n $user_link ]] && ln -sfn "$mountpoint" "$user_link"
+
+  {
+    echo "container=$img"
+    echo "backend=$cow_backend"
+    echo "mountpoint=$mountpoint"
+    echo "lower=$lower"
+  } >"$state"
+
+  echo "Vault unlocked at $mountpoint (writable for this session; changes are discarded on lock)."
+}
+
+lock() {
+  require_root
+  local force=0
+  [[ ${1:-} == --force ]] && force=1
+
+  [[ -e /dev/mapper/$snap ]] || { rm -f "$state"; echo "Vault is not unlocked."; return 0; }
+
+  if command -v fuser >/dev/null 2>&1 && fuser -m "$mountpoint" >/dev/null 2>&1; then
+    if (( ! force )); then
+      die "files are open under $mountpoint; close them or use --force"
+    fi
+    fuser -km "$mountpoint" >/dev/null 2>&1 || true
+  fi
+
+  umount "$mountpoint" 2>/dev/null || true
+  teardown_cow
+  umount "$lower" 2>/dev/null || true
+  cryptsetup close "$mapper" 2>/dev/null || true
+  [[ -n $user_link ]] && rm -f "$user_link"
+
+  rmdir "$lower" 2>/dev/null || true
+  rm -f "$state" "$state.cowdev"
+  echo "Vault locked. Session changes discarded."
+}
+
+status() {
+  local img=""
+  img="$(find_container 2>/dev/null || true)"
+  if [[ -e /dev/mapper/$snap ]]; then
+    echo "unlocked"
+    [[ -f $state ]] && cat "$state"
+  elif [[ -n $img ]]; then
+    echo "locked ($img)"
+  else
+    echo "no vault"
+  fi
+}
+
+case "${1:-}" in
+  unlock) shift; unlock "$@" ;;
+  lock) shift; lock "$@" ;;
+  status) status ;;
+  ""|help|-h|--help)
+    cat <<USAGE
+Usage: kestrel vault <command>
+
+  unlock   Unlock and mount the vault, writable for this session only
+  lock     Unmount and discard session changes
+  status   Show whether the vault is locked or unlocked
+
+Configured by /etc/kestrel/vault.conf. Changes made while unlocked live in a
+copy-on-write store (compressed RAM by default) and never touch the encrypted
+container, so they are discarded on lock, reboot or removal.
+USAGE
+    ;;
+  *) die "unknown command: $1 (try: kestrel vault help)" ;;
+esac

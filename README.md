@@ -108,6 +108,7 @@ A post-transaction hook records a recovery snapshot after every upgrade (`defaul
 - [Kestrel on...](manual/49-kestrel-on.md)
 - [Dual Boot Install](manual/50-dual-boot-install.md)
 - [Unattended Installs](manual/51-unattended-installs.md)
+- [Portable vault](manual/52-portable-vault.md)
 
 ## License
 

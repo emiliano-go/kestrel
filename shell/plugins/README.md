@@ -37,6 +37,7 @@ User-installed plugins live alongside these conceptually but on disk under
 | Lock screen   | `kestrel.lock`            | `service`               | `lock/Service.qml`                    |
 | OSD           | `kestrel.osd`             | `panel`                 | `osd/Osd.qml`                         |
 | Polkit agent  | `kestrel.polkit`          | `service`               | `polkit/PolkitAgent.qml`              |
+| Portable vault | `kestrel.vault`          | `panel`                 | `vault/VaultPanel.qml`                |
 
 First-party bar-only widgets also carry manifests next to their QML files,
 e.g. `bar/widgets/Workspaces.manifest.json`. Rich popup widgets live in their
