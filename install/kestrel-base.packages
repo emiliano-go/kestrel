@@ -50,7 +50,6 @@ gum
 gvfs-mtp
 gvfs-nfs
 gvfs-smb
-hyprland
 hyprland-guiutils
 hyprpicker
 hyprsunset
@@ -103,7 +102,6 @@ qt6-imageformats
 qt6-multimedia
 qt6-svg
 qt6-wayland
-quickshell
 ripgrep
 ruby
 sddm
