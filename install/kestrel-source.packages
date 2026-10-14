@@ -6,3 +6,8 @@
 # installed into the live rootfs like any other package.
 trustsight=https://github.com/emiliano-go/trustsight
 linux-kestrel=https://github.com/kestrel-distro/kernel
+
+# Lean desktop builds. Same package names as Arch, with a higher pkgrel, so they
+# win over the stock packages in the build-time repository.
+hyprland=https://github.com/kestrel-distro/hyprland
+quickshell=https://github.com/kestrel-distro/quickshell
