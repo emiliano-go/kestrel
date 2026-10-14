@@ -7,7 +7,8 @@
 trustsight=https://github.com/emiliano-go/trustsight
 linux-kestrel=https://github.com/kestrel-distro/kernel
 
-# Lean desktop builds. Same package names as Arch, with a higher pkgrel, so they
-# win over the stock packages in the build-time repository.
+# Lean desktop builds. Distinct package names that conflict with the Arch
+# packages, so Arch cannot overwrite them; they are served by the Kestrel
+# [kestrel] repository after install.
 hyprland-kestrel=https://github.com/kestrel-distro/hyprland
 quickshell-kestrel=https://github.com/kestrel-distro/quickshell
