@@ -103,6 +103,7 @@ qt6-declarative
 qt6-imageformats
 qt6-multimedia
 qt6-svg
+qt6-wayland
 realtime-privileges
 ripgrep
 rtkit
