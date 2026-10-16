@@ -11,6 +11,7 @@ run_logged "$KESTREL_INSTALL/hardware/nvidia.sh"
 run_logged "$KESTREL_INSTALL/hardware/vulkan.sh"
 
 run_logged "$KESTREL_INSTALL/hardware/intel/video-acceleration.sh"
+run_logged "$KESTREL_INSTALL/hardware/amd/video-acceleration.sh"
 run_logged "$KESTREL_INSTALL/hardware/intel/lpmd.sh"
 run_logged "$KESTREL_INSTALL/hardware/intel/thermald.sh"
 run_logged "$KESTREL_INSTALL/hardware/intel/ipu7-camera.sh"

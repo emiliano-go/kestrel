@@ -4,6 +4,7 @@
 
 adwaita-cursors
 alsa-utils
+amd-ucode
 avahi
 base-devel
 bash-completion
@@ -58,6 +59,7 @@ imv
 inetutils
 inotify-tools
 inxi
+intel-ucode
 jq
 kdenlive
 kernel-modules-hook
@@ -102,7 +104,9 @@ qt6-imageformats
 qt6-multimedia
 qt6-svg
 qt6-wayland
+realtime-privileges
 ripgrep
+rtkit
 ruby
 sddm
 slurp

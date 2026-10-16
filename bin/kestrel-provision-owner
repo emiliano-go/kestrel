@@ -671,8 +671,10 @@ Timezone,${timezone:-UTC}" |
 
 # Groups recorded by kestrel-apply-system's scripts at install time
 # (/var/lib/kestrel/provisioning/groups), filtered to groups that exist on this system.
+# `realtime` is a safe default (rtprio/memlock limits only, no device access)
+# now that realtime-privileges ships in the base set.
 user_groups() {
-  local groups="wheel" group
+  local groups="wheel,realtime" group
   if [[ -f $PROVISIONING_DIR/groups ]]; then
     while IFS= read -r group; do
       [[ -n $group ]] || continue
