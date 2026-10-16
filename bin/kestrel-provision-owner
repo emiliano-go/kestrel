@@ -674,7 +674,13 @@ Timezone,${timezone:-UTC}" |
 # `realtime` is a safe default (rtprio/memlock limits only, no device access)
 # now that realtime-privileges ships in the base set.
 user_groups() {
-  local groups="wheel,realtime" group
+  # Defaults must pass the same getent filter as recorded groups: on systems
+  # predating realtime-privileges the group does not exist and useradd would
+  # fail outright.
+  local groups="" group
+  for group in wheel realtime; do
+    getent group "$group" >/dev/null && groups+="${groups:+,}$group"
+  done
   if [[ -f $PROVISIONING_DIR/groups ]]; then
     while IFS= read -r group; do
       [[ -n $group ]] || continue
@@ -688,7 +694,7 @@ user_groups() {
         continue
       fi
       getent group "$group" >/dev/null || continue
-      [[ ",$groups," == *",$group,"* ]] || groups+=",$group"
+      [[ ",$groups," == *",$group,"* ]] || groups+="${groups:+,}$group"
     done <"$PROVISIONING_DIR/groups"
   fi
   echo "$groups"
