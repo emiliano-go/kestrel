@@ -12,3 +12,14 @@ linux-kestrel=https://github.com/kestrel-distro/kernel
 # [kestrel] repository after install.
 hyprland-kestrel=https://github.com/kestrel-distro/hyprland
 quickshell-kestrel=https://github.com/kestrel-distro/quickshell
+
+# Matched desktop library closure (E2) and the explicit-sync Qt wayland
+# plugin (E4), all from kestrel-distro/desktop. Format name=url#subdir: the
+# builder looks for the PKGBUILD in the cloned repo at subdir.
+hyprutils-kestrel=https://github.com/kestrel-distro/desktop#packaging/hyprutils
+hyprlang-kestrel=https://github.com/kestrel-distro/desktop#packaging/hyprlang
+hyprgraphics-kestrel=https://github.com/kestrel-distro/desktop#packaging/hyprgraphics
+hyprcursor-kestrel=https://github.com/kestrel-distro/desktop#packaging/hyprcursor
+hyprwire-kestrel=https://github.com/kestrel-distro/desktop#packaging/hyprwire
+aquamarine-kestrel=https://github.com/kestrel-distro/desktop#packaging/aquamarine
+qt6-wayland-kestrel=https://github.com/kestrel-distro/desktop#packaging/qt6-wayland
